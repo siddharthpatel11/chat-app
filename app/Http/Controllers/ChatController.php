@@ -1,0 +1,120 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Kreait\Firebase\Factory;
+use Illuminate\Http\Request;
+use App\Events\MessageSent;
+
+class ChatController extends Controller
+{
+    public function index()
+    {
+        $users = \App\Models\User::where('id', '!=', auth()->id())->get();
+        return view('chat.index', compact('users'));
+    }
+
+
+    public function send(Request $request)
+    {
+        $factory = (new Factory)
+            ->withServiceAccount(storage_path('app/firebase.json'))
+            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+
+        $db = $factory->createDatabase();
+        $messaging = $factory->createMessaging();
+
+        $chatId = $request->chat_id;
+        $senderId = auth()->id() ?? 1;
+
+        $type = 'text';
+        $fileUrl = null;
+        $fileName = null;
+        $lat = null;
+        $lng = null;
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $mimeType = $file->getMimeType();
+
+            if (str_starts_with($mimeType, 'image/')) {
+                $type = 'image';
+            } elseif (str_starts_with($mimeType, 'video/')) {
+                $type = 'video';
+            } elseif (str_starts_with($mimeType, 'audio/')) {
+                $type = 'audio';
+            } else {
+                $type = 'document';
+            }
+
+            $fileName = $file->getClientOriginalName();
+            $path = $file->store('uploads', 'public');
+            $fileUrl = url('storage/' . $path);
+        }
+        if ($request->type === 'location' || $request->type === 'live_location') {
+            $type = $request->type;
+            $lat = $request->lat;
+            $lng = $request->lng;
+        }
+
+        $data = [
+            'sender_id' => $senderId,
+            'text' => $request->message ?? '',
+            'type' => $type,
+            'file_url' => $fileUrl,
+            'file_name' => $fileName,
+            'reply_to_id' => $request->reply_to_id ?? null,
+            'reply_to_text' => $request->reply_to_text ?? null,
+            'lat' => $lat,
+            'lng' => $lng,
+            'duration' => $request->duration ?? null,
+            'time' => now()->timestamp,
+            'status' => 'sent',
+        ];
+
+        // Push to Realtime Database
+        $db->getReference("chats/$chatId/messages")->push($data);
+
+        // Send FCM Notification to all other users with a token
+        $receivers = \App\Models\User::where('id', '!=', $senderId)
+            ->whereNotNull('fcm_token')
+            ->get();
+
+        foreach ($receivers as $user) {
+            $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $user->fcm_token)
+                ->withNotification(\Kreait\Firebase\Messaging\Notification::create('New Message', $request->message))
+                ->withData(['chat_id' => $chatId]);
+
+            try {
+                $messaging->send($message);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('FCM Send Error: ' . $e->getMessage());
+            }
+        }
+
+        return response()->json(['status' => true]);
+    }
+
+    public function saveToken(Request $request)
+    {
+        auth()->user()->update(['fcm_token' => $request->token]);
+        return response()->json(['status' => true]);
+    }
+
+    public function updateLiveLocation(Request $request)
+    {
+        $factory = (new Factory)
+            ->withServiceAccount(storage_path('app/firebase.json'))
+            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+
+        $db = $factory->createDatabase();
+
+        $db->getReference("live_locations/user_" . auth()->id())->set([
+            'lat' => $request->lat,
+            'lng' => $request->lng,
+            'time' => now()->timestamp
+        ]);
+
+        return response()->json(['status' => true]);
+    }
+}
