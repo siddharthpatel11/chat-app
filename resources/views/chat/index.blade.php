@@ -12,7 +12,8 @@
         </style>
     @endpush
 
-    <div class="flex w-full max-w-[1400px] h-[100vh] sm:h-[95vh] sm:py-4 sm:px-4 mx-auto overflow-hidden shadow-xl sm:rounded-xl">
+    <div
+        class="flex w-full max-w-[1400px] h-[100vh] sm:h-[95vh] sm:py-4 sm:px-4 mx-auto overflow-hidden shadow-xl sm:rounded-xl">
         <div class="flex w-full h-full bg-white sm:rounded-xl overflow-hidden border border-gray-200">
 
             @include('chat.sidebar')
@@ -264,10 +265,59 @@
                         </button>
                     </div>
 
-                    <div class="flex items-center gap-3 w-full">
+                    <div class="flex items-center gap-2 w-full relative">
+                        <!-- Emoji Picker Button -->
+                        <button type="button" id="emoji_toggle_btn" onclick="toggleEmojiPicker()"
+                            class="text-gray-500 hover:text-gray-700 p-2 focus:outline-none shrink-0 transition-colors">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                                <path
+                                    d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
+                                </path>
+                            </svg>
+                        </button>
+
+                        <!-- Emoji Picker Panel -->
+                        <div id="emoji_picker_container"
+                            class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px] sm:w-[350px]">
+                            <!-- The actual picker (Uses system dark/light mode automatically) -->
+                            <emoji-picker id="emoji_picker" class="w-full"
+                                style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
+
+                            <!-- Bottom Tabs Bar (WhatsApp Style) -->
+                            <div
+                                class="h-[50px] bg-gray-100 dark:bg-[#2a3942] border-t border-gray-200 dark:border-gray-700 flex items-center justify-center shrink-0">
+                                <!-- Emoji Tab (Active) -->
+                                <button
+                                    class="flex-1 flex justify-center py-2 h-full items-center relative transition-colors bg-gray-200 dark:bg-[#384b57]">
+                                    <svg viewBox="0 0 24 24" width="24" height="24"
+                                        class="text-gray-600 dark:text-gray-300" fill="currentColor">
+                                        <path
+                                            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
+                                        </path>
+                                    </svg>
+                                    <div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
+                                </button>
+                                <!-- GIF Tab -->
+                                <button
+                                    class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                                    <span class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
+                                </button>
+                                <!-- Sticker Tab -->
+                                <button
+                                    class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                                    <svg viewBox="0 0 24 24" width="24" height="24"
+                                        class="text-gray-500 dark:text-gray-400" fill="currentColor">
+                                        <path
+                                            d="M14.5 3h-5C6.46 3 4 5.46 4 8.5v7C4 18.54 6.46 21 9.5 21h4l6-6v-6.5C19.5 5.46 17.04 3 14.5 3zm-2.5 16h-2.5C7.57 19 6 17.43 6 15.5v-7C6 6.57 7.57 5 9.5 5h5C16.43 5 18 6.57 18 8.5v5.09l-4.5 4.5V19h-1.5zM17 14h-2.5c-.83 0-1.5.67-1.5 1.5V18l4-4z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
                         <input type="file" id="file_input" class="hidden">
-                        <div class="relative">
-                            <button type="button" onclick="toggleAttachMenu()"
+                        <div class="relative shrink-0">
+                            <button type="button" id="attach_toggle_btn" onclick="toggleAttachMenu()"
                                 class="text-gray-500 hover:text-gray-700 p-2 focus:outline-none">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -374,12 +424,23 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="text" id="msg" onkeypress="handleKeyPress(event)" placeholder="Type a message..."
-                            class="flex-1 bg-white border-none rounded-lg px-4 py-2 text-sm focus:ring-0 shadow-sm">
-                        <button onclick="send()"
-                            class="bg-green-500 hover:bg-green-600 text-white rounded-full p-2 shadow-sm">
-                            <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        <input type="text" id="msg" oninput="handleInputToggle()" onkeypress="handleKeyPress(event)"
+                            placeholder="Type a message"
+                            class="flex-1 bg-white border-none rounded-lg px-4 py-2 text-[15px] focus:ring-0 shadow-sm text-gray-800 placeholder-gray-500 min-h-[40px]">
+                        <button id="action_btn" onclick="handleActionBtn()"
+                            class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
+                            <!-- Mic SVG -->
+                            <svg id="mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path
+                                    d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
+                                </path>
+                            </svg>
+                            <!-- Send SVG -->
+                            <svg id="send_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                class="hidden ml-1">
+                                <path
+                                    d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
+                                </path>
                             </svg>
                         </button>
                     </div>
@@ -389,7 +450,127 @@
 
     </div>
 
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <script>
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emoji_picker_container');
+            picker.classList.toggle('hidden');
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function (event) {
+            const emojiPicker = document.getElementById('emoji_picker_container');
+            const emojiBtn = document.getElementById('emoji_toggle_btn');
+            if (emojiPicker && emojiBtn && !emojiPicker.classList.contains('hidden')) {
+                // emoji-picker component has shadow DOM which messes with contains() sometimes,
+                // so we use composedPath() to check if the click was inside the picker.
+                const path = event.composedPath();
+                if (!path.includes(emojiPicker) && !path.includes(emojiBtn)) {
+                    emojiPicker.classList.add('hidden');
+                }
+            }
+
+            const attachMenu = document.getElementById('attach_menu');
+            const attachBtn = document.getElementById('attach_toggle_btn');
+            if (attachMenu && attachBtn && !attachMenu.classList.contains('hidden')) {
+                const path = event.composedPath();
+                if (!path.includes(attachMenu) && !path.includes(attachBtn)) {
+                    attachMenu.classList.add('hidden');
+                }
+            }
+        });
+
+        document.getElementById('emoji_picker').addEventListener('emoji-click', event => {
+            const msgInput = document.getElementById('msg');
+            msgInput.value += event.detail.unicode;
+            msgInput.focus();
+            handleInputToggle();
+        });
+
+        let recognition = null;
+        let isRecording = false;
+
+        function handleInputToggle() {
+            const val = document.getElementById('msg').value.trim();
+            const micIcon = document.getElementById('mic_icon');
+            const sendIcon = document.getElementById('send_icon');
+            if (val.length > 0) {
+                micIcon.classList.add('hidden');
+                sendIcon.classList.remove('hidden');
+            } else {
+                micIcon.classList.remove('hidden');
+                sendIcon.classList.add('hidden');
+            }
+        }
+
+        function handleActionBtn() {
+            const val = document.getElementById('msg').value.trim();
+            if (val.length > 0) {
+                send();
+            } else {
+                toggleVoiceRecord();
+            }
+        }
+
+        function toggleVoiceRecord() {
+            if (isRecording) {
+                if (recognition) recognition.stop();
+                return;
+            }
+
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Voice typing is not supported in this browser.');
+                return;
+            }
+
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRec();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'gu-IN'; // Default to Gujarati/English
+
+            recognition.onstart = function () {
+                isRecording = true;
+                const btn = document.getElementById('action_btn');
+                btn.classList.replace('bg-[#00a884]', 'bg-red-500');
+                btn.classList.replace('hover:bg-[#008f6f]', 'hover:bg-red-600');
+                btn.classList.add('animate-pulse');
+            };
+
+            recognition.onresult = function (event) {
+                let finalTranscript = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                if (finalTranscript) {
+                    const msgInput = document.getElementById('msg');
+                    msgInput.value += (msgInput.value ? ' ' : '') + finalTranscript;
+                    handleInputToggle();
+                }
+            };
+
+            recognition.onerror = function (event) {
+                console.error('Speech recognition error', event.error);
+                stopVoiceRecord();
+            };
+
+            recognition.onend = function () {
+                stopVoiceRecord();
+            };
+
+            recognition.start();
+        }
+
+        function stopVoiceRecord() {
+            isRecording = false;
+            const btn = document.getElementById('action_btn');
+            btn.classList.replace('bg-red-500', 'bg-[#00a884]');
+            btn.classList.replace('hover:bg-red-600', 'hover:bg-[#008f6f]');
+            btn.classList.remove('animate-pulse');
+        }
+
         const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         window.myUserId = {{ auth()->id() ?? 1 }};
 
@@ -710,6 +891,7 @@
             document.getElementById('msg').value = "";
             clearFile();
             cancelReply();
+            if (typeof handleInputToggle === 'function') handleInputToggle();
 
             try {
                 await fetch('/send', {
@@ -820,7 +1002,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onChildAdded, remove, onChildRemoved } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onChildAdded, remove, onChildRemoved, onValue, onDisconnect, set, serverTimestamp, onChildChanged, update, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
         const firebaseConfig = {
@@ -840,10 +1022,86 @@
         window.currentChatId = null;
         let unsubscribeAdded = null;
         let unsubscribeRemoved = null;
+        let statusUnsubscribe = null;
+
+        // Firebase Presence System
+        if (window.myUserId !== '0') {
+            const connectedRef = ref(db, ".info/connected");
+            const myStatusRef = ref(db, `status/${window.myUserId}`);
+
+            onValue(connectedRef, (snap) => {
+                if (snap.val() === true) {
+                    onDisconnect(myStatusRef).set({
+                        state: 'offline',
+                        last_changed: serverTimestamp(),
+                    }).then(() => {
+                        set(myStatusRef, {
+                            state: 'online',
+                            last_changed: serverTimestamp(),
+                        });
+                    });
+                }
+            });
+
+            // Global Delivered Listener (for all users in sidebar)
+            const allUserIds = [
+                @foreach($users ?? [] as $u)
+                    {{ $u->id }},
+                @endforeach
+            ];
+
+            allUserIds.forEach(otherId => {
+                const minId = Math.min(window.myUserId, otherId);
+                const maxId = Math.max(window.myUserId, otherId);
+                const chatId = `chat_${minId}_${maxId}`;
+                const messagesRef = query(ref(db, 'chats/' + chatId + '/messages'), limitToLast(50));
+
+                onChildAdded(messagesRef, (snapshot) => {
+                    const data = snapshot.val();
+                    const key = snapshot.key;
+                    // If message is for me, and I am not currently looking at this chat, mark it as delivered
+                    if (data.sender_id != window.myUserId && data.status === 'sent') {
+                        if (window.currentChatId !== chatId) {
+                            update(ref(db, `chats/${chatId}/messages/${key}`), { status: 'delivered' });
+                        }
+                    }
+                });
+            });
+        }
+
+        // SVG Ticks Helper
+        window.getTickSVG = function (status) {
+            if (status === 'read') {
+                return `<svg viewBox="0 0 16 15" width="16" height="15" class="text-[#53bdeb]" fill="currentColor"><path d="M15,5.4L9.3,11.1l-1.3-1.4l5.7-5.7L15,5.4z M10.4,5.4L4.7,11.1L2,8.4L0.6,9.8l4.1,4.1l7.1-7.1L10.4,5.4z"></path></svg>`;
+            } else if (status === 'delivered') {
+                return `<svg viewBox="0 0 16 15" width="16" height="15" class="text-[#8696a0]" fill="currentColor"><path d="M15,5.4L9.3,11.1l-1.3-1.4l5.7-5.7L15,5.4z M10.4,5.4L4.7,11.1L2,8.4L0.6,9.8l4.1,4.1l7.1-7.1L10.4,5.4z"></path></svg>`;
+            } else {
+                return `<svg viewBox="0 0 16 11" width="16" height="11" class="text-[#8696a0]" fill="currentColor"><path d="M11.8,1.6L5.3,8.1L2.1,4.9l-1.5,1.5L5.3,11l8-8L11.8,1.6z"></path></svg>`;
+            }
+        };
+
+        window.getFileExt = function (filename) {
+            if (!filename) return 'DOC';
+            let parts = filename.split('.');
+            return parts.length > 1 ? parts.pop().toUpperCase().substring(0, 4) : 'DOC';
+        };
+
+        window.getFileColor = function (filename) {
+            const ext = window.getFileExt(filename).toLowerCase();
+            if (ext === 'pdf') return '#e53935';
+            if (ext.startsWith('doc')) return '#1e88e5';
+            if (ext.startsWith('xls') || ext === 'csv') return '#43a047';
+            if (ext.startsWith('ppt')) return '#fb8c00';
+            if (ext === 'zip' || ext === 'rar') return '#8e24aa';
+            if (ext === 'txt') return '#757575';
+            return '#607d8b';
+        };
 
         window.selectChat = function (otherUserId, name, phone) {
+            let unsubscribeChanged = null;
             if (unsubscribeAdded) unsubscribeAdded();
             if (unsubscribeRemoved) unsubscribeRemoved();
+            if (statusUnsubscribe) statusUnsubscribe();
 
             const myId = window.myUserId;
             const minId = Math.min(myId, otherUserId);
@@ -851,8 +1109,29 @@
             window.currentChatId = `chat_${minId}_${maxId}`;
 
             document.getElementById('active_chat_title').textContent = name ? name : phone;
-            document.getElementById('active_chat_subtitle').classList.remove('hidden');
+            document.getElementById('active_chat_subtitle').classList.add('hidden');
             document.getElementById('active_chat_avatar').innerHTML = `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(name ? name : phone)}&background=202c33&color=fff" class="w-full h-full object-cover">`;
+
+            // Listen to other user's status
+            const otherUserStatusRef = ref(db, `status/${otherUserId}`);
+            statusUnsubscribe = onValue(otherUserStatusRef, (snapshot) => {
+                const data = snapshot.val();
+                const subtitle = document.getElementById('active_chat_subtitle');
+                if (data && data.state === 'online') {
+                    subtitle.textContent = 'online';
+                    subtitle.classList.remove('hidden', 'text-gray-500');
+                    subtitle.classList.add('text-green-600');
+                } else {
+                    let text = 'offline';
+                    if (data && data.last_changed) {
+                        const date = new Date(data.last_changed);
+                        text = 'last seen ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+                    subtitle.textContent = text;
+                    subtitle.classList.remove('hidden', 'text-green-600');
+                    subtitle.classList.add('text-gray-500');
+                }
+            });
 
             document.getElementById('messages').innerHTML = '';
             window.globalMessages = {};
@@ -863,6 +1142,16 @@
                 const data = snapshot.val();
                 const key = snapshot.key;
                 window.globalMessages[key] = data; // store for reply/forward
+
+                // If message is from other user and not read, mark it as read since chat is open
+                if (data.sender_id != window.myUserId && data.status !== 'read') {
+                    if (document.visibilityState === 'visible') {
+                        update(ref(db, `chats/${window.currentChatId}/messages/${key}`), { status: 'read' });
+                    } else if (data.status === 'sent') {
+                        // Chat is selected but tab is hidden, so it's delivered
+                        update(ref(db, `chats/${window.currentChatId}/messages/${key}`), { status: 'delivered' });
+                    }
+                }
 
                 const isMe = data.sender_id == window.myUserId;
                 const time = new Date(data.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -876,10 +1165,26 @@
                     mediaContent = `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;
                 } else if (data.type === 'document' && data.file_url) {
                     mediaContent = `
-                        <a href="${data.file_url}" target="_blank" class="flex items-center gap-2 p-2 bg-gray-50 rounded mb-2 hover:bg-gray-100 transition-colors border border-gray-200">
-                            <svg class="w-6 h-6 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                            <span class="text-sm text-blue-600 truncate max-w-[150px]" title="${data.file_name}">${data.file_name || 'Download File'}</span>
-                        </a>`;
+                        <div class="relative rounded-lg overflow-hidden border border-black/10 bg-black/5 mb-1 cursor-pointer hover:bg-black/10 transition-colors w-[260px] sm:w-[280px]" onclick="window.open('${data.file_url}', '_blank')">
+                            <div class="h-[140px] bg-white flex flex-col items-center justify-center border-b border-black/5 relative">
+                                <div class="w-[80px] h-[100px] bg-white border border-gray-200 rounded shadow-sm flex flex-col p-3 gap-2">
+                                    <div class="w-full h-1.5 bg-gray-200 rounded-full"></div>
+                                    <div class="w-5/6 h-1.5 bg-gray-200 rounded-full"></div>
+                                    <div class="w-full h-1.5 bg-gray-200 rounded-full"></div>
+                                    <div class="w-3/4 h-1.5 bg-gray-200 rounded-full"></div>
+                                    <div class="w-1/2 h-1.5 bg-gray-200 rounded-full mt-auto"></div>
+                                </div>
+                            </div>
+                            <div class="p-3 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded flex items-center justify-center shrink-0 text-[11px] font-bold text-white shadow-sm" style="background-color: ${window.getFileColor(data.file_name)}">
+                                    ${window.getFileExt(data.file_name)}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-[15px] font-medium text-gray-800 truncate leading-tight">${data.file_name || 'Document'}</div>
+                                    <div class="text-[12px] text-gray-500 mt-1 truncate">${window.getFileExt(data.file_name)} Document</div>
+                                </div>
+                            </div>
+                        </div>`;
                 } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data.lng) {
                     const lat = parseFloat(data.lat);
                     const lng = parseFloat(data.lng);
@@ -963,7 +1268,10 @@
                             ${mediaContent}
                             <div class="flex items-end gap-3 text-right justify-between w-full min-w-0 pr-4 mt-1">
                                 ${data.text ? `<span class="text-[15px] text-gray-900 break-words flex-1 text-left">${data.text}</span>` : '<div></div>'}
-                                <span class="text-[10px] text-gray-500 whitespace-nowrap self-end leading-none">${time}</span>
+                                <div class="flex items-center gap-1 self-end leading-none">
+                                    <span class="text-[10px] text-gray-500 whitespace-nowrap">${time}</span>
+                                    ${isMe ? `<span id="tick_${key}" class="shrink-0 flex items-center justify-center">${window.getTickSVG(data.status || 'sent')}</span>` : ''}
+                                </div>
                             </div>
                         </div>
                     </div>`;
@@ -977,7 +1285,33 @@
                 if (msgEl) msgEl.remove();
                 delete window.globalMessages[key];
             });
+
+            unsubscribeChanged = onChildChanged(messagesRef, (snapshot) => {
+                const data = snapshot.val();
+                const key = snapshot.key;
+                window.globalMessages[key] = data;
+
+                const isMe = data.sender_id == window.myUserId;
+                if (isMe) {
+                    const tickEl = document.getElementById('tick_' + key);
+                    if (tickEl) {
+                        tickEl.innerHTML = window.getTickSVG(data.status || 'sent');
+                    }
+                }
+            });
         };
+
+        // Handle Tab Visibility (Mark as read when returning to tab)
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === 'visible' && window.currentChatId) {
+                for (let key in window.globalMessages) {
+                    let msg = window.globalMessages[key];
+                    if (msg.sender_id != window.myUserId && msg.status !== 'read') {
+                        update(ref(db, `chats/${window.currentChatId}/messages/${key}`), { status: 'read' });
+                    }
+                }
+            }
+        });
 
         // Handle Notifications Permissions and Token
         async function requestPermission() {
@@ -1122,10 +1456,26 @@
                 mediaContent = `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;
             } else if (data.type === 'document' && data.file_url) {
                 mediaContent = `
-                    <a href="${data.file_url}" target="_blank" class="flex items-center gap-2 p-2 bg-gray-50 rounded mb-2 hover:bg-gray-100 transition-colors border border-gray-200">
-                        <svg class="w-6 h-6 text-gray-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                        <span class="text-sm text-blue-600 truncate max-w-[150px]" title="${data.file_name}">${data.file_name || 'Download File'}</span>
-                    </a>`;
+                    <div class="relative rounded-lg overflow-hidden border border-black/10 bg-black/5 mb-1 cursor-pointer hover:bg-black/10 transition-colors w-[260px] sm:w-[280px]" onclick="window.open('${data.file_url}', '_blank')">
+                        <div class="h-[140px] bg-white flex flex-col items-center justify-center border-b border-black/5 relative">
+                            <div class="w-[80px] h-[100px] bg-white border border-gray-200 rounded shadow-sm flex flex-col p-3 gap-2">
+                                <div class="w-full h-1.5 bg-gray-200 rounded-full"></div>
+                                <div class="w-5/6 h-1.5 bg-gray-200 rounded-full"></div>
+                                <div class="w-full h-1.5 bg-gray-200 rounded-full"></div>
+                                <div class="w-3/4 h-1.5 bg-gray-200 rounded-full"></div>
+                                <div class="w-1/2 h-1.5 bg-gray-200 rounded-full mt-auto"></div>
+                            </div>
+                        </div>
+                        <div class="p-3 flex items-center gap-3">
+                            <div class="w-10 h-10 rounded flex items-center justify-center shrink-0 text-[11px] font-bold text-white shadow-sm" style="background-color: ${window.getFileColor(data.file_name)}">
+                                ${window.getFileExt(data.file_name)}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[15px] font-medium text-gray-800 truncate leading-tight">${data.file_name || 'Document'}</div>
+                                <div class="text-[12px] text-gray-500 mt-1 truncate">${window.getFileExt(data.file_name)} Document</div>
+                            </div>
+                        </div>
+                    </div>`;
             } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data.lng) {
                 const lat = parseFloat(data.lat);
                 const lng = parseFloat(data.lng);
