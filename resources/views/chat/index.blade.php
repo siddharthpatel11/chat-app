@@ -424,9 +424,87 @@
                                 </div>
                             </div>
                         </div>
-                        <input type="text" id="msg" oninput="handleInputToggle()" onkeypress="handleKeyPress(event)"
-                            placeholder="Type a message"
-                            class="flex-1 bg-white border-none rounded-lg px-4 py-2 text-[15px] focus:ring-0 shadow-sm text-gray-800 placeholder-gray-500 min-h-[40px]">
+                        <!-- Input Area Container -->
+                        <div id="input_area_container"
+                            class="flex-1 relative flex items-center bg-white rounded-lg shadow-sm">
+
+                            <!-- State 1: Normal Text Input -->
+                            <div id="text_input_state" class="w-full relative flex items-center">
+                                <input type="text" id="msg" oninput="handleInputToggle()"
+                                    onkeypress="handleKeyPress(event)" placeholder="Type a message"
+                                    class="w-full bg-transparent border-none rounded-lg pl-4 pr-10 py-2 text-[15px] focus:ring-0 text-gray-800 placeholder-gray-500 min-h-[40px]">
+                                <!-- INSIDE MIC (Voice-to-Text) -->
+                                <button type="button" id="inside_mic_btn" onclick="toggleVoiceRecord()"
+                                    class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                        <path
+                                            d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- State 2: Voice Note Recording UI -->
+                            <div id="audio_recording_state"
+                                class="hidden w-full items-center justify-between px-3 h-[40px]">
+                                <button type="button" onclick="cancelVoiceNote()"
+                                    class="text-gray-500 hover:text-red-500 focus:outline-none transition-colors">
+                                    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                        <path
+                                            d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
+                                    <span id="audio_timer" class="text-[15px] font-medium text-gray-700">0:00</span>
+                                </div>
+                                <div class="flex-1 mx-3 flex items-center h-full overflow-hidden">
+                                    <!-- Animated Waveform SVG -->
+                                    <div
+                                        class="flex items-center gap-[3px] h-4 w-full opacity-60 justify-end overflow-hidden">
+                                        <!-- Animated Bars -->
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_0.8s_ease-in-out_infinite_0.4s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_0.9s_ease-in-out_infinite_0.5s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.3s_ease-in-out_infinite_0.3s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_1s_ease-in-out_infinite_0.7s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.4s_ease-in-out_infinite_0.2s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_0.8s_ease-in-out_infinite_0.6s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_1s_ease-in-out_infinite]">
+                                        </div>
+                                        <div
+                                            class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1.2s_ease-in-out_infinite_0.4s]">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <button id="action_btn" onclick="handleActionBtn()"
                             class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
                             <!-- Mic SVG -->
@@ -488,18 +566,28 @@
         });
 
         let recognition = null;
-        let isRecording = false;
+        let isRecordingSpeechText = false;
+
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let voiceNoteTimerInterval = null;
+        let voiceNoteSeconds = 0;
+        let isRecordingVoiceNote = false;
 
         function handleInputToggle() {
             const val = document.getElementById('msg').value.trim();
             const micIcon = document.getElementById('mic_icon');
             const sendIcon = document.getElementById('send_icon');
+            const insideMicBtn = document.getElementById('inside_mic_btn');
+
             if (val.length > 0) {
                 micIcon.classList.add('hidden');
                 sendIcon.classList.remove('hidden');
+                if (insideMicBtn) insideMicBtn.classList.add('hidden');
             } else {
                 micIcon.classList.remove('hidden');
                 sendIcon.classList.add('hidden');
+                if (insideMicBtn) insideMicBtn.classList.remove('hidden');
             }
         }
 
@@ -508,12 +596,120 @@
             if (val.length > 0) {
                 send();
             } else {
-                toggleVoiceRecord();
+                if (isRecordingVoiceNote) {
+                    stopAndSendVoiceNote();
+                } else {
+                    startVoiceNote();
+                }
             }
         }
 
+        // --- VOICE NOTE (AUDIO RECORDING) LOGIC ---
+        async function startVoiceNote() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorder.start();
+                isRecordingVoiceNote = true;
+
+                // Update UI to Audio Recording State
+                document.getElementById('text_input_state').classList.add('hidden');
+                document.getElementById('audio_recording_state').classList.remove('hidden');
+                document.getElementById('audio_recording_state').classList.add('flex');
+
+                // Switch outside action button to Send immediately while recording
+                document.getElementById('mic_icon').classList.add('hidden');
+                document.getElementById('send_icon').classList.remove('hidden');
+
+                // Timer
+                voiceNoteSeconds = 0;
+                document.getElementById('audio_timer').innerText = '0:00';
+                voiceNoteTimerInterval = setInterval(() => {
+                    voiceNoteSeconds++;
+                    const mins = Math.floor(voiceNoteSeconds / 60);
+                    const secs = voiceNoteSeconds % 60;
+                    document.getElementById('audio_timer').innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+
+            } catch (err) {
+                console.error("Error accessing microphone:", err);
+                alert("Microphone access is required to send voice messages.");
+            }
+        }
+
+        function cancelVoiceNote() {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.stop();
+            }
+            audioChunks = [];
+            resetVoiceNoteUI();
+        }
+
+        function stopAndSendVoiceNote() {
+            if (mediaRecorder && mediaRecorder.state !== "inactive") {
+                mediaRecorder.addEventListener("stop", () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    sendVoiceNoteBlob(audioBlob);
+                    audioChunks = [];
+                });
+                mediaRecorder.stop();
+            }
+            resetVoiceNoteUI();
+        }
+
+        function resetVoiceNoteUI() {
+            isRecordingVoiceNote = false;
+            clearInterval(voiceNoteTimerInterval);
+
+            document.getElementById('audio_recording_state').classList.add('hidden');
+            document.getElementById('audio_recording_state').classList.remove('flex');
+            document.getElementById('text_input_state').classList.remove('hidden');
+
+            handleInputToggle(); // Restores outside button based on text
+        }
+
+        function sendVoiceNoteBlob(blob) {
+            if (!window.currentChatId) {
+                alert('Please select a chat first.');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('file', blob, 'voice_message.webm');
+            formData.append('chat_id', window.currentChatId);
+            formData.append('type', 'audio');
+            formData.append('duration', voiceNoteSeconds);
+
+            if (window.replyingToKey && window.globalMessages[window.replyingToKey]) {
+                formData.append('reply_to_id', window.replyingToKey);
+                formData.append('reply_to_text', window.globalMessages[window.replyingToKey].text || 'Voice Message');
+            }
+
+            fetch('/send', {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrf },
+                body: formData
+            }).then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                cancelReply();
+            }).catch(err => {
+                console.error("Error sending voice note", err);
+                alert("Failed to send voice note.");
+            });
+        }
+
+        // --- SPEECH-TO-TEXT LOGIC (INSIDE MIC) ---
         function toggleVoiceRecord() {
-            if (isRecording) {
+            if (isRecordingSpeechText) {
                 if (recognition) recognition.stop();
                 return;
             }
@@ -527,14 +723,15 @@
             recognition = new SpeechRec();
             recognition.continuous = false;
             recognition.interimResults = true;
-            recognition.lang = 'gu-IN'; // Default to Gujarati/English
+            recognition.lang = 'gu-IN';
 
             recognition.onstart = function () {
-                isRecording = true;
-                const btn = document.getElementById('action_btn');
-                btn.classList.replace('bg-[#00a884]', 'bg-red-500');
-                btn.classList.replace('hover:bg-[#008f6f]', 'hover:bg-red-600');
-                btn.classList.add('animate-pulse');
+                isRecordingSpeechText = true;
+                const insideMicBtn = document.getElementById('inside_mic_btn');
+                if (insideMicBtn) {
+                    insideMicBtn.classList.replace('text-gray-400', 'text-red-500');
+                    insideMicBtn.classList.add('animate-pulse');
+                }
             };
 
             recognition.onresult = function (event) {
@@ -553,22 +750,23 @@
 
             recognition.onerror = function (event) {
                 console.error('Speech recognition error', event.error);
-                stopVoiceRecord();
+                stopSpeechToText();
             };
 
             recognition.onend = function () {
-                stopVoiceRecord();
+                stopSpeechToText();
             };
 
             recognition.start();
         }
 
-        function stopVoiceRecord() {
-            isRecording = false;
-            const btn = document.getElementById('action_btn');
-            btn.classList.replace('bg-red-500', 'bg-[#00a884]');
-            btn.classList.replace('hover:bg-red-600', 'hover:bg-[#008f6f]');
-            btn.classList.remove('animate-pulse');
+        function stopSpeechToText() {
+            isRecordingSpeechText = false;
+            const insideMicBtn = document.getElementById('inside_mic_btn');
+            if (insideMicBtn) {
+                insideMicBtn.classList.replace('text-red-500', 'text-gray-400');
+                insideMicBtn.classList.remove('animate-pulse');
+            }
         }
 
         const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
