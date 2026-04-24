@@ -9,11 +9,34 @@
                 background-image: url('https://w0.peakpx.com/wallpaper/508/871/HD-wallpaper-whatsapp-background-theme-pattern.jpg');
                 background-blend-mode: multiply;
             }
+
+            /* Toast Animations */
+            @keyframes slide-in {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+
+            .toast-enter {
+                animation: slide-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            }
         </style>
     @endpush
 
     <div
         class="flex w-full max-w-[1400px] h-[100vh] sm:h-[95vh] sm:py-4 sm:px-4 mx-auto overflow-hidden shadow-xl sm:rounded-xl">
+
+        <!-- Toast Container -->
+        <div id="toast_container"
+            class="fixed top-6 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-3 pointer-events-none w-full max-w-sm px-4">
+        </div>
+
         <div class="flex w-full h-full bg-white sm:rounded-xl overflow-hidden border border-gray-200">
 
             @include('chat.sidebar')
@@ -1196,6 +1219,41 @@
                 if (bubbleEl) bubbleEl.style.zIndex = '';
             }
         };
+
+        window.showToast = function (title, body, otherUserId = null, otherName = null) {
+            const container = document.getElementById('toast_container');
+            const id = Date.now();
+            const clickAttr = (otherUserId && otherName) ? `onclick="window.selectChat('${otherUserId}', '${otherName.replace(/'/g, "\\'")}', ''); this.remove();"` : '';
+
+            const html = `
+                <div id="toast_${id}" ${clickAttr} class="toast-enter bg-white border border-gray-100 rounded-2xl shadow-2xl p-4 flex gap-4 w-full pointer-events-auto cursor-pointer hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.98] transition-all border-l-4 border-l-green-500">
+                    <div class="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-[15px] font-bold text-gray-900 truncate">${title}</div>
+                        <div class="text-[13px] text-gray-500 mt-0.5 line-clamp-2">${body}</div>
+                    </div>
+                    <button onclick="event.stopPropagation(); this.parentElement.remove()" class="text-gray-400 hover:text-gray-600 focus:outline-none self-start">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>`;
+
+            container.insertAdjacentHTML('afterbegin', html);
+            const toast = document.getElementById(`toast_${id}`);
+
+            // Play a subtle sound if possible
+            try { new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3').play(); } catch (e) { }
+
+            // Auto remove after 8 seconds
+            setTimeout(() => {
+                if (toast) {
+                    toast.style.transform = 'translateX(120%)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 400);
+                }
+            }, 8000);
+        };
     </script>
 
     <script type="module">
@@ -1257,10 +1315,32 @@
                 onChildAdded(messagesRef, (snapshot) => {
                     const data = snapshot.val();
                     const key = snapshot.key;
+
+                    // Update Sidebar Content Preview & Time
+                    const lastMsgEl = document.getElementById(`last_msg_${otherId}`);
+                    const lastTimeEl = document.getElementById(`last_time_${otherId}`);
+                    if (lastMsgEl) {
+                        let text = data.text ? data.text : (data.type ? data.type.charAt(0).toUpperCase() + data.type.slice(1) : 'Media');
+                        lastMsgEl.textContent = text;
+                    }
+                    if (lastTimeEl) {
+                        const date = new Date(data.time * 1000);
+                        lastTimeEl.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    }
+
                     // If message is for me, and I am not currently looking at this chat, mark it as delivered
                     if (data.sender_id != window.myUserId && data.status === 'sent') {
                         if (window.currentChatId !== chatId) {
                             update(ref(db, `chats/${chatId}/messages/${key}`), { status: 'delivered' });
+
+                            // Increment Unread Badge
+                            const badge = document.getElementById(`unread_badge_${otherId}`);
+                            if (badge) {
+                                let count = parseInt(badge.textContent) || 0;
+                                badge.textContent = count + 1;
+                                badge.classList.remove('hidden');
+                                badge.classList.add('flex');
+                            }
                         }
                     }
                 });
@@ -1276,6 +1356,30 @@
             } else {
                 return `<svg viewBox="0 0 16 11" width="16" height="11" class="text-[#8696a0]" fill="currentColor"><path d="M11.8,1.6L5.3,8.1L2.1,4.9l-1.5,1.5L5.3,11l8-8L11.8,1.6z"></path></svg>`;
             }
+        };
+
+        window.getDateHeader = function (timestamp) {
+            const date = new Date(timestamp * 1000);
+            const today = new Date();
+            const yesterday = new Date();
+            yesterday.setDate(today.getDate() - 1);
+
+            const isSameDay = (d1, d2) =>
+                d1.getDate() === d2.getDate() &&
+                d1.getMonth() === d2.getMonth() &&
+                d1.getFullYear() === d2.getFullYear();
+
+            if (isSameDay(date, today)) return "Today";
+            if (isSameDay(date, yesterday)) return "Yesterday";
+
+            const diffTime = Math.abs(today - date);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 7) {
+                return date.toLocaleDateString([], { weekday: 'long' });
+            }
+
+            return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
         };
 
         window.getFileExt = function (filename) {
@@ -1297,6 +1401,7 @@
 
         window.selectChat = function (otherUserId, name, phone) {
             let unsubscribeChanged = null;
+            let lastDateString = null;
             if (unsubscribeAdded) unsubscribeAdded();
             if (unsubscribeRemoved) unsubscribeRemoved();
             if (statusUnsubscribe) statusUnsubscribe();
@@ -1309,6 +1414,14 @@
             document.getElementById('active_chat_title').textContent = name ? name : phone;
             document.getElementById('active_chat_subtitle').classList.add('hidden');
             document.getElementById('active_chat_avatar').innerHTML = `<img src="https://ui-avatars.com/api/?name=${encodeURIComponent(name ? name : phone)}&background=202c33&color=fff" class="w-full h-full object-cover">`;
+
+            // Reset Unread Badge for this user
+            const badge = document.getElementById(`unread_badge_${otherUserId}`);
+            if (badge) {
+                badge.textContent = '0';
+                badge.classList.add('hidden');
+                badge.classList.remove('flex');
+            }
 
             // Listen to other user's status
             const otherUserStatusRef = ref(db, `status/${otherUserId}`);
@@ -1340,6 +1453,19 @@
                 const data = snapshot.val();
                 const key = snapshot.key;
                 window.globalMessages[key] = data; // store for reply/forward
+
+                // Date Header Logic
+                const dateHeader = window.getDateHeader(data.time);
+                if (dateHeader !== lastDateString) {
+                    lastDateString = dateHeader;
+                    const headerHtml = `
+                        <div class="flex justify-center my-3 sticky top-0 z-[5]">
+                            <div class="bg-[#d1d7db]/90 backdrop-blur-sm text-[#54656f] text-[11px] px-3 py-1 rounded-lg shadow-sm font-semibold uppercase tracking-wider">
+                                ${dateHeader}
+                            </div>
+                        </div>`;
+                    document.getElementById('messages').insertAdjacentHTML('beforeend', headerHtml);
+                }
 
                 // If message is from other user and not read, mark it as read since chat is open
                 if (data.sender_id != window.myUserId && data.status !== 'read') {
@@ -1548,7 +1674,31 @@
         // Handle Foreground Messages
         onMessage(messaging, (payload) => {
             console.log('Message received. ', payload);
-            alert(`New Notification: ${payload.notification.title}\n${payload.notification.body}`);
+
+            // 1. If I am the sender, don't show notification
+            if (payload.data && payload.data.sender_id == window.myUserId) {
+                return;
+            }
+
+            // 2. If I am already looking at this chat, don't show notification
+            if (payload.data && payload.data.chat_id == window.currentChatId) {
+                return;
+            }
+
+            const { title, body } = payload.notification;
+            const senderId = payload.data ? payload.data.sender_id : null;
+            const senderName = payload.data ? payload.data.sender_name : 'Someone';
+
+            // Use the custom showToast instead of alert
+            window.showToast(title, body, senderId, senderName);
+
+            // Also trigger standard browser notification if permission granted and tab is hidden
+            if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
+                new Notification(title, {
+                    body: body,
+                    icon: 'https://cdn-icons-png.flaticon.com/512/733/733585.png' // WhatsApp icon
+                });
+            }
         });
 
         // Selection Logic

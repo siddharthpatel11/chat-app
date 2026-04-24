@@ -80,10 +80,33 @@ class ChatController extends Controller
             ->whereNotNull('fcm_token')
             ->get();
 
+        $senderName = auth()->user()->name ?? 'Someone';
+        $notificationBody = $request->message ?? '';
+
+        if ($type === 'image') {
+            $notificationBody = '📷 Photo' . ($request->message ? ': ' . $request->message : '');
+        } elseif ($type === 'video') {
+            $notificationBody = '🎥 Video' . ($request->message ? ': ' . $request->message : '');
+        } elseif ($type === 'audio') {
+            $notificationBody = '🎤 Audio message';
+        } elseif ($type === 'document') {
+            $notificationBody = '📄 Document: ' . ($fileName ?? 'File');
+        } elseif ($type === 'location') {
+            $notificationBody = '📍 Location';
+        } elseif ($type === 'live_location') {
+            $notificationBody = '📍 Live Location';
+        }
+
         foreach ($receivers as $user) {
             $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $user->fcm_token)
-                ->withNotification(\Kreait\Firebase\Messaging\Notification::create('New Message', $request->message))
-                ->withData(['chat_id' => $chatId]);
+                ->withNotification(\Kreait\Firebase\Messaging\Notification::create($senderName, $notificationBody))
+                ->withData([
+                    'chat_id' => $chatId,
+                    'type' => $type,
+                    'sender_name' => $senderName,
+                    'sender_id' => (string)$senderId,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK' // For mobile apps if any
+                ]);
 
             try {
                 $messaging->send($message);
