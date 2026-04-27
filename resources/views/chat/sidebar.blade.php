@@ -17,7 +17,8 @@
                     d="M15.009 13.805h-.636l-.22-.219a5.184 5.184 0 0 0 1.256-3.386 5.207 5.207 0 1 0-5.207 5.208 5.183 5.183 0 0 0 3.385-1.255l.221.22v.635l4.004 3.999 1.194-1.195-3.997-4.007zm-4.6-1.598a3.608 3.608 0 1 1 0-7.216 3.608 3.608 0 0 1 0 7.216z">
                 </path>
             </svg>
-            <input type="text" placeholder="Search or start new chat"
+            <input type="text" id="sidebar_search" oninput="window.filterSidebar()"
+                placeholder="Search or start new chat"
                 class="bg-transparent border-none focus:ring-0 w-full text-sm ml-2 text-[#d1d7db] placeholder-[#8696a0]">
         </div>
     </div>

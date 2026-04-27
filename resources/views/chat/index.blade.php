@@ -1220,6 +1220,19 @@
             }
         };
 
+        window.filterSidebar = function () {
+            const query = document.getElementById('sidebar_search').value.toLowerCase();
+            const users = document.querySelectorAll('[id^="user_sidebar_"]');
+            users.forEach(user => {
+                const name = user.querySelector('h4').textContent.toLowerCase();
+                if (name.includes(query)) {
+                    user.style.display = '';
+                } else {
+                    user.style.display = 'none';
+                }
+            });
+        };
+
         window.showToast = function (title, body, otherUserId = null, otherName = null) {
             const container = document.getElementById('toast_container');
             const id = Date.now();
@@ -1323,7 +1336,7 @@
                         let text = data.text ? data.text : (data.type ? data.type.charAt(0).toUpperCase() + data.type.slice(1) : 'Media');
                         lastMsgEl.textContent = text;
                     }
-                    if (lastTimeEl) {
+                    if (lastTimeEl && data.time) {
                         const date = new Date(data.time * 1000);
                         lastTimeEl.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     }
@@ -1640,32 +1653,37 @@
         // Handle Notifications Permissions and Token
         async function requestPermission() {
             console.log('Requesting permission...');
+
+            if (Notification.permission === 'denied') {
+                window.showToast('Notifications Blocked', 'Please enable notifications in your browser settings to receive messages.');
+                return;
+            }
+
             const permission = await Notification.requestPermission();
             if (permission === 'granted') {
                 console.log('Notification permission granted.');
 
                 try {
                     // Get FCM Token
-                    // NOTE: If you have a VAPID key, use it here: { vapidKey: '...' }
+                    // NOTE: For production, you should add your VAPID key here: { vapidKey: '...' }
                     const currentToken = await getToken(messaging);
                     if (currentToken) {
                         console.log('FCM Token:', currentToken);
                         // Save token to server
-                        const response = await fetch('/save-token', {
+                        await fetch('/save-token', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
                             body: JSON.stringify({ token: currentToken })
                         });
-                        const result = await response.json();
-                        console.log('Token save response:', result);
                     } else {
                         console.warn('No registration token available. Request permission to generate one.');
                     }
                 } catch (err) {
                     console.error('An error occurred while retrieving token. ', err);
                 }
-            } else {
+            } else if (permission === 'denied') {
                 console.warn('Unable to get permission to notify.');
+                window.showToast('Permission Denied', 'You will not receive notifications until you allow them in your browser.');
             }
         }
 
