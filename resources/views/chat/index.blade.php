@@ -29,16 +29,21 @@
         </style>
     @endpush
 
-    <div
-        class="flex w-full max-w-[1400px] h-[100vh] sm:h-[95vh] sm:py-4 sm:px-4 mx-auto overflow-hidden shadow-xl sm:rounded-xl">
+    <div class="flex w-full h-[100vh] mx-auto overflow-hidden shadow-xl">
 
         <!-- Toast Container -->
         <div id="toast_container"
             class="fixed top-6 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-3 pointer-events-none w-full max-w-sm px-4">
         </div>
 
-        <div class="flex w-full h-full bg-white sm:rounded-xl overflow-hidden border border-gray-200">
+        <div class="flex w-full h-full bg-[#111b21] overflow-hidden border-none">
 
+            @include('chat.nav_sidebar')
+            @include('chat.profile_settings')
+            @include('chat.edit_profile')
+            @include('chat.about_modal')
+            @include('chat.about_privacy_modal')
+            @include('chat.contact_info')
             @include('chat.sidebar')
 
 
@@ -223,480 +228,555 @@
             </div>
 
             <div class="flex-1 flex h-full overflow-hidden relative">
-                <div class="flex flex-col flex-1 h-full relative transition-all duration-300">
-                    <div
-                        class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-10 relative">
-                        <!-- Normal Header -->
-                        <div id="normal_header"
-                            class="flex items-center justify-between h-full w-full transition-all duration-300">
-                            <div class="flex items-center gap-4">
-                                <div id="active_chat_avatar"
-                                    class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm overflow-hidden transition-transform hover:scale-105 cursor-pointer">
-                                    <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
-                                        </path>
+                @include('chat.settings_shortcuts')
+                <div id="main_chat_column" class="flex flex-col flex-1 h-full relative transition-all duration-300">
+                    <!-- Empty State -->
+                    <div id="chat_empty_state"
+                        class="flex-1 flex flex-col items-center justify-center bg-[#0b141a] text-center px-4 z-20">
+                        <div class="flex gap-14 mb-8">
+                            <!-- Send Document -->
+                            <div class="flex flex-col items-center gap-4 group cursor-pointer"
+                                onclick="selectFile('.pdf,.doc,.docx')">
+                                <div
+                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#8696a0] group-hover:bg-[#2a3942] transition-all duration-300">
+                                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor"
+                                        stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M9 12h6m-6 3h6m-6 3h6" />
                                     </svg>
                                 </div>
-                                <div class="cursor-pointer">
-                                    <h2 id="active_chat_title"
-                                        class="text-[15px] font-semibold text-[#e9edef] leading-tight">Select a chat
-                                    </h2>
-                                    <p id="active_chat_subtitle" class="text-xs text-[#00a884] font-medium hidden">
-                                        online</p>
-                                </div>
+                                <span class="text-[#8696a0] text-[13px] font-normal">Send document</span>
                             </div>
-
-                            <!-- Header Actions -->
-                            <div class="flex items-center gap-2 sm:gap-4">
-                                <!-- Call Button Pill -->
-                                <div class="relative">
-                                    <button id="call_btn_pill"
-                                        class="hidden sm:flex items-center gap-2.5 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] px-4 py-2 rounded-full cursor-pointer transition-all duration-200 border border-transparent hover:border-[#313d45] group focus:outline-none">
+                            <!-- Add Contact -->
+                            <div class="flex flex-col items-center gap-4 group cursor-pointer"
+                                onclick="window.focusSearch()">
+                                <div
+                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#8696a0] group-hover:bg-[#2a3942] transition-all duration-300">
+                                    <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor"
+                                        stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
+                                    </svg>
+                                </div>
+                                <span class="text-[#8696a0] text-[13px] font-normal">Add contact</span>
+                            </div>
+                            <!-- Ask Meta AI -->
+                            <div class="flex flex-col items-center gap-4 group cursor-pointer">
+                                <div
+                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#d33682] group-hover:bg-[#2a3942] transition-all duration-300">
+                                    <div class="relative w-10 h-10 flex items-center justify-center">
+                                        <div class="absolute inset-0 border-2 border-current rounded-full opacity-40">
+                                        </div>
+                                        <div class="w-5 h-5 border-2 border-current rounded-full"></div>
+                                        <!-- Dots -->
                                         <div
-                                            class="flex items-center gap-2 border-r border-[#313d45] pr-2 group-hover:border-[#8696a0]">
-                                            <svg class="w-5 h-5 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
-                                                </path>
-                                            </svg>
-                                            <span class="text-sm font-semibold">Call</span>
+                                            class="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-current rounded-full">
                                         </div>
-                                        <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 9l-7 7-7-7"></path>
-                                        </svg>
-                                    </button>
-
-                                    <!-- Call Dropdown -->
-                                    <div id="call_dropdown" style="display: none;"
-                                        class="hidden absolute top-14 right-0 w-[350px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
-                                        <style>
-                                            #call_dropdown.show {
-                                                transform: scale(1);
-                                                opacity: 1;
-                                            }
-                                        </style>
-
-                                        <!-- User Info Section -->
-                                        <div class="p-6 pb-4">
-                                            <div class="flex items-center gap-4">
-                                                <div id="call_dropdown_avatar"
-                                                    class="w-14 h-14 rounded-full overflow-hidden bg-[#202c33]">
-                                                    <img src="https://ui-avatars.com/api/?name=User&background=202c33&color=fff"
-                                                        class="w-full h-full object-cover">
-                                                </div>
-                                                <div class="flex flex-col">
-                                                    <span id="call_dropdown_name"
-                                                        class="text-[#e9edef] font-medium text-[19px]">User</span>
-                                                </div>
-                                            </div>
-
-                                            <!-- Call Action Buttons -->
-                                            <div class="flex gap-3 mt-6">
-                                                <button
-                                                    class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
-                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path
-                                                            d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
-                                                        </path>
-                                                    </svg>
-                                                    Voice
-                                                </button>
-                                                <button
-                                                    class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
-                                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path
-                                                            d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
-                                                        </path>
-                                                    </svg>
-                                                    Video
-                                                </button>
-                                            </div>
+                                        <div
+                                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-current rounded-full">
                                         </div>
-
-                                        <div class="h-px bg-white/5 mx-6 mb-1"></div>
-
-                                        <!-- Menu List Options -->
-                                        <div class="flex flex-col py-1">
-                                            <button
-                                                class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
-                                                <div
-                                                    class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
-                                                        </path>
-                                                    </svg>
-                                                </div>
-                                                <span class="text-[16px]">New group call</span>
-                                            </button>
-                                            <button
-                                                class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
-                                                <div
-                                                    class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
-                                                        </path>
-                                                    </svg>
-                                                </div>
-                                                <span class="text-[16px]">Send call link</span>
-                                            </button>
-                                            <button
-                                                class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
-                                                <div
-                                                    class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
-                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24" stroke-width="2">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                                        </path>
-                                                    </svg>
-                                                </div>
-                                                <span class="text-[16px]">Schedule call</span>
-                                            </button>
+                                        <div
+                                            class="absolute top-1/2 -left-1 -translate-y-1/2 w-1.5 h-1.5 bg-current rounded-full">
+                                        </div>
+                                        <div
+                                            class="absolute top-1/2 -right-1 -translate-y-1/2 w-1.5 h-1.5 bg-current rounded-full">
                                         </div>
                                     </div>
                                 </div>
+                                <span class="text-[#8696a0] text-[13px] font-normal">Ask Meta AI</span>
+                            </div>
+                        </div>
+                    </div>
 
-                                <!-- Search Icon -->
-                                <button onclick="toggleSearchPanel()"
-                                    class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
-                                    title="Search">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                    </svg>
-                                </button>
+                    <div id="active_chat_content" class="hidden flex-col flex-1 h-full overflow-hidden">
+                        <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-10 relative">
+                            <!-- Normal Header -->
+                            <div id="normal_header"
+                                class="flex items-center justify-between h-full w-full transition-all duration-300">
+                                <div class="flex items-center gap-2">
+                                    <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
+                                        onclick="window.backToSidebar()">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                    <div id="active_chat_avatar" onclick="openContactInfo()"
+                                        class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm overflow-hidden transition-transform hover:scale-105 cursor-pointer">
+                                        <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div class="cursor-pointer" onclick="openContactInfo()">
+                                        <h2 id="active_chat_title"
+                                            class="text-[15px] font-semibold text-[#e9edef] leading-tight">Select a chat
+                                        </h2>
+                                        <p id="active_chat_subtitle" class="text-xs text-[#00a884] font-medium hidden">
+                                            online</p>
+                                    </div>
+                                </div>
 
-                                <!-- Menu Icon -->
-                                <button
-                                    class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
-                                    title="Menu">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
-                                        </path>
-                                    </svg>
-                                </button>
+                                <!-- Header Actions -->
+                                <div class="flex items-center gap-2 sm:gap-4">
+                                    <!-- Call Button Pill -->
+                                    <div class="relative">
+                                        <button id="call_btn_pill"
+                                            class="hidden sm:flex items-center gap-2.5 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] px-4 py-2 rounded-full cursor-pointer transition-all duration-200 border border-transparent hover:border-[#313d45] group focus:outline-none">
+                                            <div
+                                                class="flex items-center gap-2 border-r border-[#313d45] pr-2 group-hover:border-[#8696a0]">
+                                                <svg class="w-5 h-5 text-[#8696a0] group-hover:text-[#e9edef]"
+                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                                <span class="text-sm font-semibold">Call</span>
+                                            </div>
+                                            <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+
+                                        <!-- Call Dropdown -->
+                                        <div id="call_dropdown" style="display: none;"
+                                            class="hidden absolute top-14 right-0 w-[350px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
+                                            <style>
+                                                #call_dropdown.show {
+                                                    transform: scale(1);
+                                                    opacity: 1;
+                                                }
+                                            </style>
+
+                                            <!-- User Info Section -->
+                                            <div class="p-6 pb-4">
+                                                <div class="flex items-center gap-4">
+                                                    <div id="call_dropdown_avatar"
+                                                        class="w-14 h-14 rounded-full overflow-hidden bg-[#202c33]">
+                                                        <img src="https://ui-avatars.com/api/?name=User&background=202c33&color=fff"
+                                                            class="w-full h-full object-cover">
+                                                    </div>
+                                                    <div class="flex flex-col">
+                                                        <span id="call_dropdown_name"
+                                                            class="text-[#e9edef] font-medium text-[19px]">User</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Call Action Buttons -->
+                                                <div class="flex gap-3 mt-6">
+                                                    <button
+                                                        class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
+                                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path
+                                                                d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
+                                                            </path>
+                                                        </svg>
+                                                        Voice
+                                                    </button>
+                                                    <button
+                                                        class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
+                                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path
+                                                                d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
+                                                            </path>
+                                                        </svg>
+                                                        Video
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="h-px bg-white/5 mx-6 mb-1"></div>
+
+                                            <!-- Menu List Options -->
+                                            <div class="flex flex-col py-1">
+                                                <button
+                                                    class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
+                                                    <div
+                                                        class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z">
+                                                            </path>
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-[16px]">New group call</span>
+                                                </button>
+                                                <button
+                                                    class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
+                                                    <div
+                                                        class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
+                                                            </path>
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-[16px]">Send call link</span>
+                                                </button>
+                                                <button
+                                                    class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
+                                                    <div
+                                                        class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
+                                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                                            viewBox="0 0 24 24" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                            </path>
+                                                        </svg>
+                                                    </div>
+                                                    <span class="text-[16px]">Schedule call</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Search Icon -->
+                                    <button onclick="toggleSearchPanel()"
+                                        class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                                        title="Search">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                        </svg>
+                                    </button>
+
+                                    <!-- Menu Icon -->
+                                    <button
+                                        class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                                        title="Menu">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Selection Header -->
+                            <div id="selection_header"
+                                class="hidden absolute inset-0 bg-teal-600 items-center justify-between px-4 h-full w-full transition-all duration-300">
+                                <div class="flex items-center gap-4">
+                                    <button onclick="cancelSelection()"
+                                        class="text-white hover:bg-black/10 p-2 rounded-full transition-colors focus:outline-none">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                    <span id="selection_count" class="text-white font-semibold text-lg">1
+                                        Selected</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <button onclick="confirmDeleteSelected()"
+                                        class="text-white hover:bg-black/10 p-2 text-sm rounded-full transition-colors focus:outline-none"
+                                        title="Delete">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Selection Header -->
-                        <div id="selection_header"
-                            class="hidden absolute inset-0 bg-teal-600 items-center justify-between px-4 h-full w-full transition-all duration-300">
-                            <div class="flex items-center gap-4">
-                                <button onclick="cancelSelection()"
-                                    class="text-white hover:bg-black/10 p-2 rounded-full transition-colors focus:outline-none">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div id="messages"
+                            class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]">
+                        </div>
+
+                        <div
+                            class="h-auto min-h-[64px] bg-[#202c33] px-4 py-2 flex flex-col justify-end shrink-0 relative z-20">
+                            <!-- Replying Block -->
+                            <div id="replying_to_block"
+                                class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
+                                <div class="flex flex-col overflow-hidden">
+                                    <span class="font-semibold text-[#00a884] text-[13px]">Replying to message</span>
+                                    <span id="replying_to_text"
+                                        class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
+                                </div>
+                                <button onclick="cancelReply()"
+                                    class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                 </button>
-                                <span id="selection_count" class="text-white font-semibold text-lg">1 Selected</span>
-                            </div>
-                            <div class="flex items-center">
-                                <button onclick="confirmDeleteSelected()"
-                                    class="text-white hover:bg-black/10 p-2 text-sm rounded-full transition-colors focus:outline-none"
-                                    title="Delete">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                        </path>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="messages" class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]">
-                    </div>
-
-                    <div
-                        class="h-auto min-h-[64px] bg-[#202c33] px-4 py-2 flex flex-col justify-end shrink-0 relative z-20">
-                        <!-- Replying Block -->
-                        <div id="replying_to_block"
-                            class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
-                            <div class="flex flex-col overflow-hidden">
-                                <span class="font-semibold text-[#00a884] text-[13px]">Replying to message</span>
-                                <span id="replying_to_text"
-                                    class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
-                            </div>
-                            <button onclick="cancelReply()"
-                                class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-
-                        <div class="flex items-center gap-2 w-full relative">
-                            <!-- Emoji Picker Button -->
-                            <button type="button" id="emoji_toggle_btn" onclick="toggleEmojiPicker()"
-                                class="text-[#8696a0] hover:text-[#e9edef] p-2 focus:outline-none shrink-0 transition-colors">
-                                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-                                    <path
-                                        d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
-                                    </path>
-                                </svg>
-                            </button>
-
-                            <!-- Emoji Picker Panel -->
-                            <div id="emoji_picker_container"
-                                class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px] sm:w-[350px]">
-                                <!-- The actual picker (Uses system dark/light mode automatically) -->
-                                <emoji-picker id="emoji_picker" class="w-full"
-                                    style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
-
-                                <!-- Bottom Tabs Bar (WhatsApp Style) -->
-                                <div
-                                    class="h-[50px] bg-gray-100 dark:bg-[#2a3942] border-t border-gray-200 dark:border-gray-700 flex items-center justify-center shrink-0">
-                                    <!-- Emoji Tab (Active) -->
-                                    <button
-                                        class="flex-1 flex justify-center py-2 h-full items-center relative transition-colors bg-gray-200 dark:bg-[#384b57]">
-                                        <svg viewBox="0 0 24 24" width="24" height="24"
-                                            class="text-gray-600 dark:text-gray-300" fill="currentColor">
-                                            <path
-                                                d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
-                                            </path>
-                                        </svg>
-                                        <div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
-                                    </button>
-                                    <!-- GIF Tab -->
-                                    <button
-                                        class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
-                                        <span class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
-                                    </button>
-                                    <!-- Sticker Tab -->
-                                    <button
-                                        class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
-                                        <svg viewBox="0 0 24 24" width="24" height="24"
-                                            class="text-gray-500 dark:text-gray-400" fill="currentColor">
-                                            <path
-                                                d="M14.5 3h-5C6.46 3 4 5.46 4 8.5v7C4 18.54 6.46 21 9.5 21h4l6-6v-6.5C19.5 5.46 17.04 3 14.5 3zm-2.5 16h-2.5C7.57 19 6 17.43 6 15.5v-7C6 6.57 7.57 5 9.5 5h5C16.43 5 18 6.57 18 8.5v5.09l-4.5 4.5V19h-1.5zM17 14h-2.5c-.83 0-1.5.67-1.5 1.5V18l4-4z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                </div>
                             </div>
 
-                            <input type="file" id="file_input" class="hidden">
-                            <div class="relative shrink-0">
-                                <button type="button" id="attach_toggle_btn" onclick="toggleAttachMenu()"
-                                    class="text-gray-500 hover:text-gray-700 p-2 focus:outline-none">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
+                            <div class="flex items-center gap-2 w-full relative">
+                                <!-- Emoji Picker Button -->
+                                <button type="button" id="emoji_toggle_btn" onclick="toggleEmojiPicker()"
+                                    class="text-[#8696a0] hover:text-[#e9edef] p-2 focus:outline-none shrink-0 transition-colors">
+                                    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                                        <path
+                                            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
                                         </path>
                                     </svg>
                                 </button>
 
-                                <!-- Attachment Menu -->
-                                <div id="attach_menu"
-                                    class="hidden absolute bottom-full mb-3 left-0 sm:left-4 bg-[#1f2c34] p-4 rounded-3xl w-[320px] shadow-2xl z-50 transition-all origin-bottom-left">
-                                    <div class="grid grid-cols-4 gap-y-6 gap-x-2 place-items-center">
-                                        <!-- Document -->
-                                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                                            onclick="selectFile('.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip')">
-                                            <div
-                                                class="w-14 h-14 rounded-2xl bg-[#5f66cd] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="text-gray-300 text-xs">Document</span>
-                                        </div>
-                                        <!-- Camera -->
-                                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                                            onclick="selectFile('image/*;capture=camera')">
-                                            <div
-                                                class="w-14 h-14 rounded-2xl bg-[#ed517b] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                                <svg class="w-7 h-7" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
-                                                    </path>
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="text-gray-300 text-xs">Camera</span>
-                                        </div>
-                                        <!-- Gallery -->
-                                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                                            onclick="selectFile('image/*,video/*')">
-                                            <div
-                                                class="w-14 h-14 rounded-2xl bg-[#bf59cf] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="text-gray-300 text-xs">Gallery</span>
-                                        </div>
-                                        <!-- Audio -->
-                                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                                            onclick="selectFile('audio/*')">
-                                            <div
-                                                class="w-14 h-14 rounded-2xl bg-[#e35920] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="text-gray-300 text-xs">Audio</span>
-                                        </div>
-                                        <!-- Location -->
-                                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                                            onclick="shareLocation()">
-                                            <div
-                                                class="w-14 h-14 rounded-2xl bg-[#1dae75] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="text-gray-300 text-xs">Location</span>
-                                        </div>
-                                        <!-- Contact (Placeholder) -->
-                                        <div class="flex flex-col items-center gap-1 group cursor-pointer">
-                                            <div
-                                                class="w-14 h-14 rounded-2xl bg-[#09a5eb] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd"
-                                                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                                                        clip-rule="evenodd"></path>
-                                                </svg>
-                                            </div>
-                                            <span class="text-gray-300 text-xs">Contact</span>
-                                        </div>
-                                        <!-- Poll (Placeholder) -->
-                                        <div class="flex flex-col items-center gap-1 group cursor-pointer">
-                                            <div
-                                                class="w-14 h-14 rounded-2xl bg-[#11a9a1] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                                <svg class="w-7 h-7" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                                                    </path>
-                                                </svg>
-                                            </div>
-                                            <span class="text-gray-300 text-xs">Poll</span>
-                                        </div>
+                                <!-- Emoji Picker Panel -->
+                                <div id="emoji_picker_container"
+                                    class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px] sm:w-[350px]">
+                                    <!-- The actual picker (Uses system dark/light mode automatically) -->
+                                    <emoji-picker id="emoji_picker" class="w-full"
+                                        style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
+
+                                    <!-- Bottom Tabs Bar (WhatsApp Style) -->
+                                    <div
+                                        class="h-[50px] bg-gray-100 dark:bg-[#2a3942] border-t border-gray-200 dark:border-gray-700 flex items-center justify-center shrink-0">
+                                        <!-- Emoji Tab (Active) -->
+                                        <button
+                                            class="flex-1 flex justify-center py-2 h-full items-center relative transition-colors bg-gray-200 dark:bg-[#384b57]">
+                                            <svg viewBox="0 0 24 24" width="24" height="24"
+                                                class="text-gray-600 dark:text-gray-300" fill="currentColor">
+                                                <path
+                                                    d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
+                                                </path>
+                                            </svg>
+                                            <div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
+                                        </button>
+                                        <!-- GIF Tab -->
+                                        <button
+                                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                                            <span
+                                                class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
+                                        </button>
+                                        <!-- Sticker Tab -->
+                                        <button
+                                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                                            <svg viewBox="0 0 24 24" width="24" height="24"
+                                                class="text-gray-500 dark:text-gray-400" fill="currentColor">
+                                                <path
+                                                    d="M14.5 3h-5C6.46 3 4 5.46 4 8.5v7C4 18.54 6.46 21 9.5 21h4l6-6v-6.5C19.5 5.46 17.04 3 14.5 3zm-2.5 16h-2.5C7.57 19 6 17.43 6 15.5v-7C6 6.57 7.57 5 9.5 5h5C16.43 5 18 6.57 18 8.5v5.09l-4.5 4.5V19h-1.5zM17 14h-2.5c-.83 0-1.5.67-1.5 1.5V18l4-4z">
+                                                </path>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
-                            </div>
-                            <!-- Input Area Container -->
-                            <div id="input_area_container"
-                                class="flex-1 relative flex items-center bg-white rounded-lg shadow-sm">
 
-                                <!-- State 1: Normal Text Input -->
-                                <div id="text_input_state" class="w-full relative flex items-center">
-                                    <input type="text" id="msg" oninput="handleInputToggle()"
-                                        onkeypress="handleKeyPress(event)" placeholder="Type a message"
-                                        class="w-full bg-transparent border-none rounded-lg pl-4 pr-10 py-2 text-[15px] focus:ring-0 text-gray-800 placeholder-gray-500 min-h-[40px]">
-                                    <!-- INSIDE MIC (Voice-to-Text) -->
-                                    <button type="button" id="inside_mic_btn" onclick="toggleVoiceRecord()"
-                                        class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
-                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                            <path
-                                                d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
+                                <input type="file" id="file_input" class="hidden">
+                                <div class="relative shrink-0">
+                                    <button type="button" id="attach_toggle_btn" onclick="toggleAttachMenu()"
+                                        class="text-gray-500 hover:text-gray-700 p-2 focus:outline-none">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
                                             </path>
                                         </svg>
                                     </button>
-                                </div>
 
-                                <!-- State 2: Voice Note Recording UI -->
-                                <div id="audio_recording_state"
-                                    class="hidden w-full items-center justify-between px-3 h-[40px]">
-                                    <button type="button" onclick="cancelVoiceNote()"
-                                        class="text-gray-500 hover:text-red-500 focus:outline-none transition-colors">
-                                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                                            <path
-                                                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z">
-                                            </path>
-                                        </svg>
-                                    </button>
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
-                                        <span id="audio_timer" class="text-[15px] font-medium text-gray-700">0:00</span>
-                                    </div>
-                                    <div class="flex-1 mx-3 flex items-center h-full overflow-hidden">
-                                        <!-- Animated Waveform SVG -->
-                                        <div
-                                            class="flex items-center gap-[3px] h-4 w-full opacity-60 justify-end overflow-hidden">
-                                            <!-- Animated Bars -->
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]">
+                                    <!-- Attachment Menu -->
+                                    <div id="attach_menu"
+                                        class="hidden absolute bottom-full mb-3 left-0 sm:left-4 bg-[#1f2c34] p-4 rounded-3xl w-[320px] shadow-2xl z-50 transition-all origin-bottom-left">
+                                        <div class="grid grid-cols-4 gap-y-6 gap-x-2 place-items-center">
+                                            <!-- Document -->
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                                onclick="selectFile('.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip')">
+                                                <div
+                                                    class="w-14 h-14 rounded-2xl bg-[#5f66cd] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd"
+                                                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-gray-300 text-xs">Document</span>
                                             </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
+                                            <!-- Camera -->
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                                onclick="selectFile('image/*;capture=camera')">
+                                                <div
+                                                    class="w-14 h-14 rounded-2xl bg-[#ed517b] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                                    <svg class="w-7 h-7" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                                                        </path>
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-gray-300 text-xs">Camera</span>
                                             </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_0.8s_ease-in-out_infinite_0.4s]">
+                                            <!-- Gallery -->
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                                onclick="selectFile('image/*,video/*')">
+                                                <div
+                                                    class="w-14 h-14 rounded-2xl bg-[#bf59cf] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd"
+                                                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-gray-300 text-xs">Gallery</span>
                                             </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
+                                            <!-- Audio -->
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                                onclick="selectFile('audio/*')">
+                                                <div
+                                                    class="w-14 h-14 rounded-2xl bg-[#e35920] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd"
+                                                            d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-gray-300 text-xs">Audio</span>
                                             </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_0.9s_ease-in-out_infinite_0.5s]">
+                                            <!-- Location -->
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                                onclick="shareLocation()">
+                                                <div
+                                                    class="w-14 h-14 rounded-2xl bg-[#1dae75] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd"
+                                                            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-gray-300 text-xs">Location</span>
                                             </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.3s_ease-in-out_infinite_0.3s]">
+                                            <!-- Contact (Placeholder) -->
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer">
+                                                <div
+                                                    class="w-14 h-14 rounded-2xl bg-[#09a5eb] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd"
+                                                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                                            clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-gray-300 text-xs">Contact</span>
                                             </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_1s_ease-in-out_infinite_0.7s]">
-                                            </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.4s_ease-in-out_infinite_0.2s]">
-                                            </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_0.8s_ease-in-out_infinite_0.6s]">
-                                            </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
-                                            </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_1s_ease-in-out_infinite]">
-                                            </div>
-                                            <div
-                                                class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1.2s_ease-in-out_infinite_0.4s]">
+                                            <!-- Poll (Placeholder) -->
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer">
+                                                <div
+                                                    class="w-14 h-14 rounded-2xl bg-[#11a9a1] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                                    <svg class="w-7 h-7" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                                        </path>
+                                                    </svg>
+                                                </div>
+                                                <span class="text-gray-300 text-xs">Poll</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                                <!-- Input Area Container -->
+                                <div id="input_area_container"
+                                    class="flex-1 relative flex items-center bg-white rounded-lg shadow-sm">
 
-                            <button id="action_btn" onclick="handleActionBtn()"
-                                class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
-                                <!-- Mic SVG -->
-                                <svg id="mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path
-                                        d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
-                                    </path>
-                                </svg>
-                                <!-- Send SVG -->
-                                <svg id="send_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                    class="hidden ml-1">
-                                    <path
-                                        d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
-                                    </path>
-                                </svg>
-                            </button>
+                                    <!-- State 1: Normal Text Input -->
+                                    <div id="text_input_state" class="w-full relative flex items-center">
+                                        <input type="text" id="msg" oninput="handleInputToggle()"
+                                            onkeypress="handleKeyPress(event)" placeholder="Type a message"
+                                            class="w-full bg-transparent border-none rounded-lg pl-4 pr-10 py-2 text-[15px] focus:ring-0 text-gray-800 placeholder-gray-500 min-h-[40px]">
+                                        <!-- INSIDE MIC (Voice-to-Text) -->
+                                        <button type="button" id="inside_mic_btn" onclick="toggleVoiceRecord()"
+                                            class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                                <path
+                                                    d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- State 2: Voice Note Recording UI -->
+                                    <div id="audio_recording_state"
+                                        class="hidden w-full items-center justify-between px-3 h-[40px]">
+                                        <button type="button" onclick="cancelVoiceNote()"
+                                            class="text-gray-500 hover:text-red-500 focus:outline-none transition-colors">
+                                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                                <path
+                                                    d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
+                                            <span id="audio_timer"
+                                                class="text-[15px] font-medium text-gray-700">0:00</span>
+                                        </div>
+                                        <div class="flex-1 mx-3 flex items-center h-full overflow-hidden">
+                                            <!-- Animated Waveform SVG -->
+                                            <div
+                                                class="flex items-center gap-[3px] h-4 w-full opacity-60 justify-end overflow-hidden">
+                                                <!-- Animated Bars -->
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_0.8s_ease-in-out_infinite_0.4s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_0.9s_ease-in-out_infinite_0.5s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.3s_ease-in-out_infinite_0.3s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_1s_ease-in-out_infinite_0.7s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.4s_ease-in-out_infinite_0.2s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_0.8s_ease-in-out_infinite_0.6s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_1s_ease-in-out_infinite]">
+                                                </div>
+                                                <div
+                                                    class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1.2s_ease-in-out_infinite_0.4s]">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button id="action_btn" onclick="handleActionBtn()"
+                                    class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
+                                    <!-- Mic SVG -->
+                                    <svg id="mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                        <path
+                                            d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
+                                        </path>
+                                    </svg>
+                                    <!-- Send SVG -->
+                                    <svg id="send_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                        class="hidden ml-1">
+                                        <path
+                                            d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -744,7 +824,8 @@
                                     }
                                 </style>
                                 <div class="flex items-center justify-between mb-5">
-                                    <h3 id="calendar_month_year" class="text-[#e9edef] font-medium text-base">April 2026
+                                    <h3 id="calendar_month_year" class="text-[#e9edef] font-medium text-base">April
+                                        2026
                                     </h3>
                                     <div class="flex items-center gap-6">
                                         <button onclick="changeCalendarMonth(-1)"
@@ -1005,18 +1086,18 @@
                 const newBtn = callBtn.cloneNode(true);
                 callBtn.parentNode.replaceChild(newBtn, callBtn);
 
-                newBtn.addEventListener('click', function(e) {
+                newBtn.addEventListener('click', function (e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    
+
                     const isOpening = callDropdown.classList.contains('hidden') || callDropdown.style.display === 'none';
-                    
+
                     if (isOpening) {
                         callDropdown.classList.remove('hidden');
                         callDropdown.style.display = 'flex';
                         callDropdown.offsetHeight; // Force reflow
                         callDropdown.classList.add('show');
-                        
+
                         // Close on outside click
                         const closeHandler = (evt) => {
                             if (!callDropdown.contains(evt.target) && !newBtn.contains(evt.target)) {
@@ -1039,7 +1120,7 @@
                 });
             }
         }
-        
+
         // Run immediately and also on a short delay to be sure
         initCallDropdown();
         setTimeout(initCallDropdown, 500);
@@ -1707,6 +1788,13 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const messaging = getMessaging(app);
+
+        // Expose to window for global access
+        window.db = db;
+        window.ref = ref;
+        window.update = update;
+        window.set = set;
+        window.serverTimestamp = serverTimestamp;
         window.myUserId = {{ auth()->id() ?? '0' }};
         window.currentChatId = null;
         let unsubscribeAdded = null;
@@ -1720,11 +1808,11 @@
 
             onValue(connectedRef, (snap) => {
                 if (snap.val() === true) {
-                    onDisconnect(myStatusRef).set({
+                    onDisconnect(myStatusRef).update({
                         state: 'offline',
                         last_changed: serverTimestamp(),
                     }).then(() => {
-                        set(myStatusRef, {
+                        update(myStatusRef, {
                             state: 'online',
                             last_changed: serverTimestamp(),
                         });
@@ -1997,6 +2085,47 @@
             return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
         };
 
+        window.formatAboutSubtitle = function (raw) {
+            if (!raw) return 'Until I change it';
+            if (!raw.includes('|')) return raw;
+
+            const [type, iso] = raw.split('|');
+            const date = new Date(iso);
+            const now = new Date();
+
+            const formatTime = (d) => {
+                let hours = d.getHours();
+                const minutes = d.getMinutes().toString().padStart(2, '0');
+                const ampm = hours >= 12 ? 'pm' : 'am';
+                hours = hours % 12 || 12;
+                return `${hours}:${minutes} ${ampm}`;
+            };
+
+            const isToday = date.toDateString() === now.toDateString();
+            const yesterday = new Date(now);
+            yesterday.setDate(now.getDate() - 1);
+            const isYesterday = date.toDateString() === yesterday.toDateString();
+
+            let datePart = '';
+            if (isToday) datePart = 'today';
+            else if (isYesterday) datePart = 'yesterday';
+            else {
+                const diffTime = Math.abs(now.getTime() - date.getTime());
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                if (diffDays < 7) {
+                    datePart = date.toLocaleDateString([], { weekday: 'long' });
+                } else {
+                    datePart = date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+                }
+            }
+
+            if (type === 'UPDATED') {
+                return `Last updated ${datePart} at ${formatTime(date)}`;
+            } else {
+                return `Until ${datePart} at ${formatTime(date)}`;
+            }
+        };
+
         window.getFileExt = function (filename) {
             if (!filename) return 'DOC';
             let parts = filename.split('.');
@@ -2014,7 +2143,46 @@
             return '#607d8b';
         };
 
-        window.selectChat = function (otherUserId, name, phone) {
+        window.showChats = function () {
+            const panel = document.getElementById('settings_panel');
+            if (panel && !panel.classList.contains('hidden')) {
+                window.toggleSettings();
+            }
+        };
+
+        window.focusSearch = function () {
+            const input = document.getElementById('sidebar_search');
+            if (input) {
+                input.focus();
+            }
+        };
+
+        window.backToSidebar = function () {
+            document.getElementById('user_sidebar_container').classList.remove('hidden');
+            document.getElementById('user_sidebar_container').classList.add('flex', 'w-full');
+            document.getElementById('main_chat_column').classList.add('hidden');
+            document.getElementById('main_chat_column').classList.remove('flex');
+        };
+
+        window.selectChat = function (otherUserId, name, phone, avatar = null, about = null) {
+            // Show content, hide empty state
+            document.getElementById('chat_empty_state')?.classList.add('hidden');
+            document.getElementById('active_chat_content')?.classList.remove('hidden');
+            document.getElementById('active_chat_content')?.classList.add('flex');
+
+            // Close settings if open
+            const panel = document.getElementById('settings_panel');
+            if (panel && !panel.classList.contains('hidden')) {
+                window.toggleSettings();
+            }
+
+            // Mobile view handling
+            if (window.innerWidth < 640) {
+                document.getElementById('user_sidebar_container').classList.add('hidden');
+                document.getElementById('main_chat_column').classList.remove('hidden');
+                document.getElementById('main_chat_column').classList.add('flex');
+            }
+
             let unsubscribeChanged = null;
             let lastDateString = null;
             if (unsubscribeAdded) unsubscribeAdded();
@@ -2028,15 +2196,26 @@
 
             const activeName = name ? name : phone;
             window.activeChatName = activeName;
-            window.activeChatAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(activeName)}&background=202c33&color=fff`;
+
+            // Use provided avatar or fallback to UI-Avatar
+            const activeAvatar = avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(activeName)}&background=202c33&color=fff`;
+            window.activeChatAvatar = activeAvatar;
+
+            window.activeChatUser = {
+                id: otherUserId,
+                name: activeName,
+                phone: phone,
+                avatar: activeAvatar,
+                about: about || 'Available'
+            };
 
             document.getElementById('active_chat_title').textContent = activeName;
             document.getElementById('active_chat_subtitle').classList.add('hidden');
-            document.getElementById('active_chat_avatar').innerHTML = `<img src="${window.activeChatAvatar}" class="w-full h-full object-cover">`;
+            document.getElementById('active_chat_avatar').innerHTML = `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
 
             // Update Call Dropdown
             document.getElementById('call_dropdown_name').textContent = activeName;
-            document.getElementById('call_dropdown_avatar').innerHTML = `<img src="${window.activeChatAvatar}" class="w-full h-full object-cover">`;
+            document.getElementById('call_dropdown_avatar').innerHTML = `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
 
             // Reset Unread Badge for this user
             const badge = document.getElementById(`unread_badge_${otherUserId}`);
@@ -2051,6 +2230,21 @@
             statusUnsubscribe = onValue(otherUserStatusRef, (snapshot) => {
                 const data = snapshot.val();
                 const subtitle = document.getElementById('active_chat_subtitle');
+
+                // Update global activeChatUser with latest about info
+                if (data && window.activeChatUser && window.activeChatUser.id == otherUserId) {
+                    if (data.about) {
+                        window.activeChatUser.about = data.about;
+                    }
+
+                    // If Contact Info panel is open and showing this user, update it live
+                    const panel = document.getElementById('contact_info_panel');
+                    if (panel && !panel.classList.contains('translate-x-full')) {
+                        const aboutText = document.getElementById('contact_about_text');
+                        if (aboutText) aboutText.textContent = window.activeChatUser.about;
+                    }
+                }
+
                 if (data && data.state === 'online') {
                     subtitle.textContent = 'online';
                     subtitle.classList.remove('hidden', 'text-gray-500');

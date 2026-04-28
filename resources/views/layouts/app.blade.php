@@ -16,7 +16,7 @@
         
         @stack('styles')
     </head>
-    <body class="font-sans antialiased {{ request()->is('chat') ? 'bg-[#111b21] min-h-screen flex items-center justify-center' : '' }}">
+    <body class="font-sans antialiased {{ request()->is('chat') ? 'bg-[#111b21] min-h-screen' : '' }}">
         <div class="{{ request()->is('chat') ? 'w-full' : 'min-h-screen bg-gray-100 dark:bg-gray-900' }}">
             @if(!request()->is('chat'))
                 @include('layouts.navigation')

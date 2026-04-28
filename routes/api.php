@@ -18,4 +18,5 @@ Route::post('/save-token',[ChatApiController::class,'saveToken']);
 Route::post('/update-live-location', [ChatApiController::class, 'updateLiveLocation']);
 
 Route::get('/users', [ChatApiController::class, 'users']);
+Route::post('/update-profile', [ChatApiController::class, 'updateProfile']);
 Route::post('/register', [ChatApiController::class, 'registerUser']);

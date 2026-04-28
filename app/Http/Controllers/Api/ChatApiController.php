@@ -219,4 +219,45 @@ class ChatApiController extends Controller
             'data' => $user
         ]);
     }
+    // Edit Profile API
+    public function updateProfile(Request $request)
+    {
+        $userId = $request->user_id ?? auth()->id();
+        $user = \App\Models\User::find($userId);
+
+        if (!$user) {
+            return response()->json(['status' => false, 'message' => 'User not found'], 404);
+        }
+
+        $data = [];
+        if ($request->has('name')) $data['name'] = $request->name;
+        if ($request->has('phone')) $data['phone'] = $request->phone;
+        if ($request->has('about')) {
+            $data['about'] = $request->about;
+            // Automatically set dynamic update time on server side if not provided
+            if (!$request->has('about_subtitle')) {
+                $data['about_subtitle'] = 'UPDATED|' . now()->toIso8601String();
+            }
+        }
+        if ($request->has('about_subtitle')) $data['about_subtitle'] = $request->about_subtitle;
+
+        // 🖼️ Handle Avatar Upload
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $path = $file->store('avatars', 'public');
+            $data['avatar'] = url('storage/' . $path);
+        }
+
+        if (empty($data)) {
+            return response()->json(['status' => false, 'message' => 'No data provided'], 400);
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Profile updated successfully',
+            'data' => $user
+        ]);
+    }
 }
