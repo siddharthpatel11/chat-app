@@ -26,6 +26,32 @@
             .toast-enter {
                 animation: slide-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             }
+
+            /* Search highlight in chat messages - text level */
+            .search-highlight {
+                background-color: #00a884;
+                color: #fff;
+                border-radius: 3px;
+                padding: 0 2px;
+            }
+
+            /* Search highlight - full row background line */
+            .search-msg-highlight {
+                background-color: rgba(0, 168, 132, 0.15);
+                position: relative;
+            }
+
+            .search-msg-highlight::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                background-color: rgba(0, 168, 132, 0.08);
+                pointer-events: none;
+                z-index: 0;
+            }
         </style>
     @endpush
 
@@ -1623,18 +1649,207 @@
             }
         };
 
+        // Highlight search text in chat messages
+        window.highlightSearchText = function (text) {
+            if (!window.activeSearchQuery || !text) return text;
+            const q = window.activeSearchQuery;
+            const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<mark class="search-highlight">$1</mark>');
+        };
+
         window.filterSidebar = function () {
-            const query = document.getElementById('sidebar_search').value.toLowerCase();
-            const users = document.querySelectorAll('[id^="user_sidebar_"]');
+            const searchQuery = document.getElementById('sidebar_search').value.toLowerCase().trim();
+            const clearBtn = document.getElementById('sidebar_search_clear');
+            const userList = document.getElementById('user_list_container');
+            const searchResults = document.getElementById('search_results_container');
+            const chatsList = document.getElementById('search_chats_list');
+            const msgsList = document.getElementById('search_messages_list');
+            const chatsSection = document.getElementById('search_chats_section');
+            const msgsSection = document.getElementById('search_messages_section');
+            const noResults = document.getElementById('sidebar_no_results');
+
+            // Show/hide clear button
+            if (searchQuery.length > 0) {
+                clearBtn?.classList.remove('hidden');
+            } else {
+                clearBtn?.classList.add('hidden');
+            }
+
+            // No query - show normal list
+            if (searchQuery === '') {
+                userList.classList.remove('hidden');
+                searchResults?.classList.add('hidden');
+                noResults?.classList.add('hidden');
+                noResults?.classList.remove('flex');
+                return;
+            }
+
+            // Hide normal list, show search results
+            userList.classList.add('hidden');
+            searchResults?.classList.remove('hidden');
+
+            // Clear previous results
+            if (chatsList) chatsList.innerHTML = '';
+            if (msgsList) msgsList.innerHTML = '';
+
+            const users = document.getElementById('user_list_container').querySelectorAll('[id^="user_sidebar_"]');
+            let chatMatches = 0;
+            let allMsgResults = []; // Collect all message matches across all users
+
+            const escQ = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const highlightRegex = new RegExp(`(${escQ})`, 'gi');
+
             users.forEach(user => {
-                const name = user.querySelector('h4').textContent.toLowerCase();
-                if (name.includes(query)) {
-                    user.style.display = '';
-                } else {
-                    user.style.display = 'none';
+                const userId = user.getAttribute('data-userid') || user.id.replace('user_sidebar_', '');
+                const name = user.getAttribute('data-name') || user.querySelector('h4')?.textContent.trim() || '';
+                const avatar = user.getAttribute('data-avatar') || '';
+                const phone = user.getAttribute('data-phone') || '';
+                const about = user.getAttribute('data-about') || 'Available';
+                const lastTimeEl = document.getElementById(`last_time_${userId}`);
+                const lastTime = lastTimeEl ? lastTimeEl.textContent.trim() : '';
+                const lastMsgEl = document.getElementById(`last_msg_${userId}`);
+                const lastMsg = lastMsgEl ? (lastMsgEl.getAttribute('data-msg') || lastMsgEl.textContent.trim()) : '';
+
+                const nameLower = name.toLowerCase();
+                const nameMatch = nameLower.includes(searchQuery);
+
+                // Chat name match -> Chats section
+                if (nameMatch && chatsList) {
+                    chatMatches++;
+                    const highlightedName = name.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+                    const prefix = lastMsg ? (lastMsg.startsWith('Click to chat') ? '' : '✓ ') : '';
+                    const previewMsg = lastMsg && !lastMsg.startsWith('Click to chat') ? prefix + lastMsg : phone || 'Click to chat';
+
+                    chatsList.insertAdjacentHTML('beforeend', `
+                        <div onclick="window.selectChat(${userId}, '${name.replace(/'/g, "\\'")}', '${phone.replace(/'/g, "\\'")}', '${avatar}', '${about.replace(/'/g, "\\'")}')"
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
+                                <img src="${avatar}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${highlightedName}</h4>
+                                    <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${lastTime}</span>
+                                </div>
+                                <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${previewMsg}</p>
+                            </div>
+                        </div>
+                    `);
+                }
+
+                // Search through ALL cached messages -> collect for Messages section
+                const cachedMessages = window.messageCache?.[userId] || [];
+                for (let i = 0; i < cachedMessages.length; i++) {
+                    const m = cachedMessages[i];
+                    if (m.text && m.text.toLowerCase().includes(searchQuery)) {
+                        allMsgResults.push({
+                            userId, name, avatar, phone, about,
+                            text: m.text,
+                            time: m.time,
+                            senderId: m.senderId
+                        });
+                    }
                 }
             });
+
+            // Sort message results by date (newest first)
+            allMsgResults.sort((a, b) => (b.time || 0) - (a.time || 0));
+
+            // Render all message results
+            allMsgResults.forEach(r => {
+                const msgTime = r.time ? new Date(r.time * 1000) : null;
+                let timeStr = '';
+                if (msgTime) {
+                    const now = new Date();
+                    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const msgDayStart = new Date(msgTime.getFullYear(), msgTime.getMonth(), msgTime.getDate());
+                    const diffDays = Math.round((todayStart - msgDayStart) / (1000 * 60 * 60 * 24));
+                    if (diffDays === 0) timeStr = msgTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    else if (diffDays === 1) timeStr = 'Yesterday';
+                    else if (diffDays < 7) timeStr = msgTime.toLocaleDateString([], { weekday: 'long' });
+                    else timeStr = msgTime.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+                }
+
+                const highlightedMsg = r.text.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+                const prefix = r.senderId == window.myUserId ? '<span class="text-[#8696a0]">✓ You: </span>' : '';
+
+                if (msgsList) {
+                    msgsList.insertAdjacentHTML('beforeend', `
+                        <div onclick="window.selectChat(${r.userId}, '${r.name.replace(/'/g, "\\'")}', '${r.phone.replace(/'/g, "\\'")}', '${r.avatar}', '${r.about.replace(/'/g, "\\'")}', ${r.time || 0})"
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
+                                <img src="${r.avatar}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="text-[16px] text-[#e9edef] truncate mr-2 font-normal">${r.name}</h4>
+                                    <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${timeStr}</span>
+                                </div>
+                                <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${prefix}${highlightedMsg}</p>
+                            </div>
+                        </div>
+                    `);
+                }
+            });
+
+            const msgMatches = allMsgResults.length;
+
+            // Toggle section visibility
+            if (chatsSection) {
+                if (chatMatches > 0) { chatsSection.classList.remove('hidden'); } else { chatsSection.classList.add('hidden'); }
+            }
+            if (msgsSection) {
+                if (msgMatches > 0) { msgsSection.classList.remove('hidden'); } else { msgsSection.classList.add('hidden'); }
+            }
+
+            // No results at all
+            if (noResults) {
+                if (chatMatches === 0 && msgMatches === 0) {
+                    noResults.classList.remove('hidden');
+                    noResults.classList.add('flex');
+                } else {
+                    noResults.classList.add('hidden');
+                    noResults.classList.remove('flex');
+                }
+            }
         };
+
+        // Search bar animation helpers
+        function onSidebarSearchFocus() {
+            document.getElementById('sidebar_search_icon')?.classList.add('hidden');
+            document.getElementById('sidebar_back_icon')?.classList.remove('hidden');
+        }
+
+        function onSidebarSearchBlur() {
+            const input = document.getElementById('sidebar_search');
+            if (!input || input.value.trim() === '') {
+                document.getElementById('sidebar_search_icon')?.classList.remove('hidden');
+                document.getElementById('sidebar_back_icon')?.classList.add('hidden');
+            }
+        }
+
+        function blurSidebarSearch() {
+            const input = document.getElementById('sidebar_search');
+            if (input) {
+                input.value = '';
+                input.blur();
+            }
+            window.activeSearchQuery = null;
+            window.activeSearchMsgTime = null;
+            window.filterSidebar();
+            document.getElementById('sidebar_search_icon')?.classList.remove('hidden');
+            document.getElementById('sidebar_back_icon')?.classList.add('hidden');
+            document.getElementById('sidebar_search_clear')?.classList.add('hidden');
+        }
+
+        function clearSidebarSearch() {
+            const input = document.getElementById('sidebar_search');
+            if (input) {
+                input.value = '';
+                input.focus();
+            }
+            window.filterSidebar();
+        }
 
         window.showToast = function (title, body, otherUserId = null, otherName = null) {
             const container = document.getElementById('toast_container');
@@ -1772,7 +1987,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onChildAdded, remove, onChildRemoved, onValue, onDisconnect, set, serverTimestamp, onChildChanged, update, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, get, onChildAdded, remove, onChildRemoved, onValue, onDisconnect, set, serverTimestamp, onChildChanged, update, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
         const firebaseConfig = {
@@ -1827,15 +2042,36 @@
                 @endforeach
             ];
 
+            // Message cache for search
+            window.messageCache = window.messageCache || {};
+
             allUserIds.forEach(otherId => {
                 const minId = Math.min(window.myUserId, otherId);
                 const maxId = Math.max(window.myUserId, otherId);
                 const chatId = `chat_${minId}_${maxId}`;
                 const messagesRef = query(ref(db, 'chats/' + chatId + '/messages'), limitToLast(50));
 
+                // Initialize cache for this user
+                if (!window.messageCache[otherId]) {
+                    window.messageCache[otherId] = [];
+                }
+
                 onChildAdded(messagesRef, (snapshot) => {
                     const data = snapshot.val();
                     const key = snapshot.key;
+
+                    // Cache message for search
+                    if (data.text) {
+                        // Avoid duplicates
+                        if (!window.messageCache[otherId].find(m => m.key === key)) {
+                            window.messageCache[otherId].push({
+                                key: key,
+                                text: data.text,
+                                time: data.time,
+                                senderId: data.sender_id
+                            });
+                        }
+                    }
 
                     // Update Sidebar Content Preview & Time
                     const lastMsgEl = document.getElementById(`last_msg_${otherId}`);
@@ -2164,7 +2400,13 @@
             document.getElementById('main_chat_column').classList.remove('flex');
         };
 
-        window.selectChat = function (otherUserId, name, phone, avatar = null, about = null) {
+        window.selectChat = function (otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
+            // Capture search query for highlighting messages
+            const searchInput = document.getElementById('sidebar_search');
+            window.activeSearchQuery = (searchInput && searchInput.value.trim().length > 0) ? searchInput.value.trim().toLowerCase() : null;
+            window.activeSearchMsgTime = searchMsgTime || null;
+            window._searchScrolled = false;
+
             // Show content, hide empty state
             document.getElementById('chat_empty_state')?.classList.add('hidden');
             document.getElementById('active_chat_content')?.classList.remove('hidden');
@@ -2375,8 +2617,12 @@
                     </div>`;
                 }
 
+                // Check if this is the specific searched message (by timestamp)
+                const isSearchMatch = window.activeSearchMsgTime && data.time && data.time == window.activeSearchMsgTime;
+                const searchHighlightClass = isSearchMatch ? 'search-msg-highlight' : '';
+
                 const html = `
-                    <div class="relative group/msg w-full flex ${isMe ? 'justify-end' : 'justify-start'} mt-1 mb-2 px-2 transition-colors cursor-pointer select-none" id="msg_${key}" onclick="window.toggleMsgSelection('${key}')">
+                    <div class="relative group/msg w-full flex ${isMe ? 'justify-end' : 'justify-start'} mt-1 mb-2 px-2 transition-colors cursor-pointer select-none ${searchHighlightClass}" id="msg_${key}" onclick="window.toggleMsgSelection('${key}')">
 
                         <!-- Selection Checkbox (Hidden by default) -->
                         <div class="msg-checkbox-container hidden flex-col justify-center px-3 z-10 ${isMe ? 'order-first' : ''}">
@@ -2408,7 +2654,7 @@
                             ${replyBlock}
                             ${mediaContent}
                             <div class="flex items-end gap-3 text-right justify-between w-full min-w-0 pr-4 mt-1">
-                                ${data.text ? `<span class="text-[15px] text-gray-900 break-words flex-1 text-left">${data.text}</span>` : '<div></div>'}
+                                ${data.text ? `<span class="text-[15px] text-gray-900 break-words flex-1 text-left">${isSearchMatch ? window.highlightSearchText(data.text) : data.text}</span>` : '<div></div>'}
                                 <div class="flex items-center gap-1 self-end leading-none">
                                     <span class="text-[10px] text-gray-500 whitespace-nowrap">${time}</span>
                                     ${isMe ? `<span id="tick_${key}" class="shrink-0 flex items-center justify-center">${window.getTickSVG(data.status || 'sent')}</span>` : ''}
@@ -2417,7 +2663,19 @@
                         </div>
                     </div>`;
                 document.getElementById('messages').insertAdjacentHTML('beforeend', html);
-                scrollToBottom();
+
+                // If search is active, scroll to first matching message; otherwise scroll to bottom
+                if (isSearchMatch && !window._searchScrolled) {
+                    window._searchScrolled = true;
+                    setTimeout(() => {
+                        const firstMatch = document.querySelector('.search-msg-highlight');
+                        if (firstMatch) {
+                            firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 500);
+                } else if (!window.activeSearchQuery) {
+                    scrollToBottom();
+                }
             });
 
             unsubscribeRemoved = onChildRemoved(messagesRef, (snapshot) => {

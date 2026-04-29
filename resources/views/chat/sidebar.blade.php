@@ -1,4 +1,5 @@
-<div id="user_sidebar_container" class="hidden sm:flex flex-col w-[30%] sm:min-w-[300px] border-r border-[#313d45] bg-[#111b21]">
+<div id="user_sidebar_container"
+    class="hidden sm:flex flex-col w-[30%] sm:min-w-[300px] border-r border-[#313d45] bg-[#111b21]">
     <div class="h-16 bg-[#202c33] flex items-center px-4 justify-between shrink-0 border-b border-[#313d45]">
         <div class="flex items-center gap-3">
             <div
@@ -11,15 +12,37 @@
     </div>
 
     <div class="p-2 border-b border-[#202c33] bg-[#111b21]">
-        <div class="bg-[#202c33] rounded-lg flex items-center px-3 py-1.5 h-9">
-            <svg class="w-4 h-4 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
-                <path
-                    d="M15.009 13.805h-.636l-.22-.219a5.184 5.184 0 0 0 1.256-3.386 5.207 5.207 1 0-5.207 5.208 5.183 5.183 0 0 0 3.385-1.255l.221.22v.635l4.004 3.999 1.194-1.195-3.997-4.007zm-4.6-1.598a3.608 3.608 0 1 1 0-7.216 3.608 3.608 0 0 1 0 7.216z">
-                </path>
-            </svg>
-            <input type="text" id="sidebar_search" oninput="window.filterSidebar()"
-                placeholder="Search or start new chat"
-                class="bg-transparent border-none focus:ring-0 w-full text-sm ml-2 text-[#d1d7db] placeholder-[#8696a0]">
+        <div id="sidebar_search_box"
+            class="bg-[#202c33] rounded-lg flex items-center px-3 py-1.5 h-9 transition-all duration-200 focus-within:bg-[#2a3942]">
+            <!-- Search / Back icon container -->
+            <div class="relative w-6 h-6 shrink-0">
+                <!-- Search icon -->
+                <svg id="sidebar_search_icon"
+                    class="w-[18px] h-[18px] text-[#8696a0] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-200"
+                    fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M15.009 13.805h-.636l-.22-.219a5.184 5.184 0 0 0 1.256-3.386 5.207 5.207 0 1 0-5.207 5.208 5.183 5.183 0 0 0 3.385-1.255l.221.22v.635l4.004 3.999 1.194-1.195-3.997-4.007zm-4.6-1.598a3.608 3.608 0 1 1 0-7.216 3.608 3.608 0 0 1 0 7.216z">
+                    </path>
+                </svg>
+                <!-- Back arrow (visible on focus) -->
+                <button id="sidebar_back_icon" onclick="blurSidebarSearch()"
+                    class="hidden w-[18px] h-[18px] text-[#00a884] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transition-all duration-200 cursor-pointer">
+                    <svg fill="currentColor" viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path>
+                    </svg>
+                </button>
+            </div>
+            <input type="text" id="sidebar_search" oninput="window.filterSidebar()" onfocus="onSidebarSearchFocus()"
+                onblur="onSidebarSearchBlur()" placeholder="Search or start new chat"
+                class="bg-transparent border-none focus:ring-0 w-full text-[13px] ml-4 text-[#d1d7db] placeholder-[#8696a0] outline-none">
+            <!-- Clear button -->
+            <button id="sidebar_search_clear" onclick="clearSidebarSearch()"
+                class="hidden text-[#8696a0] hover:text-[#e9edef] transition-colors shrink-0 p-0.5">
+                <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
         </div>
     </div>
 
@@ -30,10 +53,11 @@
             @endphp
             <div onclick="window.selectChat({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->phone ?? '') }}', '{{ $userAvatar }}', '{{ addslashes($user->about ?? 'Available') }}')"
                 class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors"
-                id="user_sidebar_{{ $user->id }}">
+                id="user_sidebar_{{ $user->id }}" data-name="{{ $user->name ?: $user->phone }}"
+                data-avatar="{{ $userAvatar }}" data-phone="{{ $user->phone ?? '' }}"
+                data-about="{{ $user->about ?? 'Available' }}" data-userid="{{ $user->id }}">
                 <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
-                    <img src="{{ $userAvatar }}"
-                        class="w-full h-full object-cover">
+                    <img src="{{ $userAvatar }}" class="w-full h-full object-cover">
                 </div>
                 <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
                     <div class="flex justify-between items-center">
@@ -55,5 +79,35 @@
                 </div>
             </div>
         @endforeach
+    </div>
+
+    <!-- Search Results View (hidden by default) -->
+    <div id="search_results_container" class="hidden flex-1 overflow-y-auto custom-scrollbar bg-[#111b21]">
+        <!-- Chats Section -->
+        <div id="search_chats_section" class="hidden">
+            <div class="px-5 pt-4 pb-2">
+                <span class="text-[#00a884] text-[14px] font-medium">Chats</span>
+            </div>
+            <div id="search_chats_list"></div>
+        </div>
+
+        <!-- Messages Section -->
+        <div id="search_messages_section" class="hidden">
+            <div class="px-5 pt-4 pb-2">
+                <span class="text-[#00a884] text-[14px] font-medium">Messages</span>
+            </div>
+            <div id="search_messages_list"></div>
+        </div>
+
+        <!-- No results state -->
+        <div id="sidebar_no_results" class="hidden flex-col items-center justify-center py-16 px-6 text-center">
+            <svg class="w-16 h-16 text-[#3b4a54] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                stroke-width="1">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                </path>
+            </svg>
+            <p class="text-[#8696a0] text-[14px]">No results found</p>
+            <p class="text-[#667781] text-[12px] mt-1">Try a different search</p>
+        </div>
     </div>
 </div>
