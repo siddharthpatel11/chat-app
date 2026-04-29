@@ -134,10 +134,12 @@ class ChatController extends Controller
         $role = $request->query('role', 'caller');
         $callId = $request->query('call_id', null);
         $calleeId = $request->query('callee_id', null);
+        $groupCallId = $request->query('group_call_id', null);
         $myUserId = auth()->id();
         $myName = auth()->user()->name ?? 'Me';
         $myAvatar = auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($myName) . '&background=202c33&color=fff&size=280';
-        return view('chat.calls.voice_call', compact('name', 'avatar', 'role', 'callId', 'calleeId', 'myUserId', 'myName', 'myAvatar'));
+        $users = \App\Models\User::where('id', '!=', auth()->id())->get(['id', 'name', 'avatar', 'phone']);
+        return view('chat.calls.voice_call', compact('name', 'avatar', 'role', 'callId', 'calleeId', 'groupCallId', 'myUserId', 'myName', 'myAvatar', 'users'));
     }
 
     public function videoCall(Request $request)
@@ -150,10 +152,12 @@ class ChatController extends Controller
         $role = $request->query('role', 'caller');
         $callId = $request->query('call_id', null);
         $calleeId = $request->query('callee_id', null);
+        $groupCallId = $request->query('group_call_id', null);
         $myUserId = auth()->id();
         $myName = auth()->user()->name ?? 'Me';
         $myAvatar = auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($myName) . '&background=202c33&color=fff&size=280';
-        return view('chat.calls.video_call', compact('name', 'avatar', 'role', 'callId', 'calleeId', 'myUserId', 'myName', 'myAvatar'));
+        $users = \App\Models\User::where('id', '!=', auth()->id())->get(['id', 'name', 'avatar', 'phone']);
+        return view('chat.calls.video_call', compact('name', 'avatar', 'role', 'callId', 'calleeId', 'groupCallId', 'myUserId', 'myName', 'myAvatar', 'users'));
     }
 
     public function updateLiveLocation(Request $request)

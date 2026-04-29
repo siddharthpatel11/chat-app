@@ -1227,11 +1227,12 @@
         window._incomingCallerName = null;
         window._incomingCallerAvatar = null;
 
-        window.showIncomingCall = function(callId, callerName, callerAvatar, callType) {
+        window.showIncomingCall = function(callId, callerName, callerAvatar, callType, groupCallId) {
             window._incomingCallId = callId;
             window._incomingCallType = callType;
             window._incomingCallerName = callerName;
             window._incomingCallerAvatar = callerAvatar;
+            window._incomingGroupCallId = groupCallId || null;
             document.getElementById('ic_caller_name').textContent = callerName;
             document.getElementById('ic_caller_avatar').src = callerAvatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(callerName) + '&background=202c33&color=fff&size=240';
             document.getElementById('ic_call_type').textContent = callType === 'video' ? 'Video Call' : 'Voice Call';
@@ -1249,6 +1250,7 @@
                 role: 'callee',
                 call_id: window._incomingCallId
             });
+            if (window._incomingGroupCallId) params.set('group_call_id', window._incomingGroupCallId);
             window.location.href = route + '?' + params.toString();
         };
 
@@ -3035,7 +3037,7 @@
             if (!callData) return;
             // Only show if I am the callee and call is in 'calling' state
             if (callData.callee_id == window.myUserId && callData.status === 'calling') {
-                window.showIncomingCall(callKey, callData.caller_name, callData.caller_avatar || '', callData.type);
+                window.showIncomingCall(callKey, callData.caller_name, callData.caller_avatar || '', callData.type, callData.group_call_id || null);
                 window._incomingCallerId = callData.caller_id;
                 window._incomingCallType = callData.type;
 
