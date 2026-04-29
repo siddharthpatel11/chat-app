@@ -62,6 +62,53 @@
             class="fixed top-6 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-3 pointer-events-none w-full max-w-sm px-4">
         </div>
 
+        <!-- Incoming Call Overlay -->
+        <div id="incoming_call_overlay" class="hidden fixed inset-0 z-[300] flex flex-col items-center justify-between" style="background:linear-gradient(135deg,#0b141a 0%,#1a2e38 40%,#0d3320 70%,#0b141a 100%)">
+            <style>
+                @keyframes ic-pulse{0%{width:120px;height:120px;opacity:.6}100%{width:300px;height:300px;opacity:0}}
+                .ic-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,168,132,0.15);animation:ic-pulse 3s ease-out infinite}
+                .ic-ring:nth-child(1){animation-delay:0s}.ic-ring:nth-child(2){animation-delay:1s}.ic-ring:nth-child(3){animation-delay:2s}
+                @keyframes ic-dot{0%,80%,100%{opacity:.3}40%{opacity:1}}
+                .icd1{animation:ic-dot 1.4s ease-in-out infinite}.icd2{animation:ic-dot 1.4s ease-in-out .2s infinite}.icd3{animation:ic-dot 1.4s ease-in-out .4s infinite}
+                @keyframes ic-btn-pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)}50%{box-shadow:0 0 0 15px rgba(34,197,94,0)}}
+                .ic-accept-pulse{animation:ic-btn-pulse 2s ease-in-out infinite}
+            </style>
+            <div class="pt-14 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full" style="background:rgba(255,255,255,0.06);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08)">
+                    <svg class="w-3.5 h-3.5 text-[#00a884]" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                    <span class="text-[#8696a0] text-[12px] font-medium">End-to-end encrypted</span>
+                </div>
+            </div>
+            <div class="flex-1 flex flex-col items-center justify-center -mt-8">
+                <div class="relative flex items-center justify-center mb-8">
+                    <div class="ic-ring"></div><div class="ic-ring"></div><div class="ic-ring"></div>
+                    <div class="w-[120px] h-[120px] rounded-full overflow-hidden border-[3px] border-[#00a884]/30 shadow-2xl relative z-10 bg-[#202c33]">
+                        <img id="ic_caller_avatar" src="" class="w-full h-full object-cover">
+                    </div>
+                </div>
+                <h1 id="ic_caller_name" class="text-white text-[26px] font-semibold mb-1"></h1>
+                <div class="flex items-center gap-1">
+                    <span id="ic_call_type" class="text-[#8696a0] text-[15px]">Voice Call</span>
+                    <span class="flex gap-0.5"><span class="icd1 text-[#8696a0]">.</span><span class="icd2 text-[#8696a0]">.</span><span class="icd3 text-[#8696a0]">.</span></span>
+                </div>
+            </div>
+            <div class="pb-16 flex items-center justify-center gap-20">
+                <div class="flex flex-col items-center gap-2">
+                    <button id="ic_reject_btn" onclick="rejectIncomingCall()" class="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all active:scale-90" style="box-shadow:0 0 30px rgba(239,68,68,0.3)">
+                        <svg class="w-8 h-8 rotate-[135deg]" fill="currentColor" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
+                    </button>
+                    <span class="text-[#8696a0] text-xs">Decline</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                    <button id="ic_accept_btn" onclick="acceptIncomingCall()" class="ic-accept-pulse w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center shadow-lg transition-all active:scale-90" style="box-shadow:0 0 30px rgba(34,197,94,0.3)">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
+                    </button>
+                    <span class="text-[#8696a0] text-xs">Accept</span>
+                </div>
+            </div>
+            <audio id="ic_ringtone" loop><source src="https://www.soundjay.com/phone/phone-calling-1.mp3" type="audio/mpeg"></audio>
+        </div>
+
         <div class="flex w-full h-full bg-[#111b21] overflow-hidden border-none">
 
             @include('chat.nav_sidebar')
@@ -397,7 +444,7 @@
 
                                                 <!-- Call Action Buttons -->
                                                 <div class="flex gap-3 mt-6">
-                                                    <button
+                                                    <button onclick="startVoiceCall()"
                                                         class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
                                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                                             <path
@@ -406,7 +453,7 @@
                                                         </svg>
                                                         Voice
                                                     </button>
-                                                    <button
+                                                    <button onclick="startVideoCall()"
                                                         class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
                                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                                             <path
@@ -1150,6 +1197,72 @@
         // Run immediately and also on a short delay to be sure
         initCallDropdown();
         setTimeout(initCallDropdown, 500);
+
+        // --- DYNAMIC CALL NAVIGATION ---
+        window.startVoiceCall = function () {
+            if (!window.activeChatUser) { alert('Please select a chat first.'); return; }
+            const params = new URLSearchParams({
+                name: window.activeChatUser.name || 'User',
+                avatar: window.activeChatUser.avatar || '',
+                role: 'caller',
+                callee_id: window.activeChatUser.id
+            });
+            window.location.href = '/chat/voice-call?' + params.toString();
+        };
+
+        window.startVideoCall = function () {
+            if (!window.activeChatUser) { alert('Please select a chat first.'); return; }
+            const params = new URLSearchParams({
+                name: window.activeChatUser.name || 'User',
+                avatar: window.activeChatUser.avatar || '',
+                role: 'caller',
+                callee_id: window.activeChatUser.id
+            });
+            window.location.href = '/chat/video-call?' + params.toString();
+        };
+
+        // --- INCOMING CALL HANDLERS ---
+        window._incomingCallId = null;
+        window._incomingCallType = null;
+        window._incomingCallerName = null;
+        window._incomingCallerAvatar = null;
+
+        window.showIncomingCall = function(callId, callerName, callerAvatar, callType) {
+            window._incomingCallId = callId;
+            window._incomingCallType = callType;
+            window._incomingCallerName = callerName;
+            window._incomingCallerAvatar = callerAvatar;
+            document.getElementById('ic_caller_name').textContent = callerName;
+            document.getElementById('ic_caller_avatar').src = callerAvatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(callerName) + '&background=202c33&color=fff&size=240';
+            document.getElementById('ic_call_type').textContent = callType === 'video' ? 'Video Call' : 'Voice Call';
+            document.getElementById('incoming_call_overlay').classList.remove('hidden');
+            try { document.getElementById('ic_ringtone').play().catch(()=>{}); } catch(e) {}
+        };
+
+        window.acceptIncomingCall = function() {
+            try { document.getElementById('ic_ringtone').pause(); } catch(e) {}
+            document.getElementById('incoming_call_overlay').classList.add('hidden');
+            const route = window._incomingCallType === 'video' ? '/chat/video-call' : '/chat/voice-call';
+            const params = new URLSearchParams({
+                name: window._incomingCallerName || 'User',
+                avatar: window._incomingCallerAvatar || '',
+                role: 'callee',
+                call_id: window._incomingCallId
+            });
+            window.location.href = route + '?' + params.toString();
+        };
+
+        window.rejectIncomingCall = function() {
+            try { document.getElementById('ic_ringtone').pause(); } catch(e) {}
+            document.getElementById('incoming_call_overlay').classList.add('hidden');
+            // Update Firebase status to rejected
+            if (window._rejectCallFn) window._rejectCallFn();
+            // Send missed call message to chat
+            if (window._incomingCallerId && window._sendMissedCallLog) {
+                window._sendMissedCallLog();
+            }
+            window._incomingCallId = null;
+        };
 
         // --- SPEECH-TO-TEXT LOGIC (INSIDE MIC) ---
         function toggleVoiceRecord() {
@@ -2606,6 +2719,52 @@
                         const statusText = diff > 0 ? `Live until ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Live location ended';
                         mediaContent += `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
                     }
+                } else if (data.type === 'call') {
+                    const isVoice = data.call_type === 'voice';
+                    const isMissed = data.call_status === 'missed' || data.call_status === 'rejected';
+                    const isNoAnswer = data.call_status === 'no_answer';
+                    const isCompleted = data.call_status === 'completed';
+
+                    // Format duration
+                    let durationText = '';
+                    if (isCompleted && data.call_duration) {
+                        const d = data.call_duration;
+                        if (d >= 3600) durationText = Math.floor(d/3600) + ' hr ' + Math.floor((d%3600)/60) + ' min';
+                        else if (d >= 60) durationText = Math.floor(d/60) + ' min';
+                        else durationText = d + ' secs';
+                    } else if (isMissed) {
+                        durationText = 'Tap to call back';
+                    } else if (isNoAnswer) {
+                        durationText = 'No answer';
+                    }
+
+                    const iconColor = isMissed ? '#ef4444' : (isMe ? '#00a884' : '#8696a0');
+                    const callIcon = isVoice
+                        ? `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>`
+                        : `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`;
+
+                    const arrowIcon = isMe
+                        ? `<svg class="w-4 h-4" fill="${isMissed || isNoAnswer ? '#ef4444' : '#00a884'}" viewBox="0 0 24 24"><path d="M5.5 18.5l1.5-1.5L4 14h16v-2H4l3-3-1.5-1.5L0 13l5.5 5.5z" transform="rotate(180 12 12)"/></svg>`
+                        : `<svg class="w-4 h-4" fill="${isMissed ? '#ef4444' : '#00a884'}" viewBox="0 0 24 24"><path d="M5.5 18.5l1.5-1.5L4 14h16v-2H4l3-3-1.5-1.5L0 13l5.5 5.5z"/></svg>`;
+
+                    const callLabel = isVoice ? 'Voice call' : 'Video call';
+                    const callTitle = isMissed ? (isVoice ? 'Missed voice call' : 'Missed video call') : callLabel;
+
+                    const tapAction = isMissed && !isMe ? `onclick="event.stopPropagation(); ${isVoice ? 'window.startVoiceCall()' : 'window.startVideoCall()'}" style="cursor:pointer"` : '';
+
+                    mediaContent = `
+                        <div class="flex items-center gap-3 py-1 min-w-[180px]" ${tapAction}>
+                            <div class="w-9 h-9 rounded-full ${isMissed ? 'bg-red-100' : (isMe ? 'bg-[#d0f4e4]' : 'bg-gray-100')} flex items-center justify-center shrink-0">
+                                ${callIcon}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[14px] font-semibold ${isMissed ? 'text-red-600' : 'text-gray-900'} leading-tight">${callTitle}</div>
+                                <div class="flex items-center gap-1 mt-0.5">
+                                    ${arrowIcon}
+                                    <span class="text-[12px] ${isMissed ? 'text-red-500' : 'text-gray-500'}">${durationText}</span>
+                                </div>
+                            </div>
+                        </div>`;
                 }
 
                 let replyBlock = '';
@@ -2867,5 +3026,51 @@
                 box.classList.remove('bg-white', 'border-gray-400');
             }
         };
+
+        // === INCOMING CALL LISTENER ===
+        const myCallsRef = ref(db, 'calls');
+        onChildAdded(myCallsRef, (snapshot) => {
+            const callData = snapshot.val();
+            const callKey = snapshot.key;
+            if (!callData) return;
+            // Only show if I am the callee and call is in 'calling' state
+            if (callData.callee_id == window.myUserId && callData.status === 'calling') {
+                window.showIncomingCall(callKey, callData.caller_name, callData.caller_avatar || '', callData.type);
+                window._incomingCallerId = callData.caller_id;
+                window._incomingCallType = callData.type;
+
+                // Set up reject function
+                window._rejectCallFn = async function() {
+                    try { await update(ref(db, `calls/${callKey}`), { status: 'rejected' }); } catch(e) {}
+                    setTimeout(async () => { try { await remove(ref(db, `calls/${callKey}`)); } catch(e) {} }, 3000);
+                };
+
+                // Set up missed call log sender
+                window._sendMissedCallLog = async function() {
+                    const callerId = callData.caller_id;
+                    const minId = Math.min(window.myUserId, callerId);
+                    const maxId = Math.max(window.myUserId, callerId);
+                    const chatId = `chat_${minId}_${maxId}`;
+                    try {
+                        await push(ref(db, `chats/${chatId}/messages`), {
+                            sender_id: callerId,
+                            type: 'call', call_type: callData.type,
+                            call_status: 'missed', call_duration: 0,
+                            text: '', time: Math.floor(Date.now() / 1000), status: 'sent'
+                        });
+                    } catch(e) { console.error('Missed call log error:', e); }
+                };
+
+                // Auto-dismiss if caller cancels
+                onValue(ref(db, `calls/${callKey}/status`), (snap) => {
+                    const st = snap.val();
+                    if (st === 'ended' || st === null) {
+                        try { document.getElementById('ic_ringtone').pause(); } catch(e) {}
+                        document.getElementById('incoming_call_overlay').classList.add('hidden');
+                        window._incomingCallId = null;
+                    }
+                });
+            }
+        });
     </script>
 </x-app-layout>

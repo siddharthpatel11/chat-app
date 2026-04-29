@@ -124,6 +124,38 @@ class ChatController extends Controller
         return response()->json(['status' => true]);
     }
 
+    public function voiceCall(Request $request)
+    {
+        $name = $request->query('name', 'User');
+        $avatar = $request->query('avatar');
+        if (empty($avatar)) {
+            $avatar = 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=202c33&color=fff&size=280';
+        }
+        $role = $request->query('role', 'caller');
+        $callId = $request->query('call_id', null);
+        $calleeId = $request->query('callee_id', null);
+        $myUserId = auth()->id();
+        $myName = auth()->user()->name ?? 'Me';
+        $myAvatar = auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($myName) . '&background=202c33&color=fff&size=280';
+        return view('chat.calls.voice_call', compact('name', 'avatar', 'role', 'callId', 'calleeId', 'myUserId', 'myName', 'myAvatar'));
+    }
+
+    public function videoCall(Request $request)
+    {
+        $name = $request->query('name', 'User');
+        $avatar = $request->query('avatar');
+        if (empty($avatar)) {
+            $avatar = 'https://ui-avatars.com/api/?name=' . urlencode($name) . '&background=202c33&color=fff&size=280';
+        }
+        $role = $request->query('role', 'caller');
+        $callId = $request->query('call_id', null);
+        $calleeId = $request->query('callee_id', null);
+        $myUserId = auth()->id();
+        $myName = auth()->user()->name ?? 'Me';
+        $myAvatar = auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($myName) . '&background=202c33&color=fff&size=280';
+        return view('chat.calls.video_call', compact('name', 'avatar', 'role', 'callId', 'calleeId', 'myUserId', 'myName', 'myAvatar'));
+    }
+
     public function updateLiveLocation(Request $request)
     {
         $factory = (new Factory)

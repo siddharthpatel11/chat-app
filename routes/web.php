@@ -20,6 +20,8 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/chat', [ChatController::class, 'index']);
+    Route::get('/chat/voice-call', [ChatController::class, 'voiceCall']);
+    Route::get('/chat/video-call', [ChatController::class, 'videoCall']);
     Route::post('/send', [ChatController::class, 'send']);
     Route::post('/save-token', [ChatController::class, 'saveToken']);
     Route::post('/update-live-location', [ChatController::class, 'updateLiveLocation']);
