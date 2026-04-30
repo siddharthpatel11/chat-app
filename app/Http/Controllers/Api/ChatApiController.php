@@ -140,6 +140,39 @@ class ChatApiController extends Controller
         ]);
     }
 
+    // Search messages within a specific chat
+    public function searchInChat(Request $request, $chatId)
+    {
+        $query = $request->query('query');
+        if (!$query) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Query parameter is required'
+            ], 400);
+        }
+
+        $messages = $this->db->getReference("chats/$chatId/messages")->getValue();
+        $results = [];
+
+        if ($messages) {
+            foreach ($messages as $msgId => $msg) {
+                if (isset($msg['text']) && stripos($msg['text'], $query) !== false) {
+                    $results[] = array_merge($msg, ['id' => $msgId]);
+                }
+            }
+        }
+
+        // Sort by time descending
+        usort($results, function ($a, $b) {
+            return ($b['time'] ?? 0) - ($a['time'] ?? 0);
+        });
+
+        return response()->json([
+            'status' => true,
+            'data' => $results
+        ]);
+    }
+
     //Create chat
     public function createChat(Request $request)
     {
@@ -183,17 +216,102 @@ class ChatApiController extends Controller
     public function users(Request $request)
     {
         $userId = $request->user_id ?? auth()->id();
-        
+        $search = $request->search;
+
         $query = \App\Models\User::query();
         if ($userId) {
             $query->where('id', '!=', $userId);
         }
-        
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('phone', 'LIKE', "%{$search}%");
+            });
+        }
+
         $users = $query->get();
 
         return response()->json([
             'status' => true,
             'data' => $users
+        ]);
+    }
+
+    // Global Search (Users + Messages)
+    public function globalSearch(Request $request)
+    {
+        $query = $request->query('query');
+        if (!$query) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Query parameter is required'
+            ], 400);
+        }
+
+        $userId = $request->user_id ?? auth()->id();
+
+        // 1. Search Users
+        $users = \App\Models\User::where('id', '!=', $userId)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                    ->orWhere('phone', 'LIKE', "%{$query}%");
+            })
+            ->get();
+
+        // 2. Search Messages in Firebase
+        $allMsgResults = [];
+        $chats = $this->db->getReference("chats")->getValue();
+        
+        // Cache users to avoid repeated DB lookups
+        $allUsers = \App\Models\User::all()->keyBy('id');
+
+        if ($chats) {
+            foreach ($chats as $chatId => $chatData) {
+                if (isset($chatData['messages'])) {
+                    // Identify the other user in this chat to provide context in results
+                    $otherUser = null;
+                    if (isset($chatData['users'])) {
+                        foreach ($chatData['users'] as $uId) {
+                            if ($uId != $userId && isset($allUsers[$uId])) {
+                                $otherUser = $allUsers[$uId];
+                                break;
+                            }
+                        }
+                    }
+
+                    foreach ($chatData['messages'] as $msgId => $msg) {
+                        if (isset($msg['text']) && stripos($msg['text'], $query) !== false) {
+                            $allMsgResults[] = [
+                                'chat_id' => $chatId,
+                                'message_id' => $msgId,
+                                'text' => $msg['text'],
+                                'sender_id' => $msg['sender_id'] ?? null,
+                                'time' => $msg['time'] ?? null,
+                                'type' => $msg['type'] ?? 'text',
+                                'user' => $otherUser ? [
+                                    'id' => $otherUser->id,
+                                    'name' => $otherUser->name,
+                                    'avatar' => $otherUser->avatar,
+                                ] : null
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Sort messages by time (newest first)
+        usort($allMsgResults, function ($a, $b) {
+            return ($b['time'] ?? 0) - ($a['time'] ?? 0);
+        });
+
+        return response()->json([
+            'status' => true,
+            'data' => [
+                'users' => $users,
+                'messages' => $allMsgResults
+            ]
         ]);
     }
 
