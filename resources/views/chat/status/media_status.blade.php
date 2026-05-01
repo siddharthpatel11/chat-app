@@ -131,15 +131,14 @@
     <!-- Bottom Thumbnails and Send -->
     <div class="h-24 px-6 mb-4 flex items-center justify-between shrink-0 z-10">
         <div class="flex items-center gap-3">
-            <div class="bg-[#111b21]/50 rounded-full px-4 py-2 flex items-center gap-2 border border-white/5">
+            <button onclick="window.openStatusPrivacy()" class="bg-[#111b21]/50 rounded-full px-4 py-2 flex items-center gap-2 border border-white/5 hover:bg-[#202c33] transition-colors cursor-pointer">
                 <svg viewBox="0 0 24 24" width="16" height="16" class="text-[#00a884]" fill="currentColor">
                     <path
                         d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 14.5h-2v-2h2v2zm0-4h-2v-6h2v6z">
                     </path>
                 </svg>
-                <span class="text-[#00a884] text-[13px] font-medium">Status (<span id="media_count_label">1</span>
-                    included)</span>
-            </div>
+                <span class="text-[#00a884] text-[13px] font-medium" id="status_privacy_label">Status (Contacts)</span>
+            </button>
         </div>
 
         <!-- Thumbnails Container -->
@@ -176,6 +175,91 @@
     <!-- Hidden File Input -->
     <input type="file" id="media_status_input" class="hidden" accept="image/*,video/*" multiple
         onchange="window.handleMediaStatusSelection(event)">
+</div>
+
+<!-- Status Privacy Modal -->
+    <div id="status_privacy_modal" class="hidden fixed inset-0 z-[850] flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-200">
+        <div class="bg-[#233138] w-full max-w-[400px] rounded-xl shadow-2xl flex flex-col overflow-hidden transform scale-95 transition-transform duration-200" id="status_privacy_modal_content">
+            <div class="h-14 flex items-center px-4 border-b border-white/5">
+                <button onclick="window.closeStatusPrivacy()" class="text-[#8696a0] hover:text-[#e9edef] mr-4">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
+                </button>
+                <h2 class="text-[#e9edef] text-[16px] font-medium">Status privacy</h2>
+            </div>
+            <div class="p-5 flex flex-col gap-5">
+                <p class="text-[#8696a0] text-sm">Who can see my status updates</p>
+                
+                <label class="flex items-center gap-4 cursor-pointer group">
+                    <div class="relative flex items-center justify-center">
+                        <input type="radio" name="status_privacy" value="all" class="peer sr-only" checked onclick="window.handlePrivacyModeChange('all')">
+                        <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] transition-colors"></div>
+                        <div class="absolute w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    </div>
+                    <div class="flex flex-col flex-1">
+                        <span class="text-[#e9edef] text-base group-hover:text-white transition-colors">My contacts</span>
+                        <span class="text-[#8696a0] text-[13px]">Share with all of your contacts</span>
+                    </div>
+                </label>
+
+                <label class="flex items-center gap-4 cursor-pointer group">
+                    <div class="relative flex items-center justify-center">
+                        <input type="radio" name="status_privacy" value="except" class="peer sr-only" onclick="window.handlePrivacyModeChange('except')">
+                        <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] transition-colors"></div>
+                        <div class="absolute w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    </div>
+                    <div class="flex flex-col flex-1">
+                        <span class="text-[#e9edef] text-base group-hover:text-white transition-colors">My contacts except...</span>
+                        <span id="privacy_except_count_text" class="text-[#8696a0] text-[13px]">Share with your contacts except people you select</span>
+                    </div>
+                </label>
+
+                <label class="flex items-center gap-4 cursor-pointer group">
+                    <div class="relative flex items-center justify-center">
+                        <input type="radio" name="status_privacy" value="only" class="peer sr-only" onclick="window.handlePrivacyModeChange('only')">
+                        <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] transition-colors"></div>
+                        <div class="absolute w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    </div>
+                    <div class="flex flex-col flex-1">
+                        <span class="text-[#e9edef] text-base group-hover:text-white transition-colors">Only share with...</span>
+                        <span id="privacy_only_count_text" class="text-[#8696a0] text-[13px]">Share with selected contacts</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Selection Modal -->
+    <div id="contact_selection_modal" class="hidden fixed inset-0 z-[900] bg-[#111b21] flex flex-col transform translate-x-full transition-transform duration-300">
+        <div class="h-16 bg-[#202c33] flex items-center px-4 shrink-0 border-b border-white/5 gap-4">
+            <button onclick="window.closeContactSelection()" class="text-[#8696a0] hover:text-[#e9edef]">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
+            </button>
+            <div class="flex flex-col">
+                <h2 id="contact_selection_title" class="text-[#e9edef] text-[19px] font-medium">My contacts except...</h2>
+                <span id="contact_selection_subtitle" class="text-[#8696a0] text-[13px]">0 contacts excluded</span>
+            </div>
+        </div>
+        
+        <div class="p-3 border-b border-[#202c33] bg-[#111b21] shrink-0">
+            <div class="bg-[#202c33] rounded-lg flex items-center px-3 py-1.5 h-9 focus-within:bg-[#2a3942] transition-colors border border-white/5 focus-within:border-[#00a884]/50">
+                <svg class="w-[18px] h-[18px] text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24"><path d="M15.009 13.805h-.636l-.22-.219a5.184 5.184 0 0 0 1.256-3.386 5.207 5.207 0 1 0-5.207 5.208 5.183 5.183 0 0 0 3.385-1.255l.221.22v.635l4.004 3.999 1.194-1.195-3.997-4.007zm-4.6-1.598a3.608 3.608 0 1 1 0-7.216 3.608 3.608 0 0 1 0 7.216z"></path></svg>
+                <input type="text" id="contact_search_input" oninput="window.filterPrivacyContacts()" placeholder="Search name or number" class="bg-transparent border-none focus:ring-0 w-full text-[14px] ml-4 text-[#d1d7db] placeholder-[#8696a0] outline-none">
+            </div>
+        </div>
+
+        <div class="px-5 pt-4 pb-2">
+            <span class="text-[#8696a0] text-[14px] font-medium">Contacts</span>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scrollbar" id="privacy_contact_list">
+            <!-- Contacts injected here via JS -->
+        </div>
+
+        <div class="p-4 bg-[#202c33] border-t border-white/5 flex justify-end shrink-0">
+            <button onclick="window.saveContactSelection()" class="w-14 h-14 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#06cf9c] active:scale-95 transition-all">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"></path></svg>
+            </button>
+    </div>
 </div>
 
 <script>
@@ -543,7 +627,9 @@
                     text: item.caption,
                     type: item.type,
                     timestamp: window.serverTimestamp(),
-                    viewers: {}
+                    viewers: {},
+                    privacyMode: window.currentPrivacyMode,
+                    privacyContacts: window.currentPrivacyContacts
                 };
 
                 const statusRef = window.ref(window.db, `statuses/${window.myUserId}`);
@@ -591,9 +677,219 @@
             }
         }
     });
+    // Privacy Logic
+    window.currentPrivacyMode = 'all'; // 'all', 'except', 'only'
+    window.currentPrivacyContacts = []; // Array of user IDs
+    
+    let tempPrivacyMode = 'all';
+    let tempPrivacyContacts = [];
+
+    window.openStatusPrivacy = function() {
+        tempPrivacyMode = window.currentPrivacyMode;
+        tempPrivacyContacts = [...window.currentPrivacyContacts];
+        
+        document.querySelector(`input[name="status_privacy"][value="${tempPrivacyMode}"]`).checked = true;
+        updatePrivacyTexts();
+
+        const modal = document.getElementById('status_privacy_modal');
+        const content = document.getElementById('status_privacy_modal_content');
+        modal.classList.remove('hidden');
+        
+        // Trigger animation
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            content.classList.remove('scale-95');
+        }, 10);
+    };
+
+    window.closeStatusPrivacy = function() {
+        const modal = document.getElementById('status_privacy_modal');
+        const content = document.getElementById('status_privacy_modal_content');
+        modal.classList.add('opacity-0');
+        content.classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 200);
+    };
+
+    window.handlePrivacyModeChange = function(mode) {
+        if (mode === 'all') {
+            window.currentPrivacyMode = mode;
+            window.currentPrivacyContacts = [];
+            updatePrivacyTexts();
+            updatePrivacyLabel();
+            window.closeStatusPrivacy();
+        } else {
+            tempPrivacyMode = mode;
+            window.openContactSelection(mode);
+        }
+    };
+
+    function updatePrivacyTexts() {
+        const exceptText = document.getElementById('privacy_except_count_text');
+        const onlyText = document.getElementById('privacy_only_count_text');
+        
+        if (window.currentPrivacyMode === 'except') {
+            const count = window.currentPrivacyContacts.length;
+            exceptText.textContent = `${count} contact${count !== 1 ? 's' : ''} excluded`;
+            exceptText.classList.add('text-[#00a884]');
+        } else {
+            exceptText.textContent = 'Share with your contacts except people you select';
+            exceptText.classList.remove('text-[#00a884]');
+        }
+
+        if (window.currentPrivacyMode === 'only') {
+            const count = window.currentPrivacyContacts.length;
+            onlyText.textContent = `${count} contact${count !== 1 ? 's' : ''} included`;
+            onlyText.classList.add('text-[#00a884]');
+        } else {
+            onlyText.textContent = 'Share with selected contacts';
+            onlyText.classList.remove('text-[#00a884]');
+        }
+    }
+
+    function updatePrivacyLabel() {
+        const label = document.getElementById('status_privacy_label');
+        if (window.currentPrivacyMode === 'all') {
+            label.textContent = 'Status (Contacts)';
+        } else if (window.currentPrivacyMode === 'except') {
+            label.textContent = `Status (${window.currentPrivacyContacts.length} excluded)`;
+        } else {
+            label.textContent = `Status (${window.currentPrivacyContacts.length} included)`;
+        }
+    }
+
+    window.openContactSelection = function(mode) {
+        const modal = document.getElementById('contact_selection_modal');
+        const title = document.getElementById('contact_selection_title');
+        
+        title.textContent = mode === 'except' ? 'My contacts except...' : 'Only share with...';
+        
+        // If switching mode, reset temp contacts if it differs from current
+        if (mode !== window.currentPrivacyMode) {
+            tempPrivacyContacts = [];
+        } else {
+            tempPrivacyContacts = [...window.currentPrivacyContacts];
+        }
+
+        document.getElementById('contact_search_input').value = '';
+        renderPrivacyContacts('');
+        
+        modal.classList.remove('hidden');
+        // Trigger animation
+        setTimeout(() => {
+            modal.classList.remove('translate-x-full');
+        }, 10);
+    };
+
+    window.closeContactSelection = function() {
+        const modal = document.getElementById('contact_selection_modal');
+        modal.classList.add('translate-x-full');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            // Revert radio button if canceled
+            document.querySelector(`input[name="status_privacy"][value="${window.currentPrivacyMode}"]`).checked = true;
+        }, 300);
+    };
+
+    window.saveContactSelection = function() {
+        window.currentPrivacyMode = tempPrivacyMode;
+        window.currentPrivacyContacts = [...tempPrivacyContacts];
+        updatePrivacyTexts();
+        updatePrivacyLabel();
+        
+        const modal = document.getElementById('contact_selection_modal');
+        modal.classList.add('translate-x-full');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            window.closeStatusPrivacy();
+        }, 300);
+    };
+
+    window.togglePrivacyContact = function(id) {
+        const index = tempPrivacyContacts.indexOf(id);
+        if (index > -1) {
+            tempPrivacyContacts.splice(index, 1);
+        } else {
+            tempPrivacyContacts.push(id);
+        }
+        updateSelectionSubtitle();
+        
+        // Update checkbox UI visually
+        const checkbox = document.getElementById(`privacy_check_${id}`);
+        if(checkbox) {
+            const inner = checkbox.querySelector('.check-inner');
+            if(tempPrivacyContacts.includes(id)) {
+                checkbox.classList.add('bg-[#00a884]', 'border-[#00a884]');
+                checkbox.classList.remove('border-[#8696a0]');
+                inner.classList.remove('hidden');
+            } else {
+                checkbox.classList.remove('bg-[#00a884]', 'border-[#00a884]');
+                checkbox.classList.add('border-[#8696a0]');
+                inner.classList.add('hidden');
+            }
+        }
+    };
+
+    function updateSelectionSubtitle() {
+        const subtitle = document.getElementById('contact_selection_subtitle');
+        const count = tempPrivacyContacts.length;
+        if (tempPrivacyMode === 'except') {
+            subtitle.textContent = `${count} contact${count !== 1 ? 's' : ''} excluded`;
+        } else {
+            subtitle.textContent = `${count} contact${count !== 1 ? 's' : ''} included`;
+        }
+    }
+
+    window.filterPrivacyContacts = function() {
+        const q = document.getElementById('contact_search_input').value.toLowerCase();
+        renderPrivacyContacts(q);
+    };
+
+    function renderPrivacyContacts(query) {
+        const list = document.getElementById('privacy_contact_list');
+        list.innerHTML = '';
+        
+        const contacts = window.allContacts || [];
+        
+        contacts.forEach(user => {
+            const name = user.name || user.phone;
+            if (query && !name.toLowerCase().includes(query)) return;
+
+            const isSelected = tempPrivacyContacts.includes(user.id);
+            const avatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
+
+            const checkColorClasses = isSelected ? 'bg-[#00a884] border-[#00a884]' : 'border-[#8696a0]';
+            const checkInnerClass = isSelected ? '' : 'hidden';
+
+            const html = `
+                <div class="flex items-center px-5 py-3 hover:bg-[#202c33] cursor-pointer transition-colors" onclick="window.togglePrivacyContact(${user.id})">
+                    <div class="mr-5 shrink-0">
+                        <div id="privacy_check_${user.id}" class="w-5 h-5 rounded border-2 ${checkColorClasses} flex items-center justify-center transition-colors">
+                            <svg class="check-inner w-3.5 h-3.5 text-white ${checkInnerClass}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full overflow-hidden bg-[#2a3942] shrink-0">
+                        <img src="${avatar}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="ml-4 flex flex-col justify-center border-b border-[#202c33]/50 pb-2 flex-1 min-w-0 h-full">
+                        <h4 class="text-[17px] text-[#e9edef] truncate font-normal">${name}</h4>
+                        ${user.about ? `<p class="text-[13px] text-[#8696a0] truncate">${user.about}</p>` : ''}
+                    </div>
+                </div>
+            `;
+            list.insertAdjacentHTML('beforeend', html);
+        });
+
+        updateSelectionSubtitle();
+    }
+
 </script>
 
 <style>
+
     .no-scrollbar::-webkit-scrollbar {
         display: none;
     }

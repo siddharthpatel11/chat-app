@@ -51,6 +51,14 @@
                         </svg>
                         <span class="text-[15px]">Delete</span>
                     </button>
+                    <button id="status_hide_btn" onclick="window.hideCurrentStatus()" class="hidden w-full text-left px-4 py-3 text-white/80 hover:bg-[#182229] transition-colors flex items-center gap-3">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.44-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zm0 10c-2.76 0-5-2.24-5-5 0-.65.13-1.26.36-1.83l-2.92-2.92c-1.51 1.26-2.7 2.89-3.44 4.75 1.73 4.39 6 7.5 11 7.5 1.4 0 2.74-.25 3.98-.7l-2.16-2.16C13.26 16.87 12.65 17 12 17zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"></path></svg>
+                        <span class="text-[15px]">Hide</span>
+                    </button>
+                    <button id="status_report_btn" onclick="window.reportCurrentStatus()" class="hidden w-full text-left px-4 py-3 text-[#f15c6d] hover:bg-[#182229] transition-colors flex items-center gap-3">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
+                        <span class="text-[15px]">Report</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -116,6 +124,16 @@
         </div>
     </button>
 
+    <!-- Reply input (Visible only when viewing another user's status) -->
+    <div id="status_reply_container" class="hidden absolute bottom-4 left-0 right-0 flex justify-center z-[610] px-4">
+        <div class="bg-[#2a3942]/60 backdrop-blur-md rounded-full max-w-lg w-full flex items-center px-4 py-1.5 border border-white/10 shadow-lg">
+            <input type="text" id="status_reply_input" onfocus="window.pauseStatusPlayback()" onblur="window.resumeStatusPlayback()" onkeydown="window.handleReplyKey(event)" placeholder="Reply" class="bg-transparent border-none focus:ring-0 text-white text-[15px] placeholder-white/60 flex-1 outline-none">
+            <button onclick="window.sendStatusReply()" class="text-[#00a884] hover:text-[#06cf9c] transition-colors p-2 shrink-0">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
+            </button>
+        </div>
+    </div>
+
     <!-- Custom Delete Confirmation Modal -->
     <div id="delete_status_modal" class="hidden fixed inset-0 z-[700] flex items-center justify-center p-6">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px]" onclick="window.closeDeleteModal()"></div>
@@ -156,9 +174,11 @@
 
     window.closeStatusViewer = function() {
         stopPlayback();
-        document.getElementById('status_viewer_overlay').classList.add('hidden');
+        const overlay = document.getElementById('status_viewer_overlay');
+        if (overlay) overlay.classList.add('hidden');
         document.body.style.overflow = '';
-        document.getElementById('status_viewers_drawer').classList.add('translate-y-full');
+        const drawer = document.getElementById('status_viewers_drawer');
+        if (drawer) drawer.classList.add('translate-y-full');
     };
 
     function renderStatus() {
@@ -220,14 +240,25 @@
         const date = new Date(status.timestamp);
         timeEl.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        // Show/Hide delete and viewers for own status
+        const hideBtn = document.getElementById('status_hide_btn');
+        const reportBtn = document.getElementById('status_report_btn');
+        const replyContainer = document.getElementById('status_reply_container');
+        const replyInput = document.getElementById('status_reply_input');
+
         if (status.userId == window.myUserId) {
             deleteBtn.classList.remove('hidden');
             showViewersBtn.classList.remove('hidden');
+            if (hideBtn) hideBtn.classList.add('hidden');
+            if (reportBtn) reportBtn.classList.add('hidden');
+            if (replyContainer) replyContainer.classList.add('hidden');
             updateViewersList(status);
         } else {
             deleteBtn.classList.add('hidden');
             showViewersBtn.classList.add('hidden');
+            if (hideBtn) hideBtn.classList.remove('hidden');
+            if (reportBtn) reportBtn.classList.remove('hidden');
+            if (replyContainer) replyContainer.classList.remove('hidden');
+            if (replyInput) replyInput.value = '';
             // Mark as viewed in Firebase
             markAsViewed(status);
         }
@@ -324,7 +355,11 @@
             if (window.showToast) window.showToast('Deleted', 'Your status has been deleted.');
         } catch (e) {
             console.error('Delete status error:', e);
-            alert('Failed to delete status.');
+            if (window.showToast) {
+                window.showToast('Error', 'Failed to delete status.');
+            } else {
+                alert('Failed to delete status.');
+            }
         }
     };
 
@@ -377,6 +412,107 @@
             console.error('Mark as viewed error:', e);
         }
     }
+
+    window.hideCurrentStatus = function() {
+        const status = currentStatusArray[currentStatusIndex];
+        if (!status) return;
+
+        let hiddenUsers = JSON.parse(localStorage.getItem('hiddenStatusUsers') || '[]').map(String);
+        if (!hiddenUsers.includes(String(status.userId))) {
+            hiddenUsers.push(String(status.userId));
+            localStorage.setItem('hiddenStatusUsers', JSON.stringify(hiddenUsers));
+        }
+
+        document.getElementById('status_viewer_menu').classList.add('hidden');
+        window.closeStatusViewer();
+        if (window.renderStatusLists) window.renderStatusLists();
+        if (window.showToast) window.showToast('Hidden', 'This user\'s status updates are now hidden.');
+    };
+
+    window.reportCurrentStatus = function() {
+        document.getElementById('status_viewer_menu').classList.add('hidden');
+        if (window.showToast) {
+            window.showToast('Reported', 'This status update has been reported for review.');
+        } else {
+            alert('This status update has been reported for review.');
+        }
+    };
+
+    window.pauseStatusPlayback = function() {
+        isPaused = true;
+    };
+
+    window.resumeStatusPlayback = function() {
+        // Only resume if delete modal or viewers modal aren't open
+        const deleteModal = document.getElementById('delete_status_modal');
+        const viewersModal = document.getElementById('status_viewers_modal');
+        if ((!deleteModal || deleteModal.classList.contains('hidden')) && 
+            (!viewersModal || viewersModal.classList.contains('hidden'))) {
+            isPaused = false;
+        }
+    };
+
+    let isSendingReply = false;
+    window.handleReplyKey = function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            window.sendStatusReply();
+        }
+    };
+
+    window.sendStatusReply = async function() {
+        if (isSendingReply) return;
+
+        const input = document.getElementById('status_reply_input');
+        const replyText = input ? input.value.trim() : '';
+        if (!replyText) return;
+
+        isSendingReply = true;
+
+        const status = currentStatusArray[currentStatusIndex];
+        if (!status) return;
+
+        const myId = window.myUserId;
+        const otherId = status.userId;
+        const minId = Math.min(myId, otherId);
+        const maxId = Math.max(myId, otherId);
+        const chatId = `chat_${minId}_${maxId}`;
+
+        // Status excerpt for the reply
+        let statusExcerpt = '';
+        if (status.type === 'text') {
+            statusExcerpt = status.text;
+        } else {
+            statusExcerpt = status.text ? `${status.type === 'image' ? '📷' : '🎥'} Status: ${status.text}` : `${status.type === 'image' ? '📷 Photo' : '🎥 Video'} status`;
+        }
+
+        const messageData = {
+            sender_id: myId,
+            text: replyText,
+            time: Math.floor(Date.now() / 1000),
+            status: 'sent',
+            reply_to_text: statusExcerpt
+        };
+
+        try {
+            await window.push(window.ref(window.db, `chats/${chatId}/messages`), messageData);
+            if (input) input.value = '';
+            if (window.showToast) {
+                window.showToast('Sent', 'Status reply sent successfully.');
+            }
+            isSendingReply = false;
+            // Switch to recent status view if needed or close status viewer
+            window.closeStatusViewer();
+        } catch (e) {
+            console.error('Send reply error:', e);
+            isSendingReply = false;
+            if (window.showToast) {
+                window.showToast('Error', 'Failed to send status reply.');
+            } else {
+                alert('Failed to send status reply.');
+            }
+        }
+    };
 
     // Global click listener for viewer menu
     document.addEventListener('click', (e) => {

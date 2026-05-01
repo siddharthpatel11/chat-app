@@ -41,7 +41,7 @@
 
                 <!-- Status Options Dropdown Menu -->
                 <div id="status_options_dropdown" class="hidden absolute top-full right-0 w-[200px] bg-[#233138] rounded-xl shadow-2xl z-[100] py-2 mt-1 border border-white/5 animate-in fade-in zoom-in duration-200">
-                    <button class="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#182229] text-[#e9edef] transition-colors text-left">
+                    <button onclick="window.openStatusPrivacy(); window.closeAllStatusMenus();" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-[#182229] text-[#e9edef] transition-colors text-left">
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#8696a0]">
                             <path d="M12 2C8.69 2 6 4.69 6 8v4c-1.1 0-2 .9-2 2v6c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-6c0-1.1-.9-2-2-2V8c0-3.31-2.69-6-6-6zm-1 13h2v3h-2v-3zm3-7H10V8c0-1.1.9-2 2-2s2 .9 2 2v1z"></path>
                         </svg>
@@ -107,10 +107,10 @@
             </div>
 
             <!-- Hidden Updates -->
-            <div class="px-4 py-6 flex items-center justify-between border-t border-[#313d45] mt-4">
-                <span class="text-[#8696a0] text-sm font-medium uppercase tracking-wide">Hidden</span>
-                <button class="text-[#00a884] text-sm font-semibold hover:underline">Show</button>
+            <div id="hidden_statuses_header" class="hidden px-4 py-4 mt-2">
+                <h2 class="text-[#8696a0] text-sm font-medium uppercase tracking-wide">Hidden</h2>
             </div>
+            <div id="hidden_statuses_list"></div>
 
             <!-- Encryption Notice -->
             <div class="px-4 py-8 text-center">
@@ -318,6 +318,19 @@
                 for (const statusId in data[userId]) {
                     const status = data[userId][statusId];
                     status.id = statusId;
+                    
+                    // Apply Privacy Filtering
+                    if (userId != window.myUserId) {
+                        const mode = status.privacyMode || 'all';
+                        const contacts = status.privacyContacts || [];
+                        
+                        // If it's 'except' and I'm in the excluded list, skip
+                        if (mode === 'except' && contacts.includes(window.myUserId)) continue;
+                        
+                        // If it's 'only' and I'm NOT in the included list, skip
+                        if (mode === 'only' && !contacts.includes(window.myUserId)) continue;
+                    }
+
                     // Only keep if < 24h old
                     if (now - status.timestamp < oneDay) {
                         userStatuses.push(status);
@@ -334,15 +347,21 @@
         });
     }
 
-    function renderStatusLists() {
+    window.renderStatusLists = function() {
         const recentList = document.getElementById('recent_statuses_list');
         const viewedList = document.getElementById('viewed_statuses_list');
         const viewedHeader = document.getElementById('viewed_statuses_header');
+        const hiddenList = document.getElementById('hidden_statuses_list');
+        const hiddenHeader = document.getElementById('hidden_statuses_header');
         
         recentList.innerHTML = '<div class="px-4 py-4"><h2 class="text-[#00a884] text-sm font-medium uppercase tracking-wide">Recent</h2></div>';
         viewedList.innerHTML = '';
+        if (hiddenList) hiddenList.innerHTML = '';
         
         let hasViewed = false;
+        let hasHidden = false;
+
+        const hiddenUsers = JSON.parse(localStorage.getItem('hiddenStatusUsers') || '[]').map(String);
 
         for (const userId in window.globalStatuses) {
             const statuses = window.globalStatuses[userId];
@@ -357,36 +376,48 @@
             const allViewed = viewedCount === statuses.length;
             const timeStr = formatStatusTime(lastStatus.timestamp);
             
+            const isHidden = hiddenUsers.includes(userId);
+
             const html = `
                 <div onclick="window.openStatusByUserId('${userId}')"
-                    class="px-4 py-3 flex items-center gap-4 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-[#202c33]/50 ${allViewed ? 'opacity-70' : ''}">
-                    <div class="relative w-12 h-12 shrink-0">
-                        <div class="absolute inset-0">
-                            ${getStatusRingSVG(statuses.length, viewedCount)}
+                    class="px-4 py-3 flex items-center justify-between gap-4 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-[#202c33]/50 ${allViewed ? 'opacity-70' : ''}">
+                    <div class="flex items-center gap-4 flex-1 min-w-0">
+                        <div class="relative w-12 h-12 shrink-0">
+                            <div class="absolute inset-0">
+                                ${getStatusRingSVG(statuses.length, viewedCount)}
+                            </div>
+                            <div class="absolute inset-[3px] rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center">
+                                ${lastStatus.type === 'text' ? 
+                                    `<div class="w-full h-full flex items-center justify-center text-[6px] font-bold p-1 text-center" style="background-color: ${lastStatus.bgColor}">${lastStatus.text}</div>` :
+                                    (lastStatus.type === 'video' ?
+                                        `<div class="w-full h-full relative">
+                                            <video src="${lastStatus.mediaUrl}" class="w-full h-full object-cover" muted preload="metadata"></video>
+                                            <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                                                <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M8 5v14l11-7z"></path></svg>
+                                            </div>
+                                        </div>` :
+                                        `<img src="${lastStatus.mediaUrl}" class="w-full h-full object-cover" onerror="this.src='${lastStatus.userAvatar}'">`
+                                    )
+                                }
+                            </div>
                         </div>
-                        <div class="absolute inset-[3px] rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center">
-                            ${lastStatus.type === 'text' ? 
-                                `<div class="w-full h-full flex items-center justify-center text-[6px] font-bold p-1 text-center" style="background-color: ${lastStatus.bgColor}">${lastStatus.text}</div>` :
-                                (lastStatus.type === 'video' ?
-                                    `<div class="w-full h-full relative">
-                                        <video src="${lastStatus.mediaUrl}" class="w-full h-full object-cover" muted preload="metadata"></video>
-                                        <div class="absolute inset-0 flex items-center justify-center bg-black/20">
-                                            <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M8 5v14l11-7z"></path></svg>
-                                        </div>
-                                    </div>` :
-                                    `<img src="${lastStatus.mediaUrl}" class="w-full h-full object-cover" onerror="this.src='${lastStatus.userAvatar}'">`
-                                )
-                            }
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-[#e9edef] text-[17px] font-normal truncate">${lastStatus.userName}</h3>
+                            <p class="text-[#8696a0] text-sm mt-0.5">${timeStr}</p>
                         </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="text-[#e9edef] text-[17px] font-normal truncate">${lastStatus.userName}</h3>
-                        <p class="text-[#8696a0] text-sm mt-0.5">${timeStr}</p>
-                    </div>
+                    ${isHidden ? `
+                        <button onclick="event.stopPropagation(); window.unhideStatusUser('${userId}')" class="text-[#00a884] hover:text-[#06cf9c] text-sm font-semibold hover:underline shrink-0">
+                            Unhide
+                        </button>
+                    ` : ''}
                 </div>
             `;
 
-            if (allViewed) {
+            if (isHidden) {
+                if (hiddenList) hiddenList.insertAdjacentHTML('beforeend', html);
+                hasHidden = true;
+            } else if (allViewed) {
                 viewedList.insertAdjacentHTML('beforeend', html);
                 hasViewed = true;
             } else {
@@ -395,12 +426,20 @@
         }
 
         viewedHeader.classList.toggle('hidden', !hasViewed);
+        if (hiddenHeader) hiddenHeader.classList.toggle('hidden', !hasHidden);
         
         // If no statuses (besides mine), show a placeholder or nothing
-        if (recentList.children.length === 1 && !hasViewed) {
+        if (recentList.children.length === 1 && !hasViewed && !hasHidden) {
             recentList.insertAdjacentHTML('beforeend', '<div class="px-4 py-8 text-center text-[#8696a0] text-sm">No recent updates</div>');
         }
     }
+
+    window.unhideStatusUser = function(userId) {
+        let hiddenUsers = JSON.parse(localStorage.getItem('hiddenStatusUsers') || '[]').map(String);
+        hiddenUsers = hiddenUsers.filter(id => id != String(userId));
+        localStorage.setItem('hiddenStatusUsers', JSON.stringify(hiddenUsers));
+        window.renderStatusLists();
+    };
 
     function updateMyStatusPreview(statuses) {
         const ring = document.getElementById('my_status_preview_ring');

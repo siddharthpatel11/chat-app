@@ -2154,6 +2154,7 @@
         window.myUserName = "{{ auth()->user()->name ?? 'Me' }}";
         window.myUserAvatar = "{{ auth()->user()->avatar ?? '' }}";
         window.currentChatId = null;
+        window.allContacts = @json($users ?? []);
         let unsubscribeAdded = null;
         let unsubscribeRemoved = null;
         let statusUnsubscribe = null;
