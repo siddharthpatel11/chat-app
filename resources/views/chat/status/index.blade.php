@@ -331,10 +331,17 @@
                         if (mode === 'only' && !contacts.includes(window.myUserId)) continue;
                     }
 
-                    // Only keep if < 24h old
-                    if (now - status.timestamp < oneDay) {
-                        userStatuses.push(status);
+                    // Auto-delete from DB if >= 24h old
+                    if (now - status.timestamp >= oneDay) {
+                        try {
+                            window.remove(window.ref(window.db, `statuses/${userId}/${statusId}`));
+                        } catch (e) {
+                            console.error('Auto-delete status error:', e);
+                        }
+                        continue;
                     }
+
+                    userStatuses.push(status);
                 }
                 if (userStatuses.length > 0) {
                     // Sort by time

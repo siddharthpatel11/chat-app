@@ -85,7 +85,7 @@
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="opacity-70">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v2h-2v-2zm0-8h2v6h-2V9z"></path>
             </svg>
-            <span>Status (7 included)</span>
+            <span id="text_status_privacy_label">Status (Contacts)</span>
         </div>
 
         <!-- Send Button -->
@@ -192,11 +192,21 @@
     };
 
     window.openPrivacyModal = function() {
-        document.getElementById('privacy_modal_overlay').classList.remove('hidden');
+        if (window.openStatusPrivacy) {
+            window.openStatusPrivacy();
+        } else {
+            const overlay = document.getElementById('privacy_modal_overlay');
+            if (overlay) overlay.classList.remove('hidden');
+        }
     };
 
     window.closePrivacyModal = function() {
-        document.getElementById('privacy_modal_overlay').classList.add('hidden');
+        if (window.closeStatusPrivacy) {
+            window.closeStatusPrivacy();
+        } else {
+            const overlay = document.getElementById('privacy_modal_overlay');
+            if (overlay) overlay.classList.add('hidden');
+        }
     };
 
     // Initialize emoji picker toggle
@@ -246,7 +256,9 @@
             font: statusFonts[currentFontIndex],
             type: 'text',
             timestamp: window.serverTimestamp(),
-            viewers: {}
+            viewers: {},
+            privacyMode: window.currentPrivacyMode || 'all',
+            privacyContacts: window.currentPrivacyContacts || []
         };
 
         try {

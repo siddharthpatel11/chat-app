@@ -750,13 +750,19 @@
 
     function updatePrivacyLabel() {
         const label = document.getElementById('status_privacy_label');
+        const textLabel = document.getElementById('text_status_privacy_label');
+        
+        let labelText = '';
         if (window.currentPrivacyMode === 'all') {
-            label.textContent = 'Status (Contacts)';
+            labelText = 'Status (Contacts)';
         } else if (window.currentPrivacyMode === 'except') {
-            label.textContent = `Status (${window.currentPrivacyContacts.length} excluded)`;
+            labelText = `Status (${window.currentPrivacyContacts.length} excluded)`;
         } else {
-            label.textContent = `Status (${window.currentPrivacyContacts.length} included)`;
+            labelText = `Status (${window.currentPrivacyContacts.length} included)`;
         }
+        
+        if (label) label.textContent = labelText;
+        if (textLabel) textLabel.textContent = labelText;
     }
 
     window.openContactSelection = function(mode) {
