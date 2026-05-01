@@ -3,6 +3,9 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <!-- Cropper.js -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
         <style>
             .chat-bg {
                 background-color: #efeae2;
@@ -112,12 +115,17 @@
         <div class="flex w-full h-full bg-[#111b21] overflow-hidden border-none">
 
             @include('chat.nav_sidebar')
+            @include('chat.status.index')
+            @include('chat.status.text_status')
+            @include('chat.status.media_status')
+            @include('chat.status.status_viewer')
             @include('chat.profile_settings')
             @include('chat.edit_profile')
             @include('chat.about_modal')
             @include('chat.about_privacy_modal')
             @include('chat.contact_info')
             @include('chat.sidebar')
+            <div id="sidebar_resizer" class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]"></div>
 
 
             <!-- Media Preview Modal -->
@@ -300,7 +308,7 @@
                 </div>
             </div>
 
-            <div class="flex-1 flex h-full overflow-hidden relative">
+            <div id="chat_view_container" class="flex-1 flex h-full overflow-hidden relative">
                 @include('chat.settings_shortcuts')
                 <div id="main_chat_column" class="flex flex-col flex-1 h-full relative transition-all duration-300">
                     <!-- Empty State -->
@@ -2102,14 +2110,16 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, get, onChildAdded, remove, onChildRemoved, onValue, onDisconnect, set, serverTimestamp, onChildChanged, update, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, get, onChildAdded, remove, onChildRemoved, onValue, onDisconnect, set, serverTimestamp, onChildChanged, update, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+        import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTUuLg0mheURhlG1Z0p0DgMRwoAcR-F0w",
             authDomain: "chat-app-a370c.firebaseapp.com",
             databaseURL: "https://chat-app-a370c-default-rtdb.firebaseio.com",
             projectId: "chat-app-a370c",
+            storageBucket: "chat-app-a370c.appspot.com",
             // IMPORTANT: Get these from Firebase Console -> Project Settings
             messagingSenderId: "1089034732064",
             appId: "1:1016598612026:web:6cc4d1dd4466eec8934d03"
@@ -2118,14 +2128,31 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const messaging = getMessaging(app);
+        const storage = getStorage(app);
 
         // Expose to window for global access
         window.db = db;
         window.ref = ref;
         window.update = update;
         window.set = set;
+        window.push = push;
+        window.onValue = onValue;
+        window.onChildAdded = onChildAdded;
+        window.onChildChanged = onChildChanged;
+        window.onChildRemoved = onChildRemoved;
+        window.onDisconnect = onDisconnect;
+        window.remove = remove;
+        window.get = get;
+        window.query = query;
+        window.limitToLast = limitToLast;
         window.serverTimestamp = serverTimestamp;
+        window.storage = storage;
+        window.sRef = sRef;
+        window.uploadBytesResumable = uploadBytesResumable;
+        window.getDownloadURL = getDownloadURL;
         window.myUserId = {{ auth()->id() ?? '0' }};
+        window.myUserName = "{{ auth()->user()->name ?? 'Me' }}";
+        window.myUserAvatar = "{{ auth()->user()->avatar ?? '' }}";
         window.currentChatId = null;
         let unsubscribeAdded = null;
         let unsubscribeRemoved = null;
@@ -2495,11 +2522,94 @@
         };
 
         window.showChats = function () {
+            // Update Navigation UI
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav_chats').classList.add('active');
+
+            // Toggle Views
+            document.getElementById('status_view_container').classList.add('hidden');
+            document.getElementById('status_view_container').classList.remove('flex');
+            
+            const sidebar = document.getElementById('user_sidebar_container');
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('sm:flex', 'flex'); // Ensure both base and responsive flex are added
+
+            document.getElementById('chat_view_container').classList.remove('hidden');
+            document.getElementById('chat_view_container').classList.add('flex');
+            
+            document.getElementById('sidebar_resizer').classList.remove('hidden');
+
             const panel = document.getElementById('settings_panel');
             if (panel && !panel.classList.contains('hidden')) {
                 window.toggleSettings();
             }
         };
+
+        window.showStatus = function () {
+            // Update Navigation UI
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav_status').classList.add('active');
+
+            // Toggle Views
+            const sidebar = document.getElementById('user_sidebar_container');
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('sm:flex', 'flex'); // Remove both base and responsive flex
+
+            document.getElementById('chat_view_container').classList.add('hidden');
+            document.getElementById('chat_view_container').classList.remove('flex');
+            
+            document.getElementById('sidebar_resizer').classList.add('hidden');
+
+            document.getElementById('status_view_container').classList.remove('hidden');
+            document.getElementById('status_view_container').classList.add('flex');
+            
+            // Close settings if open
+            const panel = document.getElementById('settings_panel');
+            if (panel && !panel.classList.contains('hidden')) {
+                window.toggleSettings();
+            }
+        };
+
+        // Sidebar Resizer Logic
+        (function() {
+            const resizer = document.getElementById('sidebar_resizer');
+            const sidebar = document.getElementById('user_sidebar_container');
+            let isResizing = false;
+
+            // Load saved width
+            const savedWidth = localStorage.getItem('sidebarWidth');
+            if (savedWidth && window.innerWidth >= 640) {
+                sidebar.style.width = savedWidth;
+            }
+
+            resizer.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                document.body.style.cursor = 'col-resize';
+                document.body.classList.add('select-none');
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+
+                let newWidth = e.clientX - 60; // Subtract nav_sidebar width
+                const maxWidth = window.innerWidth / 2;
+                const minWidth = 280;
+
+                if (newWidth > maxWidth) newWidth = maxWidth;
+                if (newWidth < minWidth) newWidth = minWidth;
+
+                sidebar.style.width = `${newWidth}px`;
+                localStorage.setItem('sidebarWidth', `${newWidth}px`);
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    document.body.style.cursor = '';
+                    document.body.classList.remove('select-none');
+                }
+            });
+        })();
 
         window.focusSearch = function () {
             const input = document.getElementById('sidebar_search');
@@ -2516,6 +2626,12 @@
         };
 
         window.selectChat = function (otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
+            // If we are in Status mode, switch back to Chats
+            const statusView = document.getElementById('status_view_container');
+            if (statusView && !statusView.classList.contains('hidden')) {
+                window.showChats();
+            }
+
             // Capture search query for highlighting messages
             const searchInput = document.getElementById('sidebar_search');
             window.activeSearchQuery = (searchInput && searchInput.value.trim().length > 0) ? searchInput.value.trim().toLowerCase() : null;

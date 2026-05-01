@@ -25,6 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/send', [ChatController::class, 'send']);
     Route::post('/save-token', [ChatController::class, 'saveToken']);
     Route::post('/update-live-location', [ChatController::class, 'updateLiveLocation']);
+    Route::post('/upload-status-media', [ChatController::class, 'uploadStatusMedia']);
 });
 
 require __DIR__.'/auth.php';

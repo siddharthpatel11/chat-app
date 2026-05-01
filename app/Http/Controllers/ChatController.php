@@ -176,4 +176,15 @@ class ChatController extends Controller
 
         return response()->json(['status' => true]);
     }
+
+    public function uploadStatusMedia(Request $request)
+    {
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('uploads/statuses', 'public');
+            $fileUrl = url('storage/' . $path);
+            return response()->json(['status' => true, 'url' => $fileUrl]);
+        }
+        return response()->json(['status' => false], 400);
+    }
 }

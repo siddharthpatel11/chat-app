@@ -30,7 +30,7 @@
         </button>
 
         <!-- Status -->
-        <button class="nav-item group" title="Status">
+        <button id="nav_status" class="nav-item group" title="Status" onclick="window.showStatus()">
             <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
                     class="text-[#8696a0] group-hover:text-[#e9edef]">
@@ -38,6 +38,9 @@
                         d="M12.072 1.761a10.231 10.231 0 0 1 7.303 3.025l-1.611 1.611a7.923 7.923 0 0 0-11.433 0l-1.611-1.611a10.231 10.231 0 0 1 7.352-3.025zm7.303 17.453a10.231 10.231 0 0 1-7.303 3.025c-2.69 0-5.127-1.055-6.931-2.77l1.611-1.611a7.923 7.923 0 0 0 10.641 0l1.611 1.611a10.231 10.231 0 0 1 .371-.255zM3.737 6.397l1.611 1.611a7.923 7.923 0 0 0 0 7.984l-1.611 1.611a10.231 10.231 0 0 1 0-11.206zm14.915 0l1.611-1.611a10.231 10.231 0 0 1 0 11.206l-1.611-1.611a7.923 7.923 0 0 0 0-7.984z">
                     </path>
                 </svg>
+            </div>
+            <div
+                class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#00a884] rounded-r-full hidden group-[.active]:block">
             </div>
         </button>
 
