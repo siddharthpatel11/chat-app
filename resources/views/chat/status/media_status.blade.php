@@ -278,6 +278,7 @@
         const files = event.target.files;
         if (!files.length) return;
 
+        const prevLength = selectedMediaItems.length;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const type = file.type.startsWith('image/') ? 'image' : 'video';
