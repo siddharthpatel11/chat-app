@@ -378,4 +378,75 @@ class ChatApiController extends Controller
             'data' => $user
         ]);
     }
+    public function checkPhone(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+        ]);
+
+        // Clean phone number (remove spaces, etc) if needed
+        $phone = preg_replace('/\s+/', '', $request->phone);
+
+        $user = \App\Models\User::where('phone', $phone)
+            ->orWhere('phone', 'like', '%' . $phone)
+            ->first();
+
+        if ($user) {
+            return response()->json([
+                'status' => true,
+                'message' => 'This phone number is on WhatsApp.',
+                'user' => $user
+            ]);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'This phone number is not on WhatsApp. Invite them on your primary device.'
+        ]);
+    }
+
+    public function saveContact(Request $request)
+    {
+        $request->validate([
+            'contact_user_id' => 'required|exists:users,id',
+            'custom_name' => 'nullable|string|max:255',
+        ]);
+
+        $userId = auth()->id();
+        if (!$userId) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        $contact = \App\Models\Contact::updateOrCreate(
+            ['user_id' => $userId, 'contact_user_id' => $request->contact_user_id],
+            ['custom_name' => $request->custom_name]
+        );
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Contact saved successfully',
+            'contact' => $contact
+        ]);
+    }
+
+    public function deleteContact(Request $request)
+    {
+        $request->validate([
+            'contact_user_id' => 'required|exists:users,id',
+        ]);
+
+        $userId = auth()->id();
+        if (!$userId) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
+        }
+
+        \App\Models\Contact::where('user_id', $userId)
+            ->where('contact_user_id', $request->contact_user_id)
+            ->delete();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Contact deleted successfully'
+        ]);
+    }
 }

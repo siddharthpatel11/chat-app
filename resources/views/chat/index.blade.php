@@ -66,51 +66,164 @@
         </div>
 
         <!-- Incoming Call Overlay -->
-        <div id="incoming_call_overlay" class="hidden fixed inset-0 z-[300] flex flex-col items-center justify-between" style="background:linear-gradient(135deg,#0b141a 0%,#1a2e38 40%,#0d3320 70%,#0b141a 100%)">
+        <div id="incoming_call_overlay" class="hidden fixed inset-0 z-[300] flex flex-col items-center justify-between"
+            style="background:linear-gradient(135deg,#0b141a 0%,#1a2e38 40%,#0d3320 70%,#0b141a 100%)">
             <style>
-                @keyframes ic-pulse{0%{width:120px;height:120px;opacity:.6}100%{width:300px;height:300px;opacity:0}}
-                .ic-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,168,132,0.15);animation:ic-pulse 3s ease-out infinite}
-                .ic-ring:nth-child(1){animation-delay:0s}.ic-ring:nth-child(2){animation-delay:1s}.ic-ring:nth-child(3){animation-delay:2s}
-                @keyframes ic-dot{0%,80%,100%{opacity:.3}40%{opacity:1}}
-                .icd1{animation:ic-dot 1.4s ease-in-out infinite}.icd2{animation:ic-dot 1.4s ease-in-out .2s infinite}.icd3{animation:ic-dot 1.4s ease-in-out .4s infinite}
-                @keyframes ic-btn-pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)}50%{box-shadow:0 0 0 15px rgba(34,197,94,0)}}
-                .ic-accept-pulse{animation:ic-btn-pulse 2s ease-in-out infinite}
+                @keyframes ic-pulse {
+                    0% {
+                        width: 120px;
+                        height: 120px;
+                        opacity: .6
+                    }
+
+                    100% {
+                        width: 300px;
+                        height: 300px;
+                        opacity: 0
+                    }
+                }
+
+                .ic-ring {
+                    position: absolute;
+                    border-radius: 50%;
+                    border: 1px solid rgba(0, 168, 132, 0.15);
+                    animation: ic-pulse 3s ease-out infinite
+                }
+
+                .ic-ring:nth-child(1) {
+                    animation-delay: 0s
+                }
+
+                .ic-ring:nth-child(2) {
+                    animation-delay: 1s
+                }
+
+                .ic-ring:nth-child(3) {
+                    animation-delay: 2s
+                }
+
+                @keyframes ic-dot {
+
+                    0%,
+                    80%,
+                    100% {
+                        opacity: .3
+                    }
+
+                    40% {
+                        opacity: 1
+                    }
+                }
+
+                .icd1 {
+                    animation: ic-dot 1.4s ease-in-out infinite
+                }
+
+                .icd2 {
+                    animation: ic-dot 1.4s ease-in-out .2s infinite
+                }
+
+                .icd3 {
+                    animation: ic-dot 1.4s ease-in-out .4s infinite
+                }
+
+                @keyframes ic-btn-pulse {
+
+                    0%,
+                    100% {
+                        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4)
+                    }
+
+                    50% {
+                        box-shadow: 0 0 0 15px rgba(34, 197, 94, 0)
+                    }
+                }
+
+                .ic-accept-pulse {
+                    animation: ic-btn-pulse 2s ease-in-out infinite
+                }
             </style>
             <div class="pt-14 text-center">
-                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full" style="background:rgba(255,255,255,0.06);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08)">
-                    <svg class="w-3.5 h-3.5 text-[#00a884]" fill="currentColor" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full"
+                    style="background:rgba(255,255,255,0.06);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.08)">
+                    <svg class="w-3.5 h-3.5 text-[#00a884]" fill="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z" />
+                    </svg>
                     <span class="text-[#8696a0] text-[12px] font-medium">End-to-end encrypted</span>
                 </div>
             </div>
             <div class="flex-1 flex flex-col items-center justify-center -mt-8">
                 <div class="relative flex items-center justify-center mb-8">
-                    <div class="ic-ring"></div><div class="ic-ring"></div><div class="ic-ring"></div>
-                    <div class="w-[120px] h-[120px] rounded-full overflow-hidden border-[3px] border-[#00a884]/30 shadow-2xl relative z-10 bg-[#202c33]">
+                    <div class="ic-ring"></div>
+                    <div class="ic-ring"></div>
+                    <div class="ic-ring"></div>
+                    <div
+                        class="w-[120px] h-[120px] rounded-full overflow-hidden border-[3px] border-[#00a884]/30 shadow-2xl relative z-10 bg-[#202c33]">
                         <img id="ic_caller_avatar" src="" class="w-full h-full object-cover">
                     </div>
                 </div>
                 <h1 id="ic_caller_name" class="text-white text-[26px] font-semibold mb-1"></h1>
                 <div class="flex items-center gap-1">
                     <span id="ic_call_type" class="text-[#8696a0] text-[15px]">Voice Call</span>
-                    <span class="flex gap-0.5"><span class="icd1 text-[#8696a0]">.</span><span class="icd2 text-[#8696a0]">.</span><span class="icd3 text-[#8696a0]">.</span></span>
+                    <span class="flex gap-0.5"><span class="icd1 text-[#8696a0]">.</span><span
+                            class="icd2 text-[#8696a0]">.</span><span class="icd3 text-[#8696a0]">.</span></span>
                 </div>
             </div>
             <div class="pb-16 flex items-center justify-center gap-20">
                 <div class="flex flex-col items-center gap-2">
-                    <button id="ic_reject_btn" onclick="rejectIncomingCall()" class="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all active:scale-90" style="box-shadow:0 0 30px rgba(239,68,68,0.3)">
-                        <svg class="w-8 h-8 rotate-[135deg]" fill="currentColor" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
+                    <button id="ic_reject_btn" onclick="rejectIncomingCall()"
+                        class="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg transition-all active:scale-90"
+                        style="box-shadow:0 0 30px rgba(239,68,68,0.3)">
+                        <svg class="w-8 h-8 rotate-[135deg]" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z" />
+                        </svg>
                     </button>
                     <span class="text-[#8696a0] text-xs">Decline</span>
                 </div>
                 <div class="flex flex-col items-center gap-2">
-                    <button id="ic_accept_btn" onclick="acceptIncomingCall()" class="ic-accept-pulse w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center shadow-lg transition-all active:scale-90" style="box-shadow:0 0 30px rgba(34,197,94,0.3)">
-                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>
+                    <button id="ic_accept_btn" onclick="acceptIncomingCall()"
+                        class="ic-accept-pulse w-16 h-16 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center shadow-lg transition-all active:scale-90"
+                        style="box-shadow:0 0 30px rgba(34,197,94,0.3)">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z" />
+                        </svg>
                     </button>
                     <span class="text-[#8696a0] text-xs">Accept</span>
                 </div>
             </div>
-            <audio id="ic_ringtone" loop><source src="https://www.soundjay.com/phone/phone-calling-1.mp3" type="audio/mpeg"></audio>
+            <audio id="ic_ringtone" loop>
+                <source src="https://www.soundjay.com/phone/phone-calling-1.mp3" type="audio/mpeg">
+            </audio>
         </div>
+
+        <!-- Custom Delete Modal -->
+        <div id="delete_modal"
+            class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+            <div class="bg-[#233138] w-[90%] max-w-[340px] rounded-[32px] p-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0"
+                id="delete_modal_content">
+                <h3 id="delete_modal_title" class="text-[#e9edef] text-[16px] font-normal mb-8">Delete message?</h3>
+                <div class="flex justify-end gap-4 items-center">
+                    <button onclick="window.closeDeleteModal()"
+                        class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-4 py-2 rounded-lg transition-colors">Cancel</button>
+                    <button id="delete_confirm_btn"
+                        class="bg-[#00a884] text-[#111b21] font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg">Delete
+                        for me</button>
+                </div>
+            </div>
+        </div>
+        <style>
+            #delete_modal.show {
+                display: flex;
+            }
+
+            #delete_modal.show #delete_modal_content {
+                transform: scale(1);
+                opacity: 1;
+            }
+        </style>
 
         <div class="flex w-full h-full bg-[#111b21] overflow-hidden border-none">
 
@@ -121,11 +234,18 @@
             @include('chat.status.status_viewer')
             @include('chat.profile_settings')
             @include('chat.edit_profile')
-            @include('chat.about_modal')
-            @include('chat.about_privacy_modal')
-            @include('chat.contact_info')
+            @include('chat.about.about_modal')
+            @include('chat.about.about_privacy_modal')
+            @include('chat.contacts.contact_info')
+            @include('chat.new_chat')
+            @include('chat.groups.add_group_members')
+            @include('chat.groups.create_group')
+            @include('chat.contacts.new_contact')
+            @include('chat.contacts.edit_contact')
             @include('chat.sidebar')
-            <div id="sidebar_resizer" class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]"></div>
+            <div id="sidebar_resizer"
+                class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]">
+            </div>
 
 
             <!-- Media Preview Modal -->
@@ -581,7 +701,8 @@
                             <div id="replying_to_block"
                                 class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
                                 <div class="flex flex-col overflow-hidden">
-                                    <span class="font-semibold text-[#00a884] text-[13px]">Replying to message</span>
+                                    <span id="replying_to_name"
+                                        class="font-semibold text-[#00a884] text-[13px]">Replying to message</span>
                                     <span id="replying_to_text"
                                         class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
                                 </div>
@@ -860,6 +981,7 @@
                             </div>
                         </div>
                     </div>
+                    @include('chat.groups.group_chat')
                 </div>
 
                 <!-- Search Messages Sidebar -->
@@ -1235,7 +1357,7 @@
         window._incomingCallerName = null;
         window._incomingCallerAvatar = null;
 
-        window.showIncomingCall = function(callId, callerName, callerAvatar, callType, groupCallId) {
+        window.showIncomingCall = function (callId, callerName, callerAvatar, callType, groupCallId) {
             window._incomingCallId = callId;
             window._incomingCallType = callType;
             window._incomingCallerName = callerName;
@@ -1245,11 +1367,11 @@
             document.getElementById('ic_caller_avatar').src = callerAvatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(callerName) + '&background=202c33&color=fff&size=240';
             document.getElementById('ic_call_type').textContent = callType === 'video' ? 'Video Call' : 'Voice Call';
             document.getElementById('incoming_call_overlay').classList.remove('hidden');
-            try { document.getElementById('ic_ringtone').play().catch(()=>{}); } catch(e) {}
+            try { document.getElementById('ic_ringtone').play().catch(() => { }); } catch (e) { }
         };
 
-        window.acceptIncomingCall = function() {
-            try { document.getElementById('ic_ringtone').pause(); } catch(e) {}
+        window.acceptIncomingCall = function () {
+            try { document.getElementById('ic_ringtone').pause(); } catch (e) { }
             document.getElementById('incoming_call_overlay').classList.add('hidden');
             const route = window._incomingCallType === 'video' ? '/chat/video-call' : '/chat/voice-call';
             const params = new URLSearchParams({
@@ -1262,8 +1384,8 @@
             window.location.href = route + '?' + params.toString();
         };
 
-        window.rejectIncomingCall = function() {
-            try { document.getElementById('ic_ringtone').pause(); } catch(e) {}
+        window.rejectIncomingCall = function () {
+            try { document.getElementById('ic_ringtone').pause(); } catch (e) { }
             document.getElementById('incoming_call_overlay').classList.add('hidden');
             // Update Firebase status to rejected
             if (window._rejectCallFn) window._rejectCallFn();
@@ -1350,6 +1472,8 @@
         // Global state for features
         window.globalMessages = {};
         window.replyingToKey = null;
+        window.replyingToName = null;
+        window.replyingToText = null;
 
         let leafletMapInstance = null;
         let leafletMarker = null;
@@ -1648,6 +1772,59 @@
             }
             if (msgText === "" && !fileObj) return;
 
+            const msgInput = document.getElementById('msg');
+            if (msgInput && msgInput.disabled) {
+                alert('You do not have permission to send messages to this group.');
+                return;
+            }
+
+            if (window.currentChatId && typeof window.currentChatId === 'string' && window.currentChatId.startsWith('group_')) {
+                let msgData = {
+                    text: msgText,
+                    sender_id: window.myUserId,
+                    time: Math.floor(Date.now() / 1000),
+                    type: 'text',
+                    status: 'sent'
+                };
+                if (fileObj) {
+                    const fd = new FormData();
+                    fd.append('file', fileObj);
+                    const res = await fetch('/upload-status-media', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': csrf },
+                        body: fd
+                    });
+                    const rData = await res.json();
+                    if (rData.status && rData.url) {
+                        msgData.file_url = rData.url;
+                        msgData.file_name = fileObj.name;
+                        if (fileObj.type.startsWith('image/')) {
+                            msgData.type = 'image';
+                        } else if (fileObj.type.startsWith('video/')) {
+                            msgData.type = 'video';
+                        } else if (fileObj.type.startsWith('audio/')) {
+                            msgData.type = 'audio';
+                        } else {
+                            msgData.type = 'document';
+                        }
+                    }
+                }
+                if (window.replyingToKey) {
+                    msgData.reply_to_id = window.replyingToKey;
+                    msgData.reply_to_text = window.replyingToText || (window.globalMessages[window.replyingToKey]?.text || 'Media');
+                    msgData.reply_to_name = window.replyingToName || 'Member';
+                }
+
+                document.getElementById('msg').value = "";
+                clearFile();
+                cancelReply();
+                if (typeof handleInputToggle === 'function') handleInputToggle();
+
+                await window.push(window.ref(window.db, `chats/${window.currentChatId}/messages`), msgData);
+                document.getElementById('msg').focus();
+                return;
+            }
+
             let formData = new FormData();
             formData.append('chat_id', window.currentChatId);
             formData.append('message', msgText);
@@ -1655,9 +1832,10 @@
             if (fileObj) {
                 formData.append('file', fileObj);
             }
-            if (window.replyingToKey && window.globalMessages[window.replyingToKey]) {
+            if (window.replyingToKey) {
                 formData.append('reply_to_id', window.replyingToKey);
-                formData.append('reply_to_text', window.globalMessages[window.replyingToKey].text || 'Media');
+                formData.append('reply_to_text', window.replyingToText || (window.globalMessages[window.replyingToKey]?.text || 'Media'));
+                formData.append('reply_to_name', window.replyingToName || 'Member');
             }
 
             // Reset inputs
@@ -1706,15 +1884,45 @@
         // Feature Actions
         window.replyTo = function (key) {
             document.getElementById('menu_' + key)?.classList.add('hidden');
-            window.replyingToKey = key;
             const msgData = window.globalMessages[key];
+            if (!msgData) return;
+
+            window.replyingToKey = key;
+
+            let senderName = "Member";
+            if (msgData.sender_id == window.myUserId) {
+                senderName = "You";
+            } else if (window.allContacts) {
+                const match = window.allContacts.find(c => c.id == msgData.sender_id);
+                if (match) senderName = match.name || match.phone;
+            } else if (window.activeChatUser && window.activeChatUser.id == msgData.sender_id) {
+                senderName = window.activeChatUser.name;
+            }
+
+            window.replyingToName = senderName;
+            window.replyingToText = msgData.text || (msgData.type || 'Media');
+
             document.getElementById('replying_to_block').classList.remove('hidden');
-            document.getElementById('replying_to_text').textContent = msgData.text ? msgData.text : (msgData.type || 'Media File');
+            document.getElementById('replying_to_name').textContent = window.replyingToName;
+            document.getElementById('replying_to_text').textContent = window.replyingToText;
+            document.getElementById('msg').focus();
+        };
+
+        window.replyToMsg = function (key, name, text, groupName = null) {
+            window.replyingToKey = key;
+            window.replyingToName = name;
+            window.replyingToText = text;
+
+            document.getElementById('replying_to_block').classList.remove('hidden');
+            document.getElementById('replying_to_name').textContent = groupName ? `${name} . ${groupName}` : name;
+            document.getElementById('replying_to_text').textContent = text;
             document.getElementById('msg').focus();
         };
 
         window.cancelReply = function () {
             window.replyingToKey = null;
+            window.replyingToName = null;
+            window.replyingToText = null;
             document.getElementById('replying_to_block').classList.add('hidden');
         };
 
@@ -1938,20 +2146,20 @@
         };
 
         // Search bar animation helpers
-        function onSidebarSearchFocus() {
+        window.onSidebarSearchFocus = function () {
             document.getElementById('sidebar_search_icon')?.classList.add('hidden');
             document.getElementById('sidebar_back_icon')?.classList.remove('hidden');
-        }
+        };
 
-        function onSidebarSearchBlur() {
+        window.onSidebarSearchBlur = function () {
             const input = document.getElementById('sidebar_search');
             if (!input || input.value.trim() === '') {
                 document.getElementById('sidebar_search_icon')?.classList.remove('hidden');
                 document.getElementById('sidebar_back_icon')?.classList.add('hidden');
             }
-        }
+        };
 
-        function blurSidebarSearch() {
+        window.blurSidebarSearch = function () {
             const input = document.getElementById('sidebar_search');
             if (input) {
                 input.value = '';
@@ -1963,16 +2171,16 @@
             document.getElementById('sidebar_search_icon')?.classList.remove('hidden');
             document.getElementById('sidebar_back_icon')?.classList.add('hidden');
             document.getElementById('sidebar_search_clear')?.classList.add('hidden');
-        }
+        };
 
-        function clearSidebarSearch() {
+        window.clearSidebarSearch = function () {
             const input = document.getElementById('sidebar_search');
             if (input) {
                 input.value = '';
                 input.focus();
             }
             window.filterSidebar();
-        }
+        };
 
         window.showToast = function (title, body, otherUserId = null, otherName = null) {
             const container = document.getElementById('toast_container');
@@ -2155,9 +2363,11 @@
         window.myUserAvatar = "{{ auth()->user()->avatar ?? '' }}";
         window.currentChatId = null;
         window.allContacts = @json($users ?? []);
-        let unsubscribeAdded = null;
-        let unsubscribeRemoved = null;
-        let statusUnsubscribe = null;
+        window.unsubscribeAdded = null;
+        window.unsubscribeRemoved = null;
+        window.statusUnsubscribe = null;
+        window.selectedMessages = new Set();
+        window.isSelectionMode = false;
 
         // Firebase Presence System
         if (window.myUserId !== '0') {
@@ -2177,6 +2387,7 @@
                     });
                 }
             });
+
 
             // Global Delivered Listener (for all users in sidebar)
             const allUserIds = [
@@ -2214,6 +2425,13 @@
                                 senderId: data.sender_id
                             });
                         }
+                    }
+
+                    // Unhide the sidebar item if it was hidden (e.g. non-contact but has messages)
+                    const sidebarItem = document.getElementById(`user_sidebar_${otherId}`);
+                    if (sidebarItem && sidebarItem.classList.contains('hidden')) {
+                        sidebarItem.classList.remove('hidden');
+                        sidebarItem.classList.add('flex');
                     }
 
                     // Update Sidebar Content Preview & Time
@@ -2530,14 +2748,14 @@
             // Toggle Views
             document.getElementById('status_view_container').classList.add('hidden');
             document.getElementById('status_view_container').classList.remove('flex');
-            
+
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.remove('hidden');
             sidebar.classList.add('sm:flex', 'flex'); // Ensure both base and responsive flex are added
 
             document.getElementById('chat_view_container').classList.remove('hidden');
             document.getElementById('chat_view_container').classList.add('flex');
-            
+
             document.getElementById('sidebar_resizer').classList.remove('hidden');
 
             const panel = document.getElementById('settings_panel');
@@ -2558,12 +2776,12 @@
 
             document.getElementById('chat_view_container').classList.add('hidden');
             document.getElementById('chat_view_container').classList.remove('flex');
-            
+
             document.getElementById('sidebar_resizer').classList.add('hidden');
 
             document.getElementById('status_view_container').classList.remove('hidden');
             document.getElementById('status_view_container').classList.add('flex');
-            
+
             // Close settings if open
             const panel = document.getElementById('settings_panel');
             if (panel && !panel.classList.contains('hidden')) {
@@ -2572,7 +2790,7 @@
         };
 
         // Sidebar Resizer Logic
-        (function() {
+        (function () {
             const resizer = document.getElementById('sidebar_resizer');
             const sidebar = document.getElementById('user_sidebar_container');
             let isResizing = false;
@@ -2619,6 +2837,51 @@
             }
         };
 
+        window.toggleNewChat = function () {
+            document.getElementById('new_chat_panel')?.classList.toggle('hidden');
+            document.getElementById('user_sidebar_container')?.classList.toggle('hidden');
+        };
+
+        window.toggleEditProfile = function () {
+            document.getElementById('edit_profile_panel')?.classList.toggle('hidden');
+            document.getElementById('settings_panel')?.classList.toggle('hidden');
+        };
+
+        window.toggleAboutModal = function () {
+            document.getElementById('about_modal')?.classList.toggle('hidden');
+        };
+
+        window.toggleAboutPrivacy = function () {
+            document.getElementById('about_privacy_modal')?.classList.toggle('hidden');
+        };
+
+        window.toggleAddGroupMembers = function () {
+            document.getElementById('add_group_members_panel')?.classList.toggle('hidden');
+            document.getElementById('new_chat_panel')?.classList.add('hidden');
+        };
+
+        window.toggleCreateGroup = function () {
+            document.getElementById('create_group_panel')?.classList.toggle('hidden');
+            document.getElementById('add_group_members_panel')?.classList.add('hidden');
+        };
+
+        window.toggleNewContact = function () {
+            document.getElementById('new_contact_panel')?.classList.toggle('hidden');
+            document.getElementById('new_chat_panel')?.classList.add('hidden');
+        };
+
+        window.toggleEditContact = function () {
+            document.getElementById('edit_contact_panel')?.classList.toggle('hidden');
+            document.getElementById('contact_info_panel')?.classList.add('hidden');
+        };
+
+        window.toggleContactInfo = function () {
+            const panel = document.getElementById('contact_info_panel');
+            if (panel) {
+                panel.classList.toggle('translate-x-full');
+            }
+        };
+
         window.backToSidebar = function () {
             document.getElementById('user_sidebar_container').classList.remove('hidden');
             document.getElementById('user_sidebar_container').classList.add('flex', 'w-full');
@@ -2641,6 +2904,13 @@
 
             // Show content, hide empty state
             document.getElementById('chat_empty_state')?.classList.add('hidden');
+
+            // Reset states
+            if (window.cancelSelection) window.cancelSelection();
+            if (window.cancelGroupSelection) window.cancelGroupSelection();
+
+            document.getElementById('active_group_chat_content')?.classList.add('hidden');
+            document.getElementById('active_group_chat_content')?.classList.remove('flex');
             document.getElementById('active_chat_content')?.classList.remove('hidden');
             document.getElementById('active_chat_content')?.classList.add('flex');
 
@@ -2657,11 +2927,10 @@
                 document.getElementById('main_chat_column').classList.add('flex');
             }
 
-            let unsubscribeChanged = null;
-            let lastDateString = null;
-            if (unsubscribeAdded) unsubscribeAdded();
-            if (unsubscribeRemoved) unsubscribeRemoved();
-            if (statusUnsubscribe) statusUnsubscribe();
+            if (window.statusUnsubscribe) window.statusUnsubscribe();
+            if (window.unsubscribeAdded) window.unsubscribeAdded();
+            if (window.unsubscribeRemoved) window.unsubscribeRemoved();
+            if (window.unsubscribeChanged) window.unsubscribeChanged();
 
             const myId = window.myUserId;
             const minId = Math.min(myId, otherUserId);
@@ -2700,8 +2969,8 @@
             }
 
             // Listen to other user's status
-            const otherUserStatusRef = ref(db, `status/${otherUserId}`);
-            statusUnsubscribe = onValue(otherUserStatusRef, (snapshot) => {
+            const otherUserStatusRef = window.ref(window.db, `status/${otherUserId}`);
+            window.statusUnsubscribe = window.onValue(otherUserStatusRef, (snapshot) => {
                 const data = snapshot.val();
                 const subtitle = document.getElementById('active_chat_subtitle');
 
@@ -2737,10 +3006,11 @@
 
             document.getElementById('messages').innerHTML = '';
             window.globalMessages = {};
+            let lastDateString = null;
 
             const messagesRef = ref(db, 'chats/' + window.currentChatId + '/messages');
 
-            unsubscribeAdded = onChildAdded(messagesRef, (snapshot) => {
+            window.unsubscribeAdded = window.onChildAdded(messagesRef, (snapshot) => {
                 const data = snapshot.val();
                 const key = snapshot.key;
                 window.globalMessages[key] = data; // store for reply/forward
@@ -2848,8 +3118,8 @@
                     let durationText = '';
                     if (isCompleted && data.call_duration) {
                         const d = data.call_duration;
-                        if (d >= 3600) durationText = Math.floor(d/3600) + ' hr ' + Math.floor((d%3600)/60) + ' min';
-                        else if (d >= 60) durationText = Math.floor(d/60) + ' min';
+                        if (d >= 3600) durationText = Math.floor(d / 3600) + ' hr ' + Math.floor((d % 3600) / 60) + ' min';
+                        else if (d >= 60) durationText = Math.floor(d / 60) + ' min';
                         else durationText = d + ' secs';
                     } else if (isMissed) {
                         durationText = 'Tap to call back';
@@ -2888,10 +3158,11 @@
 
                 let replyBlock = '';
                 if (data.reply_to_text) {
+                    const rName = data.reply_to_name || 'Member';
                     replyBlock = `
-                    <div class="bg-black/5 border-l-4 ${isMe ? 'border-green-600' : 'border-blue-500'} rounded p-2 mb-2 text-sm overflow-hidden opacity-80 cursor-pointer">
-                        <div class="font-semibold ${isMe ? 'text-green-700' : 'text-blue-600'} text-xs">Replied Message</div>
-                        <div class="text-gray-700 truncate">${data.reply_to_text}</div>
+                    <div class="bg-black/5 border-l-4 ${isMe ? 'border-green-600' : 'border-blue-500'} rounded p-2 mb-2 text-sm overflow-hidden opacity-80 cursor-pointer" onclick="if(document.getElementById('msg_${data.reply_to_id}')){document.getElementById('msg_${data.reply_to_id}').scrollIntoView({behavior:'smooth'})}">
+                        <div class="font-semibold ${isMe ? 'text-green-700' : 'text-blue-600'} text-xs">${rName}</div>
+                        <div class="text-[#e9edef] truncate">${data.reply_to_text}</div>
                     </div>`;
                 }
 
@@ -2900,7 +3171,12 @@
                 const searchHighlightClass = isSearchMatch ? 'search-msg-highlight' : '';
 
                 const html = `
-                    <div class="relative group/msg w-full flex ${isMe ? 'justify-end' : 'justify-start'} mt-1 mb-2 px-2 transition-colors cursor-pointer select-none ${searchHighlightClass}" id="msg_${key}" onclick="window.toggleMsgSelection('${key}')">
+                    <div class="relative group/msg w-full flex ${isMe ? 'justify-end' : 'justify-start'} mt-1 mb-2 px-2 transition-colors cursor-pointer select-none ${searchHighlightClass} gap-2 items-start" id="msg_${key}" onclick="window.toggleMsgSelection('${key}')">
+
+                        ${!isMe ? `
+                        <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 mt-0.5 shadow-sm">
+                            <img src="${activeAvatar}" class="w-full h-full object-cover">
+                        </div>` : ''}
 
                         <!-- Selection Checkbox (Hidden by default) -->
                         <div class="msg-checkbox-container hidden flex-col justify-center px-3 z-10 ${isMe ? 'order-first' : ''}">
@@ -2914,29 +3190,33 @@
                             #checkbox_${key}:checked + svg { opacity: 1; }
                         </style>
 
-                        <div id="bubble_${key}" class="max-w-[85%] relative px-3 py-1.5 shadow-sm rounded-lg ${isMe ? 'bg-[#d9fdd3] rounded-tr-none order-last' : 'bg-white rounded-tl-none order-last'} transform transition-transform group-active/msg:scale-[0.98]">
+                        <div id="bubble_${key}" class="max-w-[85%] sm:max-w-[70%] relative px-2.5 py-1.5 shadow-sm rounded-lg ${isMe ? 'bg-[#005c4b] rounded-tr-none' : 'bg-[#202c33] rounded-tl-none'} transform transition-transform group-active/msg:scale-[0.98]">
 
-                            <!-- Options Chevron -->
-                            <button onclick="event.stopPropagation(); toggleMsgMenu('${key}')" class="absolute top-1 ${isMe ? 'right-2' : 'right-2'} text-gray-500 opacity-0 group-hover/msg:opacity-100 transition-opacity p-1 bg-white/50 backdrop-blur-sm rounded-full hover:bg-black/10 shadow-sm z-10 focus:outline-none">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </button>
+                            <!-- Options Button (WhatsApp Style) -->
+                            <div class="absolute top-0 right-0 opacity-0 group-hover/msg:opacity-100 transition-opacity z-10 bg-gradient-to-l ${isMe ? 'from-[#005c4b] via-[#005c4b]' : 'from-[#202c33] via-[#202c33]'} to-transparent pl-3 pr-1 pt-1 ${isMe ? 'rounded-tr-none' : 'rounded-tr-lg'}">
+                                <button onclick="event.stopPropagation(); window.toggleMsgMenu('${key}')" class="text-[#8696a0] hover:text-[#e9edef] focus:outline-none transition-colors">
+                                    <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                                        <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                                    </svg>
+                                </button>
+                            </div>
 
                             <!-- Menu Dropdown -->
-                            <div id="menu_${key}" class="hidden absolute top-8 ${isMe ? 'right-0' : 'left-0'} bg-white shadow-xl border border-gray-100 rounded-xl w-32 py-1 z-50 overflow-hidden transform transition-all duration-200">
-                                <button onclick="event.stopPropagation(); replyTo('${key}')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between">Reply <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
-                                <button onclick="event.stopPropagation(); forwardMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center justify-between">Forward <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
-                                <div class="h-px bg-gray-100 my-1"></div>
-                                <button onclick="event.stopPropagation(); deleteMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center justify-between">Delete <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                            <div id="menu_${key}" class="hidden absolute top-8 ${isMe ? 'right-0' : 'left-0'} bg-[#233138] shadow-2xl border border-[#313d45] rounded-xl w-32 py-1 z-50 overflow-hidden transform transition-all duration-200">
+                                <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
+                                <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
+                                <div class="h-px bg-[#313d45] my-1 mx-2"></div>
+                                <button onclick="event.stopPropagation(); window.deleteMsg('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 flex items-center justify-between transition-colors">Delete <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                             </div>
 
                             ${replyBlock}
                             ${mediaContent}
-                            <div class="flex items-end gap-3 text-right justify-between w-full min-w-0 pr-4 mt-1">
-                                ${data.text ? `<span class="text-[15px] text-gray-900 break-words flex-1 text-left">${isSearchMatch ? window.highlightSearchText(data.text) : data.text}</span>` : '<div></div>'}
-                                <div class="flex items-center gap-1 self-end leading-none">
-                                    <span class="text-[10px] text-gray-500 whitespace-nowrap">${time}</span>
-                                    ${isMe ? `<span id="tick_${key}" class="shrink-0 flex items-center justify-center">${window.getTickSVG(data.status || 'sent')}</span>` : ''}
-                                </div>
+
+                            ${data.text ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${isSearchMatch ? window.highlightSearchText(data.text) : data.text}<span class="inline-block w-[74px] h-[1px]"></span></div>` : ''}
+
+                            <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2">
+                                <span class="text-[11px] text-[#8696a0] select-none leading-none">${time}</span>
+                                ${isMe ? `<span id="tick_${key}" class="shrink-0 flex items-center justify-center leading-none">${window.getTickSVG(data.status || 'sent')}</span>` : ''}
                             </div>
                         </div>
                     </div>`;
@@ -2956,14 +3236,14 @@
                 }
             });
 
-            unsubscribeRemoved = onChildRemoved(messagesRef, (snapshot) => {
+            window.unsubscribeRemoved = window.onChildRemoved(messagesRef, (snapshot) => {
                 const key = snapshot.key;
                 const msgEl = document.getElementById('msg_' + key);
                 if (msgEl) msgEl.remove();
                 delete window.globalMessages[key];
             });
 
-            unsubscribeChanged = onChildChanged(messagesRef, (snapshot) => {
+            window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
                 const data = snapshot.val();
                 const key = snapshot.key;
                 window.globalMessages[key] = data;
@@ -3079,16 +3359,37 @@
         };
 
         window.confirmDeleteSelected = function () {
-            if (confirm('Delete ' + window.selectedMessages.size + ' message(s)?')) {
+            if (window.selectedMessages.size === 0) return;
+            window.openDeleteModal(`Delete ${window.selectedMessages.size} message(s)?`, () => {
                 window.selectedMessages.forEach(key => {
-                    // Firebase actual delete:
-                    remove(ref(db, 'chats/' + window.currentChatId + '/messages/' + key)).catch(e => {
-                        console.error('Delete error:', e);
-                        alert('Failed to delete message. Check console for details.');
-                    });
+                    remove(ref(db, `chats/${window.currentChatId}/messages/${key}`))
+                        .catch(e => console.error("Batch delete error:", e));
                 });
                 window.cancelSelection();
+            });
+        };
+
+        window.openDeleteModal = function (title, onConfirm) {
+            const modal = document.getElementById('delete_modal');
+            const titleEl = document.getElementById('delete_modal_title');
+            const confirmBtn = document.getElementById('delete_confirm_btn');
+
+            if (titleEl) titleEl.textContent = title;
+            if (confirmBtn) {
+                confirmBtn.onclick = function () {
+                    onConfirm();
+                    window.closeDeleteModal();
+                };
             }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('show'), 10);
+        };
+
+        window.closeDeleteModal = function () {
+            const modal = document.getElementById('delete_modal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.classList.add('hidden'), 300);
         };
 
         window.toggleMsgSelection = function (key) {
@@ -3120,30 +3421,19 @@
         // Activates selection mode starting with chosen message
         window.deleteMsg = function (key) {
             document.getElementById('menu_' + key)?.classList.add('hidden');
-            document.getElementById('bubble_' + key).style.zIndex = '';
-            document.getElementById('msg_' + key).style.zIndex = '';
-
-            window.isSelectionMode = true;
-            document.getElementById('normal_header').classList.add('hidden');
-            document.getElementById('selection_header').classList.remove('hidden');
-            document.getElementById('selection_header').classList.add('flex');
-
-            // Show all checkboxes
-            document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
-
-            // Pre-select the message that triggered it
-            const checkbox = document.getElementById('checkbox_' + key);
-            if (checkbox && !checkbox.checked) {
-                // Manually trigger so it doesn't double toggle
-                checkbox.checked = true;
-                window.selectedMessages.add(key);
-                document.getElementById('msg_' + key).classList.add('bg-blue-100', 'bg-opacity-50');
-                document.getElementById('selection_count').textContent = window.selectedMessages.size + ' Selected';
-
-                const box = checkbox.parentElement;
-                box.classList.add('bg-[#0d9488]', 'border-[#0d9488]');
-                box.classList.remove('bg-white', 'border-gray-400');
+            const msgData = window.globalMessages[key];
+            let typeLabel = 'message';
+            if (msgData) {
+                if (msgData.type === 'image') typeLabel = 'photo';
+                else if (msgData.type === 'video') typeLabel = 'video';
+                else if (msgData.type === 'audio') typeLabel = 'audio';
+                else if (msgData.type === 'document') typeLabel = 'document';
             }
+
+            window.openDeleteModal(`Delete ${typeLabel}?`, () => {
+                remove(ref(db, `chats/${window.currentChatId}/messages/${key}`))
+                    .catch(e => console.error("Delete error:", e));
+            });
         };
 
         // === INCOMING CALL LISTENER ===
@@ -3159,13 +3449,13 @@
                 window._incomingCallType = callData.type;
 
                 // Set up reject function
-                window._rejectCallFn = async function() {
-                    try { await update(ref(db, `calls/${callKey}`), { status: 'rejected' }); } catch(e) {}
-                    setTimeout(async () => { try { await remove(ref(db, `calls/${callKey}`)); } catch(e) {} }, 3000);
+                window._rejectCallFn = async function () {
+                    try { await update(ref(db, `calls/${callKey}`), { status: 'rejected' }); } catch (e) { }
+                    setTimeout(async () => { try { await remove(ref(db, `calls/${callKey}`)); } catch (e) { } }, 3000);
                 };
 
                 // Set up missed call log sender
-                window._sendMissedCallLog = async function() {
+                window._sendMissedCallLog = async function () {
                     const callerId = callData.caller_id;
                     const minId = Math.min(window.myUserId, callerId);
                     const maxId = Math.max(window.myUserId, callerId);
@@ -3177,14 +3467,14 @@
                             call_status: 'missed', call_duration: 0,
                             text: '', time: Math.floor(Date.now() / 1000), status: 'sent'
                         });
-                    } catch(e) { console.error('Missed call log error:', e); }
+                    } catch (e) { console.error('Missed call log error:', e); }
                 };
 
                 // Auto-dismiss if caller cancels
                 onValue(ref(db, `calls/${callKey}/status`), (snap) => {
                     const st = snap.val();
                     if (st === 'ended' || st === null) {
-                        try { document.getElementById('ic_ringtone').pause(); } catch(e) {}
+                        try { document.getElementById('ic_ringtone').pause(); } catch (e) { }
                         document.getElementById('incoming_call_overlay').classList.add('hidden');
                         window._incomingCallId = null;
                     }

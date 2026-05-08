@@ -22,3 +22,4 @@ Route::get('/users', [ChatApiController::class, 'users']);
 Route::get('/search', [ChatApiController::class, 'globalSearch']);
 Route::post('/update-profile', [ChatApiController::class, 'updateProfile']);
 Route::post('/register', [ChatApiController::class, 'registerUser']);
+Route::post('/check-phone', [ChatApiController::class, 'checkPhone']);

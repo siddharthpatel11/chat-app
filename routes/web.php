@@ -22,10 +22,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/chat', [ChatController::class, 'index']);
     Route::get('/chat/voice-call', [ChatController::class, 'voiceCall']);
     Route::get('/chat/video-call', [ChatController::class, 'videoCall']);
+    Route::get('/chat/groups/voice-call', [ChatController::class, 'groupVoiceCall'])->name('group.voice.call');
+    Route::get('/chat/groups/video-call', [ChatController::class, 'groupVideoCall'])->name('group.video.call');
     Route::post('/send', [ChatController::class, 'send']);
     Route::post('/save-token', [ChatController::class, 'saveToken']);
     Route::post('/update-live-location', [ChatController::class, 'updateLiveLocation']);
     Route::post('/upload-status-media', [ChatController::class, 'uploadStatusMedia']);
+    
+    Route::post('/save-contact', [ChatController::class, 'saveContact']);
+    Route::post('/delete-contact', [ChatController::class, 'deleteContact']);
+    Route::post('/send-group-notification', [ChatController::class, 'sendGroupNotification']);
 });
 
 require __DIR__.'/auth.php';

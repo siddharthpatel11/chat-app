@@ -159,6 +159,10 @@
             <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" class="ml-1">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
             </svg>
+            <!-- Media Count Badge -->
+            <div id="media_count_badge" class="absolute -top-1 -right-1 bg-[#00a884] text-[#0b141a] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#0b141a] hidden">
+                <span id="media_count_label">0</span>
+            </div>
             <!-- Progress Overlay for uploading -->
             <div id="upload_progress_ring" class="hidden absolute inset-0 flex items-center justify-center">
                 <svg class="w-full h-full transform -rotate-90">
@@ -377,7 +381,17 @@
             hdBtn.classList.add('border-current');
             hdBtn.classList.remove('border-[#00a884]');
         }
-        document.getElementById('media_count_label').textContent = selectedMediaItems.length;
+        const countBadge = document.getElementById('media_count_badge');
+        const countLabel = document.getElementById('media_count_label');
+        if (countBadge && countLabel) {
+            const count = selectedMediaItems.length;
+            countLabel.textContent = count;
+            if (count > 1) {
+                countBadge.classList.remove('hidden');
+            } else {
+                countBadge.classList.add('hidden');
+            }
+        }
     }
 
     const canvas = document.getElementById('media_canvas');
@@ -556,7 +570,7 @@
 
         selectedMediaItems.forEach((item, index) => {
             const thumb = document.createElement('div');
-            thumb.className = `w-14 h-14 rounded-xl overflow-hidden border-2 cursor-pointer transition-all active:scale-95 shrink-0 ${index === activeMediaIndex ? 'border-[#00a884] scale-110 z-10' : 'border-transparent opacity-60 hover:opacity-100'}`;
+            thumb.className = `w-14 h-14 rounded-xl overflow-hidden border-2 cursor-pointer transition-all active:scale-95 shrink-0 relative group ${index === activeMediaIndex ? 'border-[#00a884] scale-110 z-10' : 'border-transparent opacity-60 hover:opacity-100'}`;
             thumb.onclick = () => {
                 activeMediaIndex = index;
                 renderActiveMedia();
@@ -577,12 +591,39 @@
                 const playIcon = document.createElement('div');
                 playIcon.className = 'absolute inset-0 flex items-center justify-center bg-black/20';
                 playIcon.innerHTML = '<svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M8 5v14l11-7z"></path></svg>';
-                thumb.style.position = 'relative';
                 thumb.appendChild(playIcon);
             }
+
+            // Remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'absolute top-0.5 right-0.5 w-4 h-4 bg-black/60 rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500';
+            removeBtn.innerHTML = '<svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>';
+            removeBtn.onclick = (e) => window.removeMediaItem(index, e);
+            thumb.appendChild(removeBtn);
+
             list.appendChild(thumb);
         });
     }
+
+    window.removeMediaItem = function(index, event) {
+        if (event) event.stopPropagation();
+        
+        // Revoke URL to free memory
+        URL.revokeObjectURL(selectedMediaItems[index].url);
+        
+        selectedMediaItems.splice(index, 1);
+        
+        if (selectedMediaItems.length === 0) {
+            window.closeMediaStatusEditor();
+        } else {
+            // Adjust active index if needed
+            if (activeMediaIndex >= selectedMediaItems.length) {
+                activeMediaIndex = selectedMediaItems.length - 1;
+            }
+            renderActiveMedia();
+            renderThumbnails();
+        }
+    };
 
     window.closeMediaStatusEditor = function () {
         selectedMediaItems.forEach(item => URL.revokeObjectURL(item.url));
