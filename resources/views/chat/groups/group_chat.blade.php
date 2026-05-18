@@ -1173,7 +1173,7 @@
         let fileInput = document.getElementById('group_file_input');
         let fileObj = fileInput.files[0];
         let msgText = captionInput.value.trim();
-        
+
         if (!window.currentChatId || (!msgText && !fileObj)) return;
 
         const formData = new FormData();
@@ -1183,7 +1183,7 @@
         if (fileObj) {
             formData.append('file', fileObj);
         }
-        
+
         if (window.groupReplyingTo) {
             formData.append('reply_to_id', window.groupReplyingTo);
             formData.append('reply_to_name', window.replyingToName);
@@ -1196,7 +1196,7 @@
         const btn = document.getElementById('group_modal_send_btn');
         const icon = document.getElementById('group_modal_send_icon');
         const spinner = document.getElementById('group_modal_spinner');
-        
+
         if (btn) btn.disabled = true;
         if (icon) icon.classList.add('hidden');
         if (spinner) spinner.classList.remove('hidden');
@@ -1207,11 +1207,11 @@
                 headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
                 body: formData
             });
-            
+
             if (btn) btn.disabled = false;
             if (icon) icon.classList.remove('hidden');
             if (spinner) spinner.classList.add('hidden');
-            
+
             let data = await res.json();
             if (res.ok && data.status) {
                 clearGroupFile();
@@ -1222,11 +1222,11 @@
             if (btn) btn.disabled = false;
             if (icon) icon.classList.remove('hidden');
             if (spinner) spinner.classList.add('hidden');
-            
+
             console.error('Group media send error:', err);
             alert("Error: " + err.message);
         }
-        
+
         document.getElementById('group_msg').focus();
     };
 
@@ -1461,12 +1461,12 @@
     window.sendGroupMessage = async function() {
         const input = document.getElementById('group_msg');
         const text = input.value.trim();
-        
+
         if (!text || !window.currentChatId) return;
-        
+
         input.value = '';
         input.focus();
-        
+
         if (typeof handleGroupInputToggle === 'function') handleGroupInputToggle();
 
         const formData = new FormData();
@@ -2798,7 +2798,7 @@
     // Handle Global overrides for Group context without touching index.blade.php
     function applyGroupOverrides() {
         if (window._groupOverridesApplied) return;
-        
+
         // Wait until core functions are available
         if (typeof window.emitMessage !== 'function') {
             console.log("Waiting for emitMessage to be available for override...");
@@ -2808,19 +2808,19 @@
 
         console.log("Applying Group Chat overrides to emitMessage...");
         const originalEmitMessage = window.emitMessage;
-        
+
         window.emitMessage = async function (msgText, fileObj = null) {
             console.log("emitMessage intercepted. chatId:", window.currentChatId);
             if (window.currentChatId && typeof window.currentChatId === 'string' && window.currentChatId.startsWith('group_')) {
                 console.log("Routing group message through /send:", msgText, fileObj?.name);
-                
+
                 const formData = new FormData();
                 formData.append('chat_id', window.currentChatId);
                 formData.append('message', msgText || '');
                 if (fileObj) {
                     formData.append('file', fileObj);
                 }
-                
+
                 // Handle group reply context
                 if (window.groupReplyingTo) {
                     formData.append('reply_to_id', window.groupReplyingTo);
@@ -2842,7 +2842,7 @@
                     });
 
                     if (!response.ok) throw new Error('Failed to send group message via server');
-                    
+
                     // Cleanup UI
                     if (window.clearFile) window.clearFile();
                     if (window.cancelGroupReply) window.cancelGroupReply();
@@ -2858,11 +2858,11 @@
                 }
                 return;
             }
-            
+
             // Fallback to original for non-groups
             return originalEmitMessage.apply(this, arguments);
         };
-        
+
         window._groupOverridesApplied = true;
         console.log("Group Chat overrides successfully applied.");
     }
@@ -3009,7 +3009,307 @@
 
         // Attach message listener for real-time sidebar updates
         window.listenForGroupUpdates(group.id);
+
+        // Cache group messages for global search
+        if (typeof window.cacheGroupMessages === 'function') {
+            window.cacheGroupMessages(group.id);
+        }
     };
+
+    window.groupMessagesCache = window.groupMessagesCache || {};
+
+    window.cacheGroupMessages = function (groupId) {
+        if (window.groupMessagesCache[groupId]) return; // already listening
+
+        window.groupMessagesCache[groupId] = [];
+        const messagesRef = window.ref(window.db, `groups/${groupId}/messages`);
+
+        window.onChildAdded(messagesRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const key = snapshot.key;
+                const idx = window.groupMessagesCache[groupId].findIndex(m => m.key === key);
+                if (idx === -1) {
+                    window.groupMessagesCache[groupId].push({
+                        key: key,
+                        text: data.text || "",
+                        time: data.time || 0,
+                        senderId: data.sender_id,
+                        type: data.type || 'text',
+                        file_url: data.file_url || ""
+                    });
+                }
+            }
+        });
+
+        window.onChildRemoved(messagesRef, (snapshot) => {
+            const key = snapshot.key;
+            if (window.groupMessagesCache[groupId]) {
+                window.groupMessagesCache[groupId] = window.groupMessagesCache[groupId].filter(m => m.key !== key);
+            }
+        });
+
+        window.onChildChanged(messagesRef, (snapshot) => {
+            const data = snapshot.val();
+            const key = snapshot.key;
+            if (window.groupMessagesCache[groupId]) {
+                const idx = window.groupMessagesCache[groupId].findIndex(m => m.key === key);
+                if (idx !== -1 && data) {
+                    window.groupMessagesCache[groupId][idx].text = data.text || "";
+                }
+            }
+        });
+    };
+
+    // Hijack window.filterSidebar using Object.defineProperty to prevent index.blade.php from overwriting it
+    let customFilterSidebar = function () {
+        const searchQuery = document.getElementById('sidebar_search').value.toLowerCase().trim();
+        const clearBtn = document.getElementById('sidebar_search_clear');
+        const userList = document.getElementById('user_list_container');
+        const searchResults = document.getElementById('search_results_container');
+        const chatsList = document.getElementById('search_chats_list');
+        const msgsList = document.getElementById('search_messages_list');
+        const chatsSection = document.getElementById('search_chats_section');
+        const msgsSection = document.getElementById('search_messages_section');
+        const noResults = document.getElementById('sidebar_no_results');
+
+        // Show/hide clear button
+        if (searchQuery.length > 0) {
+            clearBtn?.classList.remove('hidden');
+        } else {
+            clearBtn?.classList.add('hidden');
+        }
+
+        // No query - show normal list
+        if (searchQuery === '') {
+            userList.classList.remove('hidden');
+            searchResults?.classList.add('hidden');
+            noResults?.classList.add('hidden');
+            noResults?.classList.remove('flex');
+            return;
+        }
+
+        // Hide normal list, show search results
+        userList.classList.add('hidden');
+        searchResults?.classList.remove('hidden');
+
+        // Clear previous results
+        if (chatsList) chatsList.innerHTML = '';
+        if (msgsList) msgsList.innerHTML = '';
+
+        const escQ = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const highlightRegex = new RegExp(`(${escQ})`, 'gi');
+
+        let chatMatches = 0;
+        let allMsgResults = [];
+
+        // 1. Search Private Chats / Contacts
+        const privateUserNodes = document.getElementById('user_list_container').querySelectorAll('[id^="user_sidebar_"]');
+        privateUserNodes.forEach(user => {
+            const userId = user.getAttribute('data-userid') || user.id.replace('user_sidebar_', '');
+            const name = user.getAttribute('data-name') || user.querySelector('h4')?.textContent.trim() || '';
+            const avatar = user.getAttribute('data-avatar') || '';
+            const phone = user.getAttribute('data-phone') || '';
+            const about = user.getAttribute('data-about') || 'Available';
+            const lastTimeEl = document.getElementById(`last_time_${userId}`);
+            const lastTime = lastTimeEl ? lastTimeEl.textContent.trim() : '';
+            const lastMsgEl = document.getElementById(`last_msg_${userId}`);
+            const lastMsg = lastMsgEl ? (lastMsgEl.getAttribute('data-msg') || lastMsgEl.textContent.trim()) : '';
+
+            const nameLower = name.toLowerCase();
+            const nameMatch = nameLower.includes(searchQuery);
+
+            if (nameMatch && chatsList) {
+                chatMatches++;
+                const highlightedName = name.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+                const prefix = lastMsg ? (lastMsg.startsWith('Click to chat') ? '' : '✓ ') : '';
+                const previewMsg = lastMsg && !lastMsg.startsWith('Click to chat') ? prefix + lastMsg : phone || 'Click to chat';
+
+                chatsList.insertAdjacentHTML('beforeend', `
+                    <div onclick="window.selectChat(${userId}, '${name.replace(/'/g, "\\'")}', '${phone.replace(/'/g, "\\'")}', '${avatar}', '${about.replace(/'/g, "\\'")}')"
+                        class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                        <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
+                            <img src="${avatar}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${highlightedName}</h4>
+                                <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${lastTime}</span>
+                            </div>
+                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${previewMsg}</p>
+                        </div>
+                    </div>
+                `);
+            }
+
+            const cachedMessages = window.messageCache?.[userId] || [];
+            for (let i = 0; i < cachedMessages.length; i++) {
+                const m = cachedMessages[i];
+                if (m.text && m.text.toLowerCase().includes(searchQuery)) {
+                    allMsgResults.push({
+                        isGroup: false,
+                        userId, name, avatar, phone, about,
+                        text: m.text,
+                        time: m.time,
+                        senderId: m.senderId
+                    });
+                }
+            }
+        });
+
+        // 2. Search Groups / Group Chats
+        const groupNodes = document.getElementById('user_list_container').querySelectorAll('[id^="group_sidebar_"]');
+        groupNodes.forEach(groupNode => {
+            const groupId = groupNode.id.replace('group_sidebar_', '');
+            const name = groupNode.querySelector('h4')?.textContent.trim() || '';
+            const imgEl = groupNode.querySelector('img');
+            const avatar = imgEl ? imgEl.src : '';
+            const lastTimeEl = document.getElementById(`group_last_time_${groupId}`);
+            const lastTime = lastTimeEl ? lastTimeEl.textContent.trim() : '';
+            const lastMsgEl = document.getElementById(`group_last_msg_${groupId}`);
+            const lastMsg = lastMsgEl ? lastMsgEl.textContent.trim() : 'Group chat';
+
+            const nameLower = name.toLowerCase();
+            const nameMatch = nameLower.includes(searchQuery);
+
+            if (nameMatch && chatsList) {
+                chatMatches++;
+                const highlightedName = name.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+
+                chatsList.insertAdjacentHTML('beforeend', `
+                    <div onclick="window.selectGroupChat('${groupId}', '${name.replace(/'/g, "\\'")}', '${avatar}')"
+                        class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                        <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
+                            <img src="${avatar}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                            <div class="flex justify-between items-center">
+                                <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${highlightedName}</h4>
+                                <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${lastTime}</span>
+                            </div>
+                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${lastMsg}</p>
+                        </div>
+                    </div>
+                `);
+            }
+
+            const cachedMessages = window.groupMessagesCache?.[groupId] || [];
+            for (let i = 0; i < cachedMessages.length; i++) {
+                const m = cachedMessages[i];
+                if (m.text && m.text.toLowerCase().includes(searchQuery)) {
+                    allMsgResults.push({
+                        isGroup: true,
+                        groupId, name, avatar,
+                        text: m.text,
+                        time: m.time,
+                        senderId: m.senderId
+                    });
+                }
+            }
+        });
+
+        // Sort combined message results chronologically (newest first)
+        allMsgResults.sort((a, b) => (b.time || 0) - (a.time || 0));
+
+        // Render all message results
+        allMsgResults.forEach(r => {
+            const msgTime = r.time ? new Date(r.time * 1000) : null;
+            let timeStr = '';
+            if (msgTime) {
+                const now = new Date();
+                const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const msgDayStart = new Date(msgTime.getFullYear(), msgTime.getMonth(), msgTime.getDate());
+                const diffDays = Math.round((todayStart - msgDayStart) / (1000 * 60 * 60 * 24));
+                if (diffDays === 0) timeStr = msgTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                else if (diffDays === 1) timeStr = 'Yesterday';
+                else if (diffDays < 7) timeStr = msgTime.toLocaleDateString([], { weekday: 'long' });
+                else timeStr = msgTime.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+            }
+
+            const highlightedMsg = r.text.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+
+            let prefix = '';
+            if (r.isGroup) {
+                const senderContact = window.allContacts ? window.allContacts.find(c => c.id == r.senderId) : null;
+                const senderName = r.senderId == window.myUserId ? 'You' : (senderContact ? (senderContact.name || senderContact.phone) : 'Member');
+                prefix = `<span class="text-[#8696a0] font-semibold">${senderName}: </span>`;
+            } else {
+                prefix = r.senderId == window.myUserId ? '<span class="text-[#8696a0]">✓ You: </span>' : '';
+            }
+
+            if (msgsList) {
+                if (r.isGroup) {
+                    msgsList.insertAdjacentHTML('beforeend', `
+                        <div onclick="window.selectGroupChat('${r.groupId}', '${r.name.replace(/'/g, "\\'")}', '${r.avatar}', ${r.time || 0})"
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
+                                <img src="${r.avatar}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="text-[16px] text-[#e9edef] truncate mr-2 font-normal">${r.name}</h4>
+                                    <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${timeStr}</span>
+                                </div>
+                                <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${prefix}${highlightedMsg}</p>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    msgsList.insertAdjacentHTML('beforeend', `
+                        <div onclick="window.selectChat(${r.userId}, '${r.name.replace(/'/g, "\\'")}', '${r.phone.replace(/'/g, "\\'")}', '${r.avatar}', '${r.about.replace(/'/g, "\\'")}', ${r.time || 0})"
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                            <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
+                                <img src="${r.avatar}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="text-[16px] text-[#e9edef] truncate mr-2 font-normal">${r.name}</h4>
+                                    <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${timeStr}</span>
+                                </div>
+                                <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${prefix}${highlightedMsg}</p>
+                            </div>
+                        </div>
+                    `);
+                }
+            }
+        });
+
+        const msgMatches = allMsgResults.length;
+
+        // Toggle section visibility
+        if (chatsSection) {
+            if (chatMatches > 0) { chatsSection.classList.remove('hidden'); } else { chatsSection.classList.add('hidden'); }
+        }
+        if (msgsSection) {
+            if (msgMatches > 0) { msgsSection.classList.remove('hidden'); } else { msgsSection.classList.add('hidden'); }
+        }
+
+        // No results at all
+        if (noResults) {
+            if (chatMatches === 0 && msgMatches === 0) {
+                noResults.classList.remove('hidden');
+                noResults.classList.add('flex');
+            } else {
+                noResults.classList.add('hidden');
+                noResults.classList.remove('flex');
+            }
+        }
+    };
+
+    // Object.defineProperty to override window.filterSidebar and prevent overwrites
+    if (Object.getOwnPropertyDescriptor(window, 'filterSidebar')?.configurable !== false) {
+        Object.defineProperty(window, 'filterSidebar', {
+            get: function () {
+                return customFilterSidebar;
+            },
+            set: function (val) {
+                if (val !== customFilterSidebar && typeof val === 'function') {
+                    window._originalFilterSidebar = val;
+                }
+            },
+            configurable: true
+        });
+    }
 
     // Override showToast to handle group chat navigation
     (function () {
@@ -3053,7 +3353,7 @@
         };
     })();
 
-    window.selectGroupChat = function (groupId, name, avatar) {
+    window.selectGroupChat = function (groupId, name, avatar, searchMsgTime = null) {
         const msgInput = document.getElementById('group_msg') || document.getElementById('msg');
         if (msgInput) {
             msgInput.disabled = false;
@@ -3175,7 +3475,7 @@
 
         const searchInput = document.getElementById('sidebar_search');
         window.activeSearchQuery = (searchInput && searchInput.value.trim().length > 0) ? searchInput.value.trim().toLowerCase() : null;
-        window.activeSearchMsgTime = null;
+        window.activeSearchMsgTime = searchMsgTime || null;
         window._searchScrolled = false;
 
         document.getElementById('chat_empty_state')?.classList.add('hidden');
@@ -3335,6 +3635,10 @@
             const key = snapshot.key;
             window.globalMessages[key] = data;
 
+            // Check if this is the specific searched message (by timestamp)
+            const isSearchMatch = window.activeSearchMsgTime && data.time && data.time == window.activeSearchMsgTime;
+            const searchHighlightClass = isSearchMatch ? 'search-msg-highlight' : '';
+
             // Auto-read new messages
             if (data.sender_id != window.myUserId && (!data.read_by || !data.read_by[window.myUserId])) {
                 window.update(window.ref(window.db, `groups/${groupId}/messages/${key}/read_by`), {
@@ -3478,7 +3782,7 @@
             }
 
             const msgHtml = `
-                <div id="msg_${key}" onclick="window.toggleGroupMsgSelection('${key}')" class="flex ${isMe ? 'justify-end' : 'justify-start'} mb-2 px-4 group/msg relative gap-2 items-start group/bubble-container cursor-default">
+                <div id="msg_${key}" onclick="window.toggleGroupMsgSelection('${key}')" class="flex ${isMe ? 'justify-end' : 'justify-start'} mb-2 px-4 group/msg relative gap-2 items-start group/bubble-container cursor-default ${searchHighlightClass}">
                     <!-- Selection Checkbox -->
                     <div class="msg-checkbox-container hidden shrink-0 self-center mr-2">
                         <div class="w-5 h-5 rounded border-2 border-gray-400 bg-white flex items-center justify-center transition-all">
@@ -3522,7 +3826,19 @@
             const gMsgs = document.getElementById('group_messages');
             if (gMsgs) {
                 gMsgs.insertAdjacentHTML('beforeend', msgHtml);
-                gMsgs.scrollTop = gMsgs.scrollHeight;
+
+                // If search is active, scroll to first matching message; otherwise scroll to bottom
+                if (isSearchMatch && !window._searchScrolled) {
+                    window._searchScrolled = true;
+                    setTimeout(() => {
+                        const firstMatch = gMsgs.querySelector('.search-msg-highlight');
+                        if (firstMatch) {
+                            firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }, 500);
+                } else if (!window.activeSearchQuery) {
+                    gMsgs.scrollTop = gMsgs.scrollHeight;
+                }
             }
 
             if (window._mediaListTimeout) clearTimeout(window._mediaListTimeout);
