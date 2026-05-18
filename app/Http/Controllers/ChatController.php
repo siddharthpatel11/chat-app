@@ -31,7 +31,6 @@ class ChatController extends Controller
         return view('chat.index', compact('users'));
     }
 
-
     public function send(Request $request)
     {
         $factory = (new Factory)
@@ -61,7 +60,7 @@ class ChatController extends Controller
             } elseif (str_starts_with($mimeType, 'audio/')) {
                 $type = 'audio';
             } else {
-                $type = 'document';
+                $type = 'document';                         
             }
 
             $fileName = $file->getClientOriginalName();
@@ -90,15 +89,25 @@ class ChatController extends Controller
             'status' => 'sent',
         ];
 
+        // Determine node (chats or groups)
+        $isGroup = str_starts_with($chatId, 'group_');
+        $node = $isGroup ? 'groups' : 'chats';
+
+        // Keep the 'group_' prefix for groups in Firebase Realtime Database
+        if ($isGroup) {
+            $firebaseChatId = $chatId;
+            if (str_starts_with($firebaseChatId, 'group_group_')) {
+                $firebaseChatId = substr($firebaseChatId, 6);
+            }
+        } else {
+            $firebaseChatId = $chatId;
+        }
+
         // Push to Realtime Database
-        $db->getReference("chats/$chatId/messages")->push($data);
+        $db->getReference("$node/$firebaseChatId/messages")->push($data);
 
-        // Send FCM Notification to all other users with a token
-        $receivers = \App\Models\User::where('id', '!=', $senderId)
-            ->whereNotNull('fcm_token')
-            ->get();
-
-        $senderName = auth()->user()->name ?? 'Someone';
+        // Handle Notifications
+        $senderName = auth()->user()->name ?? auth()->user()->phone ?? 'Someone';
         $notificationBody = $request->message ?? '';
 
         if ($type === 'image') {
@@ -115,21 +124,59 @@ class ChatController extends Controller
             $notificationBody = '📍 Live Location';
         }
 
-        foreach ($receivers as $user) {
-            $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $user->fcm_token)
-                ->withNotification(\Kreait\Firebase\Messaging\Notification::create($senderName, $notificationBody))
-                ->withData([
-                    'chat_id' => $chatId,
-                    'type' => $type,
-                    'sender_name' => $senderName,
-                    'sender_id' => (string)$senderId,
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK' // For mobile apps if any
-                ]);
+        if ($isGroup) {
+            // Group Notification Logic - Use numeric ID for node lookup
+            $group = $db->getReference("groups/$firebaseChatId")->getValue();
+            if ($group && isset($group['users'])) {
+                $userIds = is_array($group['users']) ? $group['users'] : array_values($group['users']);
+                $receivers = \App\Models\User::whereIn('id', $userIds)
+                    ->where('id', '!=', $senderId)
+                    ->whereNotNull('fcm_token')
+                    ->get();
 
-            try {
-                $messaging->send($message);
-            } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('FCM Send Error: ' . $e->getMessage());
+                $groupName = $group['name'] ?? 'Group';
+                $notificationTitle = $groupName;
+                $finalBody = $senderName . ": " . $notificationBody;
+
+                foreach ($receivers as $user) {
+                    $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $user->fcm_token)
+                        ->withNotification(\Kreait\Firebase\Messaging\Notification::create($notificationTitle, $finalBody))
+                        ->withData([
+                            'chat_id' => $chatId, // Keep group_ prefix for frontend
+                            'type' => $type,
+                            'sender_name' => $senderName,
+                            'sender_id' => (string)$senderId,
+                            'group_id' => (string)$chatId,
+                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+                        ]);
+                    try { $messaging->send($message); } catch (\Exception $e) {}
+                }
+            }
+        } else {
+            // 1-to-1 Notification Logic - Target ONLY the recipient
+            $ids = explode('_', str_replace('chat_', '', $chatId));
+            $otherUserId = null;
+            if (count($ids) >= 2) {
+                $otherUserId = ($ids[0] == $senderId) ? $ids[1] : $ids[0];
+            }
+
+            if ($otherUserId) {
+                $receivers = \App\Models\User::where('id', $otherUserId)
+                    ->whereNotNull('fcm_token')
+                    ->get();
+
+                foreach ($receivers as $user) {
+                    $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $user->fcm_token)
+                        ->withNotification(\Kreait\Firebase\Messaging\Notification::create($senderName, $notificationBody))
+                        ->withData([
+                            'chat_id' => (string)$senderId,
+                            'type' => $type,
+                            'sender_name' => $senderName,
+                            'sender_id' => (string)$senderId,
+                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
+                        ]);
+                    try { $messaging->send($message); } catch (\Exception $e) {}
+                }
             }
         }
 
@@ -196,7 +243,7 @@ class ChatController extends Controller
         $myUserId = auth()->id();
         $myName = auth()->user()->name ?? 'Me';
         $myAvatar = auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($myName) . '&background=202c33&color=fff&size=280';
-        
+
         // Fetch group members
         $users = [];
         if ($groupId) {
@@ -217,7 +264,7 @@ class ChatController extends Controller
         $myUserId = auth()->id();
         $myName = auth()->user()->name ?? 'Me';
         $myAvatar = auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($myName) . '&background=202c33&color=fff&size=280';
-        
+
         $users = \App\Models\User::where('id', '!=', auth()->id())->get(['id', 'name', 'avatar', 'phone']);
 
         return view('chat.groups.group_video_call', compact('name', 'avatar', 'role', 'groupCallId', 'groupId', 'myUserId', 'myName', 'myAvatar', 'users'));
@@ -317,7 +364,7 @@ class ChatController extends Controller
         }
 
         $userIds = $group['users'];
-        
+
         // Fetch users who have FCM tokens
         $receivers = \App\Models\User::whereIn('id', $userIds)
             ->where('id', '!=', $senderId)
@@ -326,7 +373,7 @@ class ChatController extends Controller
 
         $senderName = auth()->user()->name ?? auth()->user()->phone ?? 'Someone';
         $groupName = $group['name'] ?? 'Group';
-        
+
         $notificationTitle = $groupName;
         $notificationBody = $senderName . ": " . ($messageText ?? 'Media');
 

@@ -355,6 +355,7 @@
                 name: subject,
                 isGroup: true,
                 createdBy: window.myUserId,
+                createdAt: Math.floor(Date.now() / 1000),
                 users: selectedGroupMembers.map(u => u.id).concat(window.myUserId),
                 avatar: avatar,
                 disappearingTimer: groupDisappearingTimer,
@@ -373,7 +374,7 @@
                 status: 'read'
             };
 
-            await window.push(window.ref(window.db, `chats/${groupId}/messages`), initialMsg);
+            await window.push(window.ref(window.db, `groups/${groupId}/messages`), initialMsg);
 
             // Hide panels & show sidebar
             document.getElementById('create_group_panel').classList.add('hidden');
@@ -395,7 +396,7 @@
             }
         } catch (error) {
             console.error("Failed to create group", error);
-            alert("Failed to create group. Please try again.");
+            alert("Failed to create group: " + (error.message || error));
         } finally {
             btn.disabled = false;
             btn.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"></path></svg>';

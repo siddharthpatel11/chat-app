@@ -75,18 +75,28 @@
     function toggleAddMembers() {
         const addMembersPanel = document.getElementById('add_group_members_panel');
         const newChatPanel = document.getElementById('new_chat_panel');
+        const mainSidebar = document.getElementById('user_sidebar_container');
 
         if (addMembersPanel.classList.contains('hidden')) {
             newChatPanel.classList.add('hidden');
             newChatPanel.classList.remove('sm:flex');
+            if (mainSidebar) {
+                mainSidebar.classList.add('hidden');
+                mainSidebar.classList.remove('sm:flex');
+            }
             addMembersPanel.classList.remove('hidden');
             addMembersPanel.classList.add('flex');
             document.getElementById('add_group_search').focus();
         } else {
             addMembersPanel.classList.add('hidden');
             addMembersPanel.classList.remove('flex');
-            newChatPanel.classList.remove('hidden');
-            newChatPanel.classList.add('sm:flex');
+            if (mainSidebar && newChatPanel.classList.contains('hidden')) {
+                mainSidebar.classList.remove('hidden');
+                mainSidebar.classList.add('sm:flex');
+            } else {
+                newChatPanel.classList.remove('hidden');
+                newChatPanel.classList.add('sm:flex');
+            }
             // reset selection
             selectedGroupMembers = [];
             updateGroupMembersUI();
