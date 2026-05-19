@@ -214,12 +214,99 @@
                 </div>
             </div>
         </div>
+
+        <!-- Forward Modal -->
+        <div id="forward_modal"
+            class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+            <div class="bg-[#222e35] w-[90%] max-w-[440px] h-[550px] rounded-2xl flex flex-col overflow-hidden shadow-2xl transform scale-95 transition-all duration-300 opacity-0"
+                id="forward_modal_content">
+                <!-- Header -->
+                <div class="flex items-center gap-4 px-6 py-4 bg-[#202c33] shrink-0">
+                    <button onclick="window.closeForwardModal()"
+                        class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full focus:outline-none transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    <h3 class="text-[#e9edef] text-[18px] font-medium">Forward message to</h3>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="px-4 py-2 bg-[#111b21] shrink-0 border-b border-white/5">
+                    <div class="flex items-center bg-[#202c33] rounded-lg px-3 py-1.5 focus-within:bg-[#2a3942] transition-colors border border-transparent focus-within:border-[#00a884]/30">
+                        <svg class="w-5 h-5 text-[#8696a0] mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input type="text" id="forward_search_input" oninput="window.filterForwardContacts()"
+                            placeholder="Search name or number"
+                            class="w-full bg-transparent border-none text-[#e9edef] text-sm focus:ring-0 placeholder-[#8696a0] py-0.5">
+                    </div>
+                </div>
+
+                <!-- Scrollable Content -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-2 bg-[#111b21]">
+                    <!-- My Status -->
+                    <div onclick="window.toggleForwardTargetSelection('status', 'My status', '')"
+                        class="flex items-center justify-between p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item forward-target-item" data-name="my status">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-[#00a884]/10 flex items-center justify-center shrink-0">
+                                <svg class="w-7 h-7 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 6v6l4 2"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="text-[#e9edef] font-medium">My status</div>
+                                <div class="text-[#8696a0] text-sm mt-0.5">Share to my status</div>
+                            </div>
+                        </div>
+                        <div class="shrink-0 mr-1">
+                            <div class="w-5 h-5 rounded border-2 border-gray-400 bg-white flex items-center justify-center transition-all select-none" id="forward_checkbox_box_status">
+                                <input type="checkbox" id="forward_checkbox_status" class="hidden">
+                                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Chats Header -->
+                    <div class="text-[#00a884] text-xs font-semibold px-3 py-2 mt-2 uppercase tracking-wider">Recent chats</div>
+
+                    <!-- Contacts List Container -->
+                    <div id="forward_contacts_list" class="space-y-1">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div id="forward_modal_footer" class="hidden flex items-center justify-between px-6 py-4 bg-[#202c33] shrink-0 border-t border-white/5">
+                    <div class="flex-1 min-w-0 pr-4">
+                        <div class="text-[#8696a0] text-xs">Selected targets</div>
+                        <div id="forward_selected_names" class="text-[#e9edef] text-sm font-medium truncate mt-0.5"></div>
+                    </div>
+                    <button onclick="window.sendForwardedMessages()"
+                        class="bg-[#00a884] hover:bg-[#008f72] text-[#111b21] p-3 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95 shrink-0" title="Send messages">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
         <style>
             #delete_modal.show {
                 display: flex;
             }
 
             #delete_modal.show #delete_modal_content {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            #forward_modal.show {
+                display: flex;
+            }
+
+            #forward_modal.show #forward_modal_content {
                 transform: scale(1);
                 opacity: 1;
             }
@@ -715,7 +802,7 @@
                                 </button>
                             </div>
 
-                            <div class="flex items-center gap-2 w-full relative">
+                            <div id="normal_input_container" class="flex items-center gap-2 w-full relative">
                                 <!-- Emoji Picker Button -->
                                 <button type="button" id="emoji_toggle_btn" onclick="toggleEmojiPicker()"
                                     class="text-[#8696a0] hover:text-[#e9edef] p-2 focus:outline-none shrink-0 transition-colors">
@@ -979,6 +1066,23 @@
                                     </svg>
                                 </button>
                             </div>
+
+                            <!-- Bottom Selection Bar -->
+                            <div id="selection_bottom_bar" class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
+                                <div class="flex items-center gap-4">
+                                    <button onclick="cancelSelection()" class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                        </svg>
+                                    </button>
+                                    <span id="selection_bottom_count" class="font-semibold text-base">0 selected</span>
+                                </div>
+                                <button onclick="window.openForwardModal()" class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95" title="Forward message">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                        <path d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     @include('chat.groups.group_chat')
@@ -1127,6 +1231,22 @@
                 if (!path.includes(attachMenu) && !path.includes(attachBtn)) {
                     attachMenu.classList.add('hidden');
                 }
+            }
+
+            // Close any open message menu dropdowns when clicking outside
+            const menuBtn = event.target.closest('button[onclick*="window.toggleMsgMenu"]');
+            const menuDropdown = event.target.closest('[id^="menu_"]');
+            if (!menuBtn && !menuDropdown) {
+                document.querySelectorAll('[id^="menu_"]').forEach(el => {
+                    if (!el.classList.contains('hidden')) {
+                        el.classList.add('hidden');
+                        const k = el.id.replace('menu_', '');
+                        const msgEl = document.getElementById('msg_' + k);
+                        const bubbleEl = document.getElementById('bubble_' + k);
+                        if (msgEl) msgEl.style.zIndex = '';
+                        if (bubbleEl) bubbleEl.style.zIndex = '';
+                    }
+                });
             }
         });
 
@@ -1883,7 +2003,7 @@
 
         // Feature Actions
         window.replyTo = function (key) {
-            document.getElementById('menu_' + key)?.classList.add('hidden');
+            window.closeMsgMenu(key);
             const msgData = window.globalMessages[key];
             if (!msgData) return;
 
@@ -1926,35 +2046,6 @@
             document.getElementById('replying_to_block').classList.add('hidden');
         };
 
-        window.forwardMsg = function (key) {
-            if (!window.currentChatId) {
-                alert('Please select a chat first.');
-                return;
-            }
-            document.getElementById('menu_' + key)?.classList.add('hidden');
-            document.getElementById('msg_' + key).style.zIndex = '0';
-            const msgData = window.globalMessages[key];
-
-            let formData = new FormData();
-            formData.append('chat_id', window.currentChatId);
-            formData.append('type', msgData.type || 'text');
-            formData.append('message', msgData.text || '');
-            if (msgData.lat) formData.append('lat', msgData.lat);
-            if (msgData.lng) formData.append('lng', msgData.lng);
-
-            // If it's a file, we can't easily resend it via form data without downloading
-            if (['image', 'video', 'audio', 'document'].includes(msgData.type)) {
-                alert('Forwarding media files is not fully implemented. Please upload the file again.');
-                return;
-            }
-
-            fetch('/send', {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': csrf },
-                body: formData
-            });
-        };
-
         window.toggleMsgMenu = function (key) {
             // close others
             document.querySelectorAll('[id^="menu_"]').forEach(el => {
@@ -1978,6 +2069,15 @@
                 if (parentMsg) parentMsg.style.zIndex = '';
                 if (bubbleEl) bubbleEl.style.zIndex = '';
             }
+        };
+
+        window.closeMsgMenu = function (key) {
+            const menu = document.getElementById('menu_' + key);
+            if (menu) menu.classList.add('hidden');
+            const parentMsg = document.getElementById('msg_' + key);
+            const bubbleEl = document.getElementById('bubble_' + key);
+            if (parentMsg) parentMsg.style.zIndex = '';
+            if (bubbleEl) bubbleEl.style.zIndex = '';
         };
 
         // Highlight search text in chat messages
@@ -2337,6 +2437,9 @@
         const db = getDatabase(app);
         const messaging = getMessaging(app);
         const storage = getStorage(app);
+
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        window.csrf = csrf;
 
         // Expose to window for global access
         window.db = db;
@@ -3179,12 +3282,14 @@
                         </div>` : ''}
 
                         <!-- Selection Checkbox (Hidden by default) -->
+                        ${data.type !== 'call' ? `
                         <div class="msg-checkbox-container hidden flex-col justify-center px-3 z-10 ${isMe ? 'order-first' : ''}">
                             <div class="w-5 h-5 border-2 border-gray-400 rounded-md flex items-center justify-center bg-white">
                                 <input type="checkbox" id="checkbox_${key}" class="msg-checkbox opacity-0 absolute w-5 h-5 pointer-events-none">
                                 <svg class="w-4 h-4 text-white pointer-events-none transition-opacity opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                             </div>
                         </div>
+                        ` : ''}
 
                         <style>
                             #checkbox_${key}:checked + svg { opacity: 1; }
@@ -3203,9 +3308,11 @@
 
                             <!-- Menu Dropdown -->
                             <div id="menu_${key}" class="hidden absolute top-8 ${isMe ? 'right-0' : 'left-0'} bg-[#233138] shadow-2xl border border-[#313d45] rounded-xl w-32 py-1 z-50 overflow-hidden transform transition-all duration-200">
+                                ${data.type !== 'call' ? `
                                 <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
                                 <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
                                 <div class="h-px bg-[#313d45] my-1 mx-2"></div>
+                                ` : ''}
                                 <button onclick="event.stopPropagation(); window.deleteMsg('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 flex items-center justify-between transition-colors">Delete <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                             </div>
 
@@ -3341,13 +3448,22 @@
 
         // Selection Logic
         window.isSelectionMode = false;
+        window.isForwardSelection = false;
         window.selectedMessages = new Set();
+        window._selectedForwardTargets = new Map(); // targetId => { type, name }
 
         window.cancelSelection = function () {
             window.isSelectionMode = false;
+            window.isForwardSelection = false;
             window.selectedMessages.clear();
-            document.getElementById('normal_header').classList.remove('hidden');
-            document.getElementById('selection_header').classList.add('hidden');
+            
+            document.getElementById('normal_header')?.classList.remove('hidden');
+            document.getElementById('selection_header')?.classList.add('hidden');
+            
+            // Hide selection bottom bar and show normal input container
+            document.getElementById('selection_bottom_bar')?.classList.add('hidden');
+            document.getElementById('normal_input_container')?.classList.remove('hidden');
+            
             document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.msg-checkbox').forEach(el => {
                 el.checked = false;
@@ -3393,9 +3509,14 @@
         };
 
         window.toggleMsgSelection = function (key) {
-            if (!window.isSelectionMode) return;
+            if (!window.isSelectionMode && !window.isForwardSelection) return;
+            const msg = window.globalMessages[key];
+            if (msg && msg.type === 'call') return;
+
             const checkbox = document.getElementById('checkbox_' + key);
             const msgEl = document.getElementById('msg_' + key);
+            if (!checkbox || !msgEl) return;
+            
             checkbox.checked = !checkbox.checked;
             const box = checkbox.parentElement;
 
@@ -3414,13 +3535,270 @@
             if (window.selectedMessages.size === 0) {
                 window.cancelSelection();
             } else {
-                document.getElementById('selection_count').textContent = window.selectedMessages.size + ' Selected';
+                if (window.isSelectionMode) {
+                    document.getElementById('selection_count').textContent = window.selectedMessages.size + ' Selected';
+                } else if (window.isForwardSelection) {
+                    document.getElementById('selection_bottom_count').textContent = window.selectedMessages.size + ' Selected';
+                }
             }
+        };
+
+        // Forward Modal Operations
+        window.openForwardModal = function (isFromGroup = false) {
+            window.isForwardingFromGroup = isFromGroup;
+            const modal = document.getElementById('forward_modal');
+            const listContainer = document.getElementById('forward_contacts_list');
+            const searchInput = document.getElementById('forward_search_input');
+            const footer = document.getElementById('forward_modal_footer');
+
+            if (!modal || !listContainer) return;
+
+            window._selectedForwardTargets.clear();
+            if (searchInput) searchInput.value = '';
+            if (footer) footer.classList.add('hidden');
+
+            // Reset My Status checkbox UI
+            const statusBox = document.getElementById('forward_checkbox_box_status');
+            const statusCheck = document.getElementById('forward_checkbox_status');
+            if (statusCheck) statusCheck.checked = false;
+            if (statusBox) {
+                statusBox.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
+                statusBox.classList.add('bg-white', 'border-gray-400');
+                statusBox.querySelector('svg')?.classList.add('hidden');
+            }
+
+            // Gather contacts from sidebar
+            let html = '';
+            
+            // 1. Users
+            const userNodes = document.querySelectorAll('#user_list_container [id^="user_sidebar_"]');
+            userNodes.forEach(node => {
+                const userId = node.id.replace('user_sidebar_', '');
+                const name = node.querySelector('h4')?.textContent.trim() || '';
+                const imgEl = node.querySelector('img');
+                const avatar = imgEl ? imgEl.src : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
+                const about = node.querySelector('p')?.textContent.trim() || 'Available';
+
+                html += `
+                    <div onclick="window.toggleForwardTargetSelection('${userId}', '${name.replace(/'/g, "\\'")}', 'user')"
+                        class="flex items-center justify-between p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item forward-target-item" data-name="${name.toLowerCase()}">
+                        <div class="flex items-center gap-4">
+                            <img src="${avatar}" class="w-12 h-12 rounded-full object-cover border border-white/5 shrink-0">
+                            <div class="min-w-0">
+                                <div class="text-[#e9edef] font-medium truncate">${name}</div>
+                                <div class="text-[#8696a0] text-sm truncate mt-0.5">${about}</div>
+                            </div>
+                        </div>
+                        <div class="shrink-0 mr-1">
+                            <div class="w-5 h-5 rounded border-2 border-gray-400 bg-white flex items-center justify-center transition-all select-none" id="forward_checkbox_box_${userId}">
+                                <input type="checkbox" id="forward_checkbox_${userId}" class="hidden">
+                                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            // 2. Groups
+            const groupNodes = document.querySelectorAll('#user_list_container [id^="group_sidebar_"]');
+            groupNodes.forEach(node => {
+                const groupId = node.id.replace('group_sidebar_', '');
+                const name = node.querySelector('h4')?.textContent.trim() || '';
+                const imgEl = node.querySelector('img');
+                const avatar = imgEl ? imgEl.src : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
+                const about = node.querySelector('p')?.textContent.trim() || 'Group chat';
+
+                html += `
+                    <div onclick="window.toggleForwardTargetSelection('${groupId}', '${name.replace(/'/g, "\\'")}', 'group')"
+                        class="flex items-center justify-between p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item forward-target-item" data-name="${name.toLowerCase()}">
+                        <div class="flex items-center gap-4">
+                            <img src="${avatar}" class="w-12 h-12 rounded-full object-cover border border-white/5 shrink-0">
+                            <div class="min-w-0">
+                                <div class="text-[#e9edef] font-medium truncate">${name}</div>
+                                <div class="text-[#8696a0] text-sm truncate mt-0.5">${about}</div>
+                            </div>
+                        </div>
+                        <div class="shrink-0 mr-1">
+                            <div class="w-5 h-5 rounded border-2 border-gray-400 bg-white flex items-center justify-center transition-all select-none" id="forward_checkbox_box_${groupId}">
+                                <input type="checkbox" id="forward_checkbox_${groupId}" class="hidden">
+                                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                        </div>
+                    </div>`;
+            });
+
+            listContainer.innerHTML = html;
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.add('show'), 10);
+        };
+
+        window.closeForwardModal = function () {
+            const modal = document.getElementById('forward_modal');
+            modal.classList.remove('show');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        };
+
+        window.filterForwardContacts = function () {
+            const val = document.getElementById('forward_search_input').value.trim().toLowerCase();
+            const items = document.querySelectorAll('.forward-target-item');
+            items.forEach(item => {
+                const name = item.getAttribute('data-name');
+                if (name.includes(val)) {
+                    item.classList.remove('hidden');
+                    item.classList.add('flex');
+                } else {
+                    item.classList.remove('flex');
+                    item.classList.add('hidden');
+                }
+            });
+        };
+
+        window.toggleForwardTargetSelection = function (targetId, targetName, type) {
+            const checkbox = document.getElementById('forward_checkbox_' + targetId);
+            const box = document.getElementById('forward_checkbox_box_' + targetId);
+            if (!checkbox || !box) return;
+
+            checkbox.checked = !checkbox.checked;
+            const svg = box.querySelector('svg');
+
+            if (checkbox.checked) {
+                window._selectedForwardTargets.set(targetId, { type, name: targetName });
+                box.classList.add('bg-[#0d9488]', 'border-[#0d9488]');
+                box.classList.remove('bg-white', 'border-gray-400');
+                if (svg) svg.classList.remove('hidden');
+            } else {
+                window._selectedForwardTargets.delete(targetId);
+                box.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
+                box.classList.add('bg-white', 'border-gray-400');
+                if (svg) svg.classList.add('hidden');
+            }
+
+            // Update footer
+            const footer = document.getElementById('forward_modal_footer');
+            const namesDisplay = document.getElementById('forward_selected_names');
+            
+            if (window._selectedForwardTargets.size > 0) {
+                footer.classList.remove('hidden');
+                footer.classList.add('flex');
+                
+                const names = Array.from(window._selectedForwardTargets.values()).map(t => t.name);
+                namesDisplay.textContent = names.join(', ');
+            } else {
+                footer.classList.add('hidden');
+                footer.classList.remove('flex');
+            }
+        };
+
+        window.sendForwardedMessages = async function () {
+            if (window.isForwardingFromGroup) {
+                if (typeof window.sendGroupForwardedMessages === 'function') {
+                    await window.sendGroupForwardedMessages();
+                }
+                return;
+            }
+
+            if (window.selectedMessages.size === 0 || window._selectedForwardTargets.size === 0) return;
+
+            const messagesToForward = [];
+            window.selectedMessages.forEach(key => {
+                const msg = window.globalMessages[key];
+                if (msg) {
+                    messagesToForward.push(msg);
+                }
+            });
+
+            window.closeForwardModal();
+            window.cancelSelection();
+
+            for (const [targetId, targetInfo] of window._selectedForwardTargets.entries()) {
+                if (targetId === 'status') {
+                    for (const msg of messagesToForward) {
+                        const statusData = {
+                            userId: window.myUserId,
+                            userName: window.myUserName,
+                            userAvatar: window.myUserAvatar,
+                            text: msg.text || '',
+                            type: msg.type || 'text',
+                            timestamp: window.serverTimestamp(),
+                            viewers: {},
+                            privacyMode: window.currentPrivacyMode || 'all',
+                            privacyContacts: window.currentPrivacyContacts || []
+                        };
+                        if (msg.file_url) statusData.mediaUrl = msg.file_url;
+                        if (msg.type === 'text') {
+                            statusData.bgColor = '#00a884';
+                            statusData.font = 'font-sans';
+                        }
+                        
+                        try {
+                            const statusRef = window.ref(window.db, `statuses/${window.myUserId}`);
+                            await window.push(statusRef, statusData);
+                        } catch (e) {
+                            console.error('Forward to status error:', e);
+                        }
+                    }
+                } else {
+                    const isTargetGroup = targetInfo.type === 'group';
+                    let chatId = '';
+                    if (isTargetGroup) {
+                        chatId = 'group_' + targetId.replace('group_', '');
+                    } else {
+                        const minId = Math.min(window.myUserId, parseInt(targetId));
+                        const maxId = Math.max(window.myUserId, parseInt(targetId));
+                        chatId = `chat_${minId}_${maxId}`;
+                    }
+
+                    for (const msg of messagesToForward) {
+                        const formData = new FormData();
+                        formData.append('chat_id', chatId);
+                        formData.append('type', msg.type || 'text');
+                        formData.append('message', msg.text || '');
+                        if (msg.file_url) {
+                            formData.append('file_url', msg.file_url);
+                            formData.append('file_name', msg.file_name || 'file');
+                        }
+                        if (msg.lat) formData.append('lat', msg.lat);
+                        if (msg.lng) formData.append('lng', msg.lng);
+
+                        try {
+                            await fetch('/send', {
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': csrf },
+                                body: formData
+                            });
+                        } catch (e) {
+                            console.error('Forward send error:', e);
+                        }
+                    }
+                }
+            }
+
+            if (window.showToast) {
+                window.showToast('Forwarded', 'Message forwarded successfully.');
+            }
+        };
+
+        window.forwardMsg = function (key) {
+            window.closeMsgMenu(key);
+            
+            window.isForwardSelection = true;
+            window.selectedMessages.clear();
+            
+            document.getElementById('normal_input_container')?.classList.add('hidden');
+            
+            const bottomBar = document.getElementById('selection_bottom_bar');
+            if (bottomBar) {
+                bottomBar.classList.remove('hidden');
+                bottomBar.classList.add('flex');
+            }
+            
+            document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
+            
+            window.toggleMsgSelection(key);
         };
 
         // Activates selection mode starting with chosen message
         window.deleteMsg = function (key) {
-            document.getElementById('menu_' + key)?.classList.add('hidden');
+            window.closeMsgMenu(key);
             const msgData = window.globalMessages[key];
             let typeLabel = 'message';
             if (msgData) {

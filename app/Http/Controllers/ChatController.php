@@ -66,7 +66,12 @@ class ChatController extends Controller
             $fileName = $file->getClientOriginalName();
             $path = $file->store('uploads', 'public');
             $fileUrl = url('storage/' . $path);
+        } elseif ($request->has('file_url')) {
+            $fileUrl = $request->file_url;
+            $fileName = $request->file_name;
+            $type = $request->type ?? 'document';
         }
+
         if ($request->type === 'location' || $request->type === 'live_location') {
             $type = $request->type;
             $lat = $request->lat;
@@ -85,7 +90,7 @@ class ChatController extends Controller
             'lat' => $lat,
             'lng' => $lng,
             'duration' => $request->duration ?? null,
-            'time' => now()->timestamp,
+            'time' => microtime(true),
             'status' => 'sent',
         ];
 

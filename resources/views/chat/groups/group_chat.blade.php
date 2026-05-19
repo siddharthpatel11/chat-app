@@ -660,7 +660,7 @@
             </button>
         </div>
 
-        <div class="flex items-center gap-2 w-full relative">
+        <div id="group_normal_input_container" class="flex items-center gap-2 w-full relative">
             <!-- Emoji Picker Button -->
             <button type="button" id="group_emoji_toggle_btn" onclick="toggleGroupEmojiPicker()"
                 class="text-[#8696a0] hover:text-[#e9edef] p-2 focus:outline-none shrink-0 transition-colors">
@@ -851,6 +851,22 @@
             </button>
         </div>
 
+        <!-- Group Bottom Selection Bar -->
+        <div id="group_selection_bottom_bar" class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
+            <div class="flex items-center gap-4">
+                <button onclick="window.cancelGroupForwardSelection()" class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <span id="group_selection_bottom_count" class="font-semibold text-base">0 Selected</span>
+            </div>
+            <button onclick="window.openForwardModal(true)" class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95" title="Forward message">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z"></path>
+                </svg>
+            </button>
+        </div>
     </div>
 
 </div>
@@ -2451,6 +2467,9 @@
     window.openGroupMessageOptions = function (event, messageKey, isMe, encodedSenderName, senderId) {
         event.stopPropagation();
 
+        const msg = window.globalMessages[messageKey];
+        const isCall = msg && msg.type === 'call';
+
         const dropdown = document.getElementById('group_msg_dropdown');
         if (!dropdown) return;
 
@@ -2460,18 +2479,40 @@
         const reportDiv = document.getElementById('group_dropdown_report_divider');
         const senderNameSpan = document.getElementById('group_dropdown_sender_name');
 
+        // Toggle visibility of standard buttons for call logs
+        const replyBtn = dropdown.querySelector('button[onclick="window.replyToGroupMsg()"]');
+        const copyBtn = dropdown.querySelector('button[onclick="window.copyGroupMessage()"]');
+        const forwardBtn = dropdown.querySelector('button[onclick="window.forwardGroupMessage()"]');
+        const pinBtn = dropdown.querySelector('button[onclick="window.pinGroupMessage()"]');
+        const starBtn = dropdown.querySelector('button[onclick="window.starGroupMessage()"]');
+        const selectBtn = dropdown.querySelector('button[onclick="window.selectGroupMessage()"]');
+        
+        // Find Meta AI buttons (both standard class and onclick)
+        const metaAiBtns = Array.from(dropdown.querySelectorAll('button')).filter(btn => btn.textContent.trim() === 'Ask Meta AI');
+
         if (isMe) {
             replyPriv.style.display = 'none';
             msgUser.style.display = 'none';
             reportBtn.style.display = 'none';
             reportDiv.style.display = 'none';
         } else {
-            replyPriv.style.display = 'block';
+            replyPriv.style.display = isCall ? 'none' : 'block';
             msgUser.style.display = 'block';
-            reportBtn.style.display = 'block';
-            reportDiv.style.display = 'block';
+            reportBtn.style.display = isCall ? 'none' : 'block';
+            reportDiv.style.display = isCall ? 'none' : 'block';
             senderNameSpan.textContent = decodeURIComponent(encodedSenderName);
         }
+
+        if (replyBtn) replyBtn.style.display = isCall ? 'none' : 'block';
+        if (copyBtn) copyBtn.style.display = isCall ? 'none' : 'block';
+        if (forwardBtn) forwardBtn.style.display = isCall ? 'none' : 'block';
+        if (pinBtn) pinBtn.style.display = isCall ? 'none' : 'block';
+        if (starBtn) starBtn.style.display = isCall ? 'none' : 'block';
+        if (selectBtn) selectBtn.style.display = isCall ? 'none' : 'block';
+        
+        metaAiBtns.forEach(btn => {
+            btn.style.display = isCall ? 'none' : 'block';
+        });
 
         const rect = event.currentTarget.getBoundingClientRect();
         dropdown.classList.remove('hidden');
@@ -2640,7 +2681,10 @@
     };
 
     window.toggleGroupMsgSelection = function (key) {
-        if (!window.isGroupSelectionMode) return;
+        if (!window.isGroupSelectionMode && !window.isGroupForwardSelection) return;
+        const msg = window.globalMessages[key];
+        if (msg && msg.type === 'call') return;
+
         const checkbox = document.getElementById('checkbox_' + key);
         const msgEl = document.getElementById('msg_' + key);
         if (!checkbox || !msgEl) return;
@@ -2661,9 +2705,96 @@
         }
 
         if (window.selectedGroupMessages.size === 0) {
-            window.cancelGroupSelection();
+            if (window.isGroupSelectionMode) {
+                window.cancelGroupSelection();
+            } else if (window.isGroupForwardSelection) {
+                window.cancelGroupForwardSelection();
+            }
         } else {
-            document.getElementById('group_selection_count').textContent = window.selectedGroupMessages.size + ' Selected';
+            if (window.isGroupSelectionMode) {
+                document.getElementById('group_selection_count').textContent = window.selectedGroupMessages.size + ' Selected';
+            } else if (window.isGroupForwardSelection) {
+                document.getElementById('group_selection_bottom_count').textContent = window.selectedGroupMessages.size + ' Selected';
+            }
+        }
+    };
+
+    window.sendGroupForwardedMessages = async function () {
+        if (window.selectedGroupMessages.size === 0 || window._selectedForwardTargets.size === 0) return;
+
+        const messagesToForward = [];
+        window.selectedGroupMessages.forEach(key => {
+            const msg = window.globalMessages[key];
+            if (msg) {
+                messagesToForward.push(msg);
+            }
+        });
+
+        window.closeForwardModal();
+        window.cancelGroupForwardSelection();
+
+        for (const [targetId, targetInfo] of window._selectedForwardTargets.entries()) {
+            if (targetId === 'status') {
+                for (const msg of messagesToForward) {
+                    const statusData = {
+                        userId: window.myUserId,
+                        userName: window.myUserName,
+                        userAvatar: window.myUserAvatar,
+                        text: msg.text || '',
+                        type: msg.type || 'text',
+                        timestamp: window.serverTimestamp(),
+                        viewers: {},
+                        privacyMode: window.currentPrivacyMode || 'all',
+                        privacyContacts: window.currentPrivacyContacts || []
+                    };
+                    if (msg.file_url) statusData.mediaUrl = msg.file_url;
+                    if (msg.type === 'text') {
+                        statusData.bgColor = '#00a884';
+                        statusData.font = 'font-sans';
+                    }
+                    
+                    try {
+                        const statusRef = window.ref(window.db, `statuses/${window.myUserId}`);
+                        await window.push(statusRef, statusData);
+                    } catch (e) {
+                        console.error('Forward group msg to status error:', e);
+                    }
+                }
+            } else {
+                const isTargetGroup = targetInfo.type === 'group';
+                let chatId = '';
+                if (isTargetGroup) {
+                    chatId = 'group_' + targetId.replace('group_', '');
+                } else {
+                    const minId = Math.min(window.myUserId, parseInt(targetId));
+                    const maxId = Math.max(window.myUserId, parseInt(targetId));
+                    chatId = `chat_${minId}_${maxId}`;
+                }
+
+                for (const msg of messagesToForward) {
+                    const formData = new FormData();
+                    formData.append('chat_id', chatId);
+                    formData.append('type', msg.type || 'text');
+                    formData.append('message', msg.text || '');
+                    if (msg.file_url) {
+                        formData.append('file_url', msg.file_url);
+                        formData.append('file_name', msg.file_name || 'file');
+                    }
+                    if (msg.lat) formData.append('lat', msg.lat);
+                    if (msg.lng) formData.append('lng', msg.lng);
+
+                    try {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || (typeof csrf !== 'undefined' ? csrf : '');
+                        await fetch('/send', {
+                            method: 'POST',
+                            headers: { 'X-CSRF-TOKEN': csrfToken },
+                            body: formData
+                        });
+                    } catch (e) {
+                        console.error('Forward group msg send error:', e);
+                    }
+                }
+            }
         }
     };
 
@@ -2713,13 +2844,80 @@
         });
     };
 
+    window.isGroupForwardSelection = false;
+
+    window.cancelGroupForwardSelection = function () {
+        window.isGroupForwardSelection = false;
+        window.selectedGroupMessages.clear();
+        
+        // Hide selection bottom bar
+        const bottomBar = document.getElementById('group_selection_bottom_bar');
+        if (bottomBar) {
+            bottomBar.classList.remove('flex');
+            bottomBar.classList.add('hidden');
+        }
+        
+        // Show normal input container
+        document.getElementById('group_normal_input_container')?.classList.remove('hidden');
+        
+        // Hide checkboxes next to messages
+        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.add('hidden'));
+        
+        // Uncheck all checkboxes
+        document.querySelectorAll('#group_messages .msg-checkbox').forEach(el => {
+            el.checked = false;
+            const box = el.parentElement;
+            box.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
+            box.classList.add('bg-white', 'border-gray-400');
+        });
+        
+        // Clear message background selection classes
+        document.querySelectorAll('#group_messages [id^="msg_"]').forEach(el => el.classList.remove('bg-blue-100', 'bg-opacity-50'));
+    };
+
     window.forwardGroupMessage = function () {
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey) return;
-        // For now, we'll just show a prompt to simulate selection
-        // In a real app, this would open a modal with contact list
-        alert('Forwarding functionality triggered. Please select a contact (UI pending).');
+        
         document.getElementById('group_msg_dropdown').classList.add('hidden');
+        
+        window.isGroupForwardSelection = true;
+        window.selectedGroupMessages.clear();
+        
+        // Hide normal input area and show selection bottom bar
+        document.getElementById('group_normal_input_container')?.classList.add('hidden');
+        const bottomBar = document.getElementById('group_selection_bottom_bar');
+        if (bottomBar) {
+            bottomBar.classList.remove('hidden');
+            bottomBar.classList.add('flex');
+        }
+        
+        // Show checkboxes
+        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
+        
+        // Toggle selection for current message
+        window.toggleGroupMsgSelection(messageKey);
+    };
+
+    window.selectGroupMessage = function () {
+        const messageKey = window._activeGroupMsgKey;
+        if (!messageKey) return;
+        
+        document.getElementById('group_msg_dropdown').classList.add('hidden');
+        
+        window.isGroupSelectionMode = true;
+        window.selectedGroupMessages.clear();
+        
+        // Hide normal header and show selection header
+        document.getElementById('group_normal_header').classList.add('hidden');
+        document.getElementById('group_selection_header').classList.remove('hidden');
+        document.getElementById('group_selection_header').classList.add('flex');
+        
+        // Show checkboxes
+        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
+        
+        // Toggle selection for current message
+        window.toggleGroupMsgSelection(messageKey);
     };
 
     window.replyToGroupMsg = function () {
@@ -2874,6 +3072,8 @@
     const originalSelectGroupChat = window.selectGroupChat;
     window.selectGroupChat = function() {
         applyGroupOverrides();
+        if (typeof window.cancelGroupForwardSelection === 'function') window.cancelGroupForwardSelection();
+        if (typeof window.cancelGroupSelection === 'function') window.cancelGroupSelection();
         if (typeof originalSelectGroupChat === 'function') {
             originalSelectGroupChat.apply(this, arguments);
         }
@@ -3784,12 +3984,14 @@
             const msgHtml = `
                 <div id="msg_${key}" onclick="window.toggleGroupMsgSelection('${key}')" class="flex ${isMe ? 'justify-end' : 'justify-start'} mb-2 px-4 group/msg relative gap-2 items-start group/bubble-container cursor-default ${searchHighlightClass}">
                     <!-- Selection Checkbox -->
+                    ${data.type !== 'call' ? `
                     <div class="msg-checkbox-container hidden shrink-0 self-center mr-2">
                         <div class="w-5 h-5 rounded border-2 border-gray-400 bg-white flex items-center justify-center transition-all">
                             <input type="checkbox" id="checkbox_${key}" class="msg-checkbox hidden">
                             <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
                     </div>
+                    ` : ''}
 
                     ${!isMe ? `
                     <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 mt-0.5 shadow-sm">
