@@ -106,13 +106,26 @@
 
         <!-- Items List -->
         <div class="flex flex-col">
-            <button class="flex items-center px-4 py-4 gap-4 hover:bg-[#202c33]/30 transition-colors text-left w-full">
+            <button onclick="window.openStarredMessages()" class="flex items-center px-4 py-4 gap-4 hover:bg-[#202c33]/30 transition-colors text-left w-full">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#8696a0]">
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
-                    </path>
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
                 </svg>
                 <span class="text-[#e9edef] text-[16px] flex-1">Starred messages</span>
+                <span id="starred_count_badge" class="text-[#8696a0] text-sm">0</span>
             </button>
+
+            <!-- Starred Messages Panel (inside contact_info_panel) -->
+            <div id="starred_messages_panel" class="hidden fixed top-0 right-0 h-screen w-[400px] bg-[#111b21] border-l border-[#313d45] z-[500] flex flex-col shadow-2xl">
+                <div class="h-[60px] bg-[#202c33] flex items-center px-4 gap-4 shrink-0">
+                    <button onclick="document.getElementById('starred_messages_panel').classList.add('hidden')" class="text-[#aebac1] hover:text-[#e9edef]">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                    </button>
+                    <span class="text-[#e9edef] text-[16px] font-medium">Starred messages</span>
+                </div>
+                <div id="starred_messages_list" class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#111b21]">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
             <button class="flex items-center px-4 py-4 gap-4 hover:bg-[#202c33]/30 transition-colors text-left w-full">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#8696a0]">
                     <path
@@ -201,5 +214,60 @@
         if (window.innerWidth >= 640) {
             mainChat.classList.remove('sm:mr-[400px]');
         }
+    };
+
+    window.openStarredMessages = function() {
+        const panel = document.getElementById('starred_messages_panel');
+        const list = document.getElementById('starred_messages_list');
+        if (!panel || !list) return;
+
+        list.innerHTML = '';
+        const myId = window.myUserId;
+
+         // Update starred count badge
+        if (window.get && window.ref && window.db && window.myUserId) {
+            window.get(window.ref(window.db, `starred_messages/${window.myUserId}`)).then(snap => {
+                const badge = document.getElementById('starred_count_badge');
+                if (badge) badge.textContent = snap.val() ? Object.keys(snap.val()).length : 0;
+            });
+        }
+
+        window.get(window.ref(window.db, `starred_messages/${myId}`)).then(snapshot => {
+            const data = snapshot.val();
+            if (!data || Object.keys(data).length === 0) {
+                list.innerHTML = `<div class="text-center text-[#8696a0] py-20">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-[#3b4a54]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <p>No starred messages</p>
+                </div>`;
+            } else {
+                const msgs = Object.entries(data).sort((a, b) => (b[1].time || 0) - (a[1].time || 0));
+                msgs.forEach(([key, msg]) => {
+                    const date = msg.time ? new Date(msg.time * 1000).toLocaleDateString([], { day:'2-digit', month:'2-digit', year:'numeric' }) : '';
+                    const time = msg.time ? new Date(msg.time * 1000).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '';
+                    const isMe = msg.sender_id == myId;
+
+                    let content = msg.text || '';
+                    if (msg.type === 'image') content = '📷 Photo';
+                    else if (msg.type === 'video') content = '🎥 Video';
+                    else if (msg.type === 'audio') content = '🎤 Voice message';
+                    else if (msg.type === 'document') content = `📄 ${msg.file_name || 'Document'}`;
+
+                    list.insertAdjacentHTML('beforeend', `
+                        <div class="bg-[#202c33] rounded-xl p-3 cursor-pointer hover:bg-[#2a3942] transition-colors"
+                            onclick="window.closeContactInfo(); setTimeout(() => window.scrollToMessage('${key}'), 400)">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="#00a884"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                <span class="text-[#00a884] text-xs font-semibold">${isMe ? 'You' : (window.activeChatUser?.name || 'Contact')}</span>
+                                <span class="text-[#8696a0] text-xs ml-auto">${date} ${time}</span>
+                            </div>
+                            <p class="text-[#e9edef] text-sm leading-relaxed">${content}</p>
+                        </div>`);
+                });
+            }
+            // Update badge count
+            const badge = document.getElementById('starred_count_badge');
+            if (badge) badge.textContent = data ? Object.keys(data).length : 0;
+            panel.classList.remove('hidden');
+        });
     };
 </script>

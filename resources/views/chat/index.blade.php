@@ -778,6 +778,32 @@
                             </div>
                         </div>
 
+                        <!-- Pinned Messages Bar (Hidden by default, supports multiple) -->
+                        <div id="private_pinned_bar" onclick="window.scrollToCurrentPin && window.scrollToCurrentPin()"
+                            class="hidden bg-[#2a3942]/90 backdrop-blur-sm px-4 py-2 flex items-center justify-between border-b border-white/5 cursor-pointer hover:bg-[#384b57] transition-colors z-[15]">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="text-[#00a884] shrink-0">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                        <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
+                                    </svg>
+                                </div>
+                                <div class="flex flex-col min-w-0">
+                                    <span id="private_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1 pinned message</span>
+                                    <span id="private_pinned_text" class="text-[#8696a0] text-sm truncate w-full">Message text goes here...</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button onclick="event.stopPropagation(); window.navigatePin && window.navigatePin(-1)"
+                                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors" title="Previous pin">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>
+                                </button>
+                                <button onclick="event.stopPropagation(); window.navigatePin && window.navigatePin(1)"
+                                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors" title="Next pin">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg>
+                                </button>
+                            </div>
+                        </div>
+
                         <div id="messages"
                             class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]">
                         </div>
@@ -2046,6 +2072,11 @@
             document.getElementById('replying_to_block').classList.add('hidden');
         };
 
+        // Multi-pin state
+        window.pinnedMsgKeys = new Set();
+        window._pinnedMsgsList = []; // Array of {key, text, time} sorted by time desc
+        window._currentPinIndex = 0;
+
         window.toggleMsgMenu = function (key) {
             // close others
             document.querySelectorAll('[id^="menu_"]').forEach(el => {
@@ -2059,6 +2090,13 @@
                 }
             });
             const menu = document.getElementById('menu_' + key);
+
+            // Dynamic text update for pin/unpin
+            const pinBtnText = document.getElementById('pin_btn_text_' + key);
+            if (pinBtnText) {
+                pinBtnText.textContent = window.pinnedMsgKeys.has(key) ? 'Unpin' : 'Pin';
+            }
+
             menu.classList.toggle('hidden');
             const parentMsg = document.getElementById('msg_' + key);
             const bubbleEl = document.getElementById('bubble_' + key);
@@ -2069,6 +2107,79 @@
                 if (parentMsg) parentMsg.style.zIndex = '';
                 if (bubbleEl) bubbleEl.style.zIndex = '';
             }
+        };
+
+        window.pinPrivateMessage = function (messageKey) {
+            if (!messageKey || !window.currentChatId) return;
+
+            const msg = window.globalMessages[messageKey];
+            if (!msg) return;
+
+            let msgText = "Media";
+            if (msg.text) {
+                msgText = msg.text;
+            } else if (msg.type) {
+                msgText = msg.type.charAt(0).toUpperCase() + msg.type.slice(1);
+            }
+
+            // Write to pinned_msgs/${key} (multi-pin)
+            set(ref(db, `chats/${window.currentChatId}/pinned_msgs/${messageKey}`), {
+                text: msgText,
+                time: msg.time || Math.floor(Date.now() / 1000)
+            }).then(() => {
+                window.showToast?.('Message Pinned', 'This message has been pinned.');
+            }).catch(e => console.error("Pin private error:", e));
+
+            // Hide the menu dropdown
+            const menu = document.getElementById('menu_' + messageKey);
+            if (menu) menu.classList.add('hidden');
+        };
+
+        window.unpinPrivateMessage = function (messageKey, event) {
+            if (event) event.stopPropagation();
+            if (!window.currentChatId) return;
+
+            // If called with a specific key, remove that key; otherwise remove current pin
+            const keyToRemove = messageKey || (window._pinnedMsgsList[window._currentPinIndex] ? window._pinnedMsgsList[window._currentPinIndex].key : null);
+            if (!keyToRemove) return;
+
+            remove(ref(db, `chats/${window.currentChatId}/pinned_msgs/${keyToRemove}`)).then(() => {
+                window.showToast?.('Message Unpinned', 'This message has been unpinned.');
+            }).catch(e => console.error("Unpin private error:", e));
+
+            // Hide active menus
+            document.querySelectorAll('[id^="menu_"]').forEach(el => el.classList.add('hidden'));
+        };
+
+        // Update pin icons on all visible messages
+        window.updatePinIcons = function () {
+            // Hide all pin icons first
+            document.querySelectorAll('.msg-pin-icon').forEach(el => el.classList.add('hidden'));
+            // document.querySelectorAll('[id^="pin_icon_"]').forEach(el => el.classList.add('hidden'));
+            // Show pin icons for pinned messages
+            window.pinnedMsgKeys.forEach(key => {
+                const icon = document.getElementById('pin_icon_' + key);
+                if (icon) icon.classList.remove('hidden');
+            });
+        };
+
+        // Navigate between pinned messages
+        window.navigatePin = function (direction) {
+            if (!window._pinnedMsgsList.length) return;
+            window._currentPinIndex = (window._currentPinIndex + direction + window._pinnedMsgsList.length) % window._pinnedMsgsList.length;
+
+            const pin = window._pinnedMsgsList[window._currentPinIndex];
+            const pinText = document.getElementById('private_pinned_text');
+            if (pinText) pinText.textContent = pin.text;
+
+            window.scrollToMessage(pin.key);
+        };
+
+        // Scroll to currently displayed pin
+        window.scrollToCurrentPin = function () {
+            if (!window._pinnedMsgsList.length) return;
+            const pin = window._pinnedMsgsList[window._currentPinIndex];
+            if (pin) window.scrollToMessage(pin.key);
         };
 
         window.closeMsgMenu = function (key) {
@@ -2549,6 +2660,12 @@
                         lastTimeEl.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     }
 
+                    // Update timestamp attribute and sort sidebar
+                    if (sidebarItem && data.time) {
+                        sidebarItem.setAttribute('data-timestamp', data.time);
+                        if (window.sortSidebar) window.sortSidebar();
+                    }
+
                     // If message is for me, and I am not currently looking at this chat, mark it as delivered
                     if (data.sender_id != window.myUserId && data.status === 'sent') {
                         if (window.currentChatId !== chatId) {
@@ -2565,6 +2682,14 @@
                         }
                     }
                 });
+
+                // Show star icon if this message is already starred
+                if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
+                    const sIcon = document.getElementById('star_icon_' + key);
+                    if (sIcon) sIcon.classList.remove('hidden');
+                    const btnText = document.getElementById('star_btn_text_' + key);
+                    if (btnText) btnText.textContent = 'Unstar';
+                }
             });
         }
 
@@ -3008,6 +3133,14 @@
             // Show content, hide empty state
             document.getElementById('chat_empty_state')?.classList.add('hidden');
 
+            // Highlight selected item in sidebar
+            document.querySelectorAll('.user-chat-item').forEach(el => {
+                el.classList.remove('active');
+                if (el.getAttribute('id') === `user_sidebar_${otherUserId}` || el.getAttribute('data-userid') == otherUserId) {
+                    el.classList.add('active');
+                }
+            });
+
             // Reset states
             if (window.cancelSelection) window.cancelSelection();
             if (window.cancelGroupSelection) window.cancelGroupSelection();
@@ -3034,6 +3167,10 @@
             if (window.unsubscribeAdded) window.unsubscribeAdded();
             if (window.unsubscribeRemoved) window.unsubscribeRemoved();
             if (window.unsubscribeChanged) window.unsubscribeChanged();
+            if (window.unsubscribePinnedMsg) {
+                window.unsubscribePinnedMsg();
+                window.unsubscribePinnedMsg = null;
+            }
 
             const myId = window.myUserId;
             const minId = Math.min(myId, otherUserId);
@@ -3109,6 +3246,41 @@
 
             document.getElementById('messages').innerHTML = '';
             window.globalMessages = {};
+
+            // Multi-pin listener
+            const pinnedMsgsRef = ref(db, `chats/${window.currentChatId}/pinned_msgs`);
+            window.unsubscribePinnedMsg = onValue(pinnedMsgsRef, (snapshot) => {
+                const pinnedData = snapshot.val();
+                const pinBar = document.getElementById('private_pinned_bar');
+                const pinText = document.getElementById('private_pinned_text');
+                const pinCount = document.getElementById('private_pinned_count');
+
+                window.pinnedMsgKeys = new Set();
+                window._pinnedMsgsList = [];
+                window._currentPinIndex = 0;
+
+                if (pinnedData && typeof pinnedData === 'object') {
+                    // Build sorted list (newest first)
+                    for (const [key, val] of Object.entries(pinnedData)) {
+                        window.pinnedMsgKeys.add(key);
+                        window._pinnedMsgsList.push({ key, text: val.text, time: val.time || 0 });
+                    }
+                    window._pinnedMsgsList.sort((a, b) => b.time - a.time);
+
+                    if (pinBar && pinText && pinCount) {
+                        const count = window._pinnedMsgsList.length;
+                        pinCount.textContent = count === 1 ? '1 pinned message' : `${count} pinned messages`;
+                        pinText.textContent = window._pinnedMsgsList[0].text;
+                        pinBar.classList.remove('hidden');
+                    }
+                } else {
+                    if (pinBar) pinBar.classList.add('hidden');
+                }
+
+                // Update pin icons on message bubbles
+                if (typeof window.updatePinIcons === 'function') window.updatePinIcons();
+            });
+
             let lastDateString = null;
 
             const messagesRef = ref(db, 'chats/' + window.currentChatId + '/messages');
@@ -3309,8 +3481,15 @@
                             <!-- Menu Dropdown -->
                             <div id="menu_${key}" class="hidden absolute top-8 ${isMe ? 'right-0' : 'left-0'} bg-[#233138] shadow-2xl border border-[#313d45] rounded-xl w-32 py-1 z-50 overflow-hidden transform transition-all duration-200">
                                 ${data.type !== 'call' ? `
+                                <button onclick="event.stopPropagation(); window.toggleStarMessage('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors"><span id="star_btn_text_${key}">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
                                 <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
                                 <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
+                                <button id="pin_btn_${key}" onclick="event.stopPropagation(); if(window.pinnedMsgKeys && window.pinnedMsgKeys.has('${key}')) { window.unpinPrivateMessage('${key}'); } else { window.pinPrivateMessage('${key}'); }" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">
+                                     <span id="pin_btn_text_${key}">Pin</span>
+                                     <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor">
+                                         <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
+                                     </svg>
+                                 </button>
                                 <div class="h-px bg-[#313d45] my-1 mx-2"></div>
                                 ` : ''}
                                 <button onclick="event.stopPropagation(); window.deleteMsg('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 flex items-center justify-between transition-colors">Delete <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
@@ -3319,15 +3498,30 @@
                             ${replyBlock}
                             ${mediaContent}
 
-                            ${data.text ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${isSearchMatch ? window.highlightSearchText(data.text) : data.text}<span class="inline-block w-[74px] h-[1px]"></span></div>` : ''}
+                            ${data.text ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${isSearchMatch ? window.highlightSearchText(data.text) : data.text}<span class="inline-block w-[99px] h-[1px]"></span></div>` : ''}
 
-                            <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2">
+                            <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2 bg-transparent">
+                                <span id="star_icon_${key}" class="msg-star-icon hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+                                <span id="pin_icon_${key}" class="msg-pin-icon hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path></svg></span>
                                 <span class="text-[11px] text-[#8696a0] select-none leading-none">${time}</span>
                                 ${isMe ? `<span id="tick_${key}" class="shrink-0 flex items-center justify-center leading-none">${window.getTickSVG(data.status || 'sent')}</span>` : ''}
                             </div>
                         </div>
                     </div>`;
                 document.getElementById('messages').insertAdjacentHTML('beforeend', html);
+                // Show pin icon immediately if this message is already pinned
+                if (window.pinnedMsgKeys && window.pinnedMsgKeys.has(key)) {
+                    const icon = document.getElementById('pin_icon_' + key);
+                    if (icon) icon.classList.remove('hidden');
+                }
+
+                // Show star icon if already starred
+                if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
+                    const sIcon = document.getElementById('star_icon_' + key);
+                    if (sIcon) sIcon.classList.remove('hidden');
+                    const btnText = document.getElementById('star_btn_text_' + key);
+                    if (btnText) btnText.textContent = 'Unstar';
+                }
 
                 // If search is active, scroll to first matching message; otherwise scroll to bottom
                 if (isSearchMatch && !window._searchScrolled) {
@@ -3859,5 +4053,82 @@
                 });
             }
         });
+
+        // Starred messages state
+        window.starredMsgKeys = new Set();
+
+        window.toggleStarMessage = function(key) {
+            window.closeMsgMenu(key);
+            if (!window.currentChatId || !window.myUserId) return;
+
+            const msg = window.globalMessages[key];
+            if (!msg) return;
+
+            const starRef = ref(db, `starred_messages/${window.myUserId}/${key}`);
+
+            if (window.starredMsgKeys.has(key)) {
+                // Unstar
+                remove(starRef).then(() => {
+                    window.starredMsgKeys.delete(key);
+                    const icon = document.getElementById('star_icon_' + key);
+                    if (icon) icon.classList.add('hidden');
+                    const btnText = document.getElementById('star_btn_text_' + key);
+                    if (btnText) btnText.textContent = 'Star';
+                    window.showToast?.('Message Unstarred', 'Message removed from starred.');
+                });
+            } else {
+                // Star
+                set(starRef, {
+                    text: msg.text || '',
+                    type: msg.type || 'text',
+                    file_url: msg.file_url || null,
+                    file_name: msg.file_name || null,
+                    time: msg.time || 0,
+                    sender_id: msg.sender_id,
+                    chat_id: window.currentChatId
+                }).then(() => {
+                    window.starredMsgKeys.add(key);
+                    const icon = document.getElementById('star_icon_' + key);
+                    if (icon) icon.classList.remove('hidden');
+                    const btnText = document.getElementById('star_btn_text_' + key);
+                    if (btnText) btnText.textContent = 'Unstar';
+                    window.showToast?.('Message Starred', 'Message added to starred.');
+                });
+            }
+        };
+
+        // Load starred messages for current chat and apply icons
+        window.loadStarredMessages = function() {
+            if (!window.myUserId) return;
+            const starredRef = ref(db, `starred_messages/${window.myUserId}`);
+            onValue(starredRef, (snapshot) => {
+                window.starredMsgKeys = new Set();
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(key => {
+                        window.starredMsgKeys.add(key);
+                    });
+                }
+                // Apply icons after a short delay to ensure messages are rendered
+                window._applyStarIcons();
+            });
+        };
+
+        window._applyStarIcons = function() {
+            if (!window.starredMsgKeys) return;
+            // Clear all star icons first
+            document.querySelectorAll('.msg-star-icon, [id^="star_icon_"]').forEach(el => {
+                el.classList.add('hidden');
+            });
+            // Show icons for starred messages
+            window.starredMsgKeys.forEach(key => {
+                const icon = document.getElementById('star_icon_' + key);
+                if (icon) icon.classList.remove('hidden');
+                const btnText = document.getElementById('star_btn_text_' + key);
+                if (btnText) btnText.textContent = 'Unstar';
+            });
+        };
+
+        window.loadStarredMessages();
     </script>
 </x-app-layout>

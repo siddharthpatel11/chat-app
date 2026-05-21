@@ -235,31 +235,30 @@
         </div>
     </div>
 
-    <!-- Pinned Message Bar (Hidden by default) -->
-    <div id="group_pinned_bar"
+    <!-- Pinned Messages Bar (Hidden by default, supports multiple) -->
+    <div id="group_pinned_bar" onclick="window.scrollToCurrentGroupPin && window.scrollToCurrentGroupPin()"
         class="hidden bg-[#2a3942]/90 backdrop-blur-sm px-4 py-2 flex items-center justify-between border-b border-white/5 cursor-pointer hover:bg-[#384b57] transition-colors z-[15]">
         <div class="flex items-center gap-3 overflow-hidden">
             <div class="text-[#00a884] shrink-0">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                    <path
-                        d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z">
-                    </path>
+                    <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
                 </svg>
             </div>
             <div class="flex flex-col min-w-0">
-                <span class="text-[#00a884] text-[13px] font-semibold">Pinned message</span>
-                <span id="group_pinned_text" class="text-[#8696a0] text-sm truncate w-full">Message text goes
-                    here...</span>
+                <span id="group_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1 pinned message</span>
+                <span id="group_pinned_text" class="text-[#8696a0] text-sm truncate w-full">Message text goes here...</span>
             </div>
         </div>
-        <button onclick="window.unpinGroupMessage(event)"
-            class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path
-                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z">
-                </path>
-            </svg>
-        </button>
+        <div class="flex items-center gap-1 shrink-0">
+            <button onclick="event.stopPropagation(); window.navigateGroupPin && window.navigateGroupPin(-1)"
+                class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors" title="Previous pin">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>
+            </button>
+            <button onclick="event.stopPropagation(); window.navigateGroupPin && window.navigateGroupPin(1)"
+                class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors" title="Next pin">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg>
+            </button>
+        </div>
     </div>
 
     <!-- Main Container Row including Chat list and right-side drawers -->
@@ -483,8 +482,8 @@
 
                 <!-- Starred Messages & Notifications -->
                 <div class="flex flex-col mb-4">
-                    <div
-                        class="px-6 py-3.5 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex justify-between items-center">
+                    <div onclick="window.openGroupStarredMessages()"
+                        class="px-6 py-3.5 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex justify-between items-center relative">
                         <div class="flex items-center gap-4">
                             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#8696a0]">
                                 <path
@@ -492,11 +491,25 @@
                                 </path>
                             </svg>
                             <span class="text-[#e9edef] text-[16px]">Starred messages</span>
+                            <span id="group_starred_count_badge" class="text-[#8696a0] text-sm ml-2 hidden">0</span>
                         </div>
                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
                             class="text-[#8696a0] -rotate-90">
                             <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
                         </svg>
+                    </div>
+
+                    <!-- Group Starred Messages Panel -->
+                    <div id="group_starred_messages_panel" class="hidden fixed top-0 right-0 h-screen w-[400px] bg-[#111b21] border-l border-[#313d45] z-[500] flex-col shadow-2xl">
+                        <div class="h-[64px] bg-[#202c33] flex items-center px-4 gap-6 shrink-0 shadow-sm z-10 border-b border-[#313d45]">
+                            <button onclick="document.getElementById('group_starred_messages_panel').classList.add('hidden')" class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                            </button>
+                            <span class="text-[#e9edef] text-[16px] font-medium">Starred messages</span>
+                        </div>
+                        <div id="group_starred_messages_list" class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#111b21] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent pb-10">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
 
                     <div
@@ -1524,12 +1537,109 @@
     };
 
     // --- GROUP INFO SIDEBAR PANEL LOGIC ---
+    window.openGroupStarredMessages = function() {
+        const panel = document.getElementById('group_starred_messages_panel');
+        const list = document.getElementById('group_starred_messages_list');
+        if (!panel || !list) return;
+
+        list.innerHTML = '';
+        const myId = window.myUserId;
+        const currentChat = window.currentChatId;
+
+        if (!myId || !currentChat) return;
+
+        window.get(window.ref(window.db, `starred_messages/${myId}`)).then(snapshot => {
+            const data = snapshot.val();
+            
+            let groupStarredData = null;
+            if (data) {
+                const filtered = Object.entries(data).filter(([k, v]) => v.chat_id === currentChat);
+                if (filtered.length > 0) {
+                    groupStarredData = Object.fromEntries(filtered);
+                }
+            }
+
+            if (!groupStarredData || Object.keys(groupStarredData).length === 0) {
+                list.innerHTML = `<div class="text-center text-[#8696a0] py-20 flex flex-col items-center">
+                    <div class="w-[84px] h-[84px] rounded-full bg-[#202c33] flex items-center justify-center mb-6">
+                        <svg class="w-10 h-10 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                    <span class="text-[#e9edef] text-[16px]">No starred messages</span>
+                </div>`;
+            } else {
+                const msgs = Object.entries(groupStarredData).sort((a, b) => (b[1].time || 0) - (a[1].time || 0));
+                
+                msgs.forEach(([key, msg]) => {
+                    const dateObj = msg.time ? new Date(msg.time * 1000) : new Date();
+                    const date = dateObj.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+                    const time = dateObj.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', hour12: true });
+                    const isMe = msg.sender_id == myId;
+
+                    let senderName = isMe ? 'You' : 'Member';
+                    if (!isMe && window.allContacts) {
+                        const contact = window.allContacts.find(c => c.id == msg.sender_id);
+                        if (contact) senderName = contact.name || contact.phone;
+                    }
+
+                    let content = msg.text || '';
+                    if (msg.type === 'image') content = '📷 Photo';
+                    else if (msg.type === 'video') content = '🎥 Video';
+                    else if (msg.type === 'audio') content = '🎤 Voice message';
+                    else if (msg.type === 'document') content = `📄 ${msg.file_name || 'Document'}`;
+
+                    list.insertAdjacentHTML('beforeend', `
+                        <div class="bg-[#202c33] rounded-xl p-3 cursor-pointer hover:bg-[#2a3942] transition-colors"
+                            onclick="document.getElementById('group_info_panel').classList.add('hidden'); document.getElementById('group_starred_messages_panel').classList.add('hidden'); setTimeout(() => window.scrollToGroupMessage && window.scrollToGroupMessage('${key}'), 400)">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="#00a884"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                                <span class="text-[#00a884] text-[13.5px] font-medium">${senderName}</span>
+                                <span class="text-[#8696a0] text-[12px] ml-auto">${date} ${time}</span>
+                            </div>
+                            <p class="text-[#e9edef] text-[14.5px] leading-relaxed break-words">${content}</p>
+                        </div>`);
+                });
+            }
+            
+            const badge = document.getElementById('group_starred_count_badge');
+            if (badge) {
+                const count = groupStarredData ? Object.keys(groupStarredData).length : 0;
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+            
+            panel.classList.remove('hidden');
+            panel.classList.add('flex');
+        });
+    };
+
     window.openGroupInfoPanel = function () {
         const u = window.activeChatUser;
         if (!u) return;
 
         document.getElementById('group_info_name').textContent = u.name;
         document.getElementById('group_info_avatar').src = u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=202c33&color=fff`;
+
+        // Update Starred messages badge
+        if (window.get && window.ref && window.db && window.myUserId && window.currentChatId) {
+            window.get(window.ref(window.db, `starred_messages/${window.myUserId}`)).then(snap => {
+                const data = snap.val();
+                let count = 0;
+                if (data) count = Object.values(data).filter(m => m.chat_id === window.currentChatId).length;
+                const badge = document.getElementById('group_starred_count_badge');
+                if (badge) {
+                    if (count > 0) {
+                        badge.textContent = count;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            });
+        }
 
         const descEl = document.getElementById('group_info_description');
         if (descEl) {
@@ -2312,35 +2422,20 @@
 
     <!-- Dropdown Menu -->
     <div class="bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 w-full">
-        <button onclick="window.replyToGroupMsg()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Reply</button>
-        <button id="group_dropdown_reply_priv" onclick="window.replyPrivatelyFromGroup()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Reply
-            privately</button>
-        <button id="group_dropdown_msg_user" onclick="window.messageUserFromGroup()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px] truncate">Message
-            <span id="group_dropdown_sender_name"></span></button>
-        <button onclick="window.copyGroupMessage()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Copy</button>
-        <button onclick="window.forwardGroupMessage()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Forward</button>
-        <button onclick="window.pinGroupMessage()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Pin</button>
-        <button class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Ask
-            Meta AI</button>
-        <button onclick="window.askMetaAIGroupMessage()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Ask
-            Meta AI</button>
-        <button onclick="window.starGroupMessage()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Star</button>
+        <button onclick="window.replyToGroupMsg()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Reply</span> <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
+        <button id="group_dropdown_reply_priv" onclick="window.replyPrivatelyFromGroup()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Reply privately</span> <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
+        <button id="group_dropdown_msg_user" onclick="window.messageUserFromGroup()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px] truncate"><span>Message <span id="group_dropdown_sender_name"></span></span></button>
+        <button onclick="window.copyGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Copy</span></button>
+        <button onclick="window.forwardGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Forward</span> <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
+        <button id="group_pin_dropdown_btn" onclick="window.toggleGroupPinMessage(event)" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span id="group_pin_dropdown_btn_text">Pin</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path></svg></button>
+        <button class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask Meta AI</span></button>
+        <button onclick="window.askMetaAIGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask Meta AI</span></button>
+        <button onclick="window.starGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span id="group_star_dropdown_btn_text">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
         <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
-        <button onclick="window.selectGroupMessage()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Select</button>
+        <button onclick="window.selectGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Select</span></button>
         <div id="group_dropdown_report_divider" class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
-        <button id="group_dropdown_report" onclick="window.reportGroupMessage()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Report</button>
-        <button onclick="window.deleteGroupMessage()"
-            class="w-full text-left px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[15px]">Delete</button>
+        <button id="group_dropdown_report" onclick="window.reportGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Report</span></button>
+        <button onclick="window.deleteGroupMessage()" class="w-full text-left px-4 py-2.5 text-red-500 hover:bg-red-500/10 flex items-center justify-between transition-colors text-[15px]"><span>Delete</span> <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
     </div>
 </div>
 
@@ -2483,7 +2578,7 @@
         const replyBtn = dropdown.querySelector('button[onclick="window.replyToGroupMsg()"]');
         const copyBtn = dropdown.querySelector('button[onclick="window.copyGroupMessage()"]');
         const forwardBtn = dropdown.querySelector('button[onclick="window.forwardGroupMessage()"]');
-        const pinBtn = dropdown.querySelector('button[onclick="window.pinGroupMessage()"]');
+        const pinBtn = document.getElementById('group_pin_dropdown_btn');
         const starBtn = dropdown.querySelector('button[onclick="window.starGroupMessage()"]');
         const selectBtn = dropdown.querySelector('button[onclick="window.selectGroupMessage()"]');
         
@@ -2496,22 +2591,32 @@
             reportBtn.style.display = 'none';
             reportDiv.style.display = 'none';
         } else {
-            replyPriv.style.display = isCall ? 'none' : 'block';
-            msgUser.style.display = 'block';
-            reportBtn.style.display = isCall ? 'none' : 'block';
+            replyPriv.style.display = isCall ? 'none' : 'flex';
+            msgUser.style.display = 'flex';
+            reportBtn.style.display = isCall ? 'none' : 'flex';
             reportDiv.style.display = isCall ? 'none' : 'block';
             senderNameSpan.textContent = decodeURIComponent(encodedSenderName);
         }
 
-        if (replyBtn) replyBtn.style.display = isCall ? 'none' : 'block';
-        if (copyBtn) copyBtn.style.display = isCall ? 'none' : 'block';
-        if (forwardBtn) forwardBtn.style.display = isCall ? 'none' : 'block';
-        if (pinBtn) pinBtn.style.display = isCall ? 'none' : 'block';
-        if (starBtn) starBtn.style.display = isCall ? 'none' : 'block';
-        if (selectBtn) selectBtn.style.display = isCall ? 'none' : 'block';
+        if (replyBtn) replyBtn.style.display = isCall ? 'none' : 'flex';
+        if (copyBtn) copyBtn.style.display = isCall ? 'none' : 'flex';
+        if (forwardBtn) forwardBtn.style.display = isCall ? 'none' : 'flex';
+        
+        if (pinBtn) {
+            const pinBtnText = document.getElementById('group_pin_dropdown_btn_text');
+            if (pinBtnText) {
+                pinBtnText.textContent = (window._groupPinnedMsgKeys && window._groupPinnedMsgKeys.has(messageKey)) ? 'Unpin' : 'Pin';
+            } else {
+                pinBtn.textContent = (window._groupPinnedMsgKeys && window._groupPinnedMsgKeys.has(messageKey)) ? 'Unpin' : 'Pin';
+            }
+            pinBtn.style.display = isCall ? 'none' : 'flex';
+        }
+
+        if (starBtn) starBtn.style.display = isCall ? 'none' : 'flex';
+        if (selectBtn) selectBtn.style.display = isCall ? 'none' : 'flex';
         
         metaAiBtns.forEach(btn => {
-            btn.style.display = isCall ? 'none' : 'block';
+            btn.style.display = isCall ? 'none' : 'flex';
         });
 
         const rect = event.currentTarget.getBoundingClientRect();
@@ -2819,29 +2924,92 @@
         });
     };
 
+    // Multi-pin state for groups
+    window._groupPinnedMsgKeys = new Set();
+    window._groupPinnedMsgsList = [];
+    window._currentGroupPinIndex = 0;
+
     window.pinGroupMessage = function () {
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey || !window.currentChatId) return;
 
-        const msgElement = document.getElementById(`msg_${messageKey}`);
-        const textDiv = msgElement ? msgElement.querySelector('.break-words') : null;
-        const msgText = textDiv ? textDiv.childNodes[0].textContent.trim() : "Media";
+        const msg = window.globalMessages[messageKey];
+        if (!msg) return;
 
-        window.update(window.ref(window.db, `groups/${window.currentChatId}`), {
-            pinned_msg: {
-                key: messageKey,
-                text: msgText
-            }
+        let msgText = "Media";
+        if (msg.text) {
+            msgText = msg.text;
+        } else if (msg.type) {
+            msgText = msg.type.charAt(0).toUpperCase() + msg.type.slice(1);
+        }
+
+        // Write to pinned_msgs/${key} (multi-pin)
+        window.set(window.ref(window.db, `groups/${window.currentChatId}/pinned_msgs/${messageKey}`), {
+            text: msgText,
+            time: msg.time || Math.floor(Date.now() / 1000)
         });
         document.getElementById('group_msg_dropdown').classList.add('hidden');
     };
 
-    window.unpinGroupMessage = function (event) {
+    window.unpinGroupMessage = function (messageKey, event) {
         if (event) event.stopPropagation();
         if (!window.currentChatId) return;
-        window.update(window.ref(window.db, `groups/${window.currentChatId}`), {
-            pinned_msg: null
+
+        const keyToRemove = messageKey || (window._groupPinnedMsgsList[window._currentGroupPinIndex] ? window._groupPinnedMsgsList[window._currentGroupPinIndex].key : null);
+        if (!keyToRemove) return;
+
+        window.remove(window.ref(window.db, `groups/${window.currentChatId}/pinned_msgs/${keyToRemove}`));
+    };
+
+    window.toggleGroupPinMessage = function (event) {
+        if (event) event.stopPropagation();
+        const messageKey = window._activeGroupMsgKey;
+        if (!messageKey || !window.currentChatId) return;
+
+        if (window._groupPinnedMsgKeys.has(messageKey)) {
+            window.unpinGroupMessage(messageKey, event);
+        } else {
+            window.pinGroupMessage();
+        }
+        document.getElementById('group_msg_dropdown').classList.add('hidden');
+    };
+
+    // Update pin icons on all visible group messages
+    window.updateGroupPinIcons = function () {
+        document.querySelectorAll('[id^="pin_icon_"]').forEach(el => el.classList.add('hidden'));
+        window._groupPinnedMsgKeys.forEach(key => {
+            const icon = document.getElementById('pin_icon_' + key);
+            if (icon) icon.classList.remove('hidden');
         });
+    };
+
+    // Scroll to message by key (group)
+    window.scrollToMessage = function (key) {
+        const el = document.getElementById('msg_' + key);
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.backgroundColor = 'rgba(0, 168, 132, 0.15)';
+            setTimeout(() => { el.style.backgroundColor = ''; }, 2000);
+        }
+    };
+
+    // Navigate between group pinned messages
+    window.navigateGroupPin = function (direction) {
+        if (!window._groupPinnedMsgsList.length) return;
+        window._currentGroupPinIndex = (window._currentGroupPinIndex + direction + window._groupPinnedMsgsList.length) % window._groupPinnedMsgsList.length;
+
+        const pin = window._groupPinnedMsgsList[window._currentGroupPinIndex];
+        const pinText = document.getElementById('group_pinned_text');
+        if (pinText) pinText.textContent = pin.text;
+
+        window.scrollToMessage(pin.key);
+    };
+
+    // Scroll to currently displayed group pin
+    window.scrollToCurrentGroupPin = function () {
+        if (!window._groupPinnedMsgsList.length) return;
+        const pin = window._groupPinnedMsgsList[window._currentGroupPinIndex];
+        if (pin) window.scrollToMessage(pin.key);
     };
 
     window.isGroupForwardSelection = false;
@@ -2897,6 +3065,43 @@
         
         // Toggle selection for current message
         window.toggleGroupMsgSelection(messageKey);
+    };
+
+    window.starGroupMessage = function () {
+        const key = window._activeGroupMsgKey;
+        if (!key || !window.myUserId) return;
+
+        document.getElementById('group_msg_dropdown')?.classList.add('hidden');
+
+        const msg = window.globalMessages[key];
+        if (!msg) return;
+
+        const starRef = window.ref(window.db, `starred_messages/${window.myUserId}/${key}`);
+
+        if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
+            window.remove(starRef).then(() => {
+                window.starredMsgKeys.delete(key);
+                const icon = document.getElementById('star_icon_' + key);
+                if (icon) icon.classList.add('hidden');
+                window.showToast?.('Message Unstarred', 'Message removed from starred.');
+            });
+        } else {
+            window.set(starRef, {
+                text: msg.text || '',
+                type: msg.type || 'text',
+                file_url: msg.file_url || null,
+                file_name: msg.file_name || null,
+                time: msg.time || 0,
+                sender_id: msg.sender_id,
+                chat_id: window.currentChatId
+            }).then(() => {
+                if (!window.starredMsgKeys) window.starredMsgKeys = new Set();
+                window.starredMsgKeys.add(key);
+                const icon = document.getElementById('star_icon_' + key);
+                if (icon) icon.classList.remove('hidden');
+                window.showToast?.('Message Starred', 'Message added to starred.');
+            });
+        }
     };
 
     window.selectGroupMessage = function () {
@@ -3154,6 +3359,13 @@
                 lastTimeEl.textContent = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
 
+            // Update timestamp attribute and sort sidebar
+            const groupItem = document.getElementById(`group_sidebar_${groupId}`);
+            if (groupItem && data.time) {
+                groupItem.setAttribute('data-timestamp', data.time);
+                if (window.sortSidebar) window.sortSidebar();
+            }
+
             // Update Unread Badge
             const isActive = window.currentChatId === 'group_' + groupId.replace('group_', '');
             const isMe = data.sender_id == window.myUserId;
@@ -3176,7 +3388,10 @@
         if (!item) {
             item = document.createElement('div');
             item.id = `group_sidebar_${group.id}`;
-            item.className = "flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item";
+            item.className = "flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item relative group";
+            item.setAttribute('data-name', group.name);
+            item.setAttribute('data-groupid', group.id);
+            item.setAttribute('data-timestamp', '0');
             item.onclick = function () {
                 window.selectGroupChat(group.id, group.name, group.avatar);
             };
@@ -3185,20 +3400,47 @@
                 <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                     <img src="${group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`}" class="w-full h-full object-cover">
                 </div>
-                <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                     <div class="flex justify-between items-center">
                         <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${group.name}</h4>
                         <span class="text-[12px] text-[#8696a0] whitespace-nowrap" id="group_last_time_${group.id}"></span>
                     </div>
                     <div class="flex justify-between items-center mt-0.5">
                         <p class="text-[14px] text-[#8696a0] truncate flex-1 min-w-0 leading-snug" id="group_last_msg_${group.id}">Group chat</p>
-                        <span id="group_unread_badge_${group.id}" class="hidden bg-[#00a884] text-[#111b21] text-[12px] font-bold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1.5 ml-2 shadow-sm shrink-0">0</span>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <!-- Pin Icon -->
+                            <span id="group_pin_icon_${group.id}" class="hidden text-[#8696a0]">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                                </svg>
+                            </span>
+                            <!-- Unread Badge -->
+                            <span id="group_unread_badge_${group.id}" class="hidden bg-[#00a884] text-[#111b21] text-[12px] font-bold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1.5 shadow-sm">0</span>
+                        </div>
                     </div>
+                </div>
+                <!-- Dropdown Trigger Button with Gradient Overlay -->
+                <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                    <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, '${group.id}', '${group.name.replace(/'/g, "\\'")}', 'group')"
+                        class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                        <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                            <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                        </svg>
+                    </button>
                 </div>
             `;
             const container = document.getElementById('user_list_container');
             if (container) {
                 container.appendChild(item);
+            }
+
+            // Apply initial pin visual state
+            const isPinned = window.pinnedChats && window.pinnedChats.includes(item.id);
+            if (window.applyPinVisualState) {
+                window.applyPinVisualState(item, isPinned);
+            }
+            if (window.sortSidebar) {
+                window.sortSidebar();
             }
         } else {
             const h4 = item.querySelector('h4');
@@ -3325,18 +3567,41 @@
                 const prefix = lastMsg ? (lastMsg.startsWith('Click to chat') ? '' : '✓ ') : '';
                 const previewMsg = lastMsg && !lastMsg.startsWith('Click to chat') ? prefix + lastMsg : phone || 'Click to chat';
 
+                const elementId = `user_sidebar_${userId}`;
+                const isPinned = window.pinnedChats && window.pinnedChats.includes(elementId);
+                const pinClass = isPinned ? '' : 'hidden';
+
                 chatsList.insertAdjacentHTML('beforeend', `
                     <div onclick="window.selectChat(${userId}, '${name.replace(/'/g, "\\'")}', '${phone.replace(/'/g, "\\'")}', '${avatar}', '${about.replace(/'/g, "\\'")}')"
-                        class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                        class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors relative group user-chat-item" data-userid="${userId}">
                         <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                             <img src="${avatar}" class="w-full h-full object-cover">
                         </div>
-                        <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                        <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                             <div class="flex justify-between items-center">
                                 <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${highlightedName}</h4>
                                 <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${lastTime}</span>
                             </div>
-                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${previewMsg}</p>
+                            <div class="flex justify-between items-center mt-0.5">
+                                <p class="text-[14px] text-[#8696a0] truncate flex-1 min-w-0 leading-snug">${previewMsg}</p>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <!-- Pin Icon -->
+                                    <span id="pin_icon_${userId}" class="${pinClass} text-[#8696a0]">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                            <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Dropdown Trigger Button with Gradient Overlay -->
+                        <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                            <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, ${userId}, '${name.replace(/'/g, "\\'")}', 'user')"
+                                class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                                <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                                    <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 `);
@@ -3376,18 +3641,41 @@
                 chatMatches++;
                 const highlightedName = name.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
 
+                const elementId = `group_sidebar_${groupId}`;
+                const isPinned = window.pinnedChats && window.pinnedChats.includes(elementId);
+                const pinClass = isPinned ? '' : 'hidden';
+
                 chatsList.insertAdjacentHTML('beforeend', `
                     <div onclick="window.selectGroupChat('${groupId}', '${name.replace(/'/g, "\\'")}', '${avatar}')"
-                        class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                        class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors relative group user-chat-item" data-groupid="${groupId}">
                         <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                             <img src="${avatar}" class="w-full h-full object-cover">
                         </div>
-                        <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                        <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                             <div class="flex justify-between items-center">
                                 <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${highlightedName}</h4>
                                 <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${lastTime}</span>
                             </div>
-                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${lastMsg}</p>
+                            <div class="flex justify-between items-center mt-0.5">
+                                <p class="text-[14px] text-[#8696a0] truncate flex-1 min-w-0 leading-snug">${lastMsg}</p>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <!-- Pin Icon -->
+                                    <span id="group_pin_icon_${groupId}" class="${pinClass} text-[#8696a0]">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                            <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                                        </svg>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Dropdown Trigger Button with Gradient Overlay -->
+                        <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                            <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, '${groupId}', '${name.replace(/'/g, "\\'")}', 'group')"
+                                class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                                <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                                    <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 `);
@@ -3441,7 +3729,7 @@
                 if (r.isGroup) {
                     msgsList.insertAdjacentHTML('beforeend', `
                         <div onclick="window.selectGroupChat('${r.groupId}', '${r.name.replace(/'/g, "\\'")}', '${r.avatar}', ${r.time || 0})"
-                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item" data-groupid="${r.groupId}">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                                 <img src="${r.avatar}" class="w-full h-full object-cover">
                             </div>
@@ -3457,7 +3745,7 @@
                 } else {
                     msgsList.insertAdjacentHTML('beforeend', `
                         <div onclick="window.selectChat(${r.userId}, '${r.name.replace(/'/g, "\\'")}', '${r.phone.replace(/'/g, "\\'")}', '${r.avatar}', '${r.about.replace(/'/g, "\\'")}', ${r.time || 0})"
-                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item" data-userid="${r.userId}">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                                 <img src="${r.avatar}" class="w-full h-full object-cover">
                             </div>
@@ -3554,6 +3842,14 @@
     })();
 
     window.selectGroupChat = function (groupId, name, avatar, searchMsgTime = null) {
+        // Highlight selected group item in sidebar
+        document.querySelectorAll('.user-chat-item').forEach(el => {
+            el.classList.remove('active');
+            if (el.getAttribute('id') === `group_sidebar_${groupId}` || el.getAttribute('data-groupid') === groupId) {
+                el.classList.add('active');
+            }
+        });
+
         const msgInput = document.getElementById('group_msg') || document.getElementById('msg');
         if (msgInput) {
             msgInput.disabled = false;
@@ -3608,12 +3904,32 @@
 
                 const pinBar = document.getElementById('group_pinned_bar');
                 const pinText = document.getElementById('group_pinned_text');
-                if (gData.pinned_msg && pinBar && pinText) {
-                    pinText.textContent = gData.pinned_msg.text;
-                    pinBar.classList.remove('hidden');
+                const pinCount = document.getElementById('group_pinned_count');
+
+                // Multi-pin support
+                window._groupPinnedMsgKeys = new Set();
+                window._groupPinnedMsgsList = [];
+                window._currentGroupPinIndex = 0;
+
+                if (gData.pinned_msgs && typeof gData.pinned_msgs === 'object') {
+                    for (const [key, val] of Object.entries(gData.pinned_msgs)) {
+                        window._groupPinnedMsgKeys.add(key);
+                        window._groupPinnedMsgsList.push({ key, text: val.text, time: val.time || 0 });
+                    }
+                    window._groupPinnedMsgsList.sort((a, b) => b.time - a.time);
+
+                    if (pinBar && pinText && pinCount) {
+                        const count = window._groupPinnedMsgsList.length;
+                        pinCount.textContent = count === 1 ? '1 pinned message' : `${count} pinned messages`;
+                        pinText.textContent = window._groupPinnedMsgsList[0].text;
+                        pinBar.classList.remove('hidden');
+                    }
                 } else if (pinBar) {
                     pinBar.classList.add('hidden');
                 }
+
+                // Update pin icons on message bubbles
+                if (typeof window.updateGroupPinIcons === 'function') window.updateGroupPinIcons();
 
                 // Real-time Description Update
                 const descEl = document.getElementById('group_info_description');
@@ -4013,9 +4329,11 @@
                         ${replyPreviewHtml}
                         ${mediaContent}
 
-                        ${msgText ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${msgText}<span class="inline-block w-[74px] h-[1px]"></span></div>` : ''}
+                        ${msgText ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${msgText}<span class="inline-block w-[99px] h-[1px]"></span></div>` : ''}
 
-                        <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2">
+                        <div class="flex items-center justify-end gap-1 absolute bottom-0.5 right-2 bg-transparent">
+                            <span id="star_icon_${key}" class="hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
+                            <span id="pin_icon_${key}" class="hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path></svg></span>
                             <span class="text-[11px] text-[#8696a0] select-none leading-none">${time}</span>
                             ${isMe ? `
                                 <span id="status_icon_${key}" class="shrink-0 flex items-center justify-center leading-none">
@@ -4028,6 +4346,11 @@
             const gMsgs = document.getElementById('group_messages');
             if (gMsgs) {
                 gMsgs.insertAdjacentHTML('beforeend', msgHtml);
+
+                if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
+                    const sIcon = document.getElementById('star_icon_' + key);
+                    if (sIcon) sIcon.classList.remove('hidden');
+                }
 
                 // If search is active, scroll to first matching message; otherwise scroll to bottom
                 if (isSearchMatch && !window._searchScrolled) {
