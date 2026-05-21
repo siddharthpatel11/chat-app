@@ -2976,7 +2976,7 @@
 
     // Update pin icons on all visible group messages
     window.updateGroupPinIcons = function () {
-        document.querySelectorAll('[id^="pin_icon_"]').forEach(el => el.classList.add('hidden'));
+        document.querySelectorAll('#group_messages [id^="pin_icon_"]').forEach(el => el.classList.add('hidden'));
         window._groupPinnedMsgKeys.forEach(key => {
             const icon = document.getElementById('pin_icon_' + key);
             if (icon) icon.classList.remove('hidden');
