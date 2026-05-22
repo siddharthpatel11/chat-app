@@ -1111,6 +1111,7 @@
                             </div>
                         </div>
                     </div>
+                    @include('chat.reaction_popup')
                     @include('chat.groups.group_chat')
                 </div>
 
@@ -3478,21 +3479,38 @@
                                 </button>
                             </div>
 
-                            <!-- Menu Dropdown -->
-                            <div id="menu_${key}" class="hidden absolute top-8 ${isMe ? 'right-0' : 'left-0'} bg-[#233138] shadow-2xl border border-[#313d45] rounded-xl w-32 py-1 z-50 overflow-hidden transform transition-all duration-200">
-                                ${data.type !== 'call' ? `
-                                <button onclick="event.stopPropagation(); window.toggleStarMessage('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors"><span id="star_btn_text_${key}">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                                <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
-                                <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
-                                <button id="pin_btn_${key}" onclick="event.stopPropagation(); if(window.pinnedMsgKeys && window.pinnedMsgKeys.has('${key}')) { window.unpinPrivateMessage('${key}'); } else { window.pinPrivateMessage('${key}'); }" class="w-full text-left px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">
-                                     <span id="pin_btn_text_${key}">Pin</span>
-                                     <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor">
-                                         <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
-                                     </svg>
-                                 </button>
-                                <div class="h-px bg-[#313d45] my-1 mx-2"></div>
-                                ` : ''}
-                                <button onclick="event.stopPropagation(); window.deleteMsg('${key}')" class="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-500/10 flex items-center justify-between transition-colors">Delete <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                            <!-- Menu Container with Reaction Strip -->
+                            <div id="menu_${key}" class="hidden absolute top-8 ${isMe ? 'right-0' : 'left-0'} z-50 flex flex-col ${isMe ? 'items-end' : 'items-start'} gap-1.5 transform transition-all duration-200">
+                                <!-- Reaction Strip -->
+                                <div class="bg-[#233138] rounded-full px-2 py-1.5 flex items-center gap-1 shadow-2xl border border-[#313d45] w-max">
+                                    <button onclick="event.stopPropagation(); window.sendReaction('👍', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">👍</button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('❤️', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">❤️</button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('😂', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😂</button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('😮', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😮</button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('😢', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😢</button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('🙏', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">🙏</button>
+                                    <button onclick="event.stopPropagation(); window.openFullReactionPicker('${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-[18px] text-[#aebac1] hover:bg-white/10 rounded-full transition-transform hover:scale-125 bg-white/5 ml-1">
+                                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+                                    </button>
+                                </div>
+                                <!-- Dropdown List -->
+                                <div class="bg-[#233138] shadow-2xl border border-[#313d45] rounded-xl w-40 py-1 overflow-hidden flex-shrink-0">
+                                    ${data.type !== 'call' ? `
+                                    <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
+                                    <button onclick="event.stopPropagation(); /* copy function */" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Copy <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+                                    <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
+                                    <button id="pin_btn_${key}" onclick="event.stopPropagation(); if(window.pinnedMsgKeys && window.pinnedMsgKeys.has('${key}')) { window.unpinPrivateMessage('${key}'); } else { window.pinPrivateMessage('${key}'); }" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">
+                                         <span id="pin_btn_text_${key}">Pin</span>
+                                         <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor">
+                                             <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
+                                         </svg>
+                                     </button>
+                                    <button onclick="event.stopPropagation(); window.toggleStarMessage('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors"><span id="star_btn_text_${key}">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                                    <button onclick="event.stopPropagation(); window.toggleMsgSelection('${key}'); window.isSelectionMode=true; document.querySelectorAll('.msg-checkbox-container').forEach(el=>el.classList.remove('hidden'));" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Select <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></button>
+                                    <div class="h-px bg-[#313d45] my-1 mx-2"></div>
+                                    ` : ''}
+                                    <button onclick="event.stopPropagation(); window.deleteMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Delete <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                </div>
                             </div>
 
                             ${replyBlock}
@@ -3506,9 +3524,11 @@
                                 <span class="text-[11px] text-[#8696a0] select-none leading-none">${time}</span>
                                 ${isMe ? `<span id="tick_${key}" class="shrink-0 flex items-center justify-center leading-none">${window.getTickSVG(data.status || 'sent')}</span>` : ''}
                             </div>
+                            <div id="reactions_${key}" class="hidden"></div>
                         </div>
                     </div>`;
                 document.getElementById('messages').insertAdjacentHTML('beforeend', html);
+                if (data.reactions) window.renderReactions(key, data.reactions, isMe);
                 // Show pin icon immediately if this message is already pinned
                 if (window.pinnedMsgKeys && window.pinnedMsgKeys.has(key)) {
                     const icon = document.getElementById('pin_icon_' + key);
@@ -3547,6 +3567,11 @@
             window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
                 const data = snapshot.val();
                 const key = snapshot.key;
+                
+                const oldMsg = window.globalMessages[key];
+                const oldReactions = oldMsg ? (oldMsg.reactions || {}) : {};
+                const newReactions = data.reactions || {};
+                
                 window.globalMessages[key] = data;
 
                 const isMe = data.sender_id == window.myUserId;
@@ -3554,6 +3579,26 @@
                     const tickEl = document.getElementById('tick_' + key);
                     if (tickEl) {
                         tickEl.innerHTML = window.getTickSVG(data.status || 'sent');
+                    }
+                }
+                
+                window.renderReactions(key, newReactions, isMe);
+                
+                // Notification for new reactions on MY messages
+                if (isMe) {
+                    for (const [uid, emoji] of Object.entries(newReactions)) {
+                        if (uid != window.myUserId && oldReactions[uid] !== emoji) {
+                            const reactionKey = `${key}_${uid}_${emoji}`;
+                            window.seenReactions = window.seenReactions || new Set();
+                            if (!window.seenReactions.has(reactionKey)) {
+                                window.seenReactions.add(reactionKey);
+                                const reactorName = window.activeChatName || 'Someone';
+                                window.showToast('Reaction', `${reactorName} reacted to your message: ${emoji}`);
+                                if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
+                                    new Notification("Reaction", { body: `${reactorName} reacted: ${emoji}` });
+                                }
+                            }
+                        }
                     }
                 }
             });

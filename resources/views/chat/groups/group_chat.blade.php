@@ -25,8 +25,7 @@
 <div id="active_group_chat_content" class="hidden flex-col flex-1 h-full overflow-hidden select-none">
     <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-20 relative">
         <!-- Normal Header -->
-        <div id="group_normal_header"
-            class="flex items-center justify-between h-full w-full transition-all duration-300">
+        <div id="group_normal_header" class="flex items-center justify-between h-full w-full transition-all duration-300">
             <div class="flex items-center gap-3">
                 <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
                     onclick="window.backToSidebar()">
@@ -66,8 +65,8 @@
                             </svg>
                             <span class="text-sm font-semibold">Call</span>
                         </div>
-                        <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
                             </path>
                         </svg>
@@ -215,7 +214,8 @@
                 <button onclick="cancelGroupSelection()"
                     class="text-white hover:bg-black/10 p-2 rounded-full transition-colors focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12">
                         </path>
                     </svg>
                 </button>
@@ -241,22 +241,31 @@
         <div class="flex items-center gap-3 overflow-hidden">
             <div class="text-[#00a884] shrink-0">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                    <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
+                    <path
+                        d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z">
+                    </path>
                 </svg>
             </div>
             <div class="flex flex-col min-w-0">
                 <span id="group_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1 pinned message</span>
-                <span id="group_pinned_text" class="text-[#8696a0] text-sm truncate w-full">Message text goes here...</span>
+                <span id="group_pinned_text" class="text-[#8696a0] text-sm truncate w-full">Message text goes
+                    here...</span>
             </div>
         </div>
         <div class="flex items-center gap-1 shrink-0">
             <button onclick="event.stopPropagation(); window.navigateGroupPin && window.navigateGroupPin(-1)"
-                class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors" title="Previous pin">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>
+                class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors"
+                title="Previous pin">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
+                </svg>
             </button>
             <button onclick="event.stopPropagation(); window.navigateGroupPin && window.navigateGroupPin(1)"
-                class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors" title="Next pin">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg>
+                class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors"
+                title="Next pin">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path>
+                </svg>
             </button>
         </div>
     </div>
@@ -265,7 +274,8 @@
     <div class="flex-1 flex overflow-hidden relative">
 
         <!-- Group Message List -->
-        <div id="group_messages" class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]"></div>
+        <div id="group_messages" class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]">
+        </div>
 
         <!-- Group Search Drawer (Hidden by default) -->
         <div id="group_search_drawer"
@@ -376,7 +386,8 @@
                         <button
                             class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
                             onclick="window.startGroupVoiceCall(false)">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#00a884]">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                class="text-[#00a884]">
                                 <path
                                     d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
                                 </path>
@@ -386,7 +397,8 @@
                         <button
                             class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
                             onclick="window.startGroupVideoCall(false)">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#00a884]">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                class="text-[#00a884]">
                                 <path
                                     d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
                                 </path>
@@ -396,7 +408,8 @@
                         <button
                             class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
                             onclick="window.openAddGroupMembersModal()">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#00a884]">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                class="text-[#00a884]">
                                 <path
                                     d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
                                 </path>
@@ -406,7 +419,8 @@
                         <button
                             class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
                             onclick="window.toggleGroupSearchDrawer()">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#00a884]">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                class="text-[#00a884]">
                                 <path
                                     d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
                                 </path>
@@ -420,23 +434,38 @@
                 <div class="px-6 mb-5 group/desc">
                     <div id="group_info_description_container" class="flex items-start justify-between gap-2">
                         <div class="flex-1 min-w-0">
-                            <p id="group_info_description" class="text-[#00a884] text-[15px] cursor-pointer hover:underline break-words" onclick="window.startEditGroupDescription()">Add group description</p>
+                            <p id="group_info_description"
+                                class="text-[#00a884] text-[15px] cursor-pointer hover:underline break-words"
+                                onclick="window.startEditGroupDescription()">Add group description</p>
                         </div>
-                        <button onclick="window.startEditGroupDescription()" class="text-[#8696a0] hover:text-[#e9edef] opacity-0 group-hover/desc:opacity-100 transition-opacity flex-shrink-0" title="Edit description">
+                        <button onclick="window.startEditGroupDescription()"
+                            class="text-[#8696a0] hover:text-[#e9edef] opacity-0 group-hover/desc:opacity-100 transition-opacity flex-shrink-0"
+                            title="Edit description">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                                <path
+                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
+                                </path>
                             </svg>
                         </button>
                     </div>
                     <div id="group_info_description_edit_container" class="hidden flex-col gap-2">
-                        <textarea id="group_info_description_input" class="bg-transparent border-b-2 border-[#00a884] text-[#e9edef] text-[15px] w-full focus:outline-none focus:ring-0 pb-1 resize-none overflow-hidden" rows="1" placeholder="Add group description" maxlength="500" oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                        <textarea id="group_info_description_input"
+                            class="bg-transparent border-b-2 border-[#00a884] text-[#e9edef] text-[15px] w-full focus:outline-none focus:ring-0 pb-1 resize-none overflow-hidden"
+                            rows="1" placeholder="Add group description" maxlength="500"
+                            oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
                         <div class="flex justify-end gap-2">
-                            <button onclick="window.cancelEditGroupDescription()" class="text-[#f15c6d] hover:text-[#ff7b8b] p-1.5 focus:outline-none transition-colors" title="Cancel">
+                            <button onclick="window.cancelEditGroupDescription()"
+                                class="text-[#f15c6d] hover:text-[#ff7b8b] p-1.5 focus:outline-none transition-colors"
+                                title="Cancel">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path>
+                                    <path
+                                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z">
+                                    </path>
                                 </svg>
                             </button>
-                            <button onclick="window.saveGroupDescription()" class="text-[#00a884] hover:text-[#00bfa5] p-1.5 focus:outline-none transition-colors" title="Save">
+                            <button onclick="window.saveGroupDescription()"
+                                class="text-[#00a884] hover:text-[#00bfa5] p-1.5 focus:outline-none transition-colors"
+                                title="Save">
                                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
                                 </svg>
@@ -455,10 +484,12 @@
                 <div class="h-[1px] bg-[#313d45] mx-6 mb-5"></div>
 
                 <!-- Media, Links and Docs -->
-                <div class="px-6 py-2 hover:bg-[#202c33]/30 cursor-pointer transition-colors mb-3" onclick="window.openGroupMediaLibrary()">
+                <div class="px-6 py-2 hover:bg-[#202c33]/30 cursor-pointer transition-colors mb-3"
+                    onclick="window.openGroupMediaLibrary()">
                     <div class="flex justify-between items-center mb-4">
                         <div class="flex items-center gap-4">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#8696a0]">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                class="text-[#8696a0]">
                                 <path
                                     d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z">
                                 </path>
@@ -485,7 +516,8 @@
                     <div onclick="window.openGroupStarredMessages()"
                         class="px-6 py-3.5 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex justify-between items-center relative">
                         <div class="flex items-center gap-4">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#8696a0]">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                class="text-[#8696a0]">
                                 <path
                                     d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
                                 </path>
@@ -500,14 +532,21 @@
                     </div>
 
                     <!-- Group Starred Messages Panel -->
-                    <div id="group_starred_messages_panel" class="hidden fixed top-0 right-0 h-screen w-[400px] bg-[#111b21] border-l border-[#313d45] z-[500] flex-col shadow-2xl">
-                        <div class="h-[64px] bg-[#202c33] flex items-center px-4 gap-6 shrink-0 shadow-sm z-10 border-b border-[#313d45]">
-                            <button onclick="document.getElementById('group_starred_messages_panel').classList.add('hidden')" class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                    <div id="group_starred_messages_panel"
+                        class="hidden fixed top-0 right-0 h-screen w-[400px] bg-[#111b21] border-l border-[#313d45] z-[500] flex-col shadow-2xl">
+                        <div
+                            class="h-[64px] bg-[#202c33] flex items-center px-4 gap-6 shrink-0 shadow-sm z-10 border-b border-[#313d45]">
+                            <button
+                                onclick="document.getElementById('group_starred_messages_panel').classList.add('hidden')"
+                                class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                                </svg>
                             </button>
                             <span class="text-[#e9edef] text-[16px] font-medium">Starred messages</span>
                         </div>
-                        <div id="group_starred_messages_list" class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#111b21] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent pb-10">
+                        <div id="group_starred_messages_list"
+                            class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#111b21] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent pb-10">
                             <!-- Populated by JS -->
                         </div>
                     </div>
@@ -515,7 +554,8 @@
                     <div
                         class="px-6 py-3.5 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex justify-between items-center">
                         <div class="flex items-center gap-4">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#8696a0]">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                                class="text-[#8696a0]">
                                 <path
                                     d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z">
                                 </path>
@@ -622,7 +662,8 @@
                     </div>
 
                     <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#f15c6d]">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#f15c6d]">
                             <path
                                 d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z">
                             </path>
@@ -631,7 +672,8 @@
                     </div>
 
                     <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#f15c6d]">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#f15c6d]">
                             <path
                                 d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z">
                             </path>
@@ -685,7 +727,8 @@
             </button>
 
             <!-- Hidden File Input for Group Media -->
-            <input type="file" id="group_file_input" class="hidden" onchange="window.handleGroupFileChange(this)">
+            <input type="file" id="group_file_input" class="hidden"
+                onchange="window.handleGroupFileChange(this)">
 
             <!-- Attachment Trigger -->
             <div class="relative shrink-0">
@@ -834,7 +877,8 @@
                     <div class="flex-1 mx-3 flex items-center h-full overflow-hidden">
                         <!-- Waveform animation effect -->
                         <div class="flex items-center gap-[3px] h-4 w-full opacity-60 justify-end overflow-hidden">
-                            <div class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]"></div>
+                            <div class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]">
+                            </div>
                             <div
                                 class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
                             </div>
@@ -865,18 +909,25 @@
         </div>
 
         <!-- Group Bottom Selection Bar -->
-        <div id="group_selection_bottom_bar" class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
+        <div id="group_selection_bottom_bar"
+            class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
             <div class="flex items-center gap-4">
-                <button onclick="window.cancelGroupForwardSelection()" class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
+                <button onclick="window.cancelGroupForwardSelection()"
+                    class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
                 <span id="group_selection_bottom_count" class="font-semibold text-base">0 Selected</span>
             </div>
-            <button onclick="window.openForwardModal(true)" class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95" title="Forward message">
+            <button onclick="window.openForwardModal(true)"
+                class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95"
+                title="Forward message">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z"></path>
+                    <path
+                        d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z">
+                    </path>
                 </svg>
             </button>
         </div>
@@ -938,11 +989,14 @@
 </div>
 
 <!-- Group Media Preview Modal -->
-<div id="group_media_preview_modal" class="hidden fixed inset-0 z-[200] bg-gray-900/95 flex flex-col items-center justify-center backdrop-blur-sm">
+<div id="group_media_preview_modal"
+    class="hidden fixed inset-0 z-[200] bg-gray-900/95 flex flex-col items-center justify-center backdrop-blur-sm">
     <div class="absolute top-4 right-4 z-[210]">
-        <button onclick="window.clearGroupFile()" class="text-white hover:text-red-400 p-2 focus:outline-none transition-colors">
+        <button onclick="window.clearGroupFile()"
+            class="text-white hover:text-red-400 p-2 focus:outline-none transition-colors">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                </path>
             </svg>
         </button>
     </div>
@@ -951,63 +1005,86 @@
         <div id="group_modal_image_container" class="hidden h-full w-full flex items-center justify-center min-h-0">
             <img id="group_modal_image_preview" class="max-h-full max-w-full object-contain rounded-lg shadow-2xl">
         </div>
-        <div id="group_modal_file_container" class="hidden bg-white/10 p-8 rounded-3xl flex flex-col items-center justify-center gap-6 text-white w-full max-w-sm shadow-2xl backdrop-blur-md border border-white/20">
-            <svg class="w-20 h-20 text-blue-400 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        <div id="group_modal_file_container"
+            class="hidden bg-white/10 p-8 rounded-3xl flex flex-col items-center justify-center gap-6 text-white w-full max-w-sm shadow-2xl backdrop-blur-md border border-white/20">
+            <svg class="w-20 h-20 text-blue-400 drop-shadow-md" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                </path>
             </svg>
             <span id="group_modal_file_name" class="font-medium text-lg text-center break-words w-full"></span>
         </div>
     </div>
 
     <div class="w-full max-w-2xl px-6 pb-8 flex gap-3 items-end">
-        <div class="flex-1 bg-gray-800 rounded-2xl px-4 py-3 border border-gray-700 shadow-xl focus-within:border-gray-500 transition-colors">
-            <input type="text" id="group_modal_caption" placeholder="Add a caption..." onkeypress="if(event.key === 'Enter') window.sendFromGroupModal()" class="w-full bg-transparent border-none text-white focus:ring-0 placeholder-gray-400 text-lg">
+        <div
+            class="flex-1 bg-gray-800 rounded-2xl px-4 py-3 border border-gray-700 shadow-xl focus-within:border-gray-500 transition-colors">
+            <input type="text" id="group_modal_caption" placeholder="Add a caption..."
+                onkeypress="if(event.key === 'Enter') window.sendFromGroupModal()"
+                class="w-full bg-transparent border-none text-white focus:ring-0 placeholder-gray-400 text-lg">
         </div>
-        <button id="group_modal_send_btn" onclick="window.sendFromGroupModal()" class="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all hover:scale-105 active:scale-95 focus:outline-none flex items-center justify-center min-w-[60px] min-h-[60px]">
-            <svg id="group_modal_send_icon" class="w-7 h-7 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button id="group_modal_send_btn" onclick="window.sendFromGroupModal()"
+            class="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all hover:scale-105 active:scale-95 focus:outline-none flex items-center justify-center min-w-[60px] min-h-[60px]">
+            <svg id="group_modal_send_icon" class="w-7 h-7 ml-1" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
                 <path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
             </svg>
-            <svg id="group_modal_spinner" class="hidden w-7 h-7 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <svg id="group_modal_spinner" class="hidden w-7 h-7 animate-spin text-white" fill="none"
+                viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                    stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                </path>
             </svg>
         </button>
     </div>
 </div>
 
 <!-- Group Media Library Modal -->
-<div id="group_media_library_modal" class="hidden fixed inset-0 z-[250] bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm">
-    <div class="bg-[#111b21] border border-[#313d45] w-full max-w-2xl h-[85vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl">
+<div id="group_media_library_modal"
+    class="hidden fixed inset-0 z-[250] bg-black/70 flex items-center justify-center p-4 backdrop-blur-sm">
+    <div
+        class="bg-[#111b21] border border-[#313d45] w-full max-w-2xl h-[85vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl">
         <!-- Modal Header -->
         <div class="h-16 bg-[#202c33] px-6 flex items-center justify-between shrink-0 border-b border-[#313d45]">
             <div class="flex items-center gap-4">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#00a884]">
-                    <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>
+                    <path
+                        d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z">
+                    </path>
                 </svg>
                 <span class="text-[#e9edef] text-[18px] font-medium">Media, links and docs</span>
             </div>
-            <button onclick="window.closeGroupMediaLibrary()" class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
+            <button onclick="window.closeGroupMediaLibrary()"
+                class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
                 </svg>
             </button>
         </div>
 
         <!-- Tabs Navigation -->
         <div class="flex bg-[#111b21] border-b border-[#313d45] shrink-0">
-            <button onclick="window.switchGroupMediaTab('media')" id="tab_btn_media" class="flex-1 py-3 text-center border-b-2 border-[#00a884] text-[#00a884] font-medium text-sm transition-all focus:outline-none">
+            <button onclick="window.switchGroupMediaTab('media')" id="tab_btn_media"
+                class="flex-1 py-3 text-center border-b-2 border-[#00a884] text-[#00a884] font-medium text-sm transition-all focus:outline-none">
                 Media
             </button>
-            <button onclick="window.switchGroupMediaTab('docs')" id="tab_btn_docs" class="flex-1 py-3 text-center border-b-2 border-transparent text-[#8696a0] hover:text-[#e9edef] font-medium text-sm transition-all focus:outline-none">
+            <button onclick="window.switchGroupMediaTab('docs')" id="tab_btn_docs"
+                class="flex-1 py-3 text-center border-b-2 border-transparent text-[#8696a0] hover:text-[#e9edef] font-medium text-sm transition-all focus:outline-none">
                 Docs
             </button>
-            <button onclick="window.switchGroupMediaTab('links')" id="tab_btn_links" class="flex-1 py-3 text-center border-b-2 border-transparent text-[#8696a0] hover:text-[#e9edef] font-medium text-sm transition-all focus:outline-none">
+            <button onclick="window.switchGroupMediaTab('links')" id="tab_btn_links"
+                class="flex-1 py-3 text-center border-b-2 border-transparent text-[#8696a0] hover:text-[#e9edef] font-medium text-sm transition-all focus:outline-none">
                 Links
             </button>
         </div>
 
         <!-- Scrollable Tabs Content -->
-        <div class="flex-1 overflow-y-auto p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent bg-[#0b141a]">
+        <div
+            class="flex-1 overflow-y-auto p-6 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent bg-[#0b141a]">
             <!-- Media Tab Content (Grid of images and videos) -->
             <div id="tab_content_media" class="grid grid-cols-3 sm:grid-cols-4 gap-3">
                 <!-- Dynamically populated -->
@@ -1027,7 +1104,8 @@
 </div>
 
 <!-- Group Media Viewer Modal -->
-<div id="group_media_viewer_modal" class="hidden fixed inset-0 z-[300] bg-black/95 flex flex-col items-center justify-between select-none">
+<div id="group_media_viewer_modal"
+    class="hidden fixed inset-0 z-[300] bg-black/95 flex flex-col items-center justify-between select-none">
     <!-- Header -->
     <div class="w-full h-16 bg-black/30 px-6 flex items-center justify-between shrink-0 text-white z-10">
         <div class="flex flex-col">
@@ -1036,14 +1114,19 @@
         </div>
         <div class="flex items-center gap-4">
             <!-- Download Button -->
-            <button id="group_viewer_download_btn" class="text-[#aebac1] hover:text-white transition-colors focus:outline-none" title="Download">
+            <button id="group_viewer_download_btn"
+                class="text-[#aebac1] hover:text-white transition-colors focus:outline-none" title="Download">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"></path>
+                    <path
+                        d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z">
+                    </path>
                 </svg>
             </button>
-            <button onclick="window.closeGroupMediaViewer()" class="text-[#aebac1] hover:text-white transition-colors focus:outline-none" title="Close">
+            <button onclick="window.closeGroupMediaViewer()"
+                class="text-[#aebac1] hover:text-white transition-colors focus:outline-none" title="Close">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
                 </svg>
             </button>
         </div>
@@ -1052,7 +1135,8 @@
     <!-- Main Content Area with Navigation Arrows -->
     <div class="w-full flex-1 flex items-center justify-between px-4 sm:px-12 relative min-h-0">
         <!-- Prev Arrow -->
-        <button id="group_viewer_prev_btn" onclick="window.prevGroupMediaItem()" class="text-white bg-black/40 hover:bg-black/60 p-3 rounded-full transition-all active:scale-90 focus:outline-none z-10 shrink-0">
+        <button id="group_viewer_prev_btn" onclick="window.prevGroupMediaItem()"
+            class="text-white bg-black/40 hover:bg-black/60 p-3 rounded-full transition-all active:scale-90 focus:outline-none z-10 shrink-0">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
             </svg>
@@ -1062,7 +1146,8 @@
         <div class="flex-1 flex items-center justify-center p-4 max-h-full max-w-full overflow-hidden min-h-0">
             <!-- Image Frame -->
             <div id="group_viewer_image_frame" class="hidden max-h-full max-w-full">
-                <img id="group_viewer_image" class="max-h-[75vh] max-w-full object-contain rounded-lg shadow-2xl transition-transform duration-200">
+                <img id="group_viewer_image"
+                    class="max-h-[75vh] max-w-full object-contain rounded-lg shadow-2xl transition-transform duration-200">
             </div>
 
             <!-- Video Frame -->
@@ -1071,10 +1156,14 @@
             </div>
 
             <!-- Audio Frame -->
-            <div id="group_viewer_audio_frame" class="hidden bg-[#202c33]/90 border border-[#313d45] p-8 rounded-3xl flex flex-col items-center gap-4 text-white w-full max-w-md shadow-2xl backdrop-blur-md">
-                <div class="w-20 h-20 rounded-full bg-[#00a884] flex items-center justify-center shadow-lg animate-pulse">
+            <div id="group_viewer_audio_frame"
+                class="hidden bg-[#202c33]/90 border border-[#313d45] p-8 rounded-3xl flex flex-col items-center gap-4 text-white w-full max-w-md shadow-2xl backdrop-blur-md">
+                <div
+                    class="w-20 h-20 rounded-full bg-[#00a884] flex items-center justify-center shadow-lg animate-pulse">
                     <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor">
-                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"></path>
+                        <path
+                            d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z">
+                        </path>
                     </svg>
                 </div>
                 <span class="font-medium text-lg text-center break-words w-full">Audio Message</span>
@@ -1082,39 +1171,56 @@
             </div>
 
             <!-- Document Frame -->
-            <div id="group_viewer_doc_frame" class="hidden bg-[#202c33]/90 border border-[#313d45] p-8 rounded-3xl flex flex-col items-center gap-6 text-white w-full max-w-md shadow-2xl backdrop-blur-md">
-                <svg class="w-24 h-24 text-blue-400 drop-shadow-md" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <div id="group_viewer_doc_frame"
+                class="hidden bg-[#202c33]/90 border border-[#313d45] p-8 rounded-3xl flex flex-col items-center gap-6 text-white w-full max-w-md shadow-2xl backdrop-blur-md">
+                <svg class="w-24 h-24 text-blue-400 drop-shadow-md" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                    </path>
                 </svg>
-                <span id="group_viewer_doc_name" class="font-medium text-lg text-center break-words w-full">file_name.pdf</span>
-                <a id="group_viewer_doc_download_link" target="_blank" class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-bold py-3.5 px-6 rounded-xl text-center shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
+                <span id="group_viewer_doc_name"
+                    class="font-medium text-lg text-center break-words w-full">file_name.pdf</span>
+                <a id="group_viewer_doc_download_link" target="_blank"
+                    class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-bold py-3.5 px-6 rounded-xl text-center shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"></path>
+                        <path
+                            d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z">
+                        </path>
                     </svg>
                     Download / Open Document
                 </a>
             </div>
 
             <!-- Link Frame -->
-            <div id="group_viewer_link_frame" class="hidden bg-[#202c33]/90 border border-[#313d45] p-8 rounded-3xl flex flex-col items-center gap-6 text-white w-full max-w-md shadow-2xl backdrop-blur-md">
+            <div id="group_viewer_link_frame"
+                class="hidden bg-[#202c33]/90 border border-[#313d45] p-8 rounded-3xl flex flex-col items-center gap-6 text-white w-full max-w-md shadow-2xl backdrop-blur-md">
                 <div class="w-20 h-20 rounded-full bg-[#00a884]/20 flex items-center justify-center text-[#00a884]">
                     <svg viewBox="0 0 24 24" width="40" height="40" fill="currentColor">
-                        <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path>
+                        <path
+                            d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z">
+                        </path>
                     </svg>
                 </div>
-                <span id="group_viewer_link_url" class="font-medium text-lg text-center break-all w-full text-[#00a884] hover:underline cursor-pointer"></span>
-                <p id="group_viewer_link_context" class="text-sm text-gray-400 text-center break-words max-h-24 overflow-y-auto px-2"></p>
-                <a id="group_viewer_link_btn" target="_blank" class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-bold py-3.5 px-6 rounded-xl text-center shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
+                <span id="group_viewer_link_url"
+                    class="font-medium text-lg text-center break-all w-full text-[#00a884] hover:underline cursor-pointer"></span>
+                <p id="group_viewer_link_context"
+                    class="text-sm text-gray-400 text-center break-words max-h-24 overflow-y-auto px-2"></p>
+                <a id="group_viewer_link_btn" target="_blank"
+                    class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-bold py-3.5 px-6 rounded-xl text-center shadow-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2">
                     Open Link in New Tab
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                        <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"></path>
+                        <path
+                            d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z">
+                        </path>
                     </svg>
                 </a>
             </div>
         </div>
 
         <!-- Next Arrow -->
-        <button id="group_viewer_next_btn" onclick="window.nextGroupMediaItem()" class="text-white bg-black/40 hover:bg-black/60 p-3 rounded-full transition-all active:scale-90 focus:outline-none z-10 shrink-0">
+        <button id="group_viewer_next_btn" onclick="window.nextGroupMediaItem()"
+            class="text-white bg-black/40 hover:bg-black/60 p-3 rounded-full transition-all active:scale-90 focus:outline-none z-10 shrink-0">
             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
@@ -1122,7 +1228,8 @@
     </div>
 
     <!-- Bottom Caption/Context Bar -->
-    <div class="w-full bg-black/40 p-6 flex flex-col items-center text-center text-white shrink-0 z-10 border-t border-white/5">
+    <div
+        class="w-full bg-black/40 p-6 flex flex-col items-center text-center text-white shrink-0 z-10 border-t border-white/5">
         <p id="group_viewer_caption" class="text-base font-normal max-w-3xl leading-relaxed break-words"></p>
     </div>
 </div>
@@ -1182,7 +1289,9 @@
             imgContainer.classList.remove('hidden');
             fileContainer.classList.add('hidden');
             const reader = new FileReader();
-            reader.onload = function (e) { imgPreview.src = e.target.result; }
+            reader.onload = function(e) {
+                imgPreview.src = e.target.result;
+            }
             reader.readAsDataURL(file);
         } else {
             imgContainer.classList.add('hidden');
@@ -1233,7 +1342,9 @@
         try {
             let res = await fetch('/send', {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
                 body: formData
             });
 
@@ -1259,7 +1370,7 @@
         document.getElementById('group_msg').focus();
     };
 
-    window.shareGroupLocation = function () {
+    window.shareGroupLocation = function() {
         toggleGroupAttachMenu();
         if (!navigator.geolocation) {
             alert("Geolocation is not supported by your browser");
@@ -1312,7 +1423,7 @@
         const pill = document.getElementById('group_call_btn_pill');
         const dropdown = document.getElementById('group_call_dropdown');
         if (pill && dropdown) {
-            pill.addEventListener('click', function (e) {
+            pill.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const isOpen = !dropdown.classList.contains('hidden');
                 if (isOpen) {
@@ -1347,7 +1458,7 @@
 
     window.selectedCallParticipants = new Set();
 
-    window.toggleGroupCallMembersList = function () {
+    window.toggleGroupCallMembersList = function() {
         const list = document.getElementById('group_call_members_list');
         const footer = document.getElementById('group_call_collapsed_footer');
         const chevron = document.getElementById('group_call_chevron');
@@ -1365,7 +1476,7 @@
         }
     };
 
-    window.renderGroupCallParticipants = function () {
+    window.renderGroupCallParticipants = function() {
         const container = document.getElementById('group_call_members_container');
         if (!container || !window.activeChatUser || !window.activeChatUser.users) return;
 
@@ -1374,10 +1485,12 @@
             if (member.id == window.myUserId) return; // Don't show self
 
             const isSelected = window.selectedCallParticipants.has(member.id);
-            const avatarUrl = member.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=2a3942&color=fff`;
+            const avatarUrl = member.avatar ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=2a3942&color=fff`;
 
             const item = document.createElement('div');
-            item.className = 'flex items-center gap-3 px-4 py-3 hover:bg-white/5 cursor-pointer transition-colors border-b border-white/[0.02]';
+            item.className =
+                'flex items-center gap-3 px-4 py-3 hover:bg-white/5 cursor-pointer transition-colors border-b border-white/[0.02]';
             item.onclick = (e) => {
                 e.stopPropagation();
                 window.toggleCallParticipant(member.id);
@@ -1402,7 +1515,7 @@
         });
     };
 
-    window.toggleCallParticipant = function (userId) {
+    window.toggleCallParticipant = function(userId) {
         if (window.selectedCallParticipants.has(userId)) {
             window.selectedCallParticipants.delete(userId);
         } else {
@@ -1411,8 +1524,11 @@
         window.renderGroupCallParticipants();
     };
 
-    window.startGroupVoiceCall = function (useSelection = false) {
-        if (!window.activeChatUser) { alert('Please select a group first.'); return; }
+    window.startGroupVoiceCall = function(useSelection = false) {
+        if (!window.activeChatUser) {
+            alert('Please select a group first.');
+            return;
+        }
 
         let participants = [];
         if (useSelection) {
@@ -1439,8 +1555,11 @@
         window.location.href = '/chat/groups/voice-call?' + params.toString();
     };
 
-    window.startGroupVideoCall = function (useSelection = false) {
-        if (!window.activeChatUser) { alert('Please select a group first.'); return; }
+    window.startGroupVideoCall = function(useSelection = false) {
+        if (!window.activeChatUser) {
+            alert('Please select a group first.');
+            return;
+        }
 
         let participants = [];
         if (useSelection) {
@@ -1467,7 +1586,7 @@
     };
 
     // Close any menu/picker if clicked outside
-    document.addEventListener('click', function (event) {
+    document.addEventListener('click', function(event) {
         const attachMenu = document.getElementById('group_attach_menu');
         const attachBtn = document.getElementById('group_attach_toggle_btn');
         if (attachMenu && attachBtn && !attachMenu.classList.contains('hidden')) {
@@ -1517,7 +1636,9 @@
         try {
             await fetch('/send', {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
                 body: formData
             });
         } catch (err) {
@@ -1526,7 +1647,7 @@
         input.focus();
     };
 
-    window.getGroupTickSVG = function (status) {
+    window.getGroupTickSVG = function(status) {
         if (status === 'all_read') {
             return `<svg viewBox="0 0 16 15" width="16" height="15" class="text-[#53bdeb]" fill="currentColor"><path d="M15,5.4L9.3,11.1l-1.3-1.4l5.7-5.7L15,5.4z M10.4,5.4L4.7,11.1L2,8.4L0.6,9.8l4.1,4.1l7.1-7.1L10.4,5.4z"></path></svg>`;
         } else if (status === 'read_by_some') {
@@ -1550,7 +1671,7 @@
 
         window.get(window.ref(window.db, `starred_messages/${myId}`)).then(snapshot => {
             const data = snapshot.val();
-            
+
             let groupStarredData = null;
             if (data) {
                 const filtered = Object.entries(data).filter(([k, v]) => v.chat_id === currentChat);
@@ -1567,12 +1688,21 @@
                     <span class="text-[#e9edef] text-[16px]">No starred messages</span>
                 </div>`;
             } else {
-                const msgs = Object.entries(groupStarredData).sort((a, b) => (b[1].time || 0) - (a[1].time || 0));
-                
+                const msgs = Object.entries(groupStarredData).sort((a, b) => (b[1].time || 0) - (a[1]
+                    .time || 0));
+
                 msgs.forEach(([key, msg]) => {
                     const dateObj = msg.time ? new Date(msg.time * 1000) : new Date();
-                    const date = dateObj.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
-                    const time = dateObj.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', hour12: true });
+                    const date = dateObj.toLocaleDateString('en-US', {
+                        month: '2-digit',
+                        day: '2-digit',
+                        year: 'numeric'
+                    });
+                    const time = dateObj.toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    });
                     const isMe = msg.sender_id == myId;
 
                     let senderName = isMe ? 'You' : 'Member';
@@ -1599,7 +1729,7 @@
                         </div>`);
                 });
             }
-            
+
             const badge = document.getElementById('group_starred_count_badge');
             if (badge) {
                 const count = groupStarredData ? Object.keys(groupStarredData).length : 0;
@@ -1610,25 +1740,27 @@
                     badge.classList.add('hidden');
                 }
             }
-            
+
             panel.classList.remove('hidden');
             panel.classList.add('flex');
         });
     };
 
-    window.openGroupInfoPanel = function () {
+    window.openGroupInfoPanel = function() {
         const u = window.activeChatUser;
         if (!u) return;
 
         document.getElementById('group_info_name').textContent = u.name;
-        document.getElementById('group_info_avatar').src = u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=202c33&color=fff`;
+        document.getElementById('group_info_avatar').src = u.avatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=202c33&color=fff`;
 
         // Update Starred messages badge
         if (window.get && window.ref && window.db && window.myUserId && window.currentChatId) {
             window.get(window.ref(window.db, `starred_messages/${window.myUserId}`)).then(snap => {
                 const data = snap.val();
                 let count = 0;
-                if (data) count = Object.values(data).filter(m => m.chat_id === window.currentChatId).length;
+                if (data) count = Object.values(data).filter(m => m.chat_id === window.currentChatId)
+                    .length;
                 const badge = document.getElementById('group_starred_count_badge');
                 if (badge) {
                     if (count > 0) {
@@ -1672,7 +1804,10 @@
                         const day = date.getDate().toString().padStart(2, '0');
                         const month = (date.getMonth() + 1).toString().padStart(2, '0');
                         const year = date.getFullYear();
-                        const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const time = date.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
                         dateStr = `, on ${day}/${month}/${year} at ${time}`;
                     }
                     createdInfoEl.textContent = `Group created by ${creatorName}${dateStr}`;
@@ -1711,7 +1846,9 @@
                         let memberName = "Member";
                         let memberAbout = "Available";
                         let isAdmin = (group.createdBy == userId);
-                        let isAdminBadge = isAdmin ? `<div class="border border-[#00a884]/40 bg-[#00a884]/10 rounded px-1.5 py-0.5 text-[11px] text-[#00a884]">Group admin</div>` : '';
+                        let isAdminBadge = isAdmin ?
+                            `<div class="border border-[#00a884]/40 bg-[#00a884]/10 rounded px-1.5 py-0.5 text-[11px] text-[#00a884]">Group admin</div>` :
+                            '';
 
                         if (userId == window.myUserId) {
                             memberName = "You";
@@ -1762,7 +1899,7 @@
         }
     };
 
-    window.closeGroupInfoPanel = function () {
+    window.closeGroupInfoPanel = function() {
         const p = document.getElementById('group_info_panel');
         if (p) {
             p.classList.remove('flex');
@@ -1771,7 +1908,7 @@
     };
 
     // --- GROUP MEDIA, LINKS AND DOCS LOGIC ---
-    window.updateGroupInfoMediaList = function () {
+    window.updateGroupInfoMediaList = function() {
         if (!window.globalMessages) return;
 
         let mediaItems = [];
@@ -1843,7 +1980,8 @@
         const containerEl = document.getElementById('group_media_container');
         if (containerEl) {
             if (previewItems.length === 0) {
-                containerEl.innerHTML = `<div class="text-[#8696a0] text-sm py-2">No media, links or docs shared yet</div>`;
+                containerEl.innerHTML =
+                    `<div class="text-[#8696a0] text-sm py-2">No media, links or docs shared yet</div>`;
             } else {
                 let html = '';
                 previewItems.forEach(item => {
@@ -1880,7 +2018,8 @@
                     } else if (item.type === 'link') {
                         let displayDomain = 'Link';
                         try {
-                            let parsed = new URL(item.url.startsWith('http') ? item.url : 'http://' + item.url);
+                            let parsed = new URL(item.url.startsWith('http') ? item.url : 'http://' + item
+                                .url);
                             displayDomain = parsed.hostname.replace('www.', '');
                         } catch (e) {}
                         html += `
@@ -1901,7 +2040,7 @@
         window.currentGroupLinkItems = linkItems;
     };
 
-    window.switchGroupMediaTab = function (tab) {
+    window.switchGroupMediaTab = function(tab) {
         ['media', 'docs', 'links'].forEach(t => {
             const btn = document.getElementById('tab_btn_' + t);
             const content = document.getElementById('tab_content_' + t);
@@ -1925,7 +2064,7 @@
         });
     };
 
-    window.openGroupMediaLibrary = function () {
+    window.openGroupMediaLibrary = function() {
         const modal = document.getElementById('group_media_library_modal');
         if (!modal) return;
 
@@ -1934,7 +2073,8 @@
         if (mediaTab) {
             const items = window.currentGroupMediaItems || [];
             if (items.length === 0) {
-                mediaTab.innerHTML = `<div class="text-[#8696a0] text-sm py-4 text-center col-span-full">No media shared yet</div>`;
+                mediaTab.innerHTML =
+                    `<div class="text-[#8696a0] text-sm py-4 text-center col-span-full">No media shared yet</div>`;
             } else {
                 let html = '';
                 items.forEach(item => {
@@ -1964,13 +2104,18 @@
         if (docsTab) {
             const items = window.currentGroupDocItems || [];
             if (items.length === 0) {
-                docsTab.innerHTML = `<div class="text-[#8696a0] text-sm py-4 text-center">No documents shared yet</div>`;
+                docsTab.innerHTML =
+                    `<div class="text-[#8696a0] text-sm py-4 text-center">No documents shared yet</div>`;
             } else {
                 let html = '';
                 items.forEach(item => {
                     const ext = window.getFileExt(item.name);
                     const color = window.getFileColor(item.name);
-                    const dateStr = new Date(item.time * 1000).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+                    const dateStr = new Date(item.time * 1000).toLocaleDateString([], {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
 
                     docsTab.innerHTML = ''; // Clear earlier if any
                     html += `
@@ -1997,11 +2142,16 @@
         if (linksTab) {
             const items = window.currentGroupLinkItems || [];
             if (items.length === 0) {
-                linksTab.innerHTML = `<div class="text-[#8696a0] text-sm py-4 text-center">No links shared yet</div>`;
+                linksTab.innerHTML =
+                    `<div class="text-[#8696a0] text-sm py-4 text-center">No links shared yet</div>`;
             } else {
                 let html = '';
                 items.forEach(item => {
-                    const dateStr = new Date(item.time * 1000).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+                    const dateStr = new Date(item.time * 1000).toLocaleDateString([], {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
                     let displayDomain = 'Link';
                     try {
                         let parsed = new URL(item.url.startsWith('http') ? item.url : 'http://' + item.url);
@@ -2032,7 +2182,7 @@
         modal.classList.remove('hidden');
     };
 
-    window.closeGroupMediaLibrary = function () {
+    window.closeGroupMediaLibrary = function() {
         const modal = document.getElementById('group_media_library_modal');
         if (modal) modal.classList.add('hidden');
     };
@@ -2040,7 +2190,7 @@
     window.groupViewerList = [];
     window.groupViewerIndex = -1;
 
-    window.openGroupMediaViewer = function (itemKey) {
+    window.openGroupMediaViewer = function(itemKey) {
         const viewerModal = document.getElementById('group_media_viewer_modal');
         if (!viewerModal) return;
 
@@ -2057,7 +2207,7 @@
         viewerModal.classList.remove('hidden');
     };
 
-    window.closeGroupMediaViewer = function () {
+    window.closeGroupMediaViewer = function() {
         const viewerModal = document.getElementById('group_media_viewer_modal');
         if (viewerModal) {
             viewerModal.classList.add('hidden');
@@ -2068,7 +2218,7 @@
         }
     };
 
-    window.renderGroupViewerItem = function () {
+    window.renderGroupViewerItem = function() {
         if (window.groupViewerIndex < 0 || window.groupViewerIndex >= window.groupViewerList.length) return;
 
         const item = window.groupViewerList[window.groupViewerIndex];
@@ -2077,12 +2227,19 @@
 
         const prevBtn = document.getElementById('group_viewer_prev_btn');
         const nextBtn = document.getElementById('group_viewer_next_btn');
-        if (prevBtn) prevBtn.style.visibility = (window.groupViewerIndex < window.groupViewerList.length - 1) ? 'visible' : 'hidden';
+        if (prevBtn) prevBtn.style.visibility = (window.groupViewerIndex < window.groupViewerList.length - 1) ?
+            'visible' : 'hidden';
         if (nextBtn) nextBtn.style.visibility = (window.groupViewerIndex > 0) ? 'visible' : 'hidden';
 
         const titleEl = document.getElementById('group_viewer_title');
         const subtitleEl = document.getElementById('group_viewer_subtitle');
-        const dateStr = new Date(msg.time * 1000).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        const dateStr = new Date(msg.time * 1000).toLocaleString([], {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
 
         if (titleEl) {
             let label = 'Media Viewer';
@@ -2105,9 +2262,15 @@
         });
 
         const vid = document.getElementById('group_viewer_video');
-        if (vid) { vid.pause(); vid.src = ''; }
+        if (vid) {
+            vid.pause();
+            vid.src = '';
+        }
         const aud = document.getElementById('group_viewer_audio');
-        if (aud) { aud.pause(); aud.src = ''; }
+        if (aud) {
+            aud.pause();
+            aud.src = '';
+        }
 
         const downloadBtn = document.getElementById('group_viewer_download_btn');
         if (downloadBtn) {
@@ -2156,7 +2319,8 @@
             const linkBtn = document.getElementById('group_viewer_link_btn');
             if (frame && urlEl && contextEl && linkBtn) {
                 urlEl.textContent = item.url;
-                urlEl.onclick = () => window.open(item.url.startsWith('http') ? item.url : 'http://' + item.url, '_blank');
+                urlEl.onclick = () => window.open(item.url.startsWith('http') ? item.url : 'http://' + item.url,
+                    '_blank');
                 contextEl.textContent = msg.text;
                 linkBtn.href = item.url.startsWith('http') ? item.url : 'http://' + item.url;
                 frame.classList.remove('hidden');
@@ -2171,14 +2335,14 @@
         }
     };
 
-    window.prevGroupMediaItem = function () {
+    window.prevGroupMediaItem = function() {
         if (window.groupViewerIndex < window.groupViewerList.length - 1) {
             window.groupViewerIndex++;
             window.renderGroupViewerItem();
         }
     };
 
-    window.nextGroupMediaItem = function () {
+    window.nextGroupMediaItem = function() {
         if (window.groupViewerIndex > 0) {
             window.groupViewerIndex--;
             window.renderGroupViewerItem();
@@ -2186,7 +2350,7 @@
     };
 
     // --- SEARCH LOGIC ---
-    window.toggleGroupSearchDrawer = function () {
+    window.toggleGroupSearchDrawer = function() {
         const drawer = document.getElementById('group_search_drawer');
         if (!drawer) return;
 
@@ -2201,13 +2365,14 @@
         }
     };
 
-    window.searchGroupMessages = function () {
+    window.searchGroupMessages = function() {
         const queryVal = document.getElementById('group_search_input').value.trim().toLowerCase();
         const resultsEl = document.getElementById('group_search_results');
         if (!resultsEl) return;
 
         if (!queryVal) {
-            resultsEl.innerHTML = `<div class="text-[#8696a0] text-center text-sm py-4">Type to search messages in group</div>`;
+            resultsEl.innerHTML =
+                `<div class="text-[#8696a0] text-center text-sm py-4">Type to search messages in group</div>`;
             return;
         }
 
@@ -2218,7 +2383,10 @@
             const m = window.globalMessages[key];
             if (m && m.text && m.text.toLowerCase().includes(queryVal)) {
                 found = true;
-                const time = m.time ? new Date(m.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                const time = m.time ? new Date(m.time * 1000).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : '';
                 html += `
                     <div onclick="scrollToGroupMessage('${key}')" class="p-3 bg-[#202c33] hover:bg-[#2a3942] rounded-lg transition-colors cursor-pointer border border-[#313d45]">
                         <div class="flex justify-between items-center mb-1">
@@ -2237,10 +2405,13 @@
         }
     };
 
-    window.scrollToGroupMessage = function (key) {
+    window.scrollToGroupMessage = function(key) {
         const el = document.getElementById('msg_' + key);
         if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
             el.classList.add('bg-[#00a884]/20');
             setTimeout(() => el.classList.remove('bg-[#00a884]/20'), 3000);
         }
@@ -2255,7 +2426,9 @@
 
     async function startGroupVoiceNote() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: true
+            });
             groupMediaRecorder = new MediaRecorder(stream);
             groupAudioChunks = [];
 
@@ -2283,7 +2456,8 @@
                 groupVoiceSeconds++;
                 const mins = Math.floor(groupVoiceSeconds / 60);
                 const secs = groupVoiceSeconds % 60;
-                document.getElementById('group_audio_timer').innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
+                document.getElementById('group_audio_timer').innerText =
+                    `${mins}:${secs.toString().padStart(2, '0')}`;
             }, 1000);
 
         } catch (err) {
@@ -2306,7 +2480,9 @@
         document.getElementById('group_send_icon').classList.add('hidden');
 
         groupMediaRecorder.addEventListener('stop', async () => {
-            const audioBlob = new Blob(groupAudioChunks, { type: 'audio/webm' });
+            const audioBlob = new Blob(groupAudioChunks, {
+                type: 'audio/webm'
+            });
             if (audioBlob.size < 100) return;
 
             const fd = new FormData();
@@ -2316,7 +2492,10 @@
             try {
                 await fetch('/send', {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .content
+                    },
                     body: fd
                 });
             } catch (err) {
@@ -2404,38 +2583,85 @@
 <div id="group_msg_dropdown" class="hidden fixed z-50 transition-all duration-100 opacity-0 scale-95"
     style="width: 220px;">
     <!-- Emoji Reactions Bar -->
-    <div class="bg-[#233138] rounded-full shadow-lg border border-[#313d45] px-3 py-1.5 flex items-center gap-2 mb-2 absolute"
+    <div class="bg-[#233138] rounded-full shadow-lg border border-[#313d45] px-2 py-1.5 flex items-center gap-1 mb-2 absolute"
         style="top: -46px; left: 0; width: max-content;">
-        <button class="hover:scale-125 transition-transform text-xl focus:outline-none">👍</button>
-        <button class="hover:scale-125 transition-transform text-xl focus:outline-none">❤️</button>
-        <button class="hover:scale-125 transition-transform text-xl focus:outline-none">😂</button>
-        <button class="hover:scale-125 transition-transform text-xl focus:outline-none">😮</button>
-        <button class="hover:scale-125 transition-transform text-xl focus:outline-none">😢</button>
-        <button class="hover:scale-125 transition-transform text-xl focus:outline-none">🙏</button>
-        <button
-            class="text-[#8696a0] hover:text-[#e9edef] hover:bg-white/10 rounded-full w-7 h-7 flex items-center justify-center transition-colors focus:outline-none">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
-            </svg>
+        <button onclick="event.stopPropagation(); window.sendReaction('👍', window._activeGroupMsgKey, true, event)"
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">👍</button>
+        <button onclick="event.stopPropagation(); window.sendReaction('❤️', window._activeGroupMsgKey, true, event)"
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">❤️</button>
+        <button onclick="event.stopPropagation(); window.sendReaction('😂', window._activeGroupMsgKey, true, event)"
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😂</button>
+        <button onclick="event.stopPropagation(); window.sendReaction('😮', window._activeGroupMsgKey, true, event)"
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😮</button>
+        <button onclick="event.stopPropagation(); window.sendReaction('😢', window._activeGroupMsgKey, true, event)"
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😢</button>
+        <button onclick="event.stopPropagation(); window.sendReaction('🙏', window._activeGroupMsgKey, true, event)"
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">🙏</button>
+        <button onclick="event.stopPropagation(); window.openFullReactionPicker(window._activeGroupMsgKey, true, event)"
+            class="w-8 h-8 flex items-center justify-center text-[18px] text-[#aebac1] hover:bg-white/10 rounded-full transition-transform hover:scale-125 bg-white/5 ml-1">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
         </button>
     </div>
 
     <!-- Dropdown Menu -->
     <div class="bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 w-full">
-        <button onclick="window.replyToGroupMsg()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Reply</span> <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
-        <button id="group_dropdown_reply_priv" onclick="window.replyPrivatelyFromGroup()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Reply privately</span> <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
-        <button id="group_dropdown_msg_user" onclick="window.messageUserFromGroup()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px] truncate"><span>Message <span id="group_dropdown_sender_name"></span></span></button>
-        <button onclick="window.copyGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Copy</span></button>
-        <button onclick="window.forwardGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Forward</span> <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
-        <button id="group_pin_dropdown_btn" onclick="window.toggleGroupPinMessage(event)" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span id="group_pin_dropdown_btn_text">Pin</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path></svg></button>
-        <button class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask Meta AI</span></button>
-        <button onclick="window.askMetaAIGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask Meta AI</span></button>
-        <button onclick="window.starGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span id="group_star_dropdown_btn_text">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+        <button onclick="window.replyToGroupMsg()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Reply</span>
+            <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+            </svg></button>
+        <button id="group_dropdown_reply_priv" onclick="window.replyPrivatelyFromGroup()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Reply
+                privately</span> <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+            </svg></button>
+        <button id="group_dropdown_msg_user" onclick="window.messageUserFromGroup()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px] truncate"><span>Message
+                <span id="group_dropdown_sender_name"></span></span></button>
+        <button onclick="window.copyGroupMessage()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Copy</span></button>
+        <button onclick="window.forwardGroupMessage()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Forward</span>
+            <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
+                </path>
+            </svg></button>
+        <button id="group_pin_dropdown_btn" onclick="window.toggleGroupPinMessage(event)"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span
+                id="group_pin_dropdown_btn_text">Pin</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path
+                    d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z">
+                </path>
+            </svg></button>
+        <button
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask
+                Meta AI</span></button>
+        <button onclick="window.askMetaAIGroupMessage()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask
+                Meta AI</span></button>
+        <button onclick="window.starGroupMessage()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span
+                id="group_star_dropdown_btn_text">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+            </svg></button>
         <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
-        <button onclick="window.selectGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Select</span></button>
+        <button onclick="window.selectGroupMessage()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Select</span></button>
         <div id="group_dropdown_report_divider" class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
-        <button id="group_dropdown_report" onclick="window.reportGroupMessage()" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Report</span></button>
-        <button onclick="window.deleteGroupMessage()" class="w-full text-left px-4 py-2.5 text-red-500 hover:bg-red-500/10 flex items-center justify-between transition-colors text-[15px]"><span>Delete</span> <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+        <button id="group_dropdown_report" onclick="window.reportGroupMessage()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Report</span></button>
+        <button onclick="window.deleteGroupMessage()"
+            class="w-full text-left px-4 py-2.5 text-red-500 hover:bg-red-500/10 flex items-center justify-between transition-colors text-[15px]"><span>Delete</span>
+            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                </path>
+            </svg></button>
     </div>
 </div>
 
@@ -2453,7 +2679,8 @@
     </button>
     <button onclick="window.openGroupInfoPanel(); toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="16" x2="12" y2="12"></line>
             <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -2462,7 +2689,8 @@
     </button>
     <button onclick="window.toggleGroupSearchDrawer(); toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <circle cx="11" cy="11" r="8"></circle>
             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
@@ -2470,7 +2698,8 @@
     </button>
     <button onclick="toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <polyline points="9 11 12 14 22 4"></polyline>
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
         </svg>
@@ -2479,7 +2708,8 @@
     <div class="w-full flex items-center justify-between px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors cursor-pointer group"
         onclick="toggleGroupHeaderMoreMenu()">
         <div class="flex items-center gap-4">
-            <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                stroke-width="2">
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                 <path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path>
                 <path d="M6.26 6.26A5.86 5.86 0 0 0 6 8a7 7 0 0 0 7 7v0"></path>
@@ -2494,7 +2724,8 @@
     </div>
     <button onclick="toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
@@ -2502,7 +2733,8 @@
     </button>
     <button onclick="toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
         </svg>
@@ -2510,7 +2742,8 @@
     </button>
     <button onclick="toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <path
                 d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
             </path>
@@ -2519,7 +2752,8 @@
     </button>
     <button onclick="toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <line x1="8" y1="6" x2="21" y2="6"></line>
             <line x1="8" y1="12" x2="21" y2="12"></line>
             <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -2531,7 +2765,8 @@
     </button>
     <button onclick="window.backToSidebar(); toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="15" y1="9" x2="9" y2="15"></line>
             <line x1="9" y1="9" x2="15" y2="15"></line>
@@ -2541,7 +2776,8 @@
     <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
     <button onclick="toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="8" y1="12" x2="16" y2="12"></line>
         </svg>
@@ -2549,7 +2785,8 @@
     </button>
     <button onclick="toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
@@ -2559,7 +2796,7 @@
 </div>
 
 <script>
-    window.openGroupMessageOptions = function (event, messageKey, isMe, encodedSenderName, senderId) {
+    window.openGroupMessageOptions = function(event, messageKey, isMe, encodedSenderName, senderId) {
         event.stopPropagation();
 
         const msg = window.globalMessages[messageKey];
@@ -2581,40 +2818,47 @@
         const pinBtn = document.getElementById('group_pin_dropdown_btn');
         const starBtn = dropdown.querySelector('button[onclick="window.starGroupMessage()"]');
         const selectBtn = dropdown.querySelector('button[onclick="window.selectGroupMessage()"]');
-        
+
         // Find Meta AI buttons (both standard class and onclick)
-        const metaAiBtns = Array.from(dropdown.querySelectorAll('button')).filter(btn => btn.textContent.trim() === 'Ask Meta AI');
+        const metaAiBtns = Array.from(dropdown.querySelectorAll('button')).filter(btn => btn.textContent.trim() ===
+            'Ask Meta AI');
+
+        const deleteBtn = dropdown.querySelector('button[onclick="window.deleteGroupMessage()"]');
 
         if (isMe) {
             replyPriv.style.display = 'none';
             msgUser.style.display = 'none';
             reportBtn.style.display = 'none';
             reportDiv.style.display = 'none';
+            if (deleteBtn) deleteBtn.style.display = 'flex';
         } else {
             replyPriv.style.display = isCall ? 'none' : 'flex';
             msgUser.style.display = 'flex';
             reportBtn.style.display = isCall ? 'none' : 'flex';
             reportDiv.style.display = isCall ? 'none' : 'block';
             senderNameSpan.textContent = decodeURIComponent(encodedSenderName);
+            if (deleteBtn) deleteBtn.style.display = 'none';
         }
 
         if (replyBtn) replyBtn.style.display = isCall ? 'none' : 'flex';
         if (copyBtn) copyBtn.style.display = isCall ? 'none' : 'flex';
         if (forwardBtn) forwardBtn.style.display = isCall ? 'none' : 'flex';
-        
+
         if (pinBtn) {
             const pinBtnText = document.getElementById('group_pin_dropdown_btn_text');
             if (pinBtnText) {
-                pinBtnText.textContent = (window._groupPinnedMsgKeys && window._groupPinnedMsgKeys.has(messageKey)) ? 'Unpin' : 'Pin';
+                pinBtnText.textContent = (window._groupPinnedMsgKeys && window._groupPinnedMsgKeys.has(
+                    messageKey)) ? 'Unpin' : 'Pin';
             } else {
-                pinBtn.textContent = (window._groupPinnedMsgKeys && window._groupPinnedMsgKeys.has(messageKey)) ? 'Unpin' : 'Pin';
+                pinBtn.textContent = (window._groupPinnedMsgKeys && window._groupPinnedMsgKeys.has(messageKey)) ?
+                    'Unpin' : 'Pin';
             }
             pinBtn.style.display = isCall ? 'none' : 'flex';
         }
 
         if (starBtn) starBtn.style.display = isCall ? 'none' : 'flex';
         if (selectBtn) selectBtn.style.display = isCall ? 'none' : 'flex';
-        
+
         metaAiBtns.forEach(btn => {
             btn.style.display = isCall ? 'none' : 'flex';
         });
@@ -2637,6 +2881,18 @@
         dropdown.style.top = top + 'px';
         dropdown.style.left = left + 'px';
 
+        // Adjust reaction strip alignment to prevent overflowing off-screen
+        const reactionStrip = dropdown.firstElementChild;
+        if (reactionStrip) {
+            if (isMe) {
+                reactionStrip.style.left = 'auto';
+                reactionStrip.style.right = '0';
+            } else {
+                reactionStrip.style.right = 'auto';
+                reactionStrip.style.left = '0';
+            }
+        }
+
         setTimeout(() => {
             dropdown.classList.remove('opacity-0', 'scale-95');
             dropdown.classList.add('opacity-100', 'scale-100');
@@ -2646,7 +2902,7 @@
         window._activeGroupSenderId = senderId;
     };
 
-    window.toggleGroupHeaderMoreMenu = function (event) {
+    window.toggleGroupHeaderMoreMenu = function(event) {
         if (event) event.stopPropagation();
         const dropdown = document.getElementById('group_header_more_dropdown');
         if (!dropdown) return;
@@ -2666,7 +2922,7 @@
     };
 
     // Global listener to close dropdowns on outside click
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
         // Message dropdown
         const msgDropdown = document.getElementById('group_msg_dropdown');
         if (msgDropdown && !msgDropdown.classList.contains('hidden')) {
@@ -2707,7 +2963,7 @@
         }
     });
 
-    window.copyGroupMessage = function () {
+    window.copyGroupMessage = function() {
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey) return;
         const msgElement = document.getElementById(`msg_${messageKey}`);
@@ -2722,7 +2978,7 @@
         }
     };
 
-    window.messageUserFromGroup = function () {
+    window.messageUserFromGroup = function() {
         const senderId = window._activeGroupSenderId;
         if (!senderId) return;
         const matchUser = window.allContacts.find(c => c.id == senderId);
@@ -2732,7 +2988,7 @@
         }
     };
 
-    window.replyPrivatelyFromGroup = function () {
+    window.replyPrivatelyFromGroup = function() {
         const messageKey = window._activeGroupMsgKey;
         const senderId = window._activeGroupSenderId;
         if (!messageKey || !senderId) return;
@@ -2758,7 +3014,7 @@
     window.isGroupSelectionMode = false;
     window.selectedGroupMessages = new Set();
 
-    window.cancelGroupSelection = function () {
+    window.cancelGroupSelection = function() {
         window.isGroupSelectionMode = false;
         window.selectedGroupMessages.clear();
         document.getElementById('group_normal_header').classList.remove('hidden');
@@ -2770,14 +3026,16 @@
             box.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
             box.classList.add('bg-white', 'border-gray-400');
         });
-        document.querySelectorAll('[id^="msg_"]').forEach(el => el.classList.remove('bg-blue-100', 'bg-opacity-50'));
+        document.querySelectorAll('[id^="msg_"]').forEach(el => el.classList.remove('bg-blue-100',
+            'bg-opacity-50'));
     };
 
-    window.confirmDeleteGroupSelected = function () {
+    window.confirmDeleteGroupSelected = function() {
         if (window.selectedGroupMessages.size === 0) return;
         window.openDeleteModal(`Delete ${window.selectedGroupMessages.size} message(s)?`, () => {
             window.selectedGroupMessages.forEach(key => {
-                window.remove(window.ref(window.db, `groups/${window.currentChatId}/messages/${key}`)).catch(e => {
+                window.remove(window.ref(window.db,
+                    `groups/${window.currentChatId}/messages/${key}`)).catch(e => {
                     console.error('Delete error:', e);
                 });
             });
@@ -2785,7 +3043,7 @@
         });
     };
 
-    window.toggleGroupMsgSelection = function (key) {
+    window.toggleGroupMsgSelection = function(key) {
         if (!window.isGroupSelectionMode && !window.isGroupForwardSelection) return;
         const msg = window.globalMessages[key];
         if (msg && msg.type === 'call') return;
@@ -2817,14 +3075,16 @@
             }
         } else {
             if (window.isGroupSelectionMode) {
-                document.getElementById('group_selection_count').textContent = window.selectedGroupMessages.size + ' Selected';
+                document.getElementById('group_selection_count').textContent = window.selectedGroupMessages.size +
+                    ' Selected';
             } else if (window.isGroupForwardSelection) {
-                document.getElementById('group_selection_bottom_count').textContent = window.selectedGroupMessages.size + ' Selected';
+                document.getElementById('group_selection_bottom_count').textContent = window.selectedGroupMessages
+                    .size + ' Selected';
             }
         }
     };
 
-    window.sendGroupForwardedMessages = async function () {
+    window.sendGroupForwardedMessages = async function() {
         if (window.selectedGroupMessages.size === 0 || window._selectedForwardTargets.size === 0) return;
 
         const messagesToForward = [];
@@ -2857,7 +3117,7 @@
                         statusData.bgColor = '#00a884';
                         statusData.font = 'font-sans';
                     }
-                    
+
                     try {
                         const statusRef = window.ref(window.db, `statuses/${window.myUserId}`);
                         await window.push(statusRef, statusData);
@@ -2889,10 +3149,13 @@
                     if (msg.lng) formData.append('lng', msg.lng);
 
                     try {
-                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || (typeof csrf !== 'undefined' ? csrf : '');
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || (
+                            typeof csrf !== 'undefined' ? csrf : '');
                         await fetch('/send', {
                             method: 'POST',
-                            headers: { 'X-CSRF-TOKEN': csrfToken },
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken
+                            },
                             body: formData
                         });
                     } catch (e) {
@@ -2903,7 +3166,7 @@
         }
     };
 
-    window.deleteGroupMessage = function () {
+    window.deleteGroupMessage = function() {
         const key = window._activeGroupMsgKey;
         if (!key) return;
 
@@ -2929,7 +3192,7 @@
     window._groupPinnedMsgsList = [];
     window._currentGroupPinIndex = 0;
 
-    window.pinGroupMessage = function () {
+    window.pinGroupMessage = function() {
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey || !window.currentChatId) return;
 
@@ -2951,17 +3214,18 @@
         document.getElementById('group_msg_dropdown').classList.add('hidden');
     };
 
-    window.unpinGroupMessage = function (messageKey, event) {
+    window.unpinGroupMessage = function(messageKey, event) {
         if (event) event.stopPropagation();
         if (!window.currentChatId) return;
 
-        const keyToRemove = messageKey || (window._groupPinnedMsgsList[window._currentGroupPinIndex] ? window._groupPinnedMsgsList[window._currentGroupPinIndex].key : null);
+        const keyToRemove = messageKey || (window._groupPinnedMsgsList[window._currentGroupPinIndex] ? window
+            ._groupPinnedMsgsList[window._currentGroupPinIndex].key : null);
         if (!keyToRemove) return;
 
         window.remove(window.ref(window.db, `groups/${window.currentChatId}/pinned_msgs/${keyToRemove}`));
     };
 
-    window.toggleGroupPinMessage = function (event) {
+    window.toggleGroupPinMessage = function(event) {
         if (event) event.stopPropagation();
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey || !window.currentChatId) return;
@@ -2975,7 +3239,7 @@
     };
 
     // Update pin icons on all visible group messages
-    window.updateGroupPinIcons = function () {
+    window.updateGroupPinIcons = function() {
         document.querySelectorAll('#group_messages [id^="pin_icon_"]').forEach(el => el.classList.add('hidden'));
         window._groupPinnedMsgKeys.forEach(key => {
             const icon = document.getElementById('pin_icon_' + key);
@@ -2984,19 +3248,25 @@
     };
 
     // Scroll to message by key (group)
-    window.scrollToMessage = function (key) {
+    window.scrollToMessage = function(key) {
         const el = document.getElementById('msg_' + key);
         if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
             el.style.backgroundColor = 'rgba(0, 168, 132, 0.15)';
-            setTimeout(() => { el.style.backgroundColor = ''; }, 2000);
+            setTimeout(() => {
+                el.style.backgroundColor = '';
+            }, 2000);
         }
     };
 
     // Navigate between group pinned messages
-    window.navigateGroupPin = function (direction) {
+    window.navigateGroupPin = function(direction) {
         if (!window._groupPinnedMsgsList.length) return;
-        window._currentGroupPinIndex = (window._currentGroupPinIndex + direction + window._groupPinnedMsgsList.length) % window._groupPinnedMsgsList.length;
+        window._currentGroupPinIndex = (window._currentGroupPinIndex + direction + window._groupPinnedMsgsList
+            .length) % window._groupPinnedMsgsList.length;
 
         const pin = window._groupPinnedMsgsList[window._currentGroupPinIndex];
         const pinText = document.getElementById('group_pinned_text');
@@ -3006,7 +3276,7 @@
     };
 
     // Scroll to currently displayed group pin
-    window.scrollToCurrentGroupPin = function () {
+    window.scrollToCurrentGroupPin = function() {
         if (!window._groupPinnedMsgsList.length) return;
         const pin = window._groupPinnedMsgsList[window._currentGroupPinIndex];
         if (pin) window.scrollToMessage(pin.key);
@@ -3014,23 +3284,24 @@
 
     window.isGroupForwardSelection = false;
 
-    window.cancelGroupForwardSelection = function () {
+    window.cancelGroupForwardSelection = function() {
         window.isGroupForwardSelection = false;
         window.selectedGroupMessages.clear();
-        
+
         // Hide selection bottom bar
         const bottomBar = document.getElementById('group_selection_bottom_bar');
         if (bottomBar) {
             bottomBar.classList.remove('flex');
             bottomBar.classList.add('hidden');
         }
-        
+
         // Show normal input container
         document.getElementById('group_normal_input_container')?.classList.remove('hidden');
-        
+
         // Hide checkboxes next to messages
-        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.add('hidden'));
-        
+        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.add(
+            'hidden'));
+
         // Uncheck all checkboxes
         document.querySelectorAll('#group_messages .msg-checkbox').forEach(el => {
             el.checked = false;
@@ -3038,20 +3309,21 @@
             box.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
             box.classList.add('bg-white', 'border-gray-400');
         });
-        
+
         // Clear message background selection classes
-        document.querySelectorAll('#group_messages [id^="msg_"]').forEach(el => el.classList.remove('bg-blue-100', 'bg-opacity-50'));
+        document.querySelectorAll('#group_messages [id^="msg_"]').forEach(el => el.classList.remove('bg-blue-100',
+            'bg-opacity-50'));
     };
 
-    window.forwardGroupMessage = function () {
+    window.forwardGroupMessage = function() {
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey) return;
-        
+
         document.getElementById('group_msg_dropdown').classList.add('hidden');
-        
+
         window.isGroupForwardSelection = true;
         window.selectedGroupMessages.clear();
-        
+
         // Hide normal input area and show selection bottom bar
         document.getElementById('group_normal_input_container')?.classList.add('hidden');
         const bottomBar = document.getElementById('group_selection_bottom_bar');
@@ -3059,15 +3331,16 @@
             bottomBar.classList.remove('hidden');
             bottomBar.classList.add('flex');
         }
-        
+
         // Show checkboxes
-        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
-        
+        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.remove(
+            'hidden'));
+
         // Toggle selection for current message
         window.toggleGroupMsgSelection(messageKey);
     };
 
-    window.starGroupMessage = function () {
+    window.starGroupMessage = function() {
         const key = window._activeGroupMsgKey;
         if (!key || !window.myUserId) return;
 
@@ -3104,28 +3377,29 @@
         }
     };
 
-    window.selectGroupMessage = function () {
+    window.selectGroupMessage = function() {
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey) return;
-        
+
         document.getElementById('group_msg_dropdown').classList.add('hidden');
-        
+
         window.isGroupSelectionMode = true;
         window.selectedGroupMessages.clear();
-        
+
         // Hide normal header and show selection header
         document.getElementById('group_normal_header').classList.add('hidden');
         document.getElementById('group_selection_header').classList.remove('hidden');
         document.getElementById('group_selection_header').classList.add('flex');
-        
+
         // Show checkboxes
-        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
-        
+        document.querySelectorAll('#group_messages .msg-checkbox-container').forEach(el => el.classList.remove(
+            'hidden'));
+
         // Toggle selection for current message
         window.toggleGroupMsgSelection(messageKey);
     };
 
-    window.replyToGroupMsg = function () {
+    window.replyToGroupMsg = function() {
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey) return;
 
@@ -3190,7 +3464,7 @@
         }, 100);
     };
 
-    window.cancelGroupReply = function () {
+    window.cancelGroupReply = function() {
         const block = document.getElementById('group_replying_to_block');
         block.classList.add('hidden');
         block.classList.remove('flex');
@@ -3212,9 +3486,10 @@
         console.log("Applying Group Chat overrides to emitMessage...");
         const originalEmitMessage = window.emitMessage;
 
-        window.emitMessage = async function (msgText, fileObj = null) {
+        window.emitMessage = async function(msgText, fileObj = null) {
             console.log("emitMessage intercepted. chatId:", window.currentChatId);
-            if (window.currentChatId && typeof window.currentChatId === 'string' && window.currentChatId.startsWith('group_')) {
+            if (window.currentChatId && typeof window.currentChatId === 'string' && window.currentChatId
+                .startsWith('group_')) {
                 console.log("Routing group message through /send:", msgText, fileObj?.name);
 
                 const formData = new FormData();
@@ -3237,10 +3512,13 @@
                 }
 
                 try {
-                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || (typeof csrf !== 'undefined' ? csrf : '');
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || (
+                        typeof csrf !== 'undefined' ? csrf : '');
                     const response = await fetch('/send', {
                         method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': csrfToken },
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken
+                        },
                         body: formData
                     });
 
@@ -3284,12 +3562,13 @@
         }
     };
 
-    window.confirmDeleteGroupSelected = function () {
+    window.confirmDeleteGroupSelected = function() {
         if (window.selectedGroupMessages.size === 0) return;
         if (confirm('Delete ' + window.selectedGroupMessages.size + ' message(s) from group?')) {
             window.selectedGroupMessages.forEach(key => {
                 try {
-                    window.remove(window.ref(window.db, 'groups/' + window.currentChatId + '/messages/' + key)).catch(e => {
+                    window.remove(window.ref(window.db, 'groups/' + window.currentChatId + '/messages/' +
+                        key)).catch(e => {
                         console.error('Delete error:', e);
                     });
                 } catch (e) {
@@ -3311,8 +3590,10 @@
                 if (groups) {
                     Object.values(groups).forEach(group => {
                         if (group && group.users) {
-                            let uList = Array.isArray(group.users) ? group.users : Object.values(group.users);
-                            let hasUser = uList.some(u => String(u) === String(window.myUserId));
+                            let uList = Array.isArray(group.users) ? group.users : Object
+                                .values(group.users);
+                            let hasUser = uList.some(u => String(u) === String(window
+                                .myUserId));
                             if (hasUser) {
                                 window.renderGroupSidebarItem(group);
                             }
@@ -3327,7 +3608,7 @@
     // Global registry for group message listeners to avoid duplicates
     window.groupMessageListeners = window.groupMessageListeners || {};
 
-    window.listenForGroupUpdates = function (groupId) {
+    window.listenForGroupUpdates = function(groupId) {
         if (window.groupMessageListeners[groupId]) return;
 
         const messagesRef = window.query(
@@ -3356,7 +3637,10 @@
             const lastTimeEl = document.getElementById(`group_last_time_${groupId}`);
             if (lastTimeEl) {
                 const msgDate = new Date(data.time * 1000);
-                lastTimeEl.textContent = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                lastTimeEl.textContent = msgDate.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
             }
 
             // Update timestamp attribute and sort sidebar
@@ -3383,16 +3667,17 @@
         });
     };
 
-    window.renderGroupSidebarItem = function (group) {
+    window.renderGroupSidebarItem = function(group) {
         let item = document.getElementById(`group_sidebar_${group.id}`);
         if (!item) {
             item = document.createElement('div');
             item.id = `group_sidebar_${group.id}`;
-            item.className = "flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item relative group";
+            item.className =
+                "flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item relative group";
             item.setAttribute('data-name', group.name);
             item.setAttribute('data-groupid', group.id);
             item.setAttribute('data-timestamp', '0');
-            item.onclick = function () {
+            item.onclick = function() {
                 window.selectGroupChat(group.id, group.name, group.avatar);
             };
 
@@ -3446,7 +3731,8 @@
             const h4 = item.querySelector('h4');
             const img = item.querySelector('img');
             if (h4) h4.textContent = group.name;
-            if (img) img.src = group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`;
+            if (img) img.src = group.avatar ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`;
         }
 
         // Attach message listener for real-time sidebar updates
@@ -3460,7 +3746,7 @@
 
     window.groupMessagesCache = window.groupMessagesCache || {};
 
-    window.cacheGroupMessages = function (groupId) {
+    window.cacheGroupMessages = function(groupId) {
         if (window.groupMessagesCache[groupId]) return; // already listening
 
         window.groupMessagesCache[groupId] = [];
@@ -3487,7 +3773,8 @@
         window.onChildRemoved(messagesRef, (snapshot) => {
             const key = snapshot.key;
             if (window.groupMessagesCache[groupId]) {
-                window.groupMessagesCache[groupId] = window.groupMessagesCache[groupId].filter(m => m.key !== key);
+                window.groupMessagesCache[groupId] = window.groupMessagesCache[groupId].filter(m => m
+                    .key !== key);
             }
         });
 
@@ -3504,7 +3791,7 @@
     };
 
     // Hijack window.filterSidebar using Object.defineProperty to prevent index.blade.php from overwriting it
-    let customFilterSidebar = function () {
+    let customFilterSidebar = function() {
         const searchQuery = document.getElementById('sidebar_search').value.toLowerCase().trim();
         const clearBtn = document.getElementById('sidebar_search_clear');
         const userList = document.getElementById('user_list_container');
@@ -3546,26 +3833,31 @@
         let allMsgResults = [];
 
         // 1. Search Private Chats / Contacts
-        const privateUserNodes = document.getElementById('user_list_container').querySelectorAll('[id^="user_sidebar_"]');
+        const privateUserNodes = document.getElementById('user_list_container').querySelectorAll(
+            '[id^="user_sidebar_"]');
         privateUserNodes.forEach(user => {
             const userId = user.getAttribute('data-userid') || user.id.replace('user_sidebar_', '');
-            const name = user.getAttribute('data-name') || user.querySelector('h4')?.textContent.trim() || '';
+            const name = user.getAttribute('data-name') || user.querySelector('h4')?.textContent.trim() ||
+                '';
             const avatar = user.getAttribute('data-avatar') || '';
             const phone = user.getAttribute('data-phone') || '';
             const about = user.getAttribute('data-about') || 'Available';
             const lastTimeEl = document.getElementById(`last_time_${userId}`);
             const lastTime = lastTimeEl ? lastTimeEl.textContent.trim() : '';
             const lastMsgEl = document.getElementById(`last_msg_${userId}`);
-            const lastMsg = lastMsgEl ? (lastMsgEl.getAttribute('data-msg') || lastMsgEl.textContent.trim()) : '';
+            const lastMsg = lastMsgEl ? (lastMsgEl.getAttribute('data-msg') || lastMsgEl.textContent
+                .trim()) : '';
 
             const nameLower = name.toLowerCase();
             const nameMatch = nameLower.includes(searchQuery);
 
             if (nameMatch && chatsList) {
                 chatMatches++;
-                const highlightedName = name.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+                const highlightedName = name.replace(highlightRegex,
+                    '<span class="text-[#00a884] font-medium">$1</span>');
                 const prefix = lastMsg ? (lastMsg.startsWith('Click to chat') ? '' : '✓ ') : '';
-                const previewMsg = lastMsg && !lastMsg.startsWith('Click to chat') ? prefix + lastMsg : phone || 'Click to chat';
+                const previewMsg = lastMsg && !lastMsg.startsWith('Click to chat') ? prefix + lastMsg :
+                    phone || 'Click to chat';
 
                 const elementId = `user_sidebar_${userId}`;
                 const isPinned = window.pinnedChats && window.pinnedChats.includes(elementId);
@@ -3613,7 +3905,11 @@
                 if (m.text && m.text.toLowerCase().includes(searchQuery)) {
                     allMsgResults.push({
                         isGroup: false,
-                        userId, name, avatar, phone, about,
+                        userId,
+                        name,
+                        avatar,
+                        phone,
+                        about,
                         text: m.text,
                         time: m.time,
                         senderId: m.senderId
@@ -3623,7 +3919,8 @@
         });
 
         // 2. Search Groups / Group Chats
-        const groupNodes = document.getElementById('user_list_container').querySelectorAll('[id^="group_sidebar_"]');
+        const groupNodes = document.getElementById('user_list_container').querySelectorAll(
+            '[id^="group_sidebar_"]');
         groupNodes.forEach(groupNode => {
             const groupId = groupNode.id.replace('group_sidebar_', '');
             const name = groupNode.querySelector('h4')?.textContent.trim() || '';
@@ -3639,7 +3936,8 @@
 
             if (nameMatch && chatsList) {
                 chatMatches++;
-                const highlightedName = name.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+                const highlightedName = name.replace(highlightRegex,
+                    '<span class="text-[#00a884] font-medium">$1</span>');
 
                 const elementId = `group_sidebar_${groupId}`;
                 const isPinned = window.pinnedChats && window.pinnedChats.includes(elementId);
@@ -3687,7 +3985,9 @@
                 if (m.text && m.text.toLowerCase().includes(searchQuery)) {
                     allMsgResults.push({
                         isGroup: true,
-                        groupId, name, avatar,
+                        groupId,
+                        name,
+                        avatar,
                         text: m.text,
                         time: m.time,
                         senderId: m.senderId
@@ -3708,18 +4008,30 @@
                 const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 const msgDayStart = new Date(msgTime.getFullYear(), msgTime.getMonth(), msgTime.getDate());
                 const diffDays = Math.round((todayStart - msgDayStart) / (1000 * 60 * 60 * 24));
-                if (diffDays === 0) timeStr = msgTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                if (diffDays === 0) timeStr = msgTime.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
                 else if (diffDays === 1) timeStr = 'Yesterday';
-                else if (diffDays < 7) timeStr = msgTime.toLocaleDateString([], { weekday: 'long' });
-                else timeStr = msgTime.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+                else if (diffDays < 7) timeStr = msgTime.toLocaleDateString([], {
+                    weekday: 'long'
+                });
+                else timeStr = msgTime.toLocaleDateString([], {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
             }
 
-            const highlightedMsg = r.text.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+            const highlightedMsg = r.text.replace(highlightRegex,
+                '<span class="text-[#00a884] font-medium">$1</span>');
 
             let prefix = '';
             if (r.isGroup) {
-                const senderContact = window.allContacts ? window.allContacts.find(c => c.id == r.senderId) : null;
-                const senderName = r.senderId == window.myUserId ? 'You' : (senderContact ? (senderContact.name || senderContact.phone) : 'Member');
+                const senderContact = window.allContacts ? window.allContacts.find(c => c.id == r
+                    .senderId) : null;
+                const senderName = r.senderId == window.myUserId ? 'You' : (senderContact ? (senderContact
+                    .name || senderContact.phone) : 'Member');
                 prefix = `<span class="text-[#8696a0] font-semibold">${senderName}: </span>`;
             } else {
                 prefix = r.senderId == window.myUserId ? '<span class="text-[#8696a0]">✓ You: </span>' : '';
@@ -3766,10 +4078,18 @@
 
         // Toggle section visibility
         if (chatsSection) {
-            if (chatMatches > 0) { chatsSection.classList.remove('hidden'); } else { chatsSection.classList.add('hidden'); }
+            if (chatMatches > 0) {
+                chatsSection.classList.remove('hidden');
+            } else {
+                chatsSection.classList.add('hidden');
+            }
         }
         if (msgsSection) {
-            if (msgMatches > 0) { msgsSection.classList.remove('hidden'); } else { msgsSection.classList.add('hidden'); }
+            if (msgMatches > 0) {
+                msgsSection.classList.remove('hidden');
+            } else {
+                msgsSection.classList.add('hidden');
+            }
         }
 
         // No results at all
@@ -3787,10 +4107,10 @@
     // Object.defineProperty to override window.filterSidebar and prevent overwrites
     if (Object.getOwnPropertyDescriptor(window, 'filterSidebar')?.configurable !== false) {
         Object.defineProperty(window, 'filterSidebar', {
-            get: function () {
+            get: function() {
                 return customFilterSidebar;
             },
-            set: function (val) {
+            set: function(val) {
                 if (val !== customFilterSidebar && typeof val === 'function') {
                     window._originalFilterSidebar = val;
                 }
@@ -3800,16 +4120,17 @@
     }
 
     // Override showToast to handle group chat navigation
-    (function () {
+    (function() {
         const originalShowToast = window.showToast;
-        window.showToast = function (title, body, otherUserId = null, otherName = null) {
+        window.showToast = function(title, body, otherUserId = null, otherName = null) {
             if (otherUserId && otherUserId.toString().startsWith('group_')) {
                 const groupId = 'group_' + otherUserId.toString().replace('group_', '');
                 const container = document.getElementById('toast_container');
                 const id = Date.now();
 
                 // For groups, we use selectGroupChat instead of selectChat
-                const clickAttr = `onclick="window.selectGroupChat('${groupId}', '${otherName.replace(/'/g, "\\'")}', ''); this.remove();"`;
+                const clickAttr =
+                    `onclick="window.selectGroupChat('${groupId}', '${otherName.replace(/'/g, "\\'")}', ''); this.remove();"`;
 
                 const html = `
                     <div id="toast_${id}" ${clickAttr} class="toast-enter bg-white border border-gray-100 rounded-2xl shadow-2xl p-4 flex gap-4 w-full pointer-events-auto cursor-pointer hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.98] transition-all border-l-4 border-l-green-500">
@@ -3841,11 +4162,12 @@
         };
     })();
 
-    window.selectGroupChat = function (groupId, name, avatar, searchMsgTime = null) {
+    window.selectGroupChat = function(groupId, name, avatar, searchMsgTime = null) {
         // Highlight selected group item in sidebar
         document.querySelectorAll('.user-chat-item').forEach(el => {
             el.classList.remove('active');
-            if (el.getAttribute('id') === `group_sidebar_${groupId}` || el.getAttribute('data-groupid') === groupId) {
+            if (el.getAttribute('id') === `group_sidebar_${groupId}` || el.getAttribute('data-groupid') ===
+                groupId) {
                 el.classList.add('active');
             }
         });
@@ -3883,10 +4205,12 @@
 
                 if (gData.users && window.activeChatUser) {
                     window.activeChatUser.users = uList.map(uid => {
-                        const contact = window.allContacts ? window.allContacts.find(c => String(c.id) === String(uid)) : null;
+                        const contact = window.allContacts ? window.allContacts.find(c =>
+                            String(c.id) === String(uid)) : null;
                         return {
                             id: uid,
-                            name: contact ? (contact.name || contact.phone) : (String(uid) === String(window.myUserId) ? 'You' : 'Member'),
+                            name: contact ? (contact.name || contact.phone) : (String(
+                                uid) === String(window.myUserId) ? 'You' : 'Member'),
                             phone: contact ? contact.phone : '',
                             avatar: contact ? contact.avatar : ''
                         };
@@ -3914,13 +4238,18 @@
                 if (gData.pinned_msgs && typeof gData.pinned_msgs === 'object') {
                     for (const [key, val] of Object.entries(gData.pinned_msgs)) {
                         window._groupPinnedMsgKeys.add(key);
-                        window._groupPinnedMsgsList.push({ key, text: val.text, time: val.time || 0 });
+                        window._groupPinnedMsgsList.push({
+                            key,
+                            text: val.text,
+                            time: val.time || 0
+                        });
                     }
                     window._groupPinnedMsgsList.sort((a, b) => b.time - a.time);
 
                     if (pinBar && pinText && pinCount) {
                         const count = window._groupPinnedMsgsList.length;
-                        pinCount.textContent = count === 1 ? '1 pinned message' : `${count} pinned messages`;
+                        pinCount.textContent = count === 1 ? '1 pinned message' :
+                            `${count} pinned messages`;
                         pinText.textContent = window._groupPinnedMsgsList[0].text;
                         pinBar.classList.remove('hidden');
                     }
@@ -3961,10 +4290,12 @@
             if (group && group.users && window.activeChatUser) {
                 let uList = Array.isArray(group.users) ? group.users : Object.values(group.users);
                 window.activeChatUser.users = uList.map(uid => {
-                    const contact = window.allContacts ? window.allContacts.find(c => String(c.id) === String(uid)) : null;
+                    const contact = window.allContacts ? window.allContacts.find(c => String(c
+                        .id) === String(uid)) : null;
                     return {
                         id: uid,
-                        name: contact ? (contact.name || contact.phone) : (String(uid) === String(window.myUserId) ? 'You' : 'Member'),
+                        name: contact ? (contact.name || contact.phone) : (String(uid) === String(
+                            window.myUserId) ? 'You' : 'Member'),
                         phone: contact ? contact.phone : '',
                         avatar: contact ? contact.avatar : ''
                     };
@@ -3975,7 +4306,8 @@
             if (window.globalMessages) {
                 for (let key in window.globalMessages) {
                     const msg = window.globalMessages[key];
-                    if (msg.sender_id != window.myUserId && (!msg.read_by || !msg.read_by[window.myUserId])) {
+                    if (msg.sender_id != window.myUserId && (!msg.read_by || !msg.read_by[window
+                            .myUserId])) {
                         window.update(window.ref(window.db, `groups/${groupId}/messages/${key}/read_by`), {
                             [window.myUserId]: Math.floor(Date.now() / 1000)
                         });
@@ -3990,7 +4322,8 @@
         }
 
         const searchInput = document.getElementById('sidebar_search');
-        window.activeSearchQuery = (searchInput && searchInput.value.trim().length > 0) ? searchInput.value.trim().toLowerCase() : null;
+        window.activeSearchQuery = (searchInput && searchInput.value.trim().length > 0) ? searchInput.value.trim()
+            .toLowerCase() : null;
         window.activeSearchMsgTime = searchMsgTime || null;
         window._searchScrolled = false;
 
@@ -4050,7 +4383,7 @@
         // that when a user is selected, we restore main_chat_column and hide group chat.
         if (!window._selectChatHijacked) {
             const originalSelectChat = window.selectChat;
-            window.selectChat = function () {
+            window.selectChat = function() {
                 // Hide group chat content
                 const gContent = document.getElementById('active_group_chat_content');
                 if (gContent) {
@@ -4068,7 +4401,7 @@
         // Hijack backToSidebar for mobile navigation
         if (!window._backToSidebarHijacked) {
             const originalBackToSidebar = window.backToSidebar;
-            window.backToSidebar = function () {
+            window.backToSidebar = function() {
                 const gContent = document.getElementById('active_group_chat_content');
                 if (gContent) {
                     gContent.classList.add('hidden');
@@ -4080,7 +4413,8 @@
             };
             window._backToSidebarHijacked = true;
         }
-        const activeAvatar = avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(activeName)}&background=202c33&color=fff`;
+        const activeAvatar = avatar ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(activeName)}&background=202c33&color=fff`;
         window.activeChatAvatar = activeAvatar;
 
         window.activeChatUser = {
@@ -4096,7 +4430,8 @@
             document.getElementById('active_group_chat_title').textContent = activeName;
         }
         if (document.getElementById('active_group_chat_avatar')) {
-            document.getElementById('active_group_chat_avatar').innerHTML = `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
+            document.getElementById('active_group_chat_avatar').innerHTML =
+                `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
         }
 
         document.getElementById('active_chat_title').textContent = activeName;
@@ -4107,10 +4442,12 @@
             subtitle.classList.add('text-gray-500');
         }
 
-        document.getElementById('active_chat_avatar').innerHTML = `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
+        document.getElementById('active_chat_avatar').innerHTML =
+            `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
 
         document.getElementById('call_dropdown_name').textContent = activeName;
-        document.getElementById('call_dropdown_avatar').innerHTML = `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
+        document.getElementById('call_dropdown_avatar').innerHTML =
+            `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
 
         const badge = document.getElementById(`group_unread_badge_${groupId}`);
         if (badge) {
@@ -4152,7 +4489,8 @@
             window.globalMessages[key] = data;
 
             // Check if this is the specific searched message (by timestamp)
-            const isSearchMatch = window.activeSearchMsgTime && data.time && data.time == window.activeSearchMsgTime;
+            const isSearchMatch = window.activeSearchMsgTime && data.time && data.time == window
+                .activeSearchMsgTime;
             const searchHighlightClass = isSearchMatch ? 'search-msg-highlight' : '';
 
             // Auto-read new messages
@@ -4176,15 +4514,21 @@
             }
 
             const isMe = data.sender_id == window.myUserId;
-            const time = new Date(data.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const time = new Date(data.time * 1000).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
 
             let mediaContent = '';
             if (data.type === 'image' && data.file_url) {
-                mediaContent = `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
+                mediaContent =
+                    `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
             } else if (data.type === 'video' && data.file_url) {
-                mediaContent = `<video src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs rounded-lg mb-2"></video>`;
+                mediaContent =
+                    `<video src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs rounded-lg mb-2"></video>`;
             } else if (data.type === 'audio' && data.file_url) {
-                mediaContent = `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;
+                mediaContent =
+                    `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;
             } else if (data.type === 'document' && data.file_url) {
                 mediaContent = `
                     <div class="relative rounded-lg overflow-hidden border border-black/10 bg-black/5 mb-1 cursor-pointer hover:bg-black/10 transition-colors w-[260px] sm:w-[280px]" onclick="window.open('${data.file_url}', '_blank')">
@@ -4226,7 +4570,8 @@
                 }
 
                 let nameColor = (rSenderName === "You" || rIsMe) ? 'text-[#ea005e]' : 'text-[#00a884]';
-                let borderColor = (rSenderName === "You" || rIsMe) ? 'border-[#ea005e]' : 'border-[#00a884]';
+                let borderColor = (rSenderName === "You" || rIsMe) ? 'border-[#ea005e]' :
+                    'border-[#00a884]';
 
                 replyPreviewHtml = `
                     <div class="bg-black/5 border-l-4 ${borderColor} p-1.5 rounded mb-1 cursor-pointer select-none max-w-full" onclick="if(document.getElementById('msg_${data.reply_to_id}')){document.getElementById('msg_${data.reply_to_id}').scrollIntoView({behavior:'smooth'})}">
@@ -4245,21 +4590,25 @@
                 let durationText = '';
                 if (isCompleted && data.call_duration) {
                     const d = data.call_duration;
-                    if (d >= 3600) durationText = Math.floor(d / 3600) + ' hr ' + Math.floor((d % 3600) / 60) + ' min';
+                    if (d >= 3600) durationText = Math.floor(d / 3600) + ' hr ' + Math.floor((d % 3600) /
+                        60) + ' min';
                     else if (d >= 60) durationText = Math.floor(d / 60) + ' min';
                     else durationText = d + ' secs';
                 } else if (isMissed) durationText = 'Missed';
                 else if (isNoAnswer) durationText = 'No answer';
 
                 const iconColor = isMissed ? '#ef4444' : (isMe ? '#00a884' : '#8696a0');
-                const callIcon = isVoice
-                    ? `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>`
-                    : `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`;
+                const callIcon = isVoice ?
+                    `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>` :
+                    `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`;
 
                 const callLabel = isVoice ? 'Voice call' : 'Video call';
-                const callTitle = isMissed ? (isVoice ? 'Missed voice call' : 'Missed video call') : callLabel;
+                const callTitle = isMissed ? (isVoice ? 'Missed voice call' : 'Missed video call') :
+                    callLabel;
 
-                const tapAction = isMissed && !isMe ? `onclick="event.stopPropagation(); ${isVoice ? 'window.startGroupVoiceCall()' : 'window.startGroupVideoCall()'}" style="cursor:pointer"` : '';
+                const tapAction = isMissed && !isMe ?
+                    `onclick="event.stopPropagation(); ${isVoice ? 'window.startGroupVoiceCall()' : 'window.startGroupVideoCall()'}" style="cursor:pointer"` :
+                    '';
 
                 mediaContent = `
                     <div class="flex items-center gap-3 py-1 min-w-[180px]" ${tapAction}>
@@ -4289,12 +4638,15 @@
                 const matchUser = window.allContacts.find(c => c.id == data.sender_id);
                 if (matchUser) {
                     senderDisplayName = matchUser.name || matchUser.phone || "Member";
-                    senderAvatar = matchUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName.charAt(0))}&background=2a3942&color=fff`;
+                    senderAvatar = matchUser.avatar ||
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName.charAt(0))}&background=2a3942&color=fff`;
                 } else {
-                    senderAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName.charAt(0))}&background=2a3942&color=fff`;
+                    senderAvatar =
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName.charAt(0))}&background=2a3942&color=fff`;
                 }
             } else {
-                senderAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName.charAt(0))}&background=2a3942&color=fff`;
+                senderAvatar =
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName.charAt(0))}&background=2a3942&color=fff`;
             }
 
             const msgHtml = `
@@ -4340,12 +4692,15 @@
                                     ${window.getGroupTickSVG(getMsgGroupStatus(data))}
                                 </span>` : ''}
                         </div>
+                        <div id="reactions_${key}" class="hidden"></div>
                     </div>
                 </div>`;
 
             const gMsgs = document.getElementById('group_messages');
             if (gMsgs) {
                 gMsgs.insertAdjacentHTML('beforeend', msgHtml);
+
+                if (data.reactions) window.renderReactions(key, data.reactions, isMe);
 
                 if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
                     const sIcon = document.getElementById('star_icon_' + key);
@@ -4358,7 +4713,10 @@
                     setTimeout(() => {
                         const firstMatch = gMsgs.querySelector('.search-msg-highlight');
                         if (firstMatch) {
-                            firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            firstMatch.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
                         }
                     }, 500);
                 } else if (!window.activeSearchQuery) {
@@ -4380,9 +4738,21 @@
             }, 100);
         });
 
+        window.unsubscribeRemoved = window.onChildRemoved(messagesRef, (snapshot) => {
+            const key = snapshot.key;
+            const msgEl = document.getElementById('msg_' + key);
+            if (msgEl) msgEl.remove();
+            delete window.globalMessages[key];
+        });
+
         window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
             const data = snapshot.val();
             const key = snapshot.key;
+            
+            const oldMsg = window.globalMessages[key];
+            const oldReactions = oldMsg ? (oldMsg.reactions || {}) : {};
+            const newReactions = data.reactions || {};
+            
             window.globalMessages[key] = data;
 
             const isMe = data.sender_id == window.myUserId;
@@ -4390,6 +4760,31 @@
                 const statusEl = document.getElementById('status_icon_' + key);
                 if (statusEl) {
                     statusEl.innerHTML = window.getGroupTickSVG(getMsgGroupStatus(data));
+                }
+            }
+
+            window.renderReactions(key, newReactions, isMe);
+
+            // Notification for new reactions on MY messages
+            if (isMe) {
+                for (const [uid, emoji] of Object.entries(newReactions)) {
+                    if (uid != window.myUserId && oldReactions[uid] !== emoji) {
+                        const reactionKey = `${key}_${uid}_${emoji}`;
+                        window.seenReactions = window.seenReactions || new Set();
+                        if (!window.seenReactions.has(reactionKey)) {
+                            window.seenReactions.add(reactionKey);
+                            let reactorName = 'Someone';
+                            if (window.allContacts) {
+                                const contact = window.allContacts.find(c => c.id == uid);
+                                if (contact) reactorName = contact.name || contact.phone;
+                            }
+                            const groupName = window.activeChatName || 'Group';
+                            window.showToast('Reaction in ' + groupName, `${reactorName} reacted: ${emoji}`);
+                            if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
+                                new Notification(groupName, { body: `${reactorName} reacted: ${emoji}` });
+                            }
+                        }
+                    }
                 }
             }
 
@@ -4409,11 +4804,13 @@
 
         // Tab Visibility for Group
         document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'visible' && window.currentChatId && window.currentChatId.startsWith('group_')) {
+            if (document.visibilityState === 'visible' && window.currentChatId && window.currentChatId
+                .startsWith('group_')) {
                 const gId = window.currentChatId;
                 for (let key in window.globalMessages) {
                     let msg = window.globalMessages[key];
-                    if (msg.sender_id != window.myUserId && (!msg.read_by || !msg.read_by[window.myUserId])) {
+                    if (msg.sender_id != window.myUserId && (!msg.read_by || !msg.read_by[window
+                            .myUserId])) {
                         window.update(window.ref(window.db, `groups/${gId}/messages/${key}/read_by`), {
                             [window.myUserId]: Math.floor(Date.now() / 1000)
                         });
@@ -4426,7 +4823,7 @@
     // --- ADD MEMBER MODAL LOGIC ---
     window._selectedAddMembers = new Set();
 
-    window.openAddGroupMembersModal = function () {
+    window.openAddGroupMembersModal = function() {
         const modal = document.getElementById('add_group_member_modal');
         const listContainer = document.getElementById('add_member_list');
         const footer = document.getElementById('add_member_footer');
@@ -4439,14 +4836,16 @@
         if (searchInput) searchInput.value = '';
 
         const currentMembers = window.activeChatUser ? window.activeChatUser.users.map(u => String(u.id)) : [];
-        const contactsToAdd = window.allContacts ? window.allContacts.filter(c => !currentMembers.includes(String(c.id))) : [];
+        const contactsToAdd = window.allContacts ? window.allContacts.filter(c => !currentMembers.includes(String(c
+            .id))) : [];
 
         let html = '';
         if (contactsToAdd.length === 0) {
             html = `<div class="p-8 text-center text-[#8696a0] text-sm">No new contacts to add</div>`;
         } else {
             contactsToAdd.forEach(user => {
-                const avatar = user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.phone)}&background=2a3942&color=fff`;
+                const avatar = user.avatar ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.phone)}&background=2a3942&color=fff`;
                 html += `
                     <div onclick="window.toggleAddMemberSelection('${user.id}')" class="flex items-center gap-4 p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item add-member-item" data-name="${(user.name || user.phone).toLowerCase()}">
                         <div class="relative shrink-0">
@@ -4467,11 +4866,11 @@
         modal.classList.remove('hidden');
     };
 
-    window.closeAddGroupMembersModal = function () {
+    window.closeAddGroupMembersModal = function() {
         document.getElementById('add_group_member_modal')?.classList.add('hidden');
     };
 
-    window.toggleAddMemberSelection = function (userId) {
+    window.toggleAddMemberSelection = function(userId) {
         const check = document.getElementById('check_add_' + userId);
         if (!check) return;
 
@@ -4494,7 +4893,7 @@
         }
     };
 
-    window.filterAddMembers = function () {
+    window.filterAddMembers = function() {
         const term = document.getElementById('add_member_search').value.toLowerCase();
         const items = document.querySelectorAll('.add-member-item');
         items.forEach(item => {
@@ -4503,7 +4902,7 @@
         });
     };
 
-    window.submitAddMembers = async function () {
+    window.submitAddMembers = async function() {
         if (window._selectedAddMembers.size === 0 || !window.activeChatUser) return;
 
         const groupId = window.activeChatUser.id;
@@ -4519,7 +4918,9 @@
                 let uList = Array.isArray(currentUsers) ? currentUsers : Object.values(currentUsers);
                 const updatedUsers = [...new Set([...uList, ...newMemberIds])];
 
-                await window.update(groupRef, { users: updatedUsers });
+                await window.update(groupRef, {
+                    users: updatedUsers
+                });
 
                 window.closeAddGroupMembersModal();
                 // Refresh group info panel if open
@@ -4537,7 +4938,7 @@
     };
 
     // --- EDIT GROUP NAME LOGIC ---
-    window.startEditGroupName = function () {
+    window.startEditGroupName = function() {
         const viewContainer = document.getElementById('group_info_name_container');
         const editContainer = document.getElementById('group_info_name_edit_container');
         const nameInput = document.getElementById('group_info_name_input');
@@ -4554,7 +4955,7 @@
         }
     };
 
-    window.cancelEditGroupName = function () {
+    window.cancelEditGroupName = function() {
         const viewContainer = document.getElementById('group_info_name_container');
         const editContainer = document.getElementById('group_info_name_edit_container');
 
@@ -4566,7 +4967,7 @@
         }
     };
 
-    window.saveGroupName = async function () {
+    window.saveGroupName = async function() {
         const nameInput = document.getElementById('group_info_name_input');
         const newName = nameInput ? nameInput.value.trim() : "";
 
@@ -4579,7 +4980,9 @@
         const groupId = window.activeChatUser.id;
         try {
             const groupRef = window.ref(window.db, 'groups/' + groupId);
-            await window.update(groupRef, { name: newName });
+            await window.update(groupRef, {
+                name: newName
+            });
             window.cancelEditGroupName();
 
             // Note: The UI for the title and group info will update automatically
@@ -4597,7 +5000,7 @@
     });
 
     // --- EDIT GROUP DESCRIPTION LOGIC ---
-    window.startEditGroupDescription = function () {
+    window.startEditGroupDescription = function() {
         const viewContainer = document.getElementById('group_info_description_container');
         const editContainer = document.getElementById('group_info_description_edit_container');
         const descInput = document.getElementById('group_info_description_input');
@@ -4619,7 +5022,7 @@
         }
     };
 
-    window.cancelEditGroupDescription = function () {
+    window.cancelEditGroupDescription = function() {
         const viewContainer = document.getElementById('group_info_description_container');
         const editContainer = document.getElementById('group_info_description_edit_container');
 
@@ -4630,7 +5033,7 @@
         }
     };
 
-    window.saveGroupDescription = async function () {
+    window.saveGroupDescription = async function() {
         const descInput = document.getElementById('group_info_description_input');
         const newDesc = descInput ? descInput.value.trim() : "";
 
@@ -4648,7 +5051,9 @@
         const groupId = window.activeChatUser.id;
         try {
             const groupRef = window.ref(window.db, 'groups/' + groupId);
-            await window.update(groupRef, { description: newDesc });
+            await window.update(groupRef, {
+                description: newDesc
+            });
             window.cancelEditGroupDescription();
         } catch (err) {
             console.error('Error updating group description:', err);
