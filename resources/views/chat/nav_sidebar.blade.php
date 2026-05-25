@@ -69,16 +69,17 @@
         </button>
 
         <!-- Archived -->
-        <button class="nav-item group" title="Archived">
+        <button id="nav_archived" class="nav-item group" title="Archived" onclick="window.showArchivedChats()">
             <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="text-[#8696a0] group-hover:text-[#e9edef]">
+                    stroke-linecap="round" stroke-linejoin="round" class="text-[#8696a0] group-[.active]:text-[#e9edef]">
                     <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                     <path d="M12 12v6"></path>
                     <path d="m9 15 3 3 3-3"></path>
                 </svg>
             </div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#00a884] rounded-r-full hidden group-[.active]:block"></div>
         </button>
 
         <!-- Meta AI -->

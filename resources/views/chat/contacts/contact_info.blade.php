@@ -147,24 +147,24 @@
 
         <!-- Bottom Actions -->
         <div class="flex flex-col py-2 mb-8">
-            <button
-                class="flex items-center px-4 py-4 gap-6 text-[#ea5656] hover:bg-[#202c33]/30 transition-colors w-full text-left">
+            <button id="contact_info_block_btn" onclick="window.toggleBlockContact(window.activeChatUser.id, 'user'); window.updateContactInfoBlockBtn();"
+                class="flex items-center px-4 py-4 gap-6 text-[#ea5656] hover:bg-[#202c33]/30 transition-colors w-full text-left focus:outline-none">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                     <path
                         d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z">
                     </path>
                 </svg>
-                <span class="text-[16px]">Block <span class="contact-name-placeholder">User</span></span>
+                <span class="text-[16px]"><span id="contact_info_block_text">Block</span> <span class="contact-name-placeholder">User</span></span>
             </button>
-            <button
-                class="flex items-center px-4 py-4 gap-6 text-[#ea5656] hover:bg-[#202c33]/30 transition-colors w-full text-left">
+            <button onclick="window.reportContact()"
+                class="flex items-center px-4 py-4 gap-6 text-[#ea5656] hover:bg-[#202c33]/30 transition-colors w-full text-left focus:outline-none">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                     <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"></path>
                 </svg>
                 <span class="text-[16px]">Report <span class="contact-name-placeholder">User</span></span>
             </button>
-            <button
-                class="flex items-center px-4 py-4 gap-6 text-[#ea5656] hover:bg-[#202c33]/30 transition-colors w-full text-left">
+            <button onclick="if(window.openDeleteModal) { window.openDeleteModal('Delete this chat?', () => { window.deleteChatMessages(window.activeChatUser.id, 'user'); window.closeContactInfo(); }); } else { if(confirm('Delete this chat?')) { window.deleteChatMessages(window.activeChatUser.id, 'user'); window.closeContactInfo(); } }"
+                class="flex items-center px-4 py-4 gap-6 text-[#ea5656] hover:bg-[#202c33]/30 transition-colors w-full text-left focus:outline-none">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                 </svg>
@@ -190,6 +190,8 @@
 
         // Update placeholders in block/report buttons
         document.querySelectorAll('.contact-name-placeholder').forEach(el => el.textContent = user.name);
+        
+        if (window.updateContactInfoBlockBtn) window.updateContactInfoBlockBtn();
 
         const panel = document.getElementById('contact_info_panel');
         const mainChat = document.getElementById('main_chat_column');
@@ -269,5 +271,32 @@
             if (badge) badge.textContent = data ? Object.keys(data).length : 0;
             panel.classList.remove('hidden');
         });
+    };
+
+    window.updateContactInfoBlockBtn = function() {
+        const user = window.activeChatUser;
+        if (!user) return;
+        const elementId = `user_sidebar_${user.id}`;
+        const isBlocked = window.blockedUsers?.includes(elementId);
+        const textSpan = document.getElementById('contact_info_block_text');
+        if (textSpan) {
+            textSpan.textContent = isBlocked ? 'Unblock' : 'Block';
+        }
+    };
+
+    window.reportContact = function() {
+        const user = window.activeChatUser;
+        if (!user) return;
+        
+        if (confirm(`Report ${user.name} to WhatsApp? The last 5 messages from this contact will be forwarded. If you block this contact and delete the chat, messages will only be removed from this device and your devices on the newer versions of WhatsApp.`)) {
+            // Mimic Report -> Block and Delete
+            const elementId = `user_sidebar_${user.id}`;
+            if (!window.blockedUsers?.includes(elementId)) {
+                window.toggleBlockContact(user.id, 'user');
+            }
+            window.deleteChatMessages(user.id, 'user');
+            window.closeContactInfo();
+            window.showToast?.('Report sent', `Contact reported and blocked.`);
+        }
     };
 </script>

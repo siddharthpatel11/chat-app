@@ -738,15 +738,38 @@
                                     </button>
 
                                     <!-- Menu Icon -->
-                                    <button
-                                        class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
-                                        title="Menu">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
-                                            </path>
-                                        </svg>
-                                    </button>
+                                    <div class="relative">
+                                        <button id="private_header_more_btn" onclick="togglePrivateHeaderMoreMenu(event)"
+                                            class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                                            title="Menu">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                                                </path>
+                                            </svg>
+                                        </button>
+                                        
+                                        <!-- Private Header More Options Dropdown -->
+                                        <div id="private_header_more_dropdown"
+                                            class="hidden absolute top-12 right-0 w-[240px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
+                                            <button onclick="window.openContactInfo(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Contact info</span></button>
+                                            <button onclick="toggleSearchPanel(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Search</span></button>
+                                            <button onclick="window.selectMessage(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Select messages</span></button>
+                                            <button onclick="window.toggleMuteChat(window.activeChatUser.id, 'user', window.mutedChats[`user_sidebar_${window.activeChatUser.id}`] ? null : 'always'); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="private_header_mute_text">Mute notifications</span></button>
+                                            <button onclick="togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Disappearing messages</span></button>
+                                            <button onclick="window.toggleLockChat(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="private_header_lock_text">Lock chat</span></button>
+                                            <button onclick="window.toggleFavouriteChat(window.activeChatUser.id, 'user'); window.updatePrivateHeaderFavouriteText(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="private_header_favourite_text">Add to favourites</span></button>
+                                            <button onclick="togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Add to list</span></button>
+                                            <button onclick="window.backToSidebar(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Close chat</span></button>
+                                            <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
+                                            <button onclick="window.reportContact(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Report</span></button>
+                                            <button onclick="window.toggleBlockContact(window.activeChatUser.id, 'user'); window.updateBlockedUI(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
+                                                <span class="text-[15px]"><span id="private_header_block_text">Block</span></span>
+                                            </button>
+                                            <button onclick="if(confirm('Clear this chat?')) { window.clearChatMessages(window.activeChatUser.id, 'user'); }; togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Clear chat</span></button>
+                                            <button onclick="if(window.openDeleteModal) { window.openDeleteModal('Delete this chat?', () => { window.deleteChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); }); } else { if(confirm('Delete this chat?')) { window.deleteChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); } }" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Delete chat</span></button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -995,13 +1018,13 @@
                                 </div>
                                 <!-- Input Area Container -->
                                 <div id="input_area_container"
-                                    class="flex-1 relative flex items-center bg-white rounded-lg shadow-sm">
+                                    class="flex-1 relative flex items-center bg-[#2a3942] rounded-xl shadow-sm overflow-hidden">
 
                                     <!-- State 1: Normal Text Input -->
                                     <div id="text_input_state" class="w-full relative flex items-center">
                                         <input type="text" id="msg" oninput="handleInputToggle()"
                                             onkeypress="handleKeyPress(event)" placeholder="Type a message"
-                                            class="w-full bg-transparent border-none rounded-lg pl-4 pr-10 py-2 text-[15px] focus:ring-0 text-gray-800 placeholder-gray-500 min-h-[40px]">
+                                            class="w-full bg-transparent border-none pl-4 pr-10 py-2.5 text-[15px] focus:ring-0 text-[#d1d7db] placeholder-[#8696a0] min-h-[44px]">
                                         <!-- INSIDE MIC (Voice-to-Text) -->
                                         <button type="button" id="inside_mic_btn" onclick="toggleVoiceRecord()"
                                             class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
@@ -1091,6 +1114,11 @@
                                         </path>
                                     </svg>
                                 </button>
+                            </div>
+
+                            <!-- Blocked State Container -->
+                            <div id="blocked_state_container" class="hidden w-full h-[62px] flex items-center justify-center bg-[#202c33] text-[#8696a0] text-[14.5px] cursor-pointer hover:bg-[#202c33]/80 transition-colors" onclick="window.unblockCurrentContact()">
+                                You blocked this contact. Tap to unblock.
                             </div>
 
                             <!-- Bottom Selection Bar -->
@@ -1238,6 +1266,52 @@
             picker.classList.toggle('hidden');
         }
 
+        window.updatePrivateHeaderFavouriteText = function() {
+            const favText = document.getElementById('private_header_favourite_text');
+            if (favText && window.activeChatUser && window.favouriteChats) {
+                const isFav = window.favouriteChats.includes(`user_sidebar_${window.activeChatUser.id}`);
+                favText.textContent = isFav ? 'Remove from favourites' : 'Add to favourites';
+            }
+        };
+
+        window.togglePrivateHeaderMoreMenu = function(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('private_header_more_dropdown');
+            if (!dropdown) return;
+
+            const isHidden = dropdown.classList.contains('hidden');
+            if (isHidden) {
+                // Update block, favourite, mute, lock text based on state
+                if (window.activeChatUser) {
+                    const elementId = `user_sidebar_${window.activeChatUser.id}`;
+                    
+                    const isBlocked = window.blockedUsers?.includes(elementId);
+                    const blockText = document.getElementById('private_header_block_text');
+                    if (blockText) blockText.textContent = isBlocked ? 'Unblock' : 'Block';
+                    
+                    const isMuted = window.mutedChats && !!window.mutedChats[elementId];
+                    const muteText = document.getElementById('private_header_mute_text');
+                    if (muteText) muteText.textContent = isMuted ? 'Unmute notifications' : 'Mute notifications';
+                    
+                    const isLocked = window.lockedChats?.includes(elementId);
+                    const lockText = document.getElementById('private_header_lock_text');
+                    if (lockText) lockText.textContent = isLocked ? 'Unlock chat' : 'Lock chat';
+                    
+                    window.updatePrivateHeaderFavouriteText();
+                }
+
+                dropdown.classList.remove('hidden');
+                setTimeout(() => {
+                    dropdown.classList.remove('opacity-0', 'scale-95');
+                    dropdown.classList.add('opacity-100', 'scale-100');
+                }, 10);
+            } else {
+                dropdown.classList.remove('opacity-100', 'scale-100');
+                dropdown.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => dropdown.classList.add('hidden'), 200);
+            }
+        };
+
         // Close dropdowns when clicking outside
         document.addEventListener('click', function (event) {
             const emojiPicker = document.getElementById('emoji_picker_container');
@@ -1274,6 +1348,18 @@
                         if (bubbleEl) bubbleEl.style.zIndex = '';
                     }
                 });
+            }
+
+            // Close private header more dropdown
+            const privateHeaderDropdown = document.getElementById('private_header_more_dropdown');
+            const privateHeaderBtn = document.getElementById('private_header_more_btn');
+            if (privateHeaderDropdown && !privateHeaderDropdown.classList.contains('hidden')) {
+                const path = event.composedPath();
+                if (!path.includes(privateHeaderDropdown) && (!privateHeaderBtn || !path.includes(privateHeaderBtn))) {
+                    privateHeaderDropdown.classList.remove('opacity-100', 'scale-100');
+                    privateHeaderDropdown.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => privateHeaderDropdown.classList.add('hidden'), 200);
+                }
             }
         });
 
@@ -2629,6 +2715,12 @@
                     const data = snapshot.val();
                     const key = snapshot.key;
 
+                    // Ignore messages from blocked users
+                    const isBlocked = window.blockedUsers?.includes(`user_sidebar_${otherId}`);
+                    if (isBlocked && data.sender_id != window.myUserId) {
+                        return;
+                    }
+
                     // Cache message for search
                     if (data.text) {
                         // Avoid duplicates
@@ -2642,8 +2734,19 @@
                         }
                     }
 
+                    // Check if chat is deleted. If so, remove from deletedChats because a new message arrived
+                    const sidebarElementId = `user_sidebar_${otherId}`;
+                    const deletedIndex = window.deletedChats?.indexOf(sidebarElementId) ?? -1;
+                    if (deletedIndex > -1) {
+                        const clearedTime = window.clearedChats?.[sidebarElementId] || 0;
+                        if (data.time > clearedTime) {
+                            window.deletedChats.splice(deletedIndex, 1);
+                            localStorage.setItem('deleted_chats', JSON.stringify(window.deletedChats));
+                        }
+                    }
+
                     // Unhide the sidebar item if it was hidden (e.g. non-contact but has messages)
-                    const sidebarItem = document.getElementById(`user_sidebar_${otherId}`);
+                    const sidebarItem = document.getElementById(sidebarElementId);
                     if (sidebarItem && sidebarItem.classList.contains('hidden')) {
                         sidebarItem.classList.remove('hidden');
                         sidebarItem.classList.add('flex');
@@ -2973,6 +3076,11 @@
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_chats').classList.add('active');
+            
+            // Set filter back to all if coming from archived
+            if (window.activeSidebarFilter === 'archived') {
+                window.setSidebarFilter('all');
+            }
 
             // Toggle Views
             document.getElementById('status_view_container').classList.add('hidden');
@@ -2981,6 +3089,35 @@
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.remove('hidden');
             sidebar.classList.add('sm:flex', 'flex'); // Ensure both base and responsive flex are added
+
+            document.getElementById('chat_view_container').classList.remove('hidden');
+            document.getElementById('chat_view_container').classList.add('flex');
+
+            document.getElementById('sidebar_resizer').classList.remove('hidden');
+
+            const panel = document.getElementById('settings_panel');
+            if (panel && !panel.classList.contains('hidden')) {
+                window.toggleSettings();
+            }
+        };
+        
+        window.showArchivedChats = function() {
+            // Update Navigation UI
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav_archived')?.classList.add('active');
+
+            // Apply archived filter
+            if (window.setSidebarFilter) {
+                window.setSidebarFilter('archived');
+            }
+
+            // Ensure Sidebar is shown (similar to showChats)
+            document.getElementById('status_view_container').classList.add('hidden');
+            document.getElementById('status_view_container').classList.remove('flex');
+
+            const sidebar = document.getElementById('user_sidebar_container');
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('sm:flex', 'flex');
 
             document.getElementById('chat_view_container').classList.remove('hidden');
             document.getElementById('chat_view_container').classList.add('flex');
@@ -3288,6 +3425,22 @@
 
             window.unsubscribeAdded = window.onChildAdded(messagesRef, (snapshot) => {
                 const data = snapshot.val();
+                
+                // Check if message is older than clear timestamp
+                const isGroup = window.currentChatId.startsWith('group_');
+                const targetId = isGroup ? window.currentChatId.replace('group_', '') : window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
+                const elementId = isGroup ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                const clearedTime = window.clearedChats?.[elementId] || 0;
+                
+                if (data.time && data.time <= clearedTime) {
+                    return; // Ignore this message because chat was cleared after it was sent
+                }
+                
+                // Ignore messages from blocked users
+                if (!isGroup && window.blockedUsers?.includes(elementId) && data.sender_id != window.myUserId) {
+                    return;
+                }
+
                 const key = snapshot.key;
                 window.globalMessages[key] = data; // store for reply/forward
 
@@ -3602,6 +3755,9 @@
                     }
                 }
             });
+            
+            // Call updateBlockedUI to refresh UI state for newly selected chat
+            if (window.updateBlockedUI) window.updateBlockedUI();
         };
 
         // Handle Tab Visibility (Mark as read when returning to tab)
@@ -3690,6 +3846,16 @@
         window.isForwardSelection = false;
         window.selectedMessages = new Set();
         window._selectedForwardTargets = new Map(); // targetId => { type, name }
+
+        window.selectMessage = function() {
+            window.isSelectionMode = true;
+            document.getElementById('normal_header')?.classList.add('hidden');
+            document.getElementById('selection_header')?.classList.remove('hidden');
+            document.getElementById('selection_header')?.classList.add('flex');
+            
+            document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
+            document.getElementById('private_header_more_dropdown')?.classList.add('hidden');
+        };
 
         window.cancelSelection = function () {
             window.isSelectionMode = false;
@@ -4172,6 +4338,72 @@
                 const btnText = document.getElementById('star_btn_text_' + key);
                 if (btnText) btnText.textContent = 'Unstar';
             });
+        };
+
+        window.updateBlockedUI = function() {
+            if (!window.currentChatId || window.currentChatId.startsWith('group_')) {
+                // Group chats can't be blocked in this implementation
+                document.getElementById('normal_input_container')?.classList.remove('hidden');
+                document.getElementById('normal_input_container')?.classList.add('flex');
+                document.getElementById('blocked_state_container')?.classList.add('hidden');
+                document.getElementById('blocked_state_container')?.classList.remove('flex');
+                return;
+            }
+
+            const targetId = window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
+            const elementId = `user_sidebar_${targetId}`;
+            const isBlocked = window.blockedUsers?.includes(elementId);
+
+            const normalInput = document.getElementById('normal_input_container');
+            const blockedState = document.getElementById('blocked_state_container');
+
+            if (isBlocked) {
+                if (normalInput) {
+                    normalInput.classList.add('hidden');
+                    normalInput.classList.remove('flex');
+                }
+                if (blockedState) {
+                    blockedState.classList.remove('hidden');
+                    blockedState.classList.add('flex');
+                }
+            } else {
+                if (normalInput) {
+                    normalInput.classList.remove('hidden');
+                    normalInput.classList.add('flex');
+                }
+                if (blockedState) {
+                    blockedState.classList.add('hidden');
+                    blockedState.classList.remove('flex');
+                }
+            }
+        };
+
+        window.checkAndApplyClearedChatUI = function(clearedElementId) {
+            const isGroup = window.currentChatId && window.currentChatId.startsWith('group_');
+            if (!window.currentChatId) return;
+            
+            let activeElementId;
+            if (isGroup) {
+                activeElementId = `group_sidebar_${window.currentChatId.replace('group_', '')}`;
+            } else {
+                const targetId = window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
+                activeElementId = `user_sidebar_${targetId}`;
+            }
+
+            if (activeElementId === clearedElementId) {
+                // Clear messages container
+                const msgsContainer = document.getElementById('messages');
+                if (msgsContainer) {
+                    msgsContainer.innerHTML = '';
+                }
+                // Clear reply state
+                if (typeof window.cancelReply === 'function') window.cancelReply();
+            }
+            
+            // Also update the sidebar preview
+            const targetId = clearedElementId.replace('user_sidebar_', '').replace('group_sidebar_', '');
+            const lastMsgEl = document.getElementById(`last_msg_${targetId}`);
+            if (lastMsgEl) lastMsgEl.textContent = 'Click to chat';
         };
 
         window.loadStarredMessages();

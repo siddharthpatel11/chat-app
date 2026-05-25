@@ -17,11 +17,17 @@
     .group-mute:hover .submenu-mute {
         display: block !important;
     }
+    
+    .filter-hidden {
+        display: none !important;
+    }
 </style>
 
 <div id="user_sidebar_container"
     class="hidden sm:flex flex-col w-[30%] sm:min-w-[300px] border-r border-[#313d45] bg-[#111b21]">
-    <div class="h-16 bg-[#202c33] flex items-center px-4 justify-between shrink-0 border-b border-[#313d45]">
+    
+    <!-- Normal Sidebar Header -->
+    <div id="normal_sidebar_header" class="h-16 bg-[#202c33] flex items-center px-4 justify-between shrink-0 border-b border-[#313d45]">
         <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSettings()">
             <div
                 class="w-10 h-10 rounded-full overflow-hidden bg-[#202c33] flex items-center justify-center text-white border border-[#313d45]">
@@ -99,7 +105,6 @@
                     </button>
                 </div>
             </div>
-            
             <script>
                 document.addEventListener('DOMContentLoaded', () => {
                     const menuBtn = document.getElementById('sidebar_menu_btn');
@@ -121,8 +126,18 @@
             </script>
         </div>
     </div>
+    
+    <!-- Archived Sidebar Header -->
+    <div id="archived_sidebar_header" class="hidden h-16 bg-[#202c33] flex items-center px-4 gap-6 shrink-0 border-b border-[#313d45]">
+        <button onclick="window.showChats()" class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none p-1 rounded-full hover:bg-[#384b57]">
+            <svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+            </svg>
+        </button>
+        <span class="font-semibold text-lg text-[#e9edef]">Archived</span>
+    </div>
  
-    <div class="p-2 border-b border-[#202c33] bg-[#111b21]">
+    <div class="p-2 border-b border-[#202c33] bg-[#111b21] flex flex-col gap-2">
         <div id="sidebar_search_box"
             class="bg-[#202c33] rounded-lg flex items-center px-3 py-1.5 h-9 transition-all duration-200 focus-within:bg-[#2a3942]">
             <!-- Search / Back icon container -->
@@ -154,6 +169,14 @@
                     </path>
                 </svg>
             </button>
+        </div>
+        
+        <!-- Filters -->
+        <div class="flex items-center gap-2 px-1 overflow-x-auto custom-scrollbar pb-1">
+            <button onclick="window.setSidebarFilter('all')" id="filter_btn_all" class="px-3 py-1.5 rounded-full bg-[#2a3942] text-[#00a884] text-[14px] whitespace-nowrap transition-colors">All</button>
+            <button onclick="window.setSidebarFilter('unread')" id="filter_btn_unread" class="px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors">Unread</button>
+            <button onclick="window.setSidebarFilter('favourites')" id="filter_btn_favourites" class="px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors">Favourites</button>
+            <button onclick="window.setSidebarFilter('groups')" id="filter_btn_groups" class="px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors">Groups</button>
         </div>
     </div>
  
@@ -247,13 +270,13 @@
 
     <!-- User/Chat Context Menu Dropdown -->
     <div id="user_context_dropdown" class="hidden fixed w-64 bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[200] transform scale-95 opacity-0 transition-all duration-150 origin-top-right">
-        <button onclick="window.handleUserContextAction('archive')" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
+        <button id="context_archive_btn" onclick="window.handleUserContextAction('archive')" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
             <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
                 <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.81.97H5.44l.8-.97zM19 19H5V8h14v11zM11 10.5h2v4.09l1.45-1.45 1.41 1.41L12 18.41l-3.86-3.86 1.41-1.41L11 14.59V10.5z"></path>
             </svg>
             Archive chat
         </button>
-        <button onclick="window.handleUserContextAction('lock')" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
+        <button id="context_lock_btn" onclick="window.handleUserContextAction('lock')" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
             <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
             </svg>
@@ -262,19 +285,19 @@
         
         <!-- Mute Notifications with Submenu -->
         <div class="relative group-mute w-full">
-            <button class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center justify-between text-[14.5px] focus:outline-none">
+            <button id="context_mute_btn" onclick="if(window.mutedChats[window.activeChatTypeForMenu === 'group' ? `group_sidebar_${window.activeChatIdForMenu}` : `user_sidebar_${window.activeChatIdForMenu}`]) window.handleUserContextAction('mute_toggle')" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center justify-between text-[14.5px] focus:outline-none">
                 <div class="flex items-center gap-4">
                     <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
                         <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM19 12c0 2.76-1.9 5.07-4.5 5.72v2.06c3.74-.72 6.5-4.07 6.5-7.78s-2.76-7.06-6.5-7.78v2.06c2.6.65 4.5 2.96 4.5 5.72zM4.3 8.3H1.5v7.4h2.8l5.1 5.1V3.2L4.3 8.3z"></path>
                     </svg>
-                    Mute notifications
+                    <span id="context_mute_text">Mute notifications</span>
                 </div>
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#8696a0]">
+                <svg id="context_mute_arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#8696a0]">
                     <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
                 </svg>
             </button>
             <!-- Submenu (opens to the left) -->
-            <div class="hidden submenu-mute absolute right-full top-0 mr-[1px] w-48 bg-[#233138] rounded-lg shadow-xl border border-[#313d45] py-2 z-[210]">
+            <div id="context_mute_submenu" class="hidden submenu-mute absolute right-full top-0 mr-[1px] w-48 bg-[#233138] rounded-lg shadow-xl border border-[#313d45] py-2 z-[210]">
                 <button onclick="window.handleUserContextAction('mute', '8h')" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">8 hours</button>
                 <button onclick="window.handleUserContextAction('mute', '1w')" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">1 week</button>
                 <button onclick="window.handleUserContextAction('mute', 'always')" class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">Always</button>
@@ -293,7 +316,7 @@
             </svg>
             Mark as unread
         </button>
-        <button onclick="window.handleUserContextAction('favourite')" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
+        <button id="context_favourite_btn" onclick="window.handleUserContextAction('favourite')" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
             <svg viewBox="0 0 24 24" height="20" width="20" fill="none" stroke="currentColor" stroke-width="2" class="text-[#aebac1]">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
             </svg>
@@ -308,7 +331,7 @@
         
         <div class="h-[1px] bg-[#313d45] my-1.5"></div>
         
-        <button onclick="window.handleUserContextAction('block')" class="w-full text-left px-4 py-3 text-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
+        <button id="context_block_btn" onclick="window.handleUserContextAction('block')" class="w-full text-left px-4 py-3 text-red-500 hover:bg-red-500/10 transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
             <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-red-500">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm4.31-3.1L5.69 6.31C6.73 5.09 8.27 4.3 10 4.3c4.42 0 8 3.58 8 8 0 1.73-.79 3.27-2.01 4.31z"></path>
             </svg>
@@ -333,9 +356,72 @@
             const dropdown = document.getElementById('user_context_dropdown');
             let activeChatIdForMenu = null;
             let activeChatTypeForMenu = null; // 'user' or 'group'
+            
+            window.activeSidebarFilter = 'all';
 
             // Pinned chats management
             window.pinnedChats = JSON.parse(localStorage.getItem('pinned_chats') || '[]');
+            
+            // Favourites management
+            window.favouriteChats = JSON.parse(localStorage.getItem('favourite_chats') || '[]');
+            
+            // Archive, Lock, Mute management
+            window.archivedChats = JSON.parse(localStorage.getItem('archived_chats') || '[]');
+            window.lockedChats = JSON.parse(localStorage.getItem('locked_chats') || '[]');
+            window.mutedChats = JSON.parse(localStorage.getItem('muted_chats') || '{}');
+            
+            // Block, Clear, Delete management
+            window.blockedUsers = JSON.parse(localStorage.getItem('blocked_users') || '[]');
+            window.clearedChats = JSON.parse(localStorage.getItem('cleared_chats') || '{}');
+            window.deletedChats = JSON.parse(localStorage.getItem('deleted_chats') || '[]');
+
+            window.setSidebarFilter = function(filter) {
+                window.activeSidebarFilter = filter;
+                
+                // Update button styles for top filters
+                ['all', 'unread', 'favourites', 'groups'].forEach(f => {
+                    const btn = document.getElementById(`filter_btn_${f}`);
+                    if (btn) {
+                        if (f === filter && filter !== 'archived') {
+                            btn.classList.remove('text-[#8696a0]', 'hover:bg-[#2a3942]', 'bg-[#202c33]');
+                            btn.classList.add('bg-[#2a3942]', 'text-[#00a884]');
+                        } else {
+                            btn.classList.remove('bg-[#2a3942]', 'text-[#00a884]');
+                            btn.classList.add('text-[#8696a0]', 'hover:bg-[#2a3942]', 'bg-[#202c33]');
+                        }
+                    }
+                });
+                
+                // Show/hide filter container depending on view
+                const filterContainer = document.getElementById('sidebar_filters_container');
+                const normalHeader = document.getElementById('normal_sidebar_header');
+                const archivedHeader = document.getElementById('archived_sidebar_header');
+                
+                if (filter === 'archived') {
+                    if (filterContainer) {
+                        filterContainer.classList.add('hidden');
+                        filterContainer.classList.remove('flex');
+                    }
+                    if (normalHeader) normalHeader.classList.add('hidden');
+                    if (archivedHeader) archivedHeader.classList.remove('hidden');
+                    if (archivedHeader) archivedHeader.classList.add('flex');
+                } else {
+                    if (filterContainer) {
+                        filterContainer.classList.remove('hidden');
+                        filterContainer.classList.add('flex');
+                    }
+                    if (normalHeader) {
+                        normalHeader.classList.remove('hidden');
+                        normalHeader.classList.add('flex');
+                    }
+                    if (archivedHeader) {
+                        archivedHeader.classList.add('hidden');
+                        archivedHeader.classList.remove('flex');
+                    }
+                }
+                
+                window.sortSidebar();
+            };
 
             window.applyPinVisualState = function(itemEl, isPinned) {
                 if (!itemEl) return;
@@ -385,6 +471,45 @@
 
                 const items = Array.from(container.children).filter(el => el.classList.contains('user-chat-item'));
                 if (items.length === 0) return;
+                
+                const filter = window.activeSidebarFilter || 'all';
+
+                items.forEach(item => {
+                    let matchesFilter = true;
+                    if (filter === 'unread') {
+                        const idSuffix = item.id.replace('user_sidebar_', '').replace('group_sidebar_', '');
+                        const isGroup = item.id.startsWith('group_sidebar_');
+                        const badge = isGroup ? document.getElementById(`group_unread_badge_${idSuffix}`) : document.getElementById(`unread_badge_${idSuffix}`);
+                        
+                        matchesFilter = badge && !badge.classList.contains('hidden') && parseInt(badge.textContent) > 0;
+                    } else if (filter === 'favourites') {
+                        matchesFilter = window.favouriteChats.includes(item.id);
+                    } else if (filter === 'groups') {
+                        matchesFilter = item.id.startsWith('group_sidebar_');
+                    } else if (filter === 'archived') {
+                        matchesFilter = window.archivedChats.includes(item.id);
+                    }
+                    
+                    // Hide archived chats from all other views
+                    if (filter !== 'archived' && window.archivedChats.includes(item.id)) {
+                        matchesFilter = false;
+                    }
+                    
+                    // Hide deleted chats unless new message exists (timestamp > cleared timestamp)
+                    if (window.deletedChats.includes(item.id)) {
+                        const itemTime = parseFloat(item.getAttribute('data-timestamp') || '0');
+                        const clearedTime = window.clearedChats[item.id] || 0;
+                        if (itemTime <= clearedTime) {
+                            matchesFilter = false;
+                        }
+                    }
+
+                    if (matchesFilter) {
+                        item.classList.remove('filter-hidden');
+                    } else {
+                        item.classList.add('filter-hidden');
+                    }
+                });
 
                 items.sort((a, b) => {
                     const aPinned = window.pinnedChats.includes(a.id);
@@ -424,6 +549,48 @@
 
                 const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                 const isPinned = window.pinnedChats.includes(elementId);
+                const isFavourite = window.favouriteChats.includes(elementId);
+                const isArchived = window.archivedChats.includes(elementId);
+                const isLocked = window.lockedChats.includes(elementId);
+                const isMuted = !!window.mutedChats[elementId];
+                
+                // Update Archive text
+                const archiveBtn = document.getElementById('context_archive_btn');
+                if (archiveBtn) {
+                    archiveBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
+                            <path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM6.24 5h11.52l.81.97H5.44l.8-.97zM19 19H5V8h14v11zM11 10.5h2v4.09l1.45-1.45 1.41 1.41L12 18.41l-3.86-3.86 1.41-1.41L11 14.59V10.5z"></path>
+                        </svg>
+                        ${isArchived ? 'Unarchive chat' : 'Archive chat'}
+                    `;
+                }
+                
+                // Update Lock text
+                const lockBtn = document.getElementById('context_lock_btn');
+                if (lockBtn) {
+                    lockBtn.innerHTML = `
+                        <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
+                            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+                        </svg>
+                        ${isLocked ? 'Unlock chat' : 'Lock chat'}
+                    `;
+                }
+
+                // Update Mute text and behavior
+                const muteText = document.getElementById('context_mute_text');
+                const muteArrow = document.getElementById('context_mute_arrow');
+                const muteSubmenu = document.getElementById('context_mute_submenu');
+                if (muteText && muteArrow && muteSubmenu) {
+                    if (isMuted) {
+                        muteText.textContent = 'Unmute notifications';
+                        muteArrow.style.display = 'none';
+                        muteSubmenu.classList.remove('submenu-mute'); // remove hover trigger
+                    } else {
+                        muteText.textContent = 'Mute notifications';
+                        muteArrow.style.display = 'block';
+                        muteSubmenu.classList.add('submenu-mute'); // add hover trigger
+                    }
+                }
                 
                 // Update context menu pin button text and icon
                 const pinBtn = document.getElementById('context_pin_btn');
@@ -442,6 +609,52 @@
                             </svg>
                             Pin chat
                         `;
+                    }
+                }
+                
+                // Update context menu favourite button text and icon
+                const favBtn = document.getElementById('context_favourite_btn');
+                if (favBtn) {
+                    if (isFavourite) {
+                        favBtn.innerHTML = `
+                            <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+                            </svg>
+                            Remove from favourites
+                        `;
+                    } else {
+                        favBtn.innerHTML = `
+                            <svg viewBox="0 0 24 24" height="20" width="20" fill="none" stroke="currentColor" stroke-width="2" class="text-[#aebac1]">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            Add to favourites
+                        `;
+                    }
+                }
+
+                // Update context menu block button text
+                const blockBtn = document.getElementById('context_block_btn');
+                if (blockBtn) {
+                    if (type === 'group') {
+                        blockBtn.style.display = 'none'; // Cannot block groups in WhatsApp
+                    } else {
+                        blockBtn.style.display = 'flex';
+                        const isBlocked = window.blockedUsers.includes(elementId);
+                        if (isBlocked) {
+                            blockBtn.innerHTML = `
+                                <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-red-500">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm4.31-3.1L5.69 6.31C6.73 5.09 8.27 4.3 10 4.3c4.42 0 8 3.58 8 8 0 1.73-.79 3.27-2.01 4.31z"></path>
+                                </svg>
+                                Unblock
+                            `;
+                        } else {
+                            blockBtn.innerHTML = `
+                                <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-red-500">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm4.31-3.1L5.69 6.31C6.73 5.09 8.27 4.3 10 4.3c4.42 0 8 3.58 8 8 0 1.73-.79 3.27-2.01 4.31z"></path>
+                                </svg>
+                                Block
+                            `;
+                        }
                     }
                 }
 
@@ -487,26 +700,112 @@
                 if (action === 'pin') {
                     window.togglePinChat(activeChatIdForMenu, activeChatTypeForMenu);
                 } else if (action === 'archive') {
-                    window.showToast?.('Chat Archived', `The ${chatName.toLowerCase()} has been archived.`);
+                    window.toggleArchiveChat(activeChatIdForMenu, activeChatTypeForMenu);
                 } else if (action === 'lock') {
-                    window.showToast?.('Chat Locked', `The ${chatName.toLowerCase()} has been locked.`);
+                    window.toggleLockChat(activeChatIdForMenu, activeChatTypeForMenu);
                 } else if (action === 'mute') {
-                    window.showToast?.('Mute Notifications', `Notifications muted for ${option === '8h' ? '8 hours' : option === '1w' ? '1 week' : 'always'}.`);
+                    window.toggleMuteChat(activeChatIdForMenu, activeChatTypeForMenu, option);
+                } else if (action === 'mute_toggle') {
+                    window.toggleMuteChat(activeChatIdForMenu, activeChatTypeForMenu, null);
                 } else if (action === 'unread') {
                     window.showToast?.('Marked Unread', `Chat marked as unread.`);
                 } else if (action === 'favourite') {
-                    window.showToast?.('Added to Favourites', `Chat added to favourites.`);
+                    window.toggleFavouriteChat(activeChatIdForMenu, activeChatTypeForMenu);
                 } else if (action === 'add_to_list') {
                     window.showToast?.('Added to List', `Chat added to custom list.`);
                 } else if (action === 'block') {
-                    window.showToast?.('Contact Blocked', `Contact has been blocked.`);
+                    window.toggleBlockContact(activeChatIdForMenu, activeChatTypeForMenu);
                 } else if (action === 'clear') {
-                    window.showToast?.('Chat Cleared', `Messages in this chat have been cleared.`);
+                    if (window.openDeleteModal) {
+                        window.openDeleteModal('Clear this chat?', () => window.clearChatMessages(activeChatIdForMenu, activeChatTypeForMenu));
+                    } else {
+                        if (confirm('Clear this chat?')) window.clearChatMessages(activeChatIdForMenu, activeChatTypeForMenu);
+                    }
                 } else if (action === 'delete') {
-                    window.showToast?.('Chat Deleted', `The chat has been deleted.`);
+                    if (window.openDeleteModal) {
+                        window.openDeleteModal('Delete this chat?', () => window.deleteChatMessages(activeChatIdForMenu, activeChatTypeForMenu));
+                    } else {
+                        if (confirm('Delete this chat?')) window.deleteChatMessages(activeChatIdForMenu, activeChatTypeForMenu);
+                    }
                 }
 
                 window.closeUserContextMenu();
+            };
+
+            window.toggleBlockContact = function(targetId, type) {
+                if (type === 'group') return;
+                const elementId = `user_sidebar_${targetId}`;
+                const index = window.blockedUsers.indexOf(elementId);
+                let isBlocked = false;
+                
+                if (index > -1) {
+                    window.blockedUsers.splice(index, 1);
+                } else {
+                    window.blockedUsers.push(elementId);
+                    isBlocked = true;
+                }
+                
+                localStorage.setItem('blocked_users', JSON.stringify(window.blockedUsers));
+                window.showToast?.(isBlocked ? 'Contact Blocked' : 'Contact Unblocked', `The contact has been ${isBlocked ? 'blocked' : 'unblocked'}.`);
+                if (window.updateBlockedUI) window.updateBlockedUI();
+            };
+
+            window.unblockCurrentContact = function() {
+                if (window.currentChatId && !window.currentChatId.startsWith('group_')) {
+                    const targetId = window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
+                    if (targetId) {
+                        window.toggleBlockContact(targetId, 'user');
+                    }
+                }
+            };
+
+            window.clearChatMessages = function(targetId, type) {
+                const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                window.clearedChats[elementId] = Math.floor(Date.now() / 1000);
+                localStorage.setItem('cleared_chats', JSON.stringify(window.clearedChats));
+                
+                // Clear UI if currently open
+                if (window.checkAndApplyClearedChatUI) window.checkAndApplyClearedChatUI(elementId);
+                
+                window.showToast?.('Chat Cleared', `Messages in this chat have been cleared for you.`);
+            };
+
+            window.deleteChatMessages = function(targetId, type) {
+                const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                window.clearedChats[elementId] = Math.floor(Date.now() / 1000);
+                localStorage.setItem('cleared_chats', JSON.stringify(window.clearedChats));
+                
+                if (!window.deletedChats.includes(elementId)) {
+                    window.deletedChats.push(elementId);
+                    localStorage.setItem('deleted_chats', JSON.stringify(window.deletedChats));
+                }
+                
+                window.sortSidebar();
+                
+                // Clear UI if currently open
+                if (window.checkAndApplyClearedChatUI) window.checkAndApplyClearedChatUI(elementId);
+                
+                window.showToast?.('Chat Deleted', `The chat has been deleted.`);
+            };
+
+            window.toggleFavouriteChat = function(targetId, type) {
+                const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                const index = window.favouriteChats.indexOf(elementId);
+                let isFavourite = false;
+                
+                if (index > -1) {
+                    window.favouriteChats.splice(index, 1);
+                } else {
+                    window.favouriteChats.push(elementId);
+                    isFavourite = true;
+                }
+                
+                localStorage.setItem('favourite_chats', JSON.stringify(window.favouriteChats));
+                
+                window.sortSidebar();
+                
+                const chatName = type === 'group' ? 'Group' : 'Chat';
+                window.showToast?.(isFavourite ? 'Added to Favourites' : 'Removed from Favourites', `The ${chatName.toLowerCase()} has been ${isFavourite ? 'added to' : 'removed from'} favourites.`);
             };
 
             window.closeUserContextMenu = function() {
@@ -530,6 +829,66 @@
                     window.closeUserContextMenu();
                 }
             });
+            window.toggleArchiveChat = function(targetId, type) {
+                const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                const index = window.archivedChats.indexOf(elementId);
+                let isArchived = false;
+                if (index > -1) {
+                    window.archivedChats.splice(index, 1);
+                } else {
+                    window.archivedChats.push(elementId);
+                    isArchived = true;
+                }
+                localStorage.setItem('archived_chats', JSON.stringify(window.archivedChats));
+                window.sortSidebar();
+                
+                const chatName = type === 'group' ? 'Group' : 'Chat';
+                window.showToast?.(isArchived ? 'Chat Archived' : 'Chat Unarchived', `The ${chatName.toLowerCase()} has been ${isArchived ? 'archived' : 'unarchived'}.`);
+            };
+
+            window.toggleLockChat = function(targetId, type) {
+                const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                const index = window.lockedChats.indexOf(elementId);
+                let isLocked = false;
+                if (index > -1) {
+                    window.lockedChats.splice(index, 1);
+                } else {
+                    window.lockedChats.push(elementId);
+                    isLocked = true;
+                }
+                localStorage.setItem('locked_chats', JSON.stringify(window.lockedChats));
+                window.sortSidebar();
+                
+                const chatName = type === 'group' ? 'Group' : 'Chat';
+                window.showToast?.(isLocked ? 'Chat Locked' : 'Chat Unlocked', `The ${chatName.toLowerCase()} has been ${isLocked ? 'locked' : 'unlocked'}.`);
+            };
+
+            window.toggleMuteChat = function(targetId, type, durationStr) {
+                const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                let isMuted = false;
+                
+                if (!durationStr) {
+                    // Unmute
+                    delete window.mutedChats[elementId];
+                } else {
+                    let expiry = Date.now();
+                    if (durationStr === '8h') expiry += 8 * 60 * 60 * 1000;
+                    else if (durationStr === '1w') expiry += 7 * 24 * 60 * 60 * 1000;
+                    else expiry += 100 * 365 * 24 * 60 * 60 * 1000; // Always
+                    
+                    window.mutedChats[elementId] = expiry;
+                    isMuted = true;
+                }
+                
+                localStorage.setItem('muted_chats', JSON.stringify(window.mutedChats));
+                window.sortSidebar();
+                
+                if (isMuted) {
+                    window.showToast?.('Mute Notifications', `Notifications muted for ${durationStr === '8h' ? '8 hours' : durationStr === '1w' ? '1 week' : 'always'}.`);
+                } else {
+                    window.showToast?.('Unmute Notifications', `Notifications have been unmuted.`);
+                }
+            };
         });
     </script>
 </div>

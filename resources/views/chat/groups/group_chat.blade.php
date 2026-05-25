@@ -22,7 +22,9 @@
         background: #4a555c;
     }
 </style>
-<div id="active_group_chat_content" class="hidden flex-col flex-1 h-full overflow-hidden select-none">
+<div id="active_group_chat_content" class="hidden flex-row flex-1 h-full overflow-hidden select-none">
+    <!-- Main Chat Column -->
+    <div id="group_chat_main_column" class="flex-1 flex flex-col relative h-full min-w-0">
     <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-20 relative">
         <!-- Normal Header -->
         <div id="group_normal_header" class="flex items-center justify-between h-full w-full transition-all duration-300">
@@ -270,13 +272,251 @@
         </div>
     </div>
 
-    <!-- Main Container Row including Chat list and right-side drawers -->
-    <div class="flex-1 flex overflow-hidden relative">
-
         <!-- Group Message List -->
         <div id="group_messages" class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]">
         </div>
 
+
+    <!-- Footer with Emoji, Attachment, Reply and Input -->
+    <div class="h-auto min-h-[64px] bg-[#202c33] px-4 py-2 flex flex-col justify-end shrink-0 relative z-20">
+
+        <!-- Replying Block (Moved outside the flex row to be on top) -->
+        <div id="group_replying_to_block"
+            class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
+            <div class="flex flex-col overflow-hidden">
+                <span id="group_replying_to_name" class="font-semibold text-[#00a884] text-[13px] mb-0.5">Replying to
+                    message</span>
+                <span id="group_replying_to_text"
+                    class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
+            </div>
+            <button onclick="cancelGroupReply()"
+                class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <div id="group_normal_input_container" class="flex items-center gap-2 w-full relative">
+            <!-- Emoji Picker Button -->
+            <button type="button" id="group_emoji_toggle_btn" onclick="toggleGroupEmojiPicker()"
+                class="text-[#8696a0] hover:text-[#e9edef] p-2 focus:outline-none shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                    <path
+                        d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
+                    </path>
+                </svg>
+            </button>
+
+            <!-- Hidden File Input for Group Media -->
+            <input type="file" id="group_file_input" class="hidden"
+                onchange="window.handleGroupFileChange(this)">
+
+            <!-- Attachment Trigger -->
+            <div class="relative shrink-0">
+                <button type="button" id="group_attach_toggle_btn" onclick="window.toggleGroupAttachMenu()"
+                    class="text-gray-500 hover:text-gray-300 p-2 focus:outline-none transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
+                        </path>
+                    </svg>
+                </button>
+
+                <!-- Attachment Menu -->
+                <div id="group_attach_menu"
+                    class="hidden absolute bottom-full mb-3 left-0 sm:left-4 bg-[#1f2c34] p-4 rounded-3xl w-[320px] shadow-2xl z-50 transition-all origin-bottom-left">
+                    <div class="grid grid-cols-4 gap-y-6 gap-x-2 place-items-center">
+                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                            onclick="window.selectGroupFile('.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip')">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-[#5f66cd] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-300 text-xs">Document</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                            onclick="window.selectGroupFile('image/*;capture=camera')">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-[#ed517b] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm12 4a3 3 0 11-6 0 3 3 0 016 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-300 text-xs">Camera</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                            onclick="window.selectGroupFile('image/*,video/*')">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-[#bf59cf] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-300 text-xs">Gallery</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                            onclick="window.selectGroupFile('audio/*')">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-[#e35920] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-300 text-xs">Audio</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                            onclick="shareGroupLocation()">
+                            <div
+                                class="w-14 h-14 rounded-2xl bg-[#1dae75] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                        clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-300 text-xs">Location</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emoji Picker Panel (Toggled with button) -->
+            <div id="group_emoji_picker_container"
+                class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px]">
+                <div class="grid grid-cols-6 place-items-center gap-1 p-3 bg-[#111b21]">
+                    <span onclick="insertEmojiIntoGroupInput('😊')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😊</span>
+                    <span onclick="insertEmojiIntoGroupInput('😂')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😂</span>
+                    <span onclick="insertEmojiIntoGroupInput('😍')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😍</span>
+                    <span onclick="insertEmojiIntoGroupInput('👍')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">👍</span>
+                    <span onclick="insertEmojiIntoGroupInput('❤️')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">❤️</span>
+                    <span onclick="insertEmojiIntoGroupInput('🙌')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙌</span>
+                    <span onclick="insertEmojiIntoGroupInput('😭')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😭</span>
+                    <span onclick="insertEmojiIntoGroupInput('🎉')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎉</span>
+                    <span onclick="insertEmojiIntoGroupInput('🙏')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙏</span>
+                    <span onclick="insertEmojiIntoGroupInput('🎂')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎂</span>
+                    <span onclick="insertEmojiIntoGroupInput('🔥')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🔥</span>
+                    <span onclick="insertEmojiIntoGroupInput('🤝')"
+                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🤝</span>
+                </div>
+            </div>
+
+            <!-- Input Area Container -->
+            <div id="group_input_area_container"
+                class="flex-1 relative flex items-center bg-[#2a3942] rounded-xl shadow-sm overflow-hidden">
+                <!-- State 1: Normal Text Input -->
+                <div id="group_text_input_state" class="w-full relative flex items-center">
+                    <input type="text" id="group_msg" oninput="handleGroupInputToggle()"
+                        onkeypress="handleGroupKeyPress(event)" placeholder="Type a message"
+                        class="w-full bg-transparent border-none pl-4 pr-10 py-2.5 text-[15px] focus:ring-0 text-[#d1d7db] placeholder-[#8696a0] min-h-[44px] focus:outline-none">
+                    <!-- Inside Voice to Text Mic Button -->
+                    <button type="button" id="group_inside_mic_btn" onclick="toggleGroupVoiceRecord()"
+                        class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path
+                                d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- State 2: Voice Note Recording UI -->
+                <div id="group_audio_recording_state"
+                    class="hidden w-full items-center justify-between px-3 h-[42px] bg-white">
+                    <button type="button" onclick="cancelGroupVoiceNote()"
+                        class="text-gray-500 hover:text-red-500 focus:outline-none transition-colors">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z">
+                            </path>
+                        </svg>
+                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
+                        <span id="group_audio_timer" class="text-[15px] font-medium text-gray-700">0:00</span>
+                    </div>
+                    <div class="flex-1 mx-3 flex items-center h-full overflow-hidden">
+                        <!-- Waveform animation effect -->
+                        <div class="flex items-center gap-[3px] h-4 w-full opacity-60 justify-end overflow-hidden">
+                            <div class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]">
+                            </div>
+                            <div
+                                class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
+                            </div>
+                            <div
+                                class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_0.8s_ease-in-out_infinite_0.4s]">
+                            </div>
+                            <div
+                                class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="group_action_btn" onclick="handleGroupActionBtn()"
+                class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-11 h-11 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
+                <svg id="group_mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path
+                        d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
+                    </path>
+                </svg>
+                <svg id="group_send_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                    class="hidden ml-1">
+                    <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
+                    </path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Group Bottom Selection Bar -->
+        <div id="group_selection_bottom_bar"
+            class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
+            <div class="flex items-center gap-4">
+                <button onclick="window.cancelGroupForwardSelection()"
+                    class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <span id="group_selection_bottom_count" class="font-semibold text-base">0 Selected</span>
+            </div>
+            <button onclick="window.openForwardModal(true)"
+                class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95"
+                title="Forward message">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path
+                        d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    </div> <!-- Close group_chat_main_column -->
         <!-- Group Search Drawer (Hidden by default) -->
         <div id="group_search_drawer"
             class="hidden w-[360px] h-full bg-[#111b21] border-l border-[#313d45] flex flex-col shrink-0">
@@ -691,247 +931,6 @@
                 </div>
             </div>
         </div>
-
-    </div>
-
-    <!-- Footer with Emoji, Attachment, Reply and Input -->
-    <div class="h-auto min-h-[64px] bg-[#202c33] px-4 py-2 flex flex-col justify-end shrink-0 relative z-20">
-
-        <!-- Replying Block (Moved outside the flex row to be on top) -->
-        <div id="group_replying_to_block"
-            class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
-            <div class="flex flex-col overflow-hidden">
-                <span id="group_replying_to_name" class="font-semibold text-[#00a884] text-[13px] mb-0.5">Replying to
-                    message</span>
-                <span id="group_replying_to_text"
-                    class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
-            </div>
-            <button onclick="cancelGroupReply()"
-                class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <div id="group_normal_input_container" class="flex items-center gap-2 w-full relative">
-            <!-- Emoji Picker Button -->
-            <button type="button" id="group_emoji_toggle_btn" onclick="toggleGroupEmojiPicker()"
-                class="text-[#8696a0] hover:text-[#e9edef] p-2 focus:outline-none shrink-0 transition-colors">
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-                    <path
-                        d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
-                    </path>
-                </svg>
-            </button>
-
-            <!-- Hidden File Input for Group Media -->
-            <input type="file" id="group_file_input" class="hidden"
-                onchange="window.handleGroupFileChange(this)">
-
-            <!-- Attachment Trigger -->
-            <div class="relative shrink-0">
-                <button type="button" id="group_attach_toggle_btn" onclick="window.toggleGroupAttachMenu()"
-                    class="text-gray-500 hover:text-gray-300 p-2 focus:outline-none transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
-                        </path>
-                    </svg>
-                </button>
-
-                <!-- Attachment Menu -->
-                <div id="group_attach_menu"
-                    class="hidden absolute bottom-full mb-3 left-0 sm:left-4 bg-[#1f2c34] p-4 rounded-3xl w-[320px] shadow-2xl z-50 transition-all origin-bottom-left">
-                    <div class="grid grid-cols-4 gap-y-6 gap-x-2 place-items-center">
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="window.selectGroupFile('.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip')">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#5f66cd] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Document</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="window.selectGroupFile('image/*;capture=camera')">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#ed517b] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm12 4a3 3 0 11-6 0 3 3 0 016 0z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Camera</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="window.selectGroupFile('image/*,video/*')">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#bf59cf] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Gallery</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="window.selectGroupFile('audio/*')">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#e35920] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Audio</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="shareGroupLocation()">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#1dae75] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Location</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Emoji Picker Panel (Toggled with button) -->
-            <div id="group_emoji_picker_container"
-                class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px]">
-                <div class="grid grid-cols-6 place-items-center gap-1 p-3 bg-[#111b21]">
-                    <span onclick="insertEmojiIntoGroupInput('😊')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😊</span>
-                    <span onclick="insertEmojiIntoGroupInput('😂')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😂</span>
-                    <span onclick="insertEmojiIntoGroupInput('😍')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😍</span>
-                    <span onclick="insertEmojiIntoGroupInput('👍')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">👍</span>
-                    <span onclick="insertEmojiIntoGroupInput('❤️')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">❤️</span>
-                    <span onclick="insertEmojiIntoGroupInput('🙌')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙌</span>
-                    <span onclick="insertEmojiIntoGroupInput('😭')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😭</span>
-                    <span onclick="insertEmojiIntoGroupInput('🎉')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎉</span>
-                    <span onclick="insertEmojiIntoGroupInput('🙏')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙏</span>
-                    <span onclick="insertEmojiIntoGroupInput('🎂')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎂</span>
-                    <span onclick="insertEmojiIntoGroupInput('🔥')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🔥</span>
-                    <span onclick="insertEmojiIntoGroupInput('🤝')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🤝</span>
-                </div>
-            </div>
-
-            <!-- Input Area Container -->
-            <div id="group_input_area_container"
-                class="flex-1 relative flex items-center bg-white rounded-lg shadow-sm">
-                <!-- State 1: Normal Text Input -->
-                <div id="group_text_input_state" class="w-full relative flex items-center">
-                    <input type="text" id="group_msg" oninput="handleGroupInputToggle()"
-                        onkeypress="handleGroupKeyPress(event)" placeholder="Type a message"
-                        class="w-full bg-transparent border-none rounded-lg pl-4 pr-10 py-2 text-[15px] focus:ring-0 text-gray-800 placeholder-gray-500 min-h-[40px] focus:outline-none">
-                    <!-- Inside Voice to Text Mic Button -->
-                    <button type="button" id="group_inside_mic_btn" onclick="toggleGroupVoiceRecord()"
-                        class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                            <path
-                                d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
-                            </path>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- State 2: Voice Note Recording UI -->
-                <div id="group_audio_recording_state"
-                    class="hidden w-full items-center justify-between px-3 h-[42px] bg-white">
-                    <button type="button" onclick="cancelGroupVoiceNote()"
-                        class="text-gray-500 hover:text-red-500 focus:outline-none transition-colors">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                            <path
-                                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z">
-                            </path>
-                        </svg>
-                    </button>
-                    <div class="flex items-center gap-2">
-                        <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
-                        <span id="group_audio_timer" class="text-[15px] font-medium text-gray-700">0:00</span>
-                    </div>
-                    <div class="flex-1 mx-3 flex items-center h-full overflow-hidden">
-                        <!-- Waveform animation effect -->
-                        <div class="flex items-center gap-[3px] h-4 w-full opacity-60 justify-end overflow-hidden">
-                            <div class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]">
-                            </div>
-                            <div
-                                class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
-                            </div>
-                            <div
-                                class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_0.8s_ease-in-out_infinite_0.4s]">
-                            </div>
-                            <div
-                                class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button id="group_action_btn" onclick="handleGroupActionBtn()"
-                class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-11 h-11 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
-                <svg id="group_mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path
-                        d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
-                    </path>
-                </svg>
-                <svg id="group_send_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                    class="hidden ml-1">
-                    <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Group Bottom Selection Bar -->
-        <div id="group_selection_bottom_bar"
-            class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
-            <div class="flex items-center gap-4">
-                <button onclick="window.cancelGroupForwardSelection()"
-                    class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-                <span id="group_selection_bottom_count" class="font-semibold text-base">0 Selected</span>
-            </div>
-            <button onclick="window.openForwardModal(true)"
-                class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95"
-                title="Forward message">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path
-                        d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z">
-                    </path>
-                </svg>
-            </button>
-        </div>
-    </div>
 
 </div>
 
@@ -3179,6 +3178,7 @@
             else if (msgData.type === 'video') typeLabel = 'video';
             else if (msgData.type === 'audio') typeLabel = 'audio';
             else if (msgData.type === 'document') typeLabel = 'document';
+            else if (msgData.type === 'location' || msgData.type === 'live_location') typeLabel = 'location';
         }
 
         window.openDeleteModal(`Delete ${typeLabel}?`, () => {
@@ -3628,6 +3628,8 @@
                 else if (data.type === 'video') preview = "🎥 Video";
                 else if (data.type === 'audio') preview = "🎵 Audio";
                 else if (data.type === 'document') preview = "📄 Document";
+                else if (data.type === 'location') preview = "📍 Location";
+                else if (data.type === 'live_location') preview = "📍 Live Location";
 
                 const prefix = (data.sender_id == window.myUserId) ? "✓ " : "";
                 lastMsgEl.textContent = prefix + preview;
@@ -4551,6 +4553,44 @@
                             </div>
                         </div>
                     </div>`;
+            } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data.lng) {
+                const lat = parseFloat(data.lat);
+                const lng = parseFloat(data.lng);
+                const isLive = data.type === 'live_location';
+
+                mediaContent = `
+                    <div class="mb-2 relative rounded-lg overflow-hidden border border-gray-200 w-[250px] max-w-[100%] h-[150px] bg-gray-100 flex items-center justify-center">
+                        <iframe width="100%" height="150" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.005}%2C${lat - 0.005}%2C${lng + 0.005}%2C${lat + 0.005}&amp;layer=mapnik&amp;marker=${lat}%2C${lng}" class="w-full absolute inset-0 pointer-events-none opacity-80"></iframe>
+
+                        <div class="z-20 relative flex flex-col items-center">
+                            ${isLive ? `
+                                <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur border border-white/50 flex flex-col items-center justify-center overflow-hidden relative shadow-lg">
+                                    <div class="absolute inset-0 bg-[#1dae75] rounded-full animate-ping opacity-70"></div>
+                                    <div class="w-10 h-10 rounded-full bg-[#202c33] border-2 border-[#1dae75] flex items-center justify-center text-white font-bold text-lg relative z-10">
+                                        {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-[#ea4335]">
+                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path></svg>
+                                </div>
+                            `}
+                        </div>
+
+                        <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="absolute inset-0 z-30 flex flex-col justify-end group">
+                            <div class="bg-white/90 text-[#111b21] text-xs p-2 text-center backdrop-blur-sm border-t border-gray-200 flex justify-between items-center group-hover:bg-gray-100 transition-colors">
+                                <span class="font-medium truncate max-w-[150px] text-left">${isLive ? 'Live location' : 'Location'}</span>
+                                <span class="text-[#008069] uppercase tracking-wider text-[10px] font-semibold">View map</span>
+                            </div>
+                        </a>
+                    </div>`;
+
+                if (isLive && data.duration) {
+                    const endTime = new Date((data.time + data.duration * 60) * 1000);
+                    const diff = endTime - new Date();
+                    const statusText = diff > 0 ? `Live until ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Live location ended';
+                    mediaContent += `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
+                }
             }
 
             let replyPreviewHtml = '';
