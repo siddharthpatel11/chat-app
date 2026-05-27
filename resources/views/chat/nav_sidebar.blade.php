@@ -83,15 +83,16 @@
         </button>
 
         <!-- Meta AI -->
-        <button class="nav-item group" title="Meta AI">
+        <button id="nav_meta_ai" class="nav-item group" title="Meta AI" onclick="window.openMetaAiChat()">
             <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-[#00a884] transition-colors">
-                    <circle cx="12" cy="12" r="10" class="text-[#8696a0] group-hover:text-[#00a884]"></circle>
+                    stroke-linecap="round" stroke-linejoin="round" class="group-hover:text-[#00a884] transition-colors group-[.active]:text-[#00a884]">
+                    <circle cx="12" cy="12" r="10" class="text-[#8696a0] group-hover:text-[#00a884] group-[.active]:text-[#00a884]"></circle>
                     <path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z"
-                        class="fill-[#8696a0] group-hover:fill-[#00a884]"></path>
+                        class="fill-[#8696a0] group-hover:fill-[#00a884] group-[.active]:fill-[#00a884]"></path>
                 </svg>
             </div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#00a884] rounded-r-full hidden group-[.active]:block"></div>
         </button>
     </div>
 

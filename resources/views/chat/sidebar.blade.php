@@ -181,6 +181,50 @@
     </div>
  
     <div class="flex-1 overflow-y-auto custom-scrollbar" id="user_list_container">
+        <!-- Meta AI Hidden Sidebar Item -->
+        <div onclick="window.openMetaAiChat()"
+            class="flex relative items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item group"
+            id="user_sidebar_meta_ai" data-name="Meta AI"
+            data-avatar="" data-phone=""
+            data-about="AI Assistant" data-userid="meta_ai"
+            data-timestamp="0">
+            <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="text-[#00a884]">
+                    <circle cx="12" cy="12" r="10" class="text-[#00a884]"></circle>
+                    <path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z"
+                        class="fill-[#00a884]"></path>
+                </svg>
+            </div>
+            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
+                <div class="flex justify-between items-center">
+                    <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">
+                        Meta AI
+                    </h4>
+                    <span class="text-[12px] text-[#8696a0] whitespace-nowrap"></span>
+                </div>
+                <div class="flex justify-between items-center mt-0.5">
+                    <p class="text-[14px] text-[#8696a0] truncate flex-1 min-w-0 leading-snug">
+                        AI Assistant
+                    </p>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span id="pin_icon_meta_ai" class="hidden text-[#8696a0]">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                            </svg>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, 'meta_ai', 'Meta AI', 'user')"
+                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded transition-colors focus:outline-none">
+                    <svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor">
+                        <path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
         @foreach($users ?? [] as $user)
             @php
                 $userAvatar = $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->saved_name ?? $user->name ?: $user->phone) . '&background=2a3942&color=fff';

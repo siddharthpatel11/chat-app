@@ -2610,6 +2610,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
             </svg></button>
+        <button onclick="window.askMetaAiGroupMsg()"
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask Meta AI</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8696a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z" class="fill-[#8696a0]"></path></svg>
+        </button>
         <button id="group_dropdown_reply_priv" onclick="window.replyPrivatelyFromGroup()"
             class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Reply
                 privately</span> <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor"
@@ -3397,6 +3401,31 @@
 
         // Toggle selection for current message
         window.toggleGroupMsgSelection(messageKey);
+    };
+
+    window.askMetaAiGroupMsg = function() {
+        const messageKey = window._activeGroupMsgKey;
+        if (!messageKey) return;
+        
+        let msgNode = document.getElementById(`group_msg_${messageKey}`);
+        if (!msgNode) return;
+        
+        let senderName = msgNode.querySelector('.text-\\[13px\\]')?.innerText || 'Unknown';
+        if (msgNode.classList.contains('justify-end')) {
+            senderName = 'You';
+        }
+        
+        let textNode = msgNode.querySelector('.break-words');
+        let text = textNode ? textNode.innerText : '';
+        
+        window.closeGroupMsgDropdown();
+        
+        if (window.openMetaAiChat) {
+            window.openMetaAiChat();
+        }
+        if (window.setMetaAiReplyContext) {
+            window.setMetaAiReplyContext(messageKey, senderName, text);
+        }
     };
 
     window.replyToGroupMsg = function() {
@@ -4352,6 +4381,8 @@
 
         document.getElementById('active_chat_content')?.classList.add('hidden');
         document.getElementById('active_chat_content')?.classList.remove('flex');
+        document.getElementById('meta_ai_content')?.classList.add('hidden');
+        document.getElementById('meta_ai_content')?.classList.remove('flex');
 
         const gContent = document.getElementById('active_group_chat_content');
         if (gContent) {

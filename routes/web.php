@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\ChatController;
+use App\Http\Controllers\MetaAiController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ChatController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -28,10 +29,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/save-token', [ChatController::class, 'saveToken']);
     Route::post('/update-live-location', [ChatController::class, 'updateLiveLocation']);
     Route::post('/upload-status-media', [ChatController::class, 'uploadStatusMedia']);
-    
+
     Route::post('/save-contact', [ChatController::class, 'saveContact']);
     Route::post('/delete-contact', [ChatController::class, 'deleteContact']);
     Route::post('/send-group-notification', [ChatController::class, 'sendGroupNotification']);
+    Route::post('/meta-ai/ask', [MetaAiController::class, 'ask']);
 });
 
 require __DIR__.'/auth.php';

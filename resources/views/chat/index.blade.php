@@ -230,7 +230,7 @@
                     </button>
                     <h3 class="text-[#e9edef] text-[18px] font-medium">Forward message to</h3>
                 </div>
-                
+
                 <!-- Search Bar -->
                 <div class="px-4 py-2 bg-[#111b21] shrink-0 border-b border-white/5">
                     <div class="flex items-center bg-[#202c33] rounded-lg px-3 py-1.5 focus-within:bg-[#2a3942] transition-colors border border-transparent focus-within:border-[#00a884]/30">
@@ -748,7 +748,7 @@
                                                 </path>
                                             </svg>
                                         </button>
-                                        
+
                                         <!-- Private Header More Options Dropdown -->
                                         <div id="private_header_more_dropdown"
                                             class="hidden absolute top-12 right-0 w-[240px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
@@ -1141,6 +1141,7 @@
                     </div>
                     @include('chat.reaction_popup')
                     @include('chat.groups.group_chat')
+                    @include('chat.meta_ai')
                 </div>
 
                 <!-- Search Messages Sidebar -->
@@ -1284,19 +1285,19 @@
                 // Update block, favourite, mute, lock text based on state
                 if (window.activeChatUser) {
                     const elementId = `user_sidebar_${window.activeChatUser.id}`;
-                    
+
                     const isBlocked = window.blockedUsers?.includes(elementId);
                     const blockText = document.getElementById('private_header_block_text');
                     if (blockText) blockText.textContent = isBlocked ? 'Unblock' : 'Block';
-                    
+
                     const isMuted = window.mutedChats && !!window.mutedChats[elementId];
                     const muteText = document.getElementById('private_header_mute_text');
                     if (muteText) muteText.textContent = isMuted ? 'Unmute notifications' : 'Mute notifications';
-                    
+
                     const isLocked = window.lockedChats?.includes(elementId);
                     const lockText = document.getElementById('private_header_lock_text');
                     if (lockText) lockText.textContent = isLocked ? 'Unlock chat' : 'Lock chat';
-                    
+
                     window.updatePrivateHeaderFavouriteText();
                 }
 
@@ -2112,9 +2113,19 @@
             m.scrollTop = m.scrollHeight;
         }
 
-
-
         // Feature Actions
+        window.askMetaAi = function(key, senderName, text) {
+            // Close any open menus
+            document.querySelectorAll('[id^="menu_"]').forEach(el => el.classList.add('hidden'));
+
+            if (window.openMetaAiChat) {
+                window.openMetaAiChat();
+            }
+            if (window.setMetaAiReplyContext) {
+                window.setMetaAiReplyContext(key, senderName, text);
+            }
+        };
+
         window.replyTo = function (key) {
             window.closeMsgMenu(key);
             const msgData = window.globalMessages[key];
@@ -3076,7 +3087,7 @@
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_chats').classList.add('active');
-            
+
             // Set filter back to all if coming from archived
             if (window.activeSidebarFilter === 'archived') {
                 window.setSidebarFilter('all');
@@ -3100,7 +3111,7 @@
                 window.toggleSettings();
             }
         };
-        
+
         window.showArchivedChats = function() {
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -3285,6 +3296,8 @@
 
             document.getElementById('active_group_chat_content')?.classList.add('hidden');
             document.getElementById('active_group_chat_content')?.classList.remove('flex');
+            document.getElementById('meta_ai_content')?.classList.add('hidden');
+            document.getElementById('meta_ai_content')?.classList.remove('flex');
             document.getElementById('active_chat_content')?.classList.remove('hidden');
             document.getElementById('active_chat_content')?.classList.add('flex');
 
@@ -3425,17 +3438,17 @@
 
             window.unsubscribeAdded = window.onChildAdded(messagesRef, (snapshot) => {
                 const data = snapshot.val();
-                
+
                 // Check if message is older than clear timestamp
                 const isGroup = window.currentChatId.startsWith('group_');
                 const targetId = isGroup ? window.currentChatId.replace('group_', '') : window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
                 const elementId = isGroup ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                 const clearedTime = window.clearedChats?.[elementId] || 0;
-                
+
                 if (data.time && data.time <= clearedTime) {
                     return; // Ignore this message because chat was cleared after it was sent
                 }
-                
+
                 // Ignore messages from blocked users
                 if (!isGroup && window.blockedUsers?.includes(elementId) && data.sender_id != window.myUserId) {
                     return;
@@ -3652,6 +3665,7 @@
                                     <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
                                     <button onclick="event.stopPropagation(); /* copy function */" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Copy <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
                                     <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
+                                    <button onclick="event.stopPropagation(); window.askMetaAi('${key}', '${activeName}', \`${data.text ? data.text.replace(/\`/g, '\\\\`') : ''}\`)" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Ask Meta AI <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8696a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z" class="fill-[#8696a0]"></path></svg></button>
                                     <button id="pin_btn_${key}" onclick="event.stopPropagation(); if(window.pinnedMsgKeys && window.pinnedMsgKeys.has('${key}')) { window.unpinPrivateMessage('${key}'); } else { window.pinPrivateMessage('${key}'); }" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">
                                          <span id="pin_btn_text_${key}">Pin</span>
                                          <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor">
@@ -3720,11 +3734,11 @@
             window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
                 const data = snapshot.val();
                 const key = snapshot.key;
-                
+
                 const oldMsg = window.globalMessages[key];
                 const oldReactions = oldMsg ? (oldMsg.reactions || {}) : {};
                 const newReactions = data.reactions || {};
-                
+
                 window.globalMessages[key] = data;
 
                 const isMe = data.sender_id == window.myUserId;
@@ -3734,9 +3748,9 @@
                         tickEl.innerHTML = window.getTickSVG(data.status || 'sent');
                     }
                 }
-                
+
                 window.renderReactions(key, newReactions, isMe);
-                
+
                 // Notification for new reactions on MY messages
                 if (isMe) {
                     for (const [uid, emoji] of Object.entries(newReactions)) {
@@ -3755,7 +3769,7 @@
                     }
                 }
             });
-            
+
             // Call updateBlockedUI to refresh UI state for newly selected chat
             if (window.updateBlockedUI) window.updateBlockedUI();
         };
@@ -3852,7 +3866,7 @@
             document.getElementById('normal_header')?.classList.add('hidden');
             document.getElementById('selection_header')?.classList.remove('hidden');
             document.getElementById('selection_header')?.classList.add('flex');
-            
+
             document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
             document.getElementById('private_header_more_dropdown')?.classList.add('hidden');
         };
@@ -3861,14 +3875,14 @@
             window.isSelectionMode = false;
             window.isForwardSelection = false;
             window.selectedMessages.clear();
-            
+
             document.getElementById('normal_header')?.classList.remove('hidden');
             document.getElementById('selection_header')?.classList.add('hidden');
-            
+
             // Hide selection bottom bar and show normal input container
             document.getElementById('selection_bottom_bar')?.classList.add('hidden');
             document.getElementById('normal_input_container')?.classList.remove('hidden');
-            
+
             document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.msg-checkbox').forEach(el => {
                 el.checked = false;
@@ -3921,7 +3935,7 @@
             const checkbox = document.getElementById('checkbox_' + key);
             const msgEl = document.getElementById('msg_' + key);
             if (!checkbox || !msgEl) return;
-            
+
             checkbox.checked = !checkbox.checked;
             const box = checkbox.parentElement;
 
@@ -3974,7 +3988,7 @@
 
             // Gather contacts from sidebar
             let html = '';
-            
+
             // 1. Users
             const userNodes = document.querySelectorAll('#user_list_container [id^="user_sidebar_"]');
             userNodes.forEach(node => {
@@ -4080,11 +4094,11 @@
             // Update footer
             const footer = document.getElementById('forward_modal_footer');
             const namesDisplay = document.getElementById('forward_selected_names');
-            
+
             if (window._selectedForwardTargets.size > 0) {
                 footer.classList.remove('hidden');
                 footer.classList.add('flex');
-                
+
                 const names = Array.from(window._selectedForwardTargets.values()).map(t => t.name);
                 namesDisplay.textContent = names.join(', ');
             } else {
@@ -4133,7 +4147,7 @@
                             statusData.bgColor = '#00a884';
                             statusData.font = 'font-sans';
                         }
-                        
+
                         try {
                             const statusRef = window.ref(window.db, `statuses/${window.myUserId}`);
                             await window.push(statusRef, statusData);
@@ -4184,20 +4198,20 @@
 
         window.forwardMsg = function (key) {
             window.closeMsgMenu(key);
-            
+
             window.isForwardSelection = true;
             window.selectedMessages.clear();
-            
+
             document.getElementById('normal_input_container')?.classList.add('hidden');
-            
+
             const bottomBar = document.getElementById('selection_bottom_bar');
             if (bottomBar) {
                 bottomBar.classList.remove('hidden');
                 bottomBar.classList.add('flex');
             }
-            
+
             document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
-            
+
             window.toggleMsgSelection(key);
         };
 
@@ -4381,7 +4395,7 @@
         window.checkAndApplyClearedChatUI = function(clearedElementId) {
             const isGroup = window.currentChatId && window.currentChatId.startsWith('group_');
             if (!window.currentChatId) return;
-            
+
             let activeElementId;
             if (isGroup) {
                 activeElementId = `group_sidebar_${window.currentChatId.replace('group_', '')}`;
@@ -4399,7 +4413,7 @@
                 // Clear reply state
                 if (typeof window.cancelReply === 'function') window.cancelReply();
             }
-            
+
             // Also update the sidebar preview
             const targetId = clearedElementId.replace('user_sidebar_', '').replace('group_sidebar_', '');
             const lastMsgEl = document.getElementById(`last_msg_${targetId}`);
