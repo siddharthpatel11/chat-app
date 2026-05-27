@@ -2,7 +2,7 @@
     <!-- Header -->
     <div id="meta_ai_normal_header" class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] flex items-center justify-between shrink-0 shadow-sm z-20 relative">
         <div class="flex items-center gap-3">
-            <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1" onclick="window.backToSidebar()">
+            <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1" onclick="window.closeChat()">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
                 </svg>
@@ -48,7 +48,7 @@
                     <button onclick="window.selectMetaAiMessage(); toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Select messages</span></button>
                     <button onclick="toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Mute notifications</span></button>
                     <button onclick="window.toggleFavouriteChat('meta_ai', 'user'); window.updateMetaAiHeaderFavouriteText(); toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="meta_ai_favourite_text">Add to favourites</span></button>
-                    <button onclick="window.backToSidebar(); toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Close chat</span></button>
+                    <button onclick="window.closeChat(); toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Close chat</span></button>
                     <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
                     <button onclick="toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#8696a0] hover:bg-[#182229] transition-colors cursor-not-allowed"><span class="text-[15px]">Send call link</span></button>
                     <button onclick="toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#8696a0] hover:bg-[#182229] transition-colors cursor-not-allowed"><span class="text-[15px]">Schedule call</span></button>

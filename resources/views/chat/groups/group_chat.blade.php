@@ -2794,7 +2794,7 @@
         </svg>
         <span class="text-[15px]">Add to list</span>
     </button>
-    <button onclick="window.backToSidebar(); toggleGroupHeaderMoreMenu()"
+    <button onclick="window.closeChat(); toggleGroupHeaderMoreMenu()"
         class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
         <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
             stroke-width="2">
@@ -3918,6 +3918,12 @@
             const nameLower = name.toLowerCase();
             const nameMatch = nameLower.includes(searchQuery);
 
+            const elementId = `user_sidebar_${userId}`;
+            // Skip locked chats if not in locked view
+            if (window.lockedChats && window.lockedChats.includes(elementId) && window.activeSidebarFilter !== 'locked') {
+                return; // Skip this user
+            }
+
             if (nameMatch && chatsList) {
                 chatMatches++;
                 const highlightedName = name.replace(highlightRegex,
@@ -4000,6 +4006,12 @@
 
             const nameLower = name.toLowerCase();
             const nameMatch = nameLower.includes(searchQuery);
+
+            const elementId = `group_sidebar_${groupId}`;
+            // Skip locked groups if not in locked view
+            if (window.lockedChats && window.lockedChats.includes(elementId) && window.activeSidebarFilter !== 'locked') {
+                return; // Skip this group
+            }
 
             if (nameMatch && chatsList) {
                 chatMatches++;

@@ -177,6 +177,16 @@
         <span class="font-semibold text-lg text-[#e9edef]">Archived</span>
     </div>
 
+    <!-- Locked Chats Header (Hidden by default) -->
+    <div id="locked_sidebar_header" class="hidden items-center gap-6 px-4 py-4 bg-[#202c33] shrink-0 border-b border-[#313d45]">
+        <button onclick="window.setSidebarFilter('all')" class="text-[#d1d7db] hover:text-[#e9edef] transition-colors p-2 -ml-2 rounded-full hover:bg-[#111b21]">
+            <svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor">
+                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+            </svg>
+        </button>
+        <span class="text-[#e9edef] text-[19px] font-medium">Locked chats</span>
+    </div>
+
     <!-- Global Starred Sidebar Header -->
     <div id="global_starred_sidebar_header"
         class="hidden h-16 bg-[#202c33] flex items-center px-4 gap-6 shrink-0 border-b border-[#313d45]">
@@ -289,10 +299,25 @@
                 class="px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors">Favourites</button>
             <button onclick="window.setSidebarFilter('groups')" id="filter_btn_groups"
                 class="px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors">Groups</button>
+            <div id="custom_lists_container" class="flex items-center gap-2"></div>
         </div>
     </div>
 
     <div class="flex-1 overflow-y-auto custom-scrollbar" id="user_list_container">
+        <!-- Locked Chats Button (Hidden by default) -->
+        <div id="locked_chats_btn" class="hidden items-center px-4 py-3 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-[#202c33]" onclick="window.openLockedChatsPrompt()">
+            <div class="flex items-center gap-4 w-full">
+                <div class="w-12 h-12 flex items-center justify-center shrink-0 text-[#00a884]">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <span class="text-[#e9edef] text-[17px] font-normal">Locked chats</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Meta AI Hidden Sidebar Item -->
         <div onclick="window.openMetaAiChat()"
             class="flex relative items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item group"
@@ -524,12 +549,25 @@
             </svg>
             Add to favourites
         </button>
-        {{-- <button onclick="window.handleUserContextAction('add_to_list')" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors flex items-center gap-4 text-[14.5px] focus:outline-none">
+        <button onclick="window.handleUserContextAction('add_to_list')" class="w-full flex items-center gap-4 px-4 py-3 hover:bg-[#182229] transition-colors text-[#e9edef] text-[14.5px]">
             <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
             </svg>
             Add to list
-        </button> --}}
+        </button>
+        <button id="context_remove_from_list_btn" onclick="window.handleUserContextAction('remove_from_list')" class="w-full hidden items-center gap-4 px-4 py-3 hover:bg-[#182229] transition-colors text-[#e9edef] text-[14.5px]">
+            <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
+                <path d="M12 2c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10-4.5-10-10-10zm5 11h-10v-2h10v2z"></path>
+            </svg>
+            Remove from list
+        </button>
+
+        <button onclick="window.handleUserContextAction('disappearing')" class="w-full flex items-center gap-4 px-4 py-3 hover:bg-[#182229] transition-colors text-[#e9edef] text-[14.5px]">
+            <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor" class="text-[#aebac1]">
+                <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"></path>
+            </svg>
+            Disappearing messages
+        </button>
 
         <div class="h-[1px] bg-[#313d45] my-1.5"></div>
 
@@ -582,6 +620,9 @@
             window.clearedChats = JSON.parse(localStorage.getItem('cleared_chats') || '{}');
             window.deletedChats = JSON.parse(localStorage.getItem('deleted_chats') || '[]');
 
+            // Custom Lists management
+            window.customLists = JSON.parse(localStorage.getItem('custom_lists') || '{}');
+
             window.setSidebarFilter = function(filter) {
                 window.activeSidebarFilter = filter;
 
@@ -589,13 +630,22 @@
                 ['all', 'unread', 'favourites', 'groups'].forEach(f => {
                     const btn = document.getElementById(`filter_btn_${f}`);
                     if (btn) {
-                        if (f === filter && filter !== 'archived') {
-                            btn.classList.remove('text-[#8696a0]', 'hover:bg-[#2a3942]',
-                            'bg-[#202c33]');
-                            btn.classList.add('bg-[#2a3942]', 'text-[#00a884]');
+                        if (filter === f) {
+                            btn.className = 'px-3 py-1.5 rounded-full bg-[#2a3942] text-[#00a884] text-[14px] whitespace-nowrap transition-colors';
                         } else {
-                            btn.classList.remove('bg-[#2a3942]', 'text-[#00a884]');
-                            btn.classList.add('text-[#8696a0]', 'hover:bg-[#2a3942]', 'bg-[#202c33]');
+                            btn.className = 'px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors';
+                        }
+                    }
+                });
+
+                // Update custom list buttons styles
+                Object.keys(window.customLists || {}).forEach(listName => {
+                    const btn = document.getElementById(`filter_btn_list_${listName}`);
+                    if (btn) {
+                        if (filter === `list_${listName}`) {
+                            btn.className = 'px-3 py-1.5 rounded-full bg-[#2a3942] text-[#00a884] text-[14px] whitespace-nowrap transition-colors flex items-center gap-2';
+                        } else {
+                            btn.className = 'px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors block';
                         }
                     }
                 });
@@ -604,19 +654,63 @@
                 const filterContainer = document.getElementById('sidebar_filters_container');
                 const normalHeader = document.getElementById('normal_sidebar_header');
                 const archivedHeader = document.getElementById('archived_sidebar_header');
+                const lockedHeader = document.getElementById('locked_sidebar_header');
+                const searchContainer = document.getElementById('sidebar_search_container');
 
                 if (filter === 'archived') {
+                    if (searchContainer) {
+                        searchContainer.classList.remove('hidden');
+                        searchContainer.classList.add('flex');
+                    }
                     if (filterContainer) {
                         filterContainer.classList.add('hidden');
                         filterContainer.classList.remove('flex');
                     }
-                    if (normalHeader) normalHeader.classList.add('hidden');
-                    if (archivedHeader) archivedHeader.classList.remove('hidden');
-                    if (archivedHeader) archivedHeader.classList.add('flex');
+                    if (normalHeader) {
+                        normalHeader.classList.add('hidden');
+                        normalHeader.classList.remove('flex');
+                    }
+                    if (archivedHeader) {
+                        archivedHeader.classList.remove('hidden');
+                        archivedHeader.classList.add('flex');
+                    }
+                    if (lockedHeader) {
+                        lockedHeader.classList.add('hidden');
+                        lockedHeader.classList.remove('flex');
+                    }
+                } else if (filter === 'locked') {
+                    if (searchContainer) {
+                        searchContainer.classList.add('hidden');
+                        searchContainer.classList.remove('flex');
+                    }
+                    if (filterContainer) {
+                        filterContainer.classList.add('hidden');
+                        filterContainer.classList.remove('flex');
+                    }
+                    if (lockedHeader) {
+                        lockedHeader.classList.remove('hidden');
+                        lockedHeader.classList.add('flex');
+                    }
+                    if (normalHeader) {
+                        normalHeader.classList.add('hidden');
+                        normalHeader.classList.remove('flex');
+                    }
+                    if (archivedHeader) {
+                        archivedHeader.classList.add('hidden');
+                        archivedHeader.classList.remove('flex');
+                    }
                 } else {
+                    if (searchContainer) {
+                        searchContainer.classList.remove('hidden');
+                        searchContainer.classList.add('flex');
+                    }
                     if (filterContainer) {
                         filterContainer.classList.remove('hidden');
                         filterContainer.classList.add('flex');
+                    }
+                    if (lockedHeader) {
+                        lockedHeader.classList.add('hidden');
+                        lockedHeader.classList.remove('flex');
                     }
                     if (normalHeader) {
                         normalHeader.classList.remove('hidden');
@@ -629,6 +723,35 @@
                 }
 
                 window.sortSidebar();
+            };
+
+            window.renderCustomListFilters = function() {
+                const container = document.getElementById('custom_lists_container');
+                if (!container) return;
+                
+                container.innerHTML = '';
+                
+                Object.keys(window.customLists || {}).forEach(listName => {
+                    const isActive = window.activeSidebarFilter === `list_${listName}`;
+                    const className = isActive ? 
+                        'px-3 py-1.5 rounded-full bg-[#2a3942] text-[#00a884] text-[14px] whitespace-nowrap transition-colors flex items-center gap-2' : 
+                        'px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors block';
+                    
+                    const deleteIcon = isActive ? `<span onclick="event.stopPropagation(); window.deleteCustomListInline('${listName.replace(/'/g, "\\'")}')" class="hover:text-[#f15c6d] text-[#00a884] ml-1" title="Delete list"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg></span>` : '';
+                    
+                    const btnHtml = `<button onclick="window.setSidebarFilter('list_${listName.replace(/'/g, "\\'")}')" id="filter_btn_list_${listName}" class="${className}">${listName}${deleteIcon}</button>`;
+                    container.insertAdjacentHTML('beforeend', btnHtml);
+                });
+            };
+
+            window.deleteCustomListInline = function(listName) {
+                if (confirm(`Are you sure you want to delete the list "${listName}"?`)) {
+                    delete window.customLists[listName];
+                    localStorage.setItem('custom_lists', JSON.stringify(window.customLists));
+                    window.setSidebarFilter('all');
+                    window.renderListCheckboxes?.();
+                    window.showToast?.('List Deleted', `The list "${listName}" has been removed.`);
+                }
             };
 
             window.applyPinVisualState = function(itemEl, isPinned) {
@@ -703,11 +826,21 @@
                     } else if (filter === 'groups') {
                         matchesFilter = item.id.startsWith('group_sidebar_');
                     } else if (filter === 'archived') {
-                        matchesFilter = window.archivedChats.includes(item.id);
+                        matchesFilter = window.archivedChats.includes(item.id) && !window.lockedChats.includes(item.id);
+                    } else if (filter === 'locked') {
+                        matchesFilter = window.lockedChats.includes(item.id);
+                    } else if (filter.startsWith('list_')) {
+                        const listName = filter.replace('list_', '');
+                        matchesFilter = window.customLists[listName] && window.customLists[listName].includes(item.id);
                     }
 
                     // Hide archived chats from all other views
-                    if (filter !== 'archived' && window.archivedChats.includes(item.id)) {
+                    if (filter !== 'archived' && filter !== 'locked' && window.archivedChats.includes(item.id)) {
+                        matchesFilter = false;
+                    }
+                    
+                    // Hide locked chats from all other views
+                    if (filter !== 'locked' && window.lockedChats.includes(item.id)) {
                         matchesFilter = false;
                     }
 
@@ -747,6 +880,18 @@
                 });
 
                 items.forEach(item => container.appendChild(item));
+                
+                // Show/hide Locked Chats button
+                const lockedBtn = document.getElementById('locked_chats_btn');
+                if (lockedBtn) {
+                    if (window.lockedChats.length > 0 && filter === 'all') {
+                        lockedBtn.classList.remove('hidden');
+                        lockedBtn.classList.add('flex');
+                    } else {
+                        lockedBtn.classList.add('hidden');
+                        lockedBtn.classList.remove('flex');
+                    }
+                }
             };
 
             // Initialize visual states and sort
@@ -754,6 +899,11 @@
                 const isPinned = window.pinnedChats.includes(item.id);
                 window.applyPinVisualState(item, isPinned);
             });
+
+            if (window.renderCustomListFilters) {
+                window.renderCustomListFilters();
+            }
+
             window.sortSidebar();
 
             window.toggleUserContextMenu = function(event, targetId, displayName, type = 'user') {
@@ -874,6 +1024,18 @@
                     }
                 }
 
+                // Dynamic updates based on state
+                const removeListBtn = document.getElementById('context_remove_from_list_btn');
+                if (removeListBtn) {
+                    if (window.activeSidebarFilter && window.activeSidebarFilter.startsWith('list_')) {
+                        removeListBtn.classList.remove('hidden');
+                        removeListBtn.classList.add('flex');
+                    } else {
+                        removeListBtn.classList.add('hidden');
+                        removeListBtn.classList.remove('flex');
+                    }
+                }
+
                 // Position the dropdown at the button position
                 const rect = event.currentTarget.getBoundingClientRect();
 
@@ -929,7 +1091,24 @@
                 } else if (action === 'favourite') {
                     window.toggleFavouriteChat(activeChatIdForMenu, activeChatTypeForMenu);
                 } else if (action === 'add_to_list') {
-                    window.showToast?.('Added to List', `Chat added to custom list.`);
+                    if (window.openAddToListModal) {
+                        const elId = activeChatTypeForMenu === 'group' ? `group_sidebar_${activeChatIdForMenu}` : `user_sidebar_${activeChatIdForMenu}`;
+                        window.openAddToListModal(elId);
+                    }
+                } else if (action === 'remove_from_list') {
+                    if (window.activeSidebarFilter && window.activeSidebarFilter.startsWith('list_')) {
+                        const listName = window.activeSidebarFilter.replace('list_', '');
+                        const elId = activeChatTypeForMenu === 'group' ? `group_sidebar_${activeChatIdForMenu}` : `user_sidebar_${activeChatIdForMenu}`;
+                        const idx = window.customLists[listName].indexOf(elId);
+                        if (idx !== -1) {
+                            window.customLists[listName].splice(idx, 1);
+                            localStorage.setItem('custom_lists', JSON.stringify(window.customLists));
+                            window.sortSidebar();
+                            window.showToast?.('Removed from List', `Chat removed from ${listName}.`);
+                        }
+                    }
+                } else if (action === 'disappearing') {
+                    window.showToast?.('Disappearing Messages', `Disappearing messages settings opened.`);
                 } else if (action === 'block') {
                     window.toggleBlockContact(activeChatIdForMenu, activeChatTypeForMenu);
                 } else if (action === 'clear') {
@@ -1073,6 +1252,13 @@
             };
 
             window.toggleLockChat = function(targetId, type) {
+                if (!localStorage.getItem('app_lock_hash')) {
+                    // Prompt user to set up App Lock first
+                    window.handleAppLockClick();
+                    return; // They can lock it manually after setting it up, or we could save intent. 
+                            // For simplicity, just prompt them and let them try again.
+                }
+                
                 const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                 const index = window.lockedChats.indexOf(elementId);
                 let isLocked = false;
@@ -1081,13 +1267,19 @@
                 } else {
                     window.lockedChats.push(elementId);
                     isLocked = true;
+                    // Also unarchive if archived, since locked takes precedence visually
+                    const archIndex = window.archivedChats.indexOf(elementId);
+                    if (archIndex > -1) {
+                        window.archivedChats.splice(archIndex, 1);
+                        localStorage.setItem('archived_chats', JSON.stringify(window.archivedChats));
+                    }
                 }
                 localStorage.setItem('locked_chats', JSON.stringify(window.lockedChats));
                 window.sortSidebar();
 
                 const chatName = type === 'group' ? 'Group' : 'Chat';
                 window.showToast?.(isLocked ? 'Chat Locked' : 'Chat Unlocked',
-                    `The ${chatName.toLowerCase()} has been ${isLocked ? 'locked' : 'unlocked'}.`);
+                    `The ${chatName.toLowerCase()} has been ${isLocked ? 'locked and hidden' : 'unlocked'}.`);
             };
 
             window.toggleMuteChat = function(targetId, type, durationStr) {

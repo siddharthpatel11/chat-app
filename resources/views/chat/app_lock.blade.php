@@ -45,6 +45,30 @@
     </div>
 </div>
 
+<!-- Chat Unlock Prompt Modal -->
+<div id="chat_unlock_modal" class="hidden fixed inset-0 z-[2000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+    <div class="bg-[#233138] w-[90%] max-w-[320px] rounded-2xl p-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0" id="chat_unlock_content">
+        <div class="flex justify-center mb-4 text-[#00a884]">
+            <svg viewBox="0 0 24 24" height="32" width="32" fill="currentColor">
+                <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+            </svg>
+        </div>
+        <h3 class="text-[#e9edef] text-[18px] font-medium mb-4 text-center">Unlock to view</h3>
+        <p class="text-[#8696a0] text-[14px] mb-6 text-center">Use your App Lock password to see locked chats.</p>
+        
+        <div class="w-full relative mb-4">
+            <input type="password" id="chat_unlock_input" placeholder="Password" class="w-full bg-[#111b21] border border-transparent focus:border-[#00a884] text-[#e9edef] px-4 py-2.5 rounded-lg outline-none transition-colors text-[15px] text-center">
+        </div>
+        
+        <p id="chat_unlock_error" class="text-red-500 text-[13px] hidden text-center mb-4">Incorrect password.</p>
+        
+        <div class="flex justify-between gap-3 mt-6">
+            <button onclick="window.closeChatUnlockModal()" class="flex-1 bg-[#2a3942] hover:bg-[#3b4a54] text-[#e9edef] font-medium text-[14px] py-2 rounded-full transition-colors">Cancel</button>
+            <button onclick="window.verifyChatUnlock()" class="flex-1 bg-[#00a884] text-[#111b21] font-medium text-[14px] py-2 rounded-full hover:bg-[#06cf9c] transition-colors">Unlock</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Simple fast hash for local locking
     async function hashPassword(password) {
@@ -169,6 +193,59 @@
             document.getElementById('logout-form').submit();
         }
     };
+
+    // Chat Unlock Logic
+    window.openLockedChatsPrompt = function() {
+        document.getElementById('chat_unlock_input').value = '';
+        document.getElementById('chat_unlock_error').classList.add('hidden');
+        const modal = document.getElementById('chat_unlock_modal');
+        const content = document.getElementById('chat_unlock_content');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.add('opacity-100');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+            document.getElementById('chat_unlock_input').focus();
+        }, 10);
+    };
+
+    window.closeChatUnlockModal = function() {
+        const modal = document.getElementById('chat_unlock_modal');
+        const content = document.getElementById('chat_unlock_content');
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.remove('opacity-100');
+            modal.classList.add('hidden');
+        }, 300);
+    };
+
+    window.verifyChatUnlock = async function() {
+        const input = document.getElementById('chat_unlock_input').value;
+        const hash = await hashPassword(input);
+        const storedHash = localStorage.getItem('app_lock_hash');
+        
+        if (hash === storedHash) {
+            window.closeChatUnlockModal();
+            // Switch sidebar filter to 'locked'
+            window.setSidebarFilter('locked');
+        } else {
+            document.getElementById('chat_unlock_error').classList.remove('hidden');
+            const inputEl = document.getElementById('chat_unlock_input');
+            inputEl.classList.add('border', 'border-red-500');
+            inputEl.value = '';
+            inputEl.focus();
+            setTimeout(() => {
+                inputEl.classList.remove('border', 'border-red-500');
+            }, 2000);
+        }
+    };
+
+    document.getElementById('chat_unlock_input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            window.verifyChatUnlock();
+        }
+    });
 
     // Check on load
     window.addEventListener('DOMContentLoaded', () => {

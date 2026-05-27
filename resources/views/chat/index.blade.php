@@ -802,7 +802,7 @@
                                             <button onclick="window.toggleLockChat(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="private_header_lock_text">Lock chat</span></button>
                                             <button onclick="window.toggleFavouriteChat(window.activeChatUser.id, 'user'); window.updatePrivateHeaderFavouriteText(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="private_header_favourite_text">Add to favourites</span></button>
                                             <button onclick="togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Add to list</span></button>
-                                            <button onclick="window.backToSidebar(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Close chat</span></button>
+                                            <button onclick="window.closeChat(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Close chat</span></button>
                                             <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
                                             <button onclick="window.reportContact(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Report</span></button>
                                             <button onclick="window.toggleBlockContact(window.activeChatUser.id, 'user'); window.updateBlockedUI(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
@@ -3372,6 +3372,27 @@
             document.getElementById('main_chat_column').classList.remove('flex');
         };
 
+        window.closeChat = function() {
+            window.activeChatUser = null;
+            document.getElementById('chat_empty_state')?.classList.remove('hidden');
+            
+            // Hide all chat contents
+            document.getElementById('active_chat_content')?.classList.add('hidden');
+            document.getElementById('active_chat_content')?.classList.remove('flex');
+            document.getElementById('active_group_chat_content')?.classList.add('hidden');
+            document.getElementById('active_group_chat_content')?.classList.remove('flex');
+            document.getElementById('meta_ai_content')?.classList.add('hidden');
+            document.getElementById('meta_ai_content')?.classList.remove('flex');
+            
+            // Remove active highlight from sidebar
+            document.querySelectorAll('.user-chat-item').forEach(el => el.classList.remove('active'));
+            
+            // On mobile, also navigate back to sidebar
+            if (window.innerWidth < 640) {
+                window.backToSidebar();
+            }
+        };
+
         window.selectChat = function (otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
             // If we are in Status mode, switch back to Chats
             const statusView = document.getElementById('status_view_container');
@@ -4553,4 +4574,5 @@
     </form>
 
     @include('chat.app_lock')
+    @include('chat.add_to_list_modal')
 </x-app-layout>

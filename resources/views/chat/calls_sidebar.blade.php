@@ -4,8 +4,10 @@
         <h1 class="text-[#e9edef] text-[22px] font-bold">Calls</h1>
         <div class="flex gap-4 text-[#aebac1]">
             <button class="hover:bg-[#202c33] p-2 rounded-full transition-colors" title="New call">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                    <path d="M20,15.5c-1.25,0-2.45-0.2-3.57-0.57c-0.35-0.11-0.74-0.03-1.01,0.24l-2.2,2.2c-2.83-1.44-5.15-3.75-6.59-6.58l2.2-2.2c0.28-0.28,0.36-0.67,0.25-1.02C8.7,6.45,8.5,5.25,8.5,4C8.5,3.45,8.05,3,7.5,3H4C3.45,3,3,3.45,3,4c0,9.39,7.61,17,17,17c0.55,0,1-0.45,1-1v-3.5C21,15.95,20.55,15.5,20,15.5z M19,12h2V9h3V7h-3V4h-2v3h-3v2h3V12z"></path>
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#aebac1]">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    <line x1="14" y1="5" x2="20" y2="5"></line>
+                    <line x1="17" y1="2" x2="17" y2="8"></line>
                 </svg>
             </button>
         </div>
