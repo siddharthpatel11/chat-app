@@ -144,7 +144,7 @@
             @endforeach
 
             <!-- Log out -->
-            <div
+            <div onclick="window.openLogoutModal()"
                 class="flex items-center px-4 py-4 hover:bg-[#202c33] rounded-lg cursor-pointer group transition-all mt-4 mb-10">
                 <div class="w-10 text-[#f15c5c] shrink-0">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"

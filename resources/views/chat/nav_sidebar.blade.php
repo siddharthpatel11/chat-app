@@ -18,15 +18,16 @@
         </button>
 
         <!-- Calls -->
-        <button class="nav-item group" title="Calls">
+        <button id="nav_calls" class="nav-item group" title="Calls" onclick="window.showCalls()">
             <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                    class="text-[#8696a0] group-hover:text-[#e9edef]">
+                    class="text-[#8696a0] group-[.active]:text-[#e9edef]">
                     <path
                         d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
                     </path>
                 </svg>
             </div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#00a884] rounded-r-full hidden group-[.active]:block"></div>
         </button>
 
         <!-- Status -->

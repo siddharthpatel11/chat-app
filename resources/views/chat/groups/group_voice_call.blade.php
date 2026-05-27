@@ -375,12 +375,26 @@
 
         async function sendCallLog(status, duration) {
             if (ROLE !== 'caller' || !GROUP_ID) return;
+            const now = Math.floor(Date.now() / 1000);
             try {
                 await push(ref(db, `groups/${GROUP_ID}/messages`), {
                     sender_id: MY_USER_ID, sender_name: MY_NAME,
                     type: 'call', call_type: 'voice', call_status: status,
-                    call_duration: duration, text: '', time: Math.floor(Date.now() / 1000), status: 'sent'
+                    call_duration: duration, text: '', time: now, status: 'sent'
                 });
+                
+                const logData = {
+                    type: 'voice',
+                    status: status,
+                    direction: 'outgoing',
+                    duration: duration || 0,
+                    time: now,
+                    other_user_id: GROUP_ID,
+                    other_user_name: 'Group Call',
+                    other_user_avatar: '',
+                    is_group: true
+                };
+                await push(ref(db, `users/${MY_USER_ID}/call_logs`), logData);
             } catch(e) {}
         }
 

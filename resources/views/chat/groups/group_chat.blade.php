@@ -1523,61 +1523,89 @@
         window.renderGroupCallParticipants();
     };
 
-    window.startGroupVoiceCall = function(useSelection = false) {
-        if (!window.activeChatUser) {
-            alert('Please select a group first.');
-            return;
-        }
+    window.startGroupVoiceCall = function(groupIdOrUseSelection = false) {
+        let isSelection = typeof groupIdOrUseSelection === 'boolean' ? groupIdOrUseSelection : false;
+        let providedGroupId = typeof groupIdOrUseSelection === 'string' || typeof groupIdOrUseSelection === 'number' ? groupIdOrUseSelection : null;
 
+        let gId = providedGroupId;
+        let gName = 'Group';
+        let gAvatar = '';
         let participants = [];
-        if (useSelection) {
-            participants = Array.from(window.selectedCallParticipants);
-            if (participants.length === 0) {
-                alert('Please select at least one participant.');
+
+        if (providedGroupId) {
+            // Started from calls list, pass the ID. Route will handle it.
+        } else {
+            if (!window.activeChatUser) {
+                alert('Please select a group first.');
                 return;
             }
-        } else {
-            // Call everyone in the group except self
-            participants = window.activeChatUser.users
-                .filter(u => u.id != window.myUserId)
-                .map(u => u.id);
+            gId = window.activeChatUser.id;
+            gName = window.activeChatUser.name || 'Group';
+            gAvatar = window.activeChatUser.avatar || '';
+
+            if (isSelection) {
+                participants = Array.from(window.selectedCallParticipants);
+                if (participants.length === 0) {
+                    alert('Please select at least one participant.');
+                    return;
+                }
+            } else {
+                participants = window.activeChatUser.users
+                    .filter(u => u.id != window.myUserId)
+                    .map(u => u.id);
+            }
         }
 
         const params = new URLSearchParams({
-            name: window.activeChatUser.name || 'Group',
-            avatar: window.activeChatUser.avatar || '',
+            name: gName,
+            avatar: gAvatar,
             role: 'caller',
-            group_id: window.activeChatUser.id,
+            group_id: gId,
             participants: participants.join(',')
         });
 
         window.location.href = '/chat/groups/voice-call?' + params.toString();
     };
 
-    window.startGroupVideoCall = function(useSelection = false) {
-        if (!window.activeChatUser) {
-            alert('Please select a group first.');
-            return;
-        }
+    window.startGroupVideoCall = function(groupIdOrUseSelection = false) {
+        let isSelection = typeof groupIdOrUseSelection === 'boolean' ? groupIdOrUseSelection : false;
+        let providedGroupId = typeof groupIdOrUseSelection === 'string' || typeof groupIdOrUseSelection === 'number' ? groupIdOrUseSelection : null;
 
+        let gId = providedGroupId;
+        let gName = 'Group';
+        let gAvatar = '';
         let participants = [];
-        if (useSelection) {
-            participants = Array.from(window.selectedCallParticipants);
-            if (participants.length === 0) {
-                alert('Please select at least one participant.');
+
+        if (providedGroupId) {
+            // Started from calls list, we just pass the ID. We might not have participants array immediately, 
+            // but the route can handle it by fetching group members, or the caller will broadcast to the group node.
+        } else {
+            if (!window.activeChatUser) {
+                alert('Please select a group first.');
                 return;
             }
-        } else {
-            participants = window.activeChatUser.users
-                .filter(u => u.id != window.myUserId)
-                .map(u => u.id);
+            gId = window.activeChatUser.id;
+            gName = window.activeChatUser.name || 'Group';
+            gAvatar = window.activeChatUser.avatar || '';
+
+            if (isSelection) {
+                participants = Array.from(window.selectedCallParticipants);
+                if (participants.length === 0) {
+                    alert('Please select at least one participant.');
+                    return;
+                }
+            } else {
+                participants = window.activeChatUser.users
+                    .filter(u => u.id != window.myUserId)
+                    .map(u => u.id);
+            }
         }
 
         const params = new URLSearchParams({
-            name: window.activeChatUser.name || 'Group',
-            avatar: window.activeChatUser.avatar || '',
+            name: gName,
+            avatar: gAvatar,
             role: 'caller',
-            group_id: window.activeChatUser.id,
+            group_id: gId,
             participants: participants.join(',')
         });
 
@@ -3649,6 +3677,10 @@
             const data = snapshot.val();
             if (!data) return;
 
+            const elementId = `group_sidebar_${groupId}`;
+            const clearedTime = window.clearedChats?.[elementId] || 0;
+            if (data.time <= clearedTime) return;
+
             // Update Last Message Text
             const lastMsgEl = document.getElementById(`group_last_msg_${groupId}`);
             if (lastMsgEl) {
@@ -3786,6 +3818,10 @@
         window.onChildAdded(messagesRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
+                const elementId = `group_sidebar_${groupId}`;
+                const clearedTime = window.clearedChats?.[elementId] || 0;
+                if (data.time <= clearedTime) return;
+                
                 const key = snapshot.key;
                 const idx = window.groupMessagesCache[groupId].findIndex(m => m.key === key);
                 if (idx === -1) {
@@ -4518,6 +4554,11 @@
 
         window.unsubscribeAdded = window.onChildAdded(messagesRef, (snapshot) => {
             const data = snapshot.val();
+            
+            const elementId = `group_sidebar_${groupId}`;
+            const clearedTime = window.clearedChats?.[elementId] || 0;
+            if (data.time && data.time <= clearedTime) return;
+            
             const key = snapshot.key;
             window.globalMessages[key] = data;
 

@@ -215,6 +215,46 @@
             </div>
         </div>
 
+        <!-- Custom Logout Modal -->
+        <div id="logout_modal"
+            class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+            <div class="bg-[#233138] w-[90%] max-w-[340px] rounded-[3px] p-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0"
+                id="logout_modal_content">
+                <h3 class="text-[#e9edef] text-[20px] font-normal mb-8">Log out?</h3>
+                <p class="text-[#8696a0] text-[15px] mb-8">Are you sure you want to log out?</p>
+                <div class="flex justify-end gap-4 items-center">
+                    <button onclick="window.closeLogoutModal()"
+                        class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-4 py-2 rounded-lg transition-colors border border-gray-600/30">Cancel</button>
+                    <button onclick="document.getElementById('logout-form').submit();"
+                        class="bg-[#00a884] text-[#111b21] font-medium text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg">Log out</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            window.openLogoutModal = function() {
+                const modal = document.getElementById('logout_modal');
+                const content = document.getElementById('logout_modal_content');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.add('opacity-100');
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            };
+
+            window.closeLogoutModal = function() {
+                const modal = document.getElementById('logout_modal');
+                const content = document.getElementById('logout_modal_content');
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-100');
+                    modal.classList.add('hidden');
+                }, 300);
+            };
+        </script>
+
         <!-- Forward Modal -->
         <div id="forward_modal"
             class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
@@ -330,10 +370,12 @@
             @include('chat.contacts.new_contact')
             @include('chat.contacts.edit_contact')
             @include('chat.sidebar')
+            @include('chat.calls_sidebar')
+            @include('chat.calls_main_column')
+            @include('chat.calls.add_favourite_modal')
             <div id="sidebar_resizer"
                 class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]">
             </div>
-
 
             <!-- Media Preview Modal -->
             <div id="media_preview_modal"
@@ -1563,24 +1605,37 @@
         setTimeout(initCallDropdown, 500);
 
         // --- DYNAMIC CALL NAVIGATION ---
-        window.startVoiceCall = function () {
-            if (!window.activeChatUser) { alert('Please select a chat first.'); return; }
+        // --- DYNAMIC CALL NAVIGATION ---
+        window.startVoiceCall = function (userId, name, avatar) {
+            let uId = userId, uName = name, uAvatar = avatar;
+            if (!uId) {
+                if (!window.activeChatUser) { alert('Please select a chat first.'); return; }
+                uId = window.activeChatUser.id;
+                uName = window.activeChatUser.name;
+                uAvatar = window.activeChatUser.avatar;
+            }
             const params = new URLSearchParams({
-                name: window.activeChatUser.name || 'User',
-                avatar: window.activeChatUser.avatar || '',
+                name: uName || 'User',
+                avatar: uAvatar || '',
                 role: 'caller',
-                callee_id: window.activeChatUser.id
+                callee_id: uId
             });
             window.location.href = '/chat/voice-call?' + params.toString();
         };
 
-        window.startVideoCall = function () {
-            if (!window.activeChatUser) { alert('Please select a chat first.'); return; }
+        window.startVideoCall = function (userId, name, avatar) {
+            let uId = userId, uName = name, uAvatar = avatar;
+            if (!uId) {
+                if (!window.activeChatUser) { alert('Please select a chat first.'); return; }
+                uId = window.activeChatUser.id;
+                uName = window.activeChatUser.name;
+                uAvatar = window.activeChatUser.avatar;
+            }
             const params = new URLSearchParams({
-                name: window.activeChatUser.name || 'User',
-                avatar: window.activeChatUser.avatar || '',
+                name: uName || 'User',
+                avatar: uAvatar || '',
                 role: 'caller',
-                callee_id: window.activeChatUser.id
+                callee_id: uId
             });
             window.location.href = '/chat/video-call?' + params.toString();
         };
@@ -3097,6 +3152,11 @@
             document.getElementById('status_view_container').classList.add('hidden');
             document.getElementById('status_view_container').classList.remove('flex');
 
+            document.getElementById('calls_sidebar_container')?.classList.add('hidden');
+            document.getElementById('calls_sidebar_container')?.classList.remove('flex');
+            document.getElementById('calls_main_column')?.classList.add('hidden');
+            document.getElementById('calls_main_column')?.classList.remove('flex');
+
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.remove('hidden');
             sidebar.classList.add('sm:flex', 'flex'); // Ensure both base and responsive flex are added
@@ -3125,6 +3185,11 @@
             // Ensure Sidebar is shown (similar to showChats)
             document.getElementById('status_view_container').classList.add('hidden');
             document.getElementById('status_view_container').classList.remove('flex');
+
+            document.getElementById('calls_sidebar_container')?.classList.add('hidden');
+            document.getElementById('calls_sidebar_container')?.classList.remove('flex');
+            document.getElementById('calls_main_column')?.classList.add('hidden');
+            document.getElementById('calls_main_column')?.classList.remove('flex');
 
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.remove('hidden');
@@ -3156,6 +3221,11 @@
 
             document.getElementById('sidebar_resizer').classList.add('hidden');
 
+            document.getElementById('calls_sidebar_container')?.classList.add('hidden');
+            document.getElementById('calls_sidebar_container')?.classList.remove('flex');
+            document.getElementById('calls_main_column')?.classList.add('hidden');
+            document.getElementById('calls_main_column')?.classList.remove('flex');
+
             document.getElementById('status_view_container').classList.remove('hidden');
             document.getElementById('status_view_container').classList.add('flex');
 
@@ -3163,6 +3233,42 @@
             const panel = document.getElementById('settings_panel');
             if (panel && !panel.classList.contains('hidden')) {
                 window.toggleSettings();
+            }
+        };
+
+        window.showCalls = function () {
+            // Update Navigation UI
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('nav_calls')?.classList.add('active');
+
+            // Hide other views
+            const sidebar = document.getElementById('user_sidebar_container');
+            sidebar.classList.add('hidden');
+            sidebar.classList.remove('sm:flex', 'flex');
+
+            document.getElementById('chat_view_container').classList.add('hidden');
+            document.getElementById('chat_view_container').classList.remove('flex');
+
+            document.getElementById('status_view_container').classList.add('hidden');
+            document.getElementById('status_view_container').classList.remove('flex');
+
+            document.getElementById('sidebar_resizer').classList.add('hidden');
+
+            // Show calls views
+            document.getElementById('calls_sidebar_container')?.classList.remove('hidden');
+            document.getElementById('calls_sidebar_container')?.classList.add('flex');
+            document.getElementById('calls_main_column')?.classList.remove('hidden');
+            document.getElementById('calls_main_column')?.classList.add('flex');
+
+            // Close settings if open
+            const panel = document.getElementById('settings_panel');
+            if (panel && !panel.classList.contains('hidden')) {
+                window.toggleSettings();
+            }
+
+            // Load logs
+            if (window.loadCallLogs) {
+                window.loadCallLogs();
             }
         };
 
@@ -4257,13 +4363,26 @@
                     const minId = Math.min(window.myUserId, callerId);
                     const maxId = Math.max(window.myUserId, callerId);
                     const chatId = `chat_${minId}_${maxId}`;
+                    const now = Math.floor(Date.now() / 1000);
                     try {
                         await push(ref(db, `chats/${chatId}/messages`), {
                             sender_id: callerId,
                             type: 'call', call_type: callData.type,
                             call_status: 'missed', call_duration: 0,
-                            text: '', time: Math.floor(Date.now() / 1000), status: 'sent'
+                            text: '', time: now, status: 'sent'
                         });
+
+                        const logData = {
+                            type: callData.type,
+                            status: 'missed',
+                            direction: 'incoming',
+                            duration: 0,
+                            time: now,
+                            other_user_id: callerId,
+                            other_user_name: callData.caller_name || 'Unknown',
+                            other_user_avatar: callData.caller_avatar || ''
+                        };
+                        await push(ref(db, `users/${window.myUserId}/call_logs`), logData);
                     } catch (e) { console.error('Missed call log error:', e); }
                 };
 
@@ -4393,33 +4512,45 @@
         };
 
         window.checkAndApplyClearedChatUI = function(clearedElementId) {
-            const isGroup = window.currentChatId && window.currentChatId.startsWith('group_');
-            if (!window.currentChatId) return;
-
-            let activeElementId;
-            if (isGroup) {
-                activeElementId = `group_sidebar_${window.currentChatId.replace('group_', '')}`;
-            } else {
-                const targetId = window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
-                activeElementId = `user_sidebar_${targetId}`;
-            }
-
-            if (activeElementId === clearedElementId) {
-                // Clear messages container
-                const msgsContainer = document.getElementById('messages');
-                if (msgsContainer) {
-                    msgsContainer.innerHTML = '';
+            if (window.currentChatId) {
+                const isGroup = window.currentChatId.startsWith('group_');
+                let activeElementId;
+                if (isGroup) {
+                    activeElementId = `group_sidebar_${window.currentChatId.replace('group_', '')}`;
+                } else {
+                    const targetId = window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
+                    activeElementId = `user_sidebar_${targetId}`;
                 }
-                // Clear reply state
-                if (typeof window.cancelReply === 'function') window.cancelReply();
+
+                if (activeElementId === clearedElementId) {
+                    // Clear messages container
+                    const msgsContainer = document.getElementById(isGroup ? 'group_messages' : 'messages');
+                    if (msgsContainer) {
+                        msgsContainer.innerHTML = '';
+                    }
+                    // Clear reply state
+                    if (isGroup && typeof window.cancelGroupReply === 'function') {
+                        window.cancelGroupReply();
+                    } else if (typeof window.cancelReply === 'function') {
+                        window.cancelReply();
+                    }
+                }
             }
 
             // Also update the sidebar preview
+            const isTargetGroup = clearedElementId.startsWith('group_sidebar_');
             const targetId = clearedElementId.replace('user_sidebar_', '').replace('group_sidebar_', '');
-            const lastMsgEl = document.getElementById(`last_msg_${targetId}`);
-            if (lastMsgEl) lastMsgEl.textContent = 'Click to chat';
+            const lastMsgElId = isTargetGroup ? `group_last_msg_${targetId}` : `last_msg_${targetId}`;
+            const lastMsgEl = document.getElementById(lastMsgElId);
+            if (lastMsgEl) lastMsgEl.textContent = isTargetGroup ? 'Group chat' : 'Click to chat';
         };
 
         window.loadStarredMessages();
     </script>
+
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+        @csrf
+    </form>
+
+    @include('chat.app_lock')
 </x-app-layout>

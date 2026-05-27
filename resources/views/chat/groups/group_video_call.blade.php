@@ -678,12 +678,26 @@
         window.endVCall = function () { ended = true; const dur = Math.floor((Date.now() - startTime) / 1000); sendCallLog('completed', dur); cleanup(); if (groupId) update(ref(db, `group_calls/${groupId}/participants/${MY_USER_ID}`), { status: 'left' }); window.location.href = '/chat'; };
         async function sendCallLog(status, duration) {
             if (ROLE !== 'caller' || !GROUP_ID) return;
+            const now = Math.floor(Date.now() / 1000);
             try {
                 await push(ref(db, `groups/${GROUP_ID}/messages`), {
                     sender_id: MY_USER_ID, sender_name: MY_NAME,
                     type: 'call', call_type: 'video', call_status: status,
-                    call_duration: duration, text: '', time: Math.floor(Date.now() / 1000), status: 'sent'
+                    call_duration: duration, text: '', time: now, status: 'sent'
                 });
+                
+                const logData = {
+                    type: 'video',
+                    status: status,
+                    direction: 'outgoing',
+                    duration: duration || 0,
+                    time: now,
+                    other_user_id: GROUP_ID,
+                    other_user_name: 'Group Call',
+                    other_user_avatar: '',
+                    is_group: true
+                };
+                await push(ref(db, `users/${MY_USER_ID}/call_logs`), logData);
             } catch (e) { }
         }
         function cleanup() { clearInterval(timer); if (localStream) localStream.getTracks().forEach(t => t.stop()); Object.values(extraPeers).forEach(p => p.close()); }

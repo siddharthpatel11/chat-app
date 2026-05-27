@@ -401,12 +401,25 @@
         async function sendCallLog(callStatus, duration) {
             if (callLogSent || !otherUserId) return;
             callLogSent = true;
+            const now = Math.floor(Date.now() / 1000);
             try {
                 await push(ref(db, `chats/${getChatId()}/messages`), {
                     sender_id: MY_USER_ID, type: 'call', call_type: CALL_TYPE,
                     call_status: callStatus, call_duration: duration || 0,
-                    text: '', time: Math.floor(Date.now() / 1000), status: 'sent'
+                    text: '', time: now, status: 'sent'
                 });
+                
+                const logData = {
+                    type: CALL_TYPE,
+                    status: callStatus,
+                    direction: ROLE === 'caller' ? 'outgoing' : 'incoming',
+                    duration: duration || 0,
+                    time: now,
+                    other_user_id: otherUserId,
+                    other_user_name: OTHER_NAME,
+                    other_user_avatar: OTHER_AVATAR
+                };
+                await push(ref(db, `users/${MY_USER_ID}/call_logs`), logData);
             } catch (e) { console.error('Call log error:', e); }
         }
 
