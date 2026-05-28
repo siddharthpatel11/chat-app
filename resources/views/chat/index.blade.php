@@ -581,7 +581,7 @@
                             </div>
                             <!-- Add Contact -->
                             <div class="flex flex-col items-center gap-4 group cursor-pointer"
-                                onclick="window.focusSearch()">
+                                onclick="toggleNewContact()">
                                 <div
                                     class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#8696a0] group-hover:bg-[#2a3942] transition-all duration-300">
                                     <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor"
@@ -593,7 +593,8 @@
                                 <span class="text-[#8696a0] text-[13px] font-normal">Add contact</span>
                             </div>
                             <!-- Ask Meta AI -->
-                            <div class="flex flex-col items-center gap-4 group cursor-pointer">
+                            <div class="flex flex-col items-center gap-4 group cursor-pointer"
+                                onclick="window.openMetaAiChat()">
                                 <div
                                     class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#d33682] group-hover:bg-[#2a3942] transition-all duration-300">
                                     <div class="relative w-10 h-10 flex items-center justify-center">
@@ -3375,7 +3376,7 @@
         window.closeChat = function() {
             window.activeChatUser = null;
             document.getElementById('chat_empty_state')?.classList.remove('hidden');
-            
+
             // Hide all chat contents
             document.getElementById('active_chat_content')?.classList.add('hidden');
             document.getElementById('active_chat_content')?.classList.remove('flex');
@@ -3383,10 +3384,10 @@
             document.getElementById('active_group_chat_content')?.classList.remove('flex');
             document.getElementById('meta_ai_content')?.classList.add('hidden');
             document.getElementById('meta_ai_content')?.classList.remove('flex');
-            
+
             // Remove active highlight from sidebar
             document.querySelectorAll('.user-chat-item').forEach(el => el.classList.remove('active'));
-            
+
             // On mobile, also navigate back to sidebar
             if (window.innerWidth < 640) {
                 window.backToSidebar();

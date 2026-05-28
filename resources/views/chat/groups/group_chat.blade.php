@@ -2668,12 +2668,7 @@
                     d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z">
                 </path>
             </svg></button>
-        <button
-            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask
-                Meta AI</span></button>
-        <button onclick="window.askMetaAIGroupMessage()"
-            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask
-                Meta AI</span></button>
+
         <button onclick="window.starGroupMessage()"
             class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span
                 id="group_star_dropdown_btn_text">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24"
