@@ -424,6 +424,8 @@
             @include('chat.settings.privacy_panels.privacy_profile_photo')
             @include('chat.settings.privacy_panels.privacy_about')
             @include('chat.settings.privacy_panels.privacy_exclude_contacts')
+            @include('chat.settings.privacy_panels.privacy_blocked_contacts')
+            @include('chat.settings.privacy_panels.privacy_add_blocked_contact')
             @include('chat.settings.chats')
             @include('chat.settings.chats_panels.chats_modals')
             @include('chat.settings.chats_panels.chats_upload_quality')
@@ -1026,6 +1028,10 @@
                                             d="M6 18L18 6M6 6l12 12"></path>
                                     </svg>
                                 </button>
+                            </div>
+                            <div id="chat_blocked_notice" class="hidden flex items-center justify-center w-full py-4 text-[#8696a0] text-[14px]">
+                                You blocked this contact. 
+                                <button onclick="window.toggleBlockContact(window.activeChatUser.id, 'user')" class="text-[#00a884] ml-1 hover:underline focus:outline-none">Tap to unblock.</button>
                             </div>
 
                             <div id="normal_input_container" class="flex items-center gap-2 w-full relative">
@@ -3812,6 +3818,9 @@
                     el.classList.add('active');
                 }
             });
+
+            // Update UI based on block status
+            if (window.updateBlockedUI) window.updateBlockedUI();
 
             // Reset states
             if (window.cancelSelection) window.cancelSelection();

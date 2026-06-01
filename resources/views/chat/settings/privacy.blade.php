@@ -113,10 +113,10 @@
             </div>
 
             <!-- Blocked contacts -->
-            <div class="flex items-center justify-between py-4 border-b border-[#202c33] cursor-pointer hover:bg-[#202c33] -mx-6 px-6 transition-colors group" onclick="window.showToast('Blocked Contacts', 'You have 12 blocked contacts.')">
-                <div class="flex-1 pr-4">
-                    <div class="text-[#e9edef] text-[16px] mb-1">Blocked contacts</div>
-                    <div class="text-[#8696a0] text-[14px]">12</div>
+            <div class="flex items-center justify-between py-4 border-b border-[#202c33] cursor-pointer hover:bg-[#202c33] -mx-6 px-6 transition-colors group" onclick="togglePrivacyBlockedContacts()">
+                <div class="flex flex-col">
+                    <span class="text-[#e9edef] text-[16px] mb-1">Blocked contacts</span>
+                    <span id="privacy_blocked_count_badge" class="text-[#8696a0] text-[14px]">0</span>
                 </div>
                 <div class="text-[#8696a0]">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
