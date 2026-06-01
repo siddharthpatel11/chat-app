@@ -13,6 +13,21 @@
                 background-blend-mode: multiply;
             }
 
+            /* Instant Light Theme via CSS Filter */
+            html.light-theme {
+                filter: invert(1) hue-rotate(180deg);
+            }
+            
+            html.light-theme img,
+            html.light-theme video,
+            html.light-theme canvas {
+                filter: invert(1) hue-rotate(180deg);
+            }
+            
+            html.light-theme .bg-transparent {
+                /* Fix for transparent backgrounds looking weird when inverted if they have borders */
+            }
+
             /* Toast Animations */
             @keyframes slide-in {
                 from {
@@ -226,7 +241,8 @@
                     <button onclick="window.closeLogoutModal()"
                         class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-4 py-2 rounded-lg transition-colors border border-gray-600/30">Cancel</button>
                     <button onclick="document.getElementById('logout-form').submit();"
-                        class="bg-[#00a884] text-[#111b21] font-medium text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg">Log out</button>
+                        class="bg-[#00a884] text-[#111b21] font-medium text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg">Log
+                        out</button>
                 </div>
             </div>
         </div>
@@ -257,7 +273,7 @@
 
         <!-- Forward Modal -->
         <div id="forward_modal"
-            class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+            class="hidden fixed inset-0 z-[3000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
             <div class="bg-[#222e35] w-[90%] max-w-[440px] h-[550px] rounded-2xl flex flex-col overflow-hidden shadow-2xl transform scale-95 transition-all duration-300 opacity-0"
                 id="forward_modal_content">
                 <!-- Header -->
@@ -265,7 +281,8 @@
                     <button onclick="window.closeForwardModal()"
                         class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full focus:outline-none transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
                     </button>
                     <h3 class="text-[#e9edef] text-[18px] font-medium">Forward message to</h3>
@@ -273,9 +290,12 @@
 
                 <!-- Search Bar -->
                 <div class="px-4 py-2 bg-[#111b21] shrink-0 border-b border-white/5">
-                    <div class="flex items-center bg-[#202c33] rounded-lg px-3 py-1.5 focus-within:bg-[#2a3942] transition-colors border border-transparent focus-within:border-[#00a884]/30">
-                        <svg class="w-5 h-5 text-[#8696a0] mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    <div
+                        class="flex items-center bg-[#202c33] rounded-lg px-3 py-1.5 focus-within:bg-[#2a3942] transition-colors border border-transparent focus-within:border-[#00a884]/30">
+                        <svg class="w-5 h-5 text-[#8696a0] mr-3 shrink-0" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <input type="text" id="forward_search_input" oninput="window.filterForwardContacts()"
                             placeholder="Search name or number"
@@ -287,10 +307,13 @@
                 <div class="flex-1 overflow-y-auto custom-scrollbar p-2 bg-[#111b21]">
                     <!-- My Status -->
                     <div onclick="window.toggleForwardTargetSelection('status', 'My status', '')"
-                        class="flex items-center justify-between p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item forward-target-item" data-name="my status">
+                        class="flex items-center justify-between p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item forward-target-item"
+                        data-name="my status">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-full bg-[#00a884]/10 flex items-center justify-center shrink-0">
-                                <svg class="w-7 h-7 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <div
+                                class="w-12 h-12 rounded-full bg-[#00a884]/10 flex items-center justify-center shrink-0">
+                                <svg class="w-7 h-7 text-[#00a884]" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24" stroke-width="2">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <path d="M12 6v6l4 2"></path>
                                 </svg>
@@ -301,15 +324,21 @@
                             </div>
                         </div>
                         <div class="shrink-0 mr-1">
-                            <div class="w-5 h-5 rounded border-2 border-gray-400 bg-white flex items-center justify-center transition-all select-none" id="forward_checkbox_box_status">
+                            <div class="w-5 h-5 rounded border-2 border-gray-400 bg-white flex items-center justify-center transition-all select-none"
+                                id="forward_checkbox_box_status">
                                 <input type="checkbox" id="forward_checkbox_status" class="hidden">
-                                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                <svg class="w-3.5 h-3.5 text-white hidden" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
                             </div>
                         </div>
                     </div>
 
                     <!-- Recent Chats Header -->
-                    <div class="text-[#00a884] text-xs font-semibold px-3 py-2 mt-2 uppercase tracking-wider">Recent chats</div>
+                    <div class="text-[#00a884] text-xs font-semibold px-3 py-2 mt-2 uppercase tracking-wider">Recent
+                        chats</div>
 
                     <!-- Contacts List Container -->
                     <div id="forward_contacts_list" class="space-y-1">
@@ -318,15 +347,20 @@
                 </div>
 
                 <!-- Footer -->
-                <div id="forward_modal_footer" class="hidden flex items-center justify-between px-6 py-4 bg-[#202c33] shrink-0 border-t border-white/5">
+                <div id="forward_modal_footer"
+                    class="hidden flex items-center justify-between px-6 py-4 bg-[#202c33] shrink-0 border-t border-white/5">
                     <div class="flex-1 min-w-0 pr-4">
                         <div class="text-[#8696a0] text-xs">Selected targets</div>
-                        <div id="forward_selected_names" class="text-[#e9edef] text-sm font-medium truncate mt-0.5"></div>
+                        <div id="forward_selected_names" class="text-[#e9edef] text-sm font-medium truncate mt-0.5">
+                        </div>
                     </div>
                     <button onclick="window.sendForwardedMessages()"
-                        class="bg-[#00a884] hover:bg-[#008f72] text-[#111b21] p-3 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95 shrink-0" title="Send messages">
+                        class="bg-[#00a884] hover:bg-[#008f72] text-[#111b21] p-3 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95 shrink-0"
+                        title="Send messages">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                            <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+                            <path
+                                d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
+                            </path>
                         </svg>
                     </button>
                 </div>
@@ -351,6 +385,29 @@
                 opacity: 1;
             }
         </style>
+        
+        <script>
+            window.applyGlobalWallpaper = function() {
+                const color = localStorage.getItem('whatsapp_wallpaper_color') || '#0b141a';
+                const doodles = localStorage.getItem('whatsapp_wallpaper_doodles') !== 'false';
+                
+                const bgElements = document.querySelectorAll('.chat-bg');
+                bgElements.forEach(el => {
+                    el.style.backgroundColor = color;
+                    if (doodles) {
+                        el.style.backgroundImage = "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')";
+                        el.style.backgroundBlendMode = "overlay";
+                        // Some colors are very dark, overlay blend mode with opacity looks best
+                    } else {
+                        el.style.backgroundImage = 'none';
+                    }
+                });
+            };
+            
+            document.addEventListener('DOMContentLoaded', () => {
+                window.applyGlobalWallpaper();
+            });
+        </script>
 
         <div class="flex w-full h-full bg-[#111b21] overflow-hidden border-none">
 
@@ -359,8 +416,28 @@
             @include('chat.status.text_status')
             @include('chat.status.media_status')
             @include('chat.status.status_viewer')
-            @include('chat.profile_settings')
-            @include('chat.edit_profile')
+            @include('chat.settings.profile_settings')
+            @include('chat.settings.edit_profile')
+            @include('chat.settings.general')
+            @include('chat.settings.privacy')
+            @include('chat.settings.privacy_panels.privacy_last_seen')
+            @include('chat.settings.privacy_panels.privacy_profile_photo')
+            @include('chat.settings.privacy_panels.privacy_about')
+            @include('chat.settings.privacy_panels.privacy_exclude_contacts')
+            @include('chat.settings.chats')
+            @include('chat.settings.chats_panels.chats_modals')
+            @include('chat.settings.chats_panels.chats_upload_quality')
+            @include('chat.settings.chats_panels.chats_auto_download')
+            @include('chat.settings.chats_panels.chats_wallpaper')
+            @include('chat.settings.account')
+            @include('chat.settings.security_notifications')
+            @include('chat.settings.video_voice_panels.video_voice')
+            @include('chat.settings.notifications_panels.notifications')
+            @include('chat.settings.notifications_panels.notifications_banner')
+            @include('chat.settings.notifications_panels.notifications_taskbar')
+            @include('chat.settings.notifications_panels.notifications_subpanel')
+            @include('chat.settings.help_and_feedback_panels.help_and_feedback')
+            @include('chat.settings.keyboard_shortcuts_modal')
             @include('chat.about.about_modal')
             @include('chat.about.about_privacy_modal')
             @include('chat.contacts.contact_info')
@@ -373,6 +450,7 @@
             @include('chat.calls_sidebar')
             @include('chat.calls_main_column')
             @include('chat.calls.add_favourite_modal')
+            @include('chat.media_gallery')
             <div id="sidebar_resizer"
                 class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]">
             </div>
@@ -424,7 +502,8 @@
             </div>
 
             <!-- Location Modal Full UI -->
-            <div id="location_preview_modal" class="hidden fixed inset-0 z-[100] bg-[#0b141a] flex flex-col font-sans">
+            <div id="location_preview_modal"
+                class="hidden fixed inset-0 z-[100] bg-[#0b141a] flex flex-col font-sans">
                 <!-- Header -->
                 <div
                     class="flex items-center justify-between px-4 h-16 bg-[#202c33] shrink-0 border-b border-[#313d45]">
@@ -439,7 +518,8 @@
                         <h2 class="text-white text-lg font-medium" id="location_modal_title">Send location</h2>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="toggleLocationSearch()" class="text-white hover:bg-white/10 p-2 rounded-full">
+                        <button onclick="toggleLocationSearch()"
+                            class="text-white hover:bg-white/10 p-2 rounded-full">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -569,8 +649,8 @@
                                 onclick="selectFile('.pdf,.doc,.docx')">
                                 <div
                                     class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#8696a0] group-hover:bg-[#2a3942] transition-all duration-300">
-                                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor"
-                                        stroke-width="1.5">
+                                    <svg viewBox="0 0 24 24" width="36" height="36" fill="none"
+                                        stroke="currentColor" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -584,8 +664,8 @@
                                 onclick="toggleNewContact()">
                                 <div
                                     class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#8696a0] group-hover:bg-[#2a3942] transition-all duration-300">
-                                    <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor"
-                                        stroke-width="1.5">
+                                    <svg viewBox="0 0 24 24" width="40" height="40" fill="none"
+                                        stroke="currentColor" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                             d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                                     </svg>
@@ -627,7 +707,8 @@
                             <div id="normal_header"
                                 class="flex items-center justify-between h-full w-full transition-all duration-300">
                                 <div class="flex items-center gap-2">
-                                    <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
+                                    <button
+                                        class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
                                         onclick="window.backToSidebar()">
                                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z">
@@ -645,9 +726,11 @@
                                     </div>
                                     <div class="cursor-pointer" onclick="openContactInfo()">
                                         <h2 id="active_chat_title"
-                                            class="text-[15px] font-semibold text-[#e9edef] leading-tight">Select a chat
+                                            class="text-[15px] font-semibold text-[#e9edef] leading-tight">Select a
+                                            chat
                                         </h2>
-                                        <p id="active_chat_subtitle" class="text-xs text-[#00a884] font-medium hidden">
+                                        <p id="active_chat_subtitle"
+                                            class="text-xs text-[#00a884] font-medium hidden">
                                             online</p>
                                     </div>
                                 </div>
@@ -669,8 +752,8 @@
                                                 </svg>
                                                 <span class="text-sm font-semibold">Call</span>
                                             </div>
-                                            <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
-                                                stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M19 9l-7 7-7-7"></path>
                                             </svg>
@@ -774,7 +857,8 @@
                                     <button onclick="toggleSearchPanel()"
                                         class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
                                         title="Search">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                         </svg>
@@ -782,10 +866,12 @@
 
                                     <!-- Menu Icon -->
                                     <div class="relative">
-                                        <button id="private_header_more_btn" onclick="togglePrivateHeaderMoreMenu(event)"
+                                        <button id="private_header_more_btn"
+                                            onclick="togglePrivateHeaderMoreMenu(event)"
                                             class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
                                             title="Menu">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
                                                 </path>
@@ -795,22 +881,57 @@
                                         <!-- Private Header More Options Dropdown -->
                                         <div id="private_header_more_dropdown"
                                             class="hidden absolute top-12 right-0 w-[240px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
-                                            <button onclick="window.openContactInfo(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Contact info</span></button>
-                                            <button onclick="toggleSearchPanel(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Search</span></button>
-                                            <button onclick="window.selectMessage(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Select messages</span></button>
-                                            <button onclick="window.toggleMuteChat(window.activeChatUser.id, 'user', window.mutedChats[`user_sidebar_${window.activeChatUser.id}`] ? null : 'always'); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="private_header_mute_text">Mute notifications</span></button>
-                                            <button onclick="togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Disappearing messages</span></button>
-                                            <button onclick="window.toggleLockChat(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="private_header_lock_text">Lock chat</span></button>
-                                            <button onclick="window.toggleFavouriteChat(window.activeChatUser.id, 'user'); window.updatePrivateHeaderFavouriteText(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]" id="private_header_favourite_text">Add to favourites</span></button>
-                                            <button onclick="togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Add to list</span></button>
-                                            <button onclick="window.closeChat(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Close chat</span></button>
+                                            <button onclick="window.openContactInfo(); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Contact info</span></button>
+                                            <button onclick="toggleSearchPanel(); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Search</span></button>
+                                            <button onclick="window.selectMessage(); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Select messages</span></button>
+                                            <button
+                                                onclick="window.toggleMuteChat(window.activeChatUser.id, 'user', window.mutedChats[`user_sidebar_${window.activeChatUser.id}`] ? null : 'always'); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]" id="private_header_mute_text">Mute
+                                                    notifications</span></button>
+                                            <button onclick="togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Disappearing messages</span></button>
+                                            <button
+                                                onclick="window.toggleLockChat(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]" id="private_header_lock_text">Lock
+                                                    chat</span></button>
+                                            <button
+                                                onclick="window.toggleFavouriteChat(window.activeChatUser.id, 'user'); window.updatePrivateHeaderFavouriteText(); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]" id="private_header_favourite_text">Add to
+                                                    favourites</span></button>
+                                            <button onclick="togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Add to list</span></button>
+                                            <button onclick="window.closeChat(); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Close chat</span></button>
                                             <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
-                                            <button onclick="window.reportContact(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Report</span></button>
-                                            <button onclick="window.toggleBlockContact(window.activeChatUser.id, 'user'); window.updateBlockedUI(); togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-                                                <span class="text-[15px]"><span id="private_header_block_text">Block</span></span>
+                                            <button onclick="window.reportContact(); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Report</span></button>
+                                            <button
+                                                onclick="window.toggleBlockContact(window.activeChatUser.id, 'user'); window.updateBlockedUI(); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
+                                                <span class="text-[15px]"><span
+                                                        id="private_header_block_text">Block</span></span>
                                             </button>
-                                            <button onclick="if(confirm('Clear this chat?')) { window.clearChatMessages(window.activeChatUser.id, 'user'); }; togglePrivateHeaderMoreMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Clear chat</span></button>
-                                            <button onclick="if(window.openDeleteModal) { window.openDeleteModal('Delete this chat?', () => { window.deleteChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); }); } else { if(confirm('Delete this chat?')) { window.deleteChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); } }" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Delete chat</span></button>
+                                            <button
+                                                onclick="if(confirm('Clear this chat?')) { window.clearChatMessages(window.activeChatUser.id, 'user'); }; togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Clear chat</span></button>
+                                            <button
+                                                onclick="if(window.openDeleteModal) { window.openDeleteModal('Delete this chat?', () => { window.deleteChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); }); } else { if(confirm('Delete this chat?')) { window.deleteChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); } }"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Delete chat</span></button>
                                         </div>
                                     </div>
                                 </div>
@@ -822,7 +943,8 @@
                                 <div class="flex items-center gap-4">
                                     <button onclick="cancelSelection()"
                                         class="text-white hover:bg-black/10 p-2 rounded-full transition-colors focus:outline-none">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
@@ -834,7 +956,8 @@
                                     <button onclick="confirmDeleteSelected()"
                                         class="text-white hover:bg-black/10 p-2 text-sm rounded-full transition-colors focus:outline-none"
                                         title="Delete">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                             </path>
@@ -845,27 +968,38 @@
                         </div>
 
                         <!-- Pinned Messages Bar (Hidden by default, supports multiple) -->
-                        <div id="private_pinned_bar" onclick="window.scrollToCurrentPin && window.scrollToCurrentPin()"
+                        <div id="private_pinned_bar"
+                            onclick="window.scrollToCurrentPin && window.scrollToCurrentPin()"
                             class="hidden bg-[#2a3942]/90 backdrop-blur-sm px-4 py-2 flex items-center justify-between border-b border-white/5 cursor-pointer hover:bg-[#384b57] transition-colors z-[15]">
                             <div class="flex items-center gap-3 overflow-hidden">
                                 <div class="text-[#00a884] shrink-0">
                                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                        <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
+                                        <path
+                                            d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z">
+                                        </path>
                                     </svg>
                                 </div>
                                 <div class="flex flex-col min-w-0">
-                                    <span id="private_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1 pinned message</span>
-                                    <span id="private_pinned_text" class="text-[#8696a0] text-sm truncate w-full">Message text goes here...</span>
+                                    <span id="private_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1
+                                        pinned message</span>
+                                    <span id="private_pinned_text"
+                                        class="text-[#8696a0] text-sm truncate w-full">Message text goes here...</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
                                 <button onclick="event.stopPropagation(); window.navigatePin && window.navigatePin(-1)"
-                                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors" title="Previous pin">
-                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path></svg>
+                                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors"
+                                    title="Previous pin">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
+                                    </svg>
                                 </button>
                                 <button onclick="event.stopPropagation(); window.navigatePin && window.navigatePin(1)"
-                                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors" title="Next pin">
-                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path></svg>
+                                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors"
+                                    title="Next pin">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path>
+                                    </svg>
                                 </button>
                             </div>
                         </div>
@@ -949,7 +1083,8 @@
                                 <div class="relative shrink-0">
                                     <button type="button" id="attach_toggle_btn" onclick="toggleAttachMenu()"
                                         class="text-gray-500 hover:text-gray-700 p-2 focus:outline-none">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
                                             </path>
@@ -1071,7 +1206,8 @@
                                         <!-- INSIDE MIC (Voice-to-Text) -->
                                         <button type="button" id="inside_mic_btn" onclick="toggleVoiceRecord()"
                                             class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
-                                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                            <svg viewBox="0 0 24 24" width="20" height="20"
+                                                fill="currentColor">
                                                 <path
                                                     d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
                                                 </path>
@@ -1084,7 +1220,8 @@
                                         class="hidden w-full items-center justify-between px-3 h-[40px]">
                                         <button type="button" onclick="cancelVoiceNote()"
                                             class="text-gray-500 hover:text-red-500 focus:outline-none transition-colors">
-                                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                            <svg viewBox="0 0 24 24" width="22" height="22"
+                                                fill="currentColor">
                                                 <path
                                                     d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z">
                                                 </path>
@@ -1144,14 +1281,15 @@
                                 <button id="action_btn" onclick="handleActionBtn()"
                                     class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
                                     <!-- Mic SVG -->
-                                    <svg id="mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                    <svg id="mic_icon" viewBox="0 0 24 24" width="24" height="24"
+                                        fill="currentColor">
                                         <path
                                             d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
                                         </path>
                                     </svg>
                                     <!-- Send SVG -->
-                                    <svg id="send_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                        class="hidden ml-1">
+                                    <svg id="send_icon" viewBox="0 0 24 24" width="24" height="24"
+                                        fill="currentColor" class="hidden ml-1">
                                         <path
                                             d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
                                         </path>
@@ -1160,23 +1298,34 @@
                             </div>
 
                             <!-- Blocked State Container -->
-                            <div id="blocked_state_container" class="hidden w-full h-[62px] flex items-center justify-center bg-[#202c33] text-[#8696a0] text-[14.5px] cursor-pointer hover:bg-[#202c33]/80 transition-colors" onclick="window.unblockCurrentContact()">
+                            <div id="blocked_state_container"
+                                class="hidden w-full h-[62px] flex items-center justify-center bg-[#202c33] text-[#8696a0] text-[14.5px] cursor-pointer hover:bg-[#202c33]/80 transition-colors"
+                                onclick="window.unblockCurrentContact()">
                                 You blocked this contact. Tap to unblock.
                             </div>
 
                             <!-- Bottom Selection Bar -->
-                            <div id="selection_bottom_bar" class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
+                            <div id="selection_bottom_bar"
+                                class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
                                 <div class="flex items-center gap-4">
-                                    <button onclick="cancelSelection()" class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
-                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    <button onclick="cancelSelection()"
+                                        class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M6 18L18 6M6 6l12 12"></path>
                                         </svg>
                                     </button>
-                                    <span id="selection_bottom_count" class="font-semibold text-base">0 selected</span>
+                                    <span id="selection_bottom_count" class="font-semibold text-base">0
+                                        selected</span>
                                 </div>
-                                <button onclick="window.openForwardModal()" class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95" title="Forward message">
+                                <button onclick="window.openForwardModal()"
+                                    class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95"
+                                    title="Forward message">
                                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                        <path d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z"></path>
+                                        <path
+                                            d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z">
+                                        </path>
                                     </svg>
                                 </button>
                             </div>
@@ -1212,7 +1361,8 @@
                                 class="text-[#aebac1] hover:text-white transition-colors">
                                 <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2">
+                                    </rect>
                                     <line x1="16" y1="2" x2="16" y2="6"></line>
                                     <line x1="8" y1="2" x2="8" y2="6"></line>
                                     <line x1="3" y1="10" x2="21" y2="10"></line>
@@ -1236,16 +1386,18 @@
                                     <div class="flex items-center gap-6">
                                         <button onclick="changeCalendarMonth(-1)"
                                             class="text-[#aebac1] hover:text-white transition-colors">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M15 19l-7-7 7-7"></path>
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
                                             </svg>
                                         </button>
                                         <button onclick="changeCalendarMonth(1)"
                                             class="text-[#aebac1] hover:text-white transition-colors">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                                    d="M9 5l7 7-7 7"></path>
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    stroke-width="2.5" d="M9 5l7 7-7 7"></path>
                                             </svg>
                                         </button>
                                     </div>
@@ -1266,8 +1418,8 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                                 </svg>
-                                <input type="text" id="search_messages_input" oninput="performMessageSearch(this.value)"
-                                    placeholder="Search..."
+                                <input type="text" id="search_messages_input"
+                                    oninput="performMessageSearch(this.value)" placeholder="Search..."
                                     class="w-full bg-transparent border-none text-[#e9edef] text-sm focus:ring-0 placeholder-[#8696a0] py-0.5">
                                 <button onclick="clearMessageSearch()" id="clear_search_btn"
                                     class="hidden text-[#8696a0] hover:text-white transition-colors ml-2">
@@ -1357,7 +1509,7 @@
         };
 
         // Close dropdowns when clicking outside
-        document.addEventListener('click', function (event) {
+        document.addEventListener('click', function(event) {
             const emojiPicker = document.getElementById('emoji_picker_container');
             const emojiBtn = document.getElementById('emoji_toggle_btn');
             if (emojiPicker && emojiBtn && !emojiPicker.classList.contains('hidden')) {
@@ -1399,7 +1551,8 @@
             const privateHeaderBtn = document.getElementById('private_header_more_btn');
             if (privateHeaderDropdown && !privateHeaderDropdown.classList.contains('hidden')) {
                 const path = event.composedPath();
-                if (!path.includes(privateHeaderDropdown) && (!privateHeaderBtn || !path.includes(privateHeaderBtn))) {
+                if (!path.includes(privateHeaderDropdown) && (!privateHeaderBtn || !path.includes(
+                    privateHeaderBtn))) {
                     privateHeaderDropdown.classList.remove('opacity-100', 'scale-100');
                     privateHeaderDropdown.classList.add('opacity-0', 'scale-95');
                     setTimeout(() => privateHeaderDropdown.classList.add('hidden'), 200);
@@ -1456,7 +1609,9 @@
         // --- VOICE NOTE (AUDIO RECORDING) LOGIC ---
         async function startVoiceNote() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true
+                });
                 mediaRecorder = new MediaRecorder(stream);
                 audioChunks = [];
 
@@ -1487,7 +1642,8 @@
                     voiceNoteSeconds++;
                     const mins = Math.floor(voiceNoteSeconds / 60);
                     const secs = voiceNoteSeconds % 60;
-                    document.getElementById('audio_timer').innerText = `${mins}:${secs.toString().padStart(2, '0')}`;
+                    document.getElementById('audio_timer').innerText =
+                        `${mins}:${secs.toString().padStart(2, '0')}`;
                 }, 1000);
 
             } catch (err) {
@@ -1507,7 +1663,9 @@
         function stopAndSendVoiceNote() {
             if (mediaRecorder && mediaRecorder.state !== "inactive") {
                 mediaRecorder.addEventListener("stop", () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioBlob = new Blob(audioChunks, {
+                        type: 'audio/webm'
+                    });
                     sendVoiceNoteBlob(audioBlob);
                     audioChunks = [];
                 });
@@ -1545,7 +1703,9 @@
 
             fetch('/send', {
                 method: 'POST',
-                headers: { 'X-CSRF-TOKEN': csrf },
+                headers: {
+                    'X-CSRF-TOKEN': csrf
+                },
                 body: formData
             }).then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
@@ -1566,11 +1726,12 @@
                 const newBtn = callBtn.cloneNode(true);
                 callBtn.parentNode.replaceChild(newBtn, callBtn);
 
-                newBtn.addEventListener('click', function (e) {
+                newBtn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
 
-                    const isOpening = callDropdown.classList.contains('hidden') || callDropdown.style.display === 'none';
+                    const isOpening = callDropdown.classList.contains('hidden') || callDropdown.style.display ===
+                        'none';
 
                     if (isOpening) {
                         callDropdown.classList.remove('hidden');
@@ -1607,10 +1768,15 @@
 
         // --- DYNAMIC CALL NAVIGATION ---
         // --- DYNAMIC CALL NAVIGATION ---
-        window.startVoiceCall = function (userId, name, avatar) {
-            let uId = userId, uName = name, uAvatar = avatar;
+        window.startVoiceCall = function(userId, name, avatar) {
+            let uId = userId,
+                uName = name,
+                uAvatar = avatar;
             if (!uId) {
-                if (!window.activeChatUser) { alert('Please select a chat first.'); return; }
+                if (!window.activeChatUser) {
+                    alert('Please select a chat first.');
+                    return;
+                }
                 uId = window.activeChatUser.id;
                 uName = window.activeChatUser.name;
                 uAvatar = window.activeChatUser.avatar;
@@ -1624,10 +1790,15 @@
             window.location.href = '/chat/voice-call?' + params.toString();
         };
 
-        window.startVideoCall = function (userId, name, avatar) {
-            let uId = userId, uName = name, uAvatar = avatar;
+        window.startVideoCall = function(userId, name, avatar) {
+            let uId = userId,
+                uName = name,
+                uAvatar = avatar;
             if (!uId) {
-                if (!window.activeChatUser) { alert('Please select a chat first.'); return; }
+                if (!window.activeChatUser) {
+                    alert('Please select a chat first.');
+                    return;
+                }
                 uId = window.activeChatUser.id;
                 uName = window.activeChatUser.name;
                 uAvatar = window.activeChatUser.avatar;
@@ -1647,21 +1818,26 @@
         window._incomingCallerName = null;
         window._incomingCallerAvatar = null;
 
-        window.showIncomingCall = function (callId, callerName, callerAvatar, callType, groupCallId) {
+        window.showIncomingCall = function(callId, callerName, callerAvatar, callType, groupCallId) {
             window._incomingCallId = callId;
             window._incomingCallType = callType;
             window._incomingCallerName = callerName;
             window._incomingCallerAvatar = callerAvatar;
             window._incomingGroupCallId = groupCallId || null;
             document.getElementById('ic_caller_name').textContent = callerName;
-            document.getElementById('ic_caller_avatar').src = callerAvatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(callerName) + '&background=202c33&color=fff&size=240';
+            document.getElementById('ic_caller_avatar').src = callerAvatar || 'https://ui-avatars.com/api/?name=' +
+                encodeURIComponent(callerName) + '&background=202c33&color=fff&size=240';
             document.getElementById('ic_call_type').textContent = callType === 'video' ? 'Video Call' : 'Voice Call';
             document.getElementById('incoming_call_overlay').classList.remove('hidden');
-            try { document.getElementById('ic_ringtone').play().catch(() => { }); } catch (e) { }
+            try {
+                document.getElementById('ic_ringtone').play().catch(() => {});
+            } catch (e) {}
         };
 
-        window.acceptIncomingCall = function () {
-            try { document.getElementById('ic_ringtone').pause(); } catch (e) { }
+        window.acceptIncomingCall = function() {
+            try {
+                document.getElementById('ic_ringtone').pause();
+            } catch (e) {}
             document.getElementById('incoming_call_overlay').classList.add('hidden');
             const route = window._incomingCallType === 'video' ? '/chat/video-call' : '/chat/voice-call';
             const params = new URLSearchParams({
@@ -1674,8 +1850,10 @@
             window.location.href = route + '?' + params.toString();
         };
 
-        window.rejectIncomingCall = function () {
-            try { document.getElementById('ic_ringtone').pause(); } catch (e) { }
+        window.rejectIncomingCall = function() {
+            try {
+                document.getElementById('ic_ringtone').pause();
+            } catch (e) {}
             document.getElementById('incoming_call_overlay').classList.add('hidden');
             // Update Firebase status to rejected
             if (window._rejectCallFn) window._rejectCallFn();
@@ -1704,7 +1882,7 @@
             recognition.interimResults = true;
             recognition.lang = 'gu-IN';
 
-            recognition.onstart = function () {
+            recognition.onstart = function() {
                 isRecordingSpeechText = true;
                 const insideMicBtn = document.getElementById('inside_mic_btn');
                 if (insideMicBtn) {
@@ -1713,7 +1891,7 @@
                 }
             };
 
-            recognition.onresult = function (event) {
+            recognition.onresult = function(event) {
                 let finalTranscript = '';
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
@@ -1727,12 +1905,12 @@
                 }
             };
 
-            recognition.onerror = function (event) {
+            recognition.onerror = function(event) {
                 console.error('Speech recognition error', event.error);
                 stopSpeechToText();
             };
 
-            recognition.onend = function () {
+            recognition.onend = function() {
                 stopSpeechToText();
             };
 
@@ -1773,7 +1951,7 @@
         let selectedDuration = 60; // default 1 hour
         let searchTimeout = null;
 
-        window.shareLocation = function () {
+        window.shareLocation = function() {
             toggleAttachMenu();
             if (!navigator.geolocation) {
                 alert("Geolocation is not supported by your browser");
@@ -1790,7 +1968,7 @@
             fetchLocation();
         };
 
-        window.fetchLocation = function () {
+        window.fetchLocation = function() {
             navigator.geolocation.getCurrentPosition((position) => {
                 currentLat = position.coords.latitude;
                 currentLng = position.coords.longitude;
@@ -1798,7 +1976,9 @@
                 document.getElementById('accuracy_meters').textContent = currentAccuracy;
 
                 if (!leafletMapInstance) {
-                    leafletMapInstance = L.map('leaflet_map', { zoomControl: false }).setView([currentLat, currentLng], 16);
+                    leafletMapInstance = L.map('leaflet_map', {
+                        zoomControl: false
+                    }).setView([currentLat, currentLng], 16);
 
                     // Dark Theme map tiles
                     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -1815,17 +1995,21 @@
                         iconAnchor: [8, 8]
                     });
 
-                    leafletMarker = L.marker([currentLat, currentLng], { icon: myIcon, draggable: true }).addTo(leafletMapInstance);
+                    leafletMarker = L.marker([currentLat, currentLng], {
+                        icon: myIcon,
+                        draggable: true
+                    }).addTo(leafletMapInstance);
 
-                    leafletMarker.on('dragend', function (e) {
+                    leafletMarker.on('dragend', function(e) {
                         currentLat = leafletMarker.getLatLng().lat;
                         currentLng = leafletMarker.getLatLng().lng;
                         updateNearbyPlaces(currentLat, currentLng);
                     });
 
-                    leafletMapInstance.on('moveend', function (e) {
+                    leafletMapInstance.on('moveend', function(e) {
                         // If marker is locked to center, update it
-                        if (document.getElementById('live_location_config_panel').classList.contains('hidden')) {
+                        if (document.getElementById('live_location_config_panel').classList.contains(
+                                'hidden')) {
                             const center = leafletMapInstance.getCenter();
                             currentLat = center.lat;
                             currentLng = center.lng;
@@ -1842,29 +2026,33 @@
                 }
             }, () => {
                 alert("Unable to retrieve your location. Please allow location access.");
-            }, { enableHighAccuracy: true });
+            }, {
+                enableHighAccuracy: true
+            });
         };
 
-        window.centerOnMe = function () {
+        window.centerOnMe = function() {
             fetchLocation();
         };
 
-        window.refreshLocation = function () {
+        window.refreshLocation = function() {
             fetchLocation();
         };
 
-        window.toggleLocationSearch = function () {
+        window.toggleLocationSearch = function() {
             const sb = document.getElementById('location_search_bar');
             sb.classList.toggle('hidden');
             if (!sb.classList.contains('hidden')) document.getElementById('location_search_input').focus();
         };
 
-        window.searchLocation = function (query) {
+        window.searchLocation = function(query) {
             clearTimeout(searchTimeout);
             if (query.length < 3) return;
             searchTimeout = setTimeout(async () => {
                 try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+                    const res = await fetch(
+                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
+                        );
                     const data = await res.json();
                     let html = '';
                     data.slice(0, 5).forEach(item => {
@@ -1880,17 +2068,18 @@
                             </div>`;
                     });
                     document.getElementById('search_results').innerHTML = html;
-                } catch (e) { }
+                } catch (e) {}
             }, 500);
         };
 
-        window.updateNearbyPlaces = function (lat, lng) {
+        window.updateNearbyPlaces = function(lat, lng) {
             // Using nominatim reverse geocoding to simulate nearby places
             fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data && data.address) {
-                        const placeName = data.address.suburb || data.address.neighbourhood || data.address.road || data.display_name.split(',')[0];
+                        const placeName = data.address.suburb || data.address.neighbourhood || data.address.road ||
+                            data.display_name.split(',')[0];
                         document.getElementById('search_results').innerHTML = `
                             <div class="px-4 py-3 hover:bg-[#202c33] cursor-pointer flex items-center gap-4 transition-colors" onclick="sendSpecificLocation(${lat}, ${lng}, '${placeName.replace(/'/g, "\\'")}')">
                                 <div class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-[#8696a0] shrink-0">
@@ -1902,10 +2091,10 @@
                                 </div>
                             </div>`;
                     }
-                }).catch(e => { });
+                }).catch(e => {});
         };
 
-        window.selectPlace = function (lat, lng, name) {
+        window.selectPlace = function(lat, lng, name) {
             currentLat = lat;
             currentLng = lng;
             leafletMapInstance.setView([lat, lng], 16);
@@ -1913,7 +2102,7 @@
             toggleLocationSearch();
         };
 
-        window.openLiveLocationConfig = function () {
+        window.openLiveLocationConfig = function() {
             document.getElementById('location_default_panel').classList.add('hidden');
             document.getElementById('live_location_config_panel').classList.remove('hidden');
             document.getElementById('location_modal_title').textContent = 'Share live location';
@@ -1928,7 +2117,7 @@
             leafletMarker.setIcon(myAvatarIcon);
         };
 
-        window.selectDuration = function (mins) {
+        window.selectDuration = function(mins) {
             selectedDuration = mins;
             document.querySelectorAll('.dur-btn').forEach(btn => {
                 btn.classList.remove('bg-[#1dae75]', 'text-white');
@@ -1939,20 +2128,20 @@
             selectedBtn.classList.add('bg-[#1dae75]', 'text-white');
         };
 
-        window.sendCurrentLocation = function () {
+        window.sendCurrentLocation = function() {
             sendLocationToServer(currentLat, currentLng, '');
         };
 
-        window.sendSpecificLocation = function (lat, lng, text) {
+        window.sendSpecificLocation = function(lat, lng, text) {
             sendLocationToServer(lat, lng, text);
         };
 
-        window.startLiveLocation = function () {
+        window.startLiveLocation = function() {
             const comment = document.getElementById('live_loc_comment').value;
             sendLocationToServer(currentLat, currentLng, comment, 'live_location', selectedDuration);
         };
 
-        window.sendLocationToServer = async function (lat, lng, text, msgType = 'location', duration = null) {
+        window.sendLocationToServer = async function(lat, lng, text, msgType = 'location', duration = null) {
             if (!window.currentChatId) {
                 alert('Please select a chat first.');
                 return;
@@ -1977,13 +2166,17 @@
             try {
                 await fetch('/send', {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf },
+                    headers: {
+                        'X-CSRF-TOKEN': csrf
+                    },
                     body: formData
                 });
-            } catch (e) { console.error('Send error:', e); }
+            } catch (e) {
+                console.error('Send error:', e);
+            }
         };
 
-        window.closeLocationModal = function () {
+        window.closeLocationModal = function() {
             document.getElementById('location_preview_modal').classList.add('hidden');
             if (leafletMarker) {
                 // Reset to blue dot if it was changed
@@ -2009,7 +2202,7 @@
         }
 
         // Close menu if clicked outside
-        document.addEventListener('click', function (event) {
+        document.addEventListener('click', function(event) {
             const menu = document.getElementById('attach_menu');
             const button = event.target.closest('button[onclick="toggleAttachMenu()"]');
             if (!button && menu && !menu.classList.contains('hidden')) {
@@ -2018,7 +2211,7 @@
         });
 
         // HANDLE FILE SELECTION -> SHOW FULL SCREEN MODAL
-        document.getElementById('file_input').addEventListener('change', function (e) {
+        document.getElementById('file_input').addEventListener('change', function(e) {
             const file = this.files[0];
             if (!file) return;
 
@@ -2037,7 +2230,9 @@
                 imgContainer.classList.remove('hidden');
                 fileContainer.classList.add('hidden');
                 const reader = new FileReader();
-                reader.onload = function (e) { imgPreview.src = e.target.result; }
+                reader.onload = function(e) {
+                    imgPreview.src = e.target.result;
+                }
                 reader.readAsDataURL(file);
             } else {
                 imgContainer.classList.add('hidden');
@@ -2052,7 +2247,9 @@
             document.getElementById('media_preview_modal').classList.add('hidden');
         }
 
-        function handleKeyPress(e) { if (e.key === 'Enter') send(); }
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') send();
+        }
 
         // Core Send Function (used for text & modal)
         async function emitMessage(msgText, fileObj = null) {
@@ -2068,7 +2265,8 @@
                 return;
             }
 
-            if (window.currentChatId && typeof window.currentChatId === 'string' && window.currentChatId.startsWith('group_')) {
+            if (window.currentChatId && typeof window.currentChatId === 'string' && window.currentChatId.startsWith(
+                    'group_')) {
                 let msgData = {
                     text: msgText,
                     sender_id: window.myUserId,
@@ -2081,7 +2279,9 @@
                     fd.append('file', fileObj);
                     const res = await fetch('/upload-status-media', {
                         method: 'POST',
-                        headers: { 'X-CSRF-TOKEN': csrf },
+                        headers: {
+                            'X-CSRF-TOKEN': csrf
+                        },
                         body: fd
                     });
                     const rData = await res.json();
@@ -2101,7 +2301,8 @@
                 }
                 if (window.replyingToKey) {
                     msgData.reply_to_id = window.replyingToKey;
-                    msgData.reply_to_text = window.replyingToText || (window.globalMessages[window.replyingToKey]?.text || 'Media');
+                    msgData.reply_to_text = window.replyingToText || (window.globalMessages[window.replyingToKey]
+                        ?.text || 'Media');
                     msgData.reply_to_name = window.replyingToName || 'Member';
                 }
 
@@ -2124,7 +2325,8 @@
             }
             if (window.replyingToKey) {
                 formData.append('reply_to_id', window.replyingToKey);
-                formData.append('reply_to_text', window.replyingToText || (window.globalMessages[window.replyingToKey]?.text || 'Media'));
+                formData.append('reply_to_text', window.replyingToText || (window.globalMessages[window.replyingToKey]
+                    ?.text || 'Media'));
                 formData.append('reply_to_name', window.replyingToName || 'Member');
             }
 
@@ -2137,10 +2339,14 @@
             try {
                 await fetch('/send', {
                     method: 'POST',
-                    headers: { 'X-CSRF-TOKEN': csrf },
+                    headers: {
+                        'X-CSRF-TOKEN': csrf
+                    },
                     body: formData
                 });
-            } catch (e) { console.error('Send error:', e); }
+            } catch (e) {
+                console.error('Send error:', e);
+            }
 
             document.getElementById('msg').focus();
         }
@@ -2182,7 +2388,7 @@
             }
         };
 
-        window.replyTo = function (key) {
+        window.replyTo = function(key) {
             window.closeMsgMenu(key);
             const msgData = window.globalMessages[key];
             if (!msgData) return;
@@ -2208,7 +2414,7 @@
             document.getElementById('msg').focus();
         };
 
-        window.replyToMsg = function (key, name, text, groupName = null) {
+        window.replyToMsg = function(key, name, text, groupName = null) {
             window.replyingToKey = key;
             window.replyingToName = name;
             window.replyingToText = text;
@@ -2219,7 +2425,7 @@
             document.getElementById('msg').focus();
         };
 
-        window.cancelReply = function () {
+        window.cancelReply = function() {
             window.replyingToKey = null;
             window.replyingToName = null;
             window.replyingToText = null;
@@ -2231,7 +2437,7 @@
         window._pinnedMsgsList = []; // Array of {key, text, time} sorted by time desc
         window._currentPinIndex = 0;
 
-        window.toggleMsgMenu = function (key) {
+        window.toggleMsgMenu = function(key) {
             // close others
             document.querySelectorAll('[id^="menu_"]').forEach(el => {
                 if (el.id !== 'menu_' + key) {
@@ -2263,7 +2469,7 @@
             }
         };
 
-        window.pinPrivateMessage = function (messageKey) {
+        window.pinPrivateMessage = function(messageKey) {
             if (!messageKey || !window.currentChatId) return;
 
             const msg = window.globalMessages[messageKey];
@@ -2289,12 +2495,13 @@
             if (menu) menu.classList.add('hidden');
         };
 
-        window.unpinPrivateMessage = function (messageKey, event) {
+        window.unpinPrivateMessage = function(messageKey, event) {
             if (event) event.stopPropagation();
             if (!window.currentChatId) return;
 
             // If called with a specific key, remove that key; otherwise remove current pin
-            const keyToRemove = messageKey || (window._pinnedMsgsList[window._currentPinIndex] ? window._pinnedMsgsList[window._currentPinIndex].key : null);
+            const keyToRemove = messageKey || (window._pinnedMsgsList[window._currentPinIndex] ? window._pinnedMsgsList[
+                window._currentPinIndex].key : null);
             if (!keyToRemove) return;
 
             remove(ref(db, `chats/${window.currentChatId}/pinned_msgs/${keyToRemove}`)).then(() => {
@@ -2306,7 +2513,7 @@
         };
 
         // Update pin icons on all visible messages
-        window.updatePinIcons = function () {
+        window.updatePinIcons = function() {
             // Hide all pin icons first
             document.querySelectorAll('.msg-pin-icon').forEach(el => el.classList.add('hidden'));
             // document.querySelectorAll('[id^="pin_icon_"]').forEach(el => el.classList.add('hidden'));
@@ -2318,9 +2525,10 @@
         };
 
         // Navigate between pinned messages
-        window.navigatePin = function (direction) {
+        window.navigatePin = function(direction) {
             if (!window._pinnedMsgsList.length) return;
-            window._currentPinIndex = (window._currentPinIndex + direction + window._pinnedMsgsList.length) % window._pinnedMsgsList.length;
+            window._currentPinIndex = (window._currentPinIndex + direction + window._pinnedMsgsList.length) % window
+                ._pinnedMsgsList.length;
 
             const pin = window._pinnedMsgsList[window._currentPinIndex];
             const pinText = document.getElementById('private_pinned_text');
@@ -2330,13 +2538,13 @@
         };
 
         // Scroll to currently displayed pin
-        window.scrollToCurrentPin = function () {
+        window.scrollToCurrentPin = function() {
             if (!window._pinnedMsgsList.length) return;
             const pin = window._pinnedMsgsList[window._currentPinIndex];
             if (pin) window.scrollToMessage(pin.key);
         };
 
-        window.closeMsgMenu = function (key) {
+        window.closeMsgMenu = function(key) {
             const menu = document.getElementById('menu_' + key);
             if (menu) menu.classList.add('hidden');
             const parentMsg = document.getElementById('msg_' + key);
@@ -2346,14 +2554,14 @@
         };
 
         // Highlight search text in chat messages
-        window.highlightSearchText = function (text) {
+        window.highlightSearchText = function(text) {
             if (!window.activeSearchQuery || !text) return text;
             const q = window.activeSearchQuery;
             const regex = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
             return text.replace(regex, '<mark class="search-highlight">$1</mark>');
         };
 
-        window.filterSidebar = function () {
+        window.filterSidebar = function() {
             const searchQuery = document.getElementById('sidebar_search').value.toLowerCase().trim();
             const clearBtn = document.getElementById('sidebar_search_clear');
             const userList = document.getElementById('user_list_container');
@@ -2397,14 +2605,16 @@
 
             users.forEach(user => {
                 const userId = user.getAttribute('data-userid') || user.id.replace('user_sidebar_', '');
-                const name = user.getAttribute('data-name') || user.querySelector('h4')?.textContent.trim() || '';
+                const name = user.getAttribute('data-name') || user.querySelector('h4')?.textContent.trim() ||
+                    '';
                 const avatar = user.getAttribute('data-avatar') || '';
                 const phone = user.getAttribute('data-phone') || '';
                 const about = user.getAttribute('data-about') || 'Available';
                 const lastTimeEl = document.getElementById(`last_time_${userId}`);
                 const lastTime = lastTimeEl ? lastTimeEl.textContent.trim() : '';
                 const lastMsgEl = document.getElementById(`last_msg_${userId}`);
-                const lastMsg = lastMsgEl ? (lastMsgEl.getAttribute('data-msg') || lastMsgEl.textContent.trim()) : '';
+                const lastMsg = lastMsgEl ? (lastMsgEl.getAttribute('data-msg') || lastMsgEl.textContent
+                .trim()) : '';
 
                 const nameLower = name.toLowerCase();
                 const nameMatch = nameLower.includes(searchQuery);
@@ -2412,9 +2622,11 @@
                 // Chat name match -> Chats section
                 if (nameMatch && chatsList) {
                     chatMatches++;
-                    const highlightedName = name.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
+                    const highlightedName = name.replace(highlightRegex,
+                        '<span class="text-[#00a884] font-medium">$1</span>');
                     const prefix = lastMsg ? (lastMsg.startsWith('Click to chat') ? '' : '✓ ') : '';
-                    const previewMsg = lastMsg && !lastMsg.startsWith('Click to chat') ? prefix + lastMsg : phone || 'Click to chat';
+                    const previewMsg = lastMsg && !lastMsg.startsWith('Click to chat') ? prefix + lastMsg :
+                        phone || 'Click to chat';
 
                     chatsList.insertAdjacentHTML('beforeend', `
                         <div onclick="window.selectChat(${userId}, '${name.replace(/'/g, "\\'")}', '${phone.replace(/'/g, "\\'")}', '${avatar}', '${about.replace(/'/g, "\\'")}')"
@@ -2439,7 +2651,11 @@
                     const m = cachedMessages[i];
                     if (m.text && m.text.toLowerCase().includes(searchQuery)) {
                         allMsgResults.push({
-                            userId, name, avatar, phone, about,
+                            userId,
+                            name,
+                            avatar,
+                            phone,
+                            about,
                             text: m.text,
                             time: m.time,
                             senderId: m.senderId
@@ -2460,14 +2676,25 @@
                     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                     const msgDayStart = new Date(msgTime.getFullYear(), msgTime.getMonth(), msgTime.getDate());
                     const diffDays = Math.round((todayStart - msgDayStart) / (1000 * 60 * 60 * 24));
-                    if (diffDays === 0) timeStr = msgTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    if (diffDays === 0) timeStr = msgTime.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
                     else if (diffDays === 1) timeStr = 'Yesterday';
-                    else if (diffDays < 7) timeStr = msgTime.toLocaleDateString([], { weekday: 'long' });
-                    else timeStr = msgTime.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    else if (diffDays < 7) timeStr = msgTime.toLocaleDateString([], {
+                        weekday: 'long'
+                    });
+                    else timeStr = msgTime.toLocaleDateString([], {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
                 }
 
-                const highlightedMsg = r.text.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
-                const prefix = r.senderId == window.myUserId ? '<span class="text-[#8696a0]">✓ You: </span>' : '';
+                const highlightedMsg = r.text.replace(highlightRegex,
+                    '<span class="text-[#00a884] font-medium">$1</span>');
+                const prefix = r.senderId == window.myUserId ? '<span class="text-[#8696a0]">✓ You: </span>' :
+                    '';
 
                 if (msgsList) {
                     msgsList.insertAdjacentHTML('beforeend', `
@@ -2492,10 +2719,18 @@
 
             // Toggle section visibility
             if (chatsSection) {
-                if (chatMatches > 0) { chatsSection.classList.remove('hidden'); } else { chatsSection.classList.add('hidden'); }
+                if (chatMatches > 0) {
+                    chatsSection.classList.remove('hidden');
+                } else {
+                    chatsSection.classList.add('hidden');
+                }
             }
             if (msgsSection) {
-                if (msgMatches > 0) { msgsSection.classList.remove('hidden'); } else { msgsSection.classList.add('hidden'); }
+                if (msgMatches > 0) {
+                    msgsSection.classList.remove('hidden');
+                } else {
+                    msgsSection.classList.add('hidden');
+                }
             }
 
             // No results at all
@@ -2511,12 +2746,12 @@
         };
 
         // Search bar animation helpers
-        window.onSidebarSearchFocus = function () {
+        window.onSidebarSearchFocus = function() {
             document.getElementById('sidebar_search_icon')?.classList.add('hidden');
             document.getElementById('sidebar_back_icon')?.classList.remove('hidden');
         };
 
-        window.onSidebarSearchBlur = function () {
+        window.onSidebarSearchBlur = function() {
             const input = document.getElementById('sidebar_search');
             if (!input || input.value.trim() === '') {
                 document.getElementById('sidebar_search_icon')?.classList.remove('hidden');
@@ -2524,7 +2759,7 @@
             }
         };
 
-        window.blurSidebarSearch = function () {
+        window.blurSidebarSearch = function() {
             const input = document.getElementById('sidebar_search');
             if (input) {
                 input.value = '';
@@ -2538,7 +2773,7 @@
             document.getElementById('sidebar_search_clear')?.classList.add('hidden');
         };
 
-        window.clearSidebarSearch = function () {
+        window.clearSidebarSearch = function() {
             const input = document.getElementById('sidebar_search');
             if (input) {
                 input.value = '';
@@ -2547,10 +2782,12 @@
             window.filterSidebar();
         };
 
-        window.showToast = function (title, body, otherUserId = null, otherName = null) {
+        window.showToast = function(title, body, otherUserId = null, otherName = null) {
             const container = document.getElementById('toast_container');
             const id = Date.now();
-            const clickAttr = (otherUserId && otherName) ? `onclick="window.selectChat('${otherUserId}', '${otherName.replace(/'/g, "\\'")}', ''); this.remove();"` : '';
+            const clickAttr = (otherUserId && otherName) ?
+                `onclick="window.selectChat('${otherUserId}', '${otherName.replace(/'/g, "\\'")}', ''); this.remove();"` :
+                '';
 
             const html = `
                 <div id="toast_${id}" ${clickAttr} class="toast-enter bg-white border border-gray-100 rounded-2xl shadow-2xl p-4 flex gap-4 w-full pointer-events-auto cursor-pointer hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.98] transition-all border-l-4 border-l-green-500">
@@ -2570,7 +2807,9 @@
             const toast = document.getElementById(`toast_${id}`);
 
             // Play a subtle sound if possible
-            try { new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3').play(); } catch (e) { }
+            try {
+                new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3').play();
+            } catch (e) {}
 
             // Auto remove after 8 seconds
             setTimeout(() => {
@@ -2582,17 +2821,18 @@
             }, 8000);
         };
 
-        window.toggleSearchPanel = function () {
+        window.toggleSearchPanel = function() {
             const sidebar = document.getElementById('search_sidebar');
             const chatMain = document.querySelector('.flex.flex-col.w-full.sm\\:w-\\[70\\%\\]');
             sidebar.classList.toggle('hidden');
             if (!sidebar.classList.contains('hidden')) {
                 document.getElementById('search_messages_input').focus();
-                document.getElementById('no_results_text').querySelector('p').textContent = `Search for messages with ${document.getElementById('active_chat_title').textContent}`;
+                document.getElementById('no_results_text').querySelector('p').textContent =
+                    `Search for messages with ${document.getElementById('active_chat_title').textContent}`;
             }
         };
 
-        window.clearMessageSearch = function () {
+        window.clearMessageSearch = function() {
             const input = document.getElementById('search_messages_input');
             input.value = '';
             document.getElementById('clear_search_btn').classList.add('hidden');
@@ -2601,7 +2841,7 @@
             input.focus();
         };
 
-        window.performMessageSearch = function (query) {
+        window.performMessageSearch = function(query) {
             const clearBtn = document.getElementById('clear_search_btn');
             const resultsList = document.getElementById('search_results_list');
             const noResults = document.getElementById('no_results_text');
@@ -2622,7 +2862,10 @@
             for (let key in window.globalMessages) {
                 const msg = window.globalMessages[key];
                 if (msg.text && msg.text.toLowerCase().includes(searchTerm)) {
-                    results.push({ ...msg, key });
+                    results.push({
+                        ...msg,
+                        key
+                    });
                 }
             }
 
@@ -2632,7 +2875,7 @@
             renderMessageSearchResults(results, searchTerm);
         };
 
-        window.renderMessageSearchResults = function (results, searchTerm) {
+        window.renderMessageSearchResults = function(results, searchTerm) {
             const resultsList = document.getElementById('search_results_list');
             resultsList.innerHTML = '';
 
@@ -2647,13 +2890,18 @@
                 const date = window.getDateHeader(msg.time);
                 if (date !== lastDate) {
                     lastDate = date;
-                    resultsList.insertAdjacentHTML('beforeend', `<div class="px-6 py-4 text-[#8696a0] text-[13px] font-medium">${date}</div>`);
+                    resultsList.insertAdjacentHTML('beforeend',
+                        `<div class="px-6 py-4 text-[#8696a0] text-[13px] font-medium">${date}</div>`);
                 }
 
                 // Highlight search term
                 const regex = new RegExp(`(${searchTerm})`, 'gi');
-                const highlightedText = msg.text.replace(regex, '<span class="text-[#00a884] font-medium">$1</span>');
-                const time = new Date(msg.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const highlightedText = msg.text.replace(regex,
+                    '<span class="text-[#00a884] font-medium">$1</span>');
+                const time = new Date(msg.time * 1000).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
                 const isMe = msg.sender_id == window.myUserId;
 
                 const html = `
@@ -2669,10 +2917,13 @@
             });
         };
 
-        window.scrollToMessage = function (key) {
+        window.scrollToMessage = function(key) {
             const el = document.getElementById('msg_' + key);
             if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
                 el.classList.add('bg-[#00a884]/20');
                 setTimeout(() => {
                     el.classList.remove('bg-[#00a884]/20');
@@ -2682,10 +2933,37 @@
     </script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, push, get, onChildAdded, remove, onChildRemoved, onValue, onDisconnect, set, serverTimestamp, onChildChanged, update, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-        import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
-        import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getDatabase,
+            ref,
+            push,
+            get,
+            onChildAdded,
+            remove,
+            onChildRemoved,
+            onValue,
+            onDisconnect,
+            set,
+            serverTimestamp,
+            onChildChanged,
+            update,
+            query,
+            limitToLast
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import {
+            getMessaging,
+            getToken,
+            onMessage
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+        import {
+            getStorage,
+            ref as sRef,
+            uploadBytesResumable,
+            getDownloadURL
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCTUuLg0mheURhlG1Z0p0DgMRwoAcR-F0w",
@@ -2709,7 +2987,9 @@
         // Expose to window for global access
         window.db = db;
         window.ref = ref;
+        window.get = get;
         window.update = update;
+        window.remove = remove;
         window.set = set;
         window.push = push;
         window.onValue = onValue;
@@ -2759,7 +3039,7 @@
 
             // Global Delivered Listener (for all users in sidebar)
             const allUserIds = [
-                @foreach($users ?? [] as $u)
+                @foreach ($users ?? [] as $u)
                     {{ $u->id }},
                 @endforeach
             ];
@@ -2801,6 +3081,62 @@
                         }
                     }
 
+                    // Populate global media cache
+                    if (data.type !== 'text' && data.file_url) {
+                        window.globalMediaCache = window.globalMediaCache || [];
+                        if (!window.globalMediaCache.find(m => m.key === key)) {
+                            let sName = 'Someone';
+                            if (data.sender_id == window.myUserId) {
+                                sName = 'You';
+                            } else {
+                                const sidebarUser = document.getElementById(`user_sidebar_${data.sender_id}`);
+                                if (sidebarUser) {
+                                    const h4Text = sidebarUser.querySelector('h4')?.textContent;
+                                    sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text.trim() : null) || sidebarUser.getAttribute('data-phone') || 'Someone';
+                                }
+                            }
+                            
+                            window.globalMediaCache.push({
+                                key: key,
+                                type: data.type,
+                                url: data.file_url,
+                                fileName: data.file_name,
+                                time: data.time,
+                                senderId: data.sender_id,
+                                senderName: sName,
+                                chatId: chatId
+                            });
+                        }
+                    } else if (data.type === 'text' && data.text) {
+                        const urlRegex = /(https?:\/\/[^\s]+)/g;
+                        const links = data.text.match(urlRegex);
+                        if (links) {
+                            window.globalMediaCache = window.globalMediaCache || [];
+                            let sName = data.sender_id == window.myUserId ? 'You' : 'Someone';
+                            if (data.sender_id != window.myUserId) {
+                                const sidebarUser = document.getElementById(`user_sidebar_${data.sender_id}`);
+                                if (sidebarUser) {
+                                    const h4Text = sidebarUser.querySelector('h4')?.textContent;
+                                    sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text.trim() : null) || sidebarUser.getAttribute('data-phone') || 'Someone';
+                                }
+                            }
+                            links.forEach((url, idx) => {
+                                const linkKey = key + '_link_' + idx;
+                                if (!window.globalMediaCache.find(m => m.key === linkKey)) {
+                                    window.globalMediaCache.push({
+                                        key: linkKey,
+                                        type: 'link',
+                                        url: url,
+                                        time: data.time,
+                                        senderId: data.sender_id,
+                                        senderName: sName,
+                                        chatId: chatId
+                                    });
+                                }
+                            });
+                        }
+                    }
+
                     // Check if chat is deleted. If so, remove from deletedChats because a new message arrived
                     const sidebarElementId = `user_sidebar_${otherId}`;
                     const deletedIndex = window.deletedChats?.indexOf(sidebarElementId) ?? -1;
@@ -2823,12 +3159,16 @@
                     const lastMsgEl = document.getElementById(`last_msg_${otherId}`);
                     const lastTimeEl = document.getElementById(`last_time_${otherId}`);
                     if (lastMsgEl) {
-                        let text = data.text ? data.text : (data.type ? data.type.charAt(0).toUpperCase() + data.type.slice(1) : 'Media');
+                        let text = data.text ? data.text : (data.type ? data.type.charAt(0).toUpperCase() +
+                            data.type.slice(1) : 'Media');
                         lastMsgEl.textContent = text;
                     }
                     if (lastTimeEl && data.time) {
                         const date = new Date(data.time * 1000);
-                        lastTimeEl.textContent = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        lastTimeEl.textContent = date.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
                     }
 
                     // Update timestamp attribute and sort sidebar
@@ -2840,7 +3180,9 @@
                     // If message is for me, and I am not currently looking at this chat, mark it as delivered
                     if (data.sender_id != window.myUserId && data.status === 'sent') {
                         if (window.currentChatId !== chatId) {
-                            update(ref(db, `chats/${chatId}/messages/${key}`), { status: 'delivered' });
+                            update(ref(db, `chats/${chatId}/messages/${key}`), {
+                                status: 'delivered'
+                            });
 
                             // Increment Unread Badge
                             const badge = document.getElementById(`unread_badge_${otherId}`);
@@ -2865,16 +3207,17 @@
         }
 
         // SVG Ticks Helper
-        window.toggleSearchPanel = function () {
+        window.toggleSearchPanel = function() {
             const sidebar = document.getElementById('search_sidebar');
             sidebar.classList.toggle('hidden');
             if (!sidebar.classList.contains('hidden')) {
                 document.getElementById('search_messages_input').focus();
-                document.getElementById('no_results_text').querySelector('p').textContent = `Search for messages with ${document.getElementById('active_chat_title').textContent}`;
+                document.getElementById('no_results_text').querySelector('p').textContent =
+                    `Search for messages with ${document.getElementById('active_chat_title').textContent}`;
             }
         };
 
-        window.clearMessageSearch = function () {
+        window.clearMessageSearch = function() {
             const input = document.getElementById('search_messages_input');
             input.value = '';
             document.getElementById('clear_search_btn').classList.add('hidden');
@@ -2883,7 +3226,7 @@
             input.focus();
         };
 
-        window.performMessageSearch = function (query) {
+        window.performMessageSearch = function(query) {
             const clearBtn = document.getElementById('clear_search_btn');
             const resultsList = document.getElementById('search_results_list');
             const noResults = document.getElementById('no_results_text');
@@ -2904,7 +3247,10 @@
             for (let key in window.globalMessages) {
                 const msg = window.globalMessages[key];
                 if (msg.text && msg.text.toLowerCase().includes(searchTerm)) {
-                    results.push({ ...msg, key });
+                    results.push({
+                        ...msg,
+                        key
+                    });
                 }
             }
 
@@ -2914,7 +3260,7 @@
             renderMessageSearchResults(results, searchTerm);
         };
 
-        window.renderMessageSearchResults = function (results, searchTerm) {
+        window.renderMessageSearchResults = function(results, searchTerm) {
             const resultsList = document.getElementById('search_results_list');
             resultsList.innerHTML = '';
 
@@ -2929,13 +3275,18 @@
                 const date = window.getDateHeader(msg.time);
                 if (date !== lastDate) {
                     lastDate = date;
-                    resultsList.insertAdjacentHTML('beforeend', `<div class="px-6 py-4 text-[#8696a0] text-[13px] font-medium">${date}</div>`);
+                    resultsList.insertAdjacentHTML('beforeend',
+                        `<div class="px-6 py-4 text-[#8696a0] text-[13px] font-medium">${date}</div>`);
                 }
 
                 // Highlight search term
                 const regex = new RegExp(`(${searchTerm})`, 'gi');
-                const highlightedText = msg.text.replace(regex, '<span class="text-[#00a884] font-medium">$1</span>');
-                const time = new Date(msg.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const highlightedText = msg.text.replace(regex,
+                    '<span class="text-[#00a884] font-medium">$1</span>');
+                const time = new Date(msg.time * 1000).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
                 const isMe = msg.sender_id == window.myUserId;
 
                 const html = `
@@ -2951,10 +3302,13 @@
             });
         };
 
-        window.scrollToMessage = function (key) {
+        window.scrollToMessage = function(key) {
             const el = document.getElementById('msg_' + key);
             if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
                 el.classList.add('bg-[#00a884]/20');
                 setTimeout(() => {
                     el.classList.remove('bg-[#00a884]/20');
@@ -2966,7 +3320,7 @@
         // Calendar Logic
         let currentCalendarDate = new Date();
 
-        window.toggleCalendar = function () {
+        window.toggleCalendar = function() {
             const modal = document.getElementById('calendar_modal');
             modal.classList.toggle('hidden');
             if (!modal.classList.contains('hidden')) {
@@ -2974,19 +3328,21 @@
             }
         };
 
-        window.changeCalendarMonth = function (delta) {
+        window.changeCalendarMonth = function(delta) {
             currentCalendarDate.setMonth(currentCalendarDate.getMonth() + delta);
             renderCalendar(currentCalendarDate);
         };
 
-        window.renderCalendar = function (date) {
+        window.renderCalendar = function(date) {
             const grid = document.getElementById('calendar_days_grid');
             const monthYearText = document.getElementById('calendar_month_year');
             grid.innerHTML = '';
 
             const year = date.getFullYear();
             const month = date.getMonth();
-            const monthName = date.toLocaleString('default', { month: 'long' });
+            const monthName = date.toLocaleString('default', {
+                month: 'long'
+            });
             monthYearText.textContent = `${monthName} ${year}`;
 
             const firstDay = new Date(year, month, 1).getDay();
@@ -2995,7 +3351,9 @@
             // Prev month days
             const prevMonthDays = new Date(year, month, 0).getDate();
             for (let i = firstDay - 1; i >= 0; i--) {
-                grid.insertAdjacentHTML('beforeend', `<span class="h-9 flex items-center justify-center text-[#54656f] text-sm select-none">${prevMonthDays - i}</span>`);
+                grid.insertAdjacentHTML('beforeend',
+                    `<span class="h-9 flex items-center justify-center text-[#54656f] text-sm select-none">${prevMonthDays - i}</span>`
+                    );
             }
 
             // Current month days
@@ -3015,17 +3373,20 @@
             const totalCells = grid.children.length;
             const nextPadding = (7 - (totalCells % 7)) % 7;
             for (let i = 1; i <= nextPadding; i++) {
-                grid.insertAdjacentHTML('beforeend', `<span class="h-9 flex items-center justify-center text-[#54656f] text-sm select-none">${i}</span>`);
+                grid.insertAdjacentHTML('beforeend',
+                    `<span class="h-9 flex items-center justify-center text-[#54656f] text-sm select-none">${i}</span>`
+                    );
             }
         };
 
-        window.selectCalendarDate = function (day, month, year) {
-            const selectedDateStr = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        window.selectCalendarDate = function(day, month, year) {
+            const selectedDateStr =
+                `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
             jumpToDate(selectedDateStr);
             document.getElementById('calendar_modal').classList.add('hidden');
         };
 
-        window.jumpToDate = function (targetDateStr) {
+        window.jumpToDate = function(targetDateStr) {
             const messages = Object.keys(window.globalMessages).map(key => ({
                 ...window.globalMessages[key],
                 key
@@ -3047,7 +3408,7 @@
             }
         };
 
-        window.getTickSVG = function (status) {
+        window.getTickSVG = function(status) {
             if (status === 'read') {
                 return `<svg viewBox="0 0 16 15" width="16" height="15" class="text-[#53bdeb]" fill="currentColor"><path d="M15,5.4L9.3,11.1l-1.3-1.4l5.7-5.7L15,5.4z M10.4,5.4L4.7,11.1L2,8.4L0.6,9.8l4.1,4.1l7.1-7.1L10.4,5.4z"></path></svg>`;
             } else if (status === 'delivered') {
@@ -3057,7 +3418,7 @@
             }
         };
 
-        window.getDateHeader = function (timestamp) {
+        window.getDateHeader = function(timestamp) {
             const date = new Date(timestamp * 1000);
             const today = new Date();
             const yesterday = new Date();
@@ -3075,13 +3436,19 @@
             const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
             if (diffDays < 7) {
-                return date.toLocaleDateString([], { weekday: 'long' });
+                return date.toLocaleDateString([], {
+                    weekday: 'long'
+                });
             }
 
-            return date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+            return date.toLocaleDateString([], {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
         };
 
-        window.formatAboutSubtitle = function (raw) {
+        window.formatAboutSubtitle = function(raw) {
             if (!raw) return 'Until I change it';
             if (!raw.includes('|')) return raw;
 
@@ -3109,9 +3476,15 @@
                 const diffTime = Math.abs(now.getTime() - date.getTime());
                 const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                 if (diffDays < 7) {
-                    datePart = date.toLocaleDateString([], { weekday: 'long' });
+                    datePart = date.toLocaleDateString([], {
+                        weekday: 'long'
+                    });
                 } else {
-                    datePart = date.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
+                    datePart = date.toLocaleDateString([], {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
                 }
             }
 
@@ -3122,13 +3495,13 @@
             }
         };
 
-        window.getFileExt = function (filename) {
+        window.getFileExt = function(filename) {
             if (!filename) return 'DOC';
             let parts = filename.split('.');
             return parts.length > 1 ? parts.pop().toUpperCase().substring(0, 4) : 'DOC';
         };
 
-        window.getFileColor = function (filename) {
+        window.getFileColor = function(filename) {
             const ext = window.getFileExt(filename).toLowerCase();
             if (ext === 'pdf') return '#e53935';
             if (ext.startsWith('doc')) return '#1e88e5';
@@ -3139,7 +3512,7 @@
             return '#607d8b';
         };
 
-        window.showChats = function () {
+        window.showChats = function() {
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_chats').classList.add('active');
@@ -3207,7 +3580,7 @@
             }
         };
 
-        window.showStatus = function () {
+        window.showStatus = function() {
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_status').classList.add('active');
@@ -3237,7 +3610,7 @@
             }
         };
 
-        window.showCalls = function () {
+        window.showCalls = function() {
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_calls')?.classList.add('active');
@@ -3274,7 +3647,7 @@
         };
 
         // Sidebar Resizer Logic
-        (function () {
+        (function() {
             const resizer = document.getElementById('sidebar_resizer');
             const sidebar = document.getElementById('user_sidebar_container');
             let isResizing = false;
@@ -3314,59 +3687,59 @@
             });
         })();
 
-        window.focusSearch = function () {
+        window.focusSearch = function() {
             const input = document.getElementById('sidebar_search');
             if (input) {
                 input.focus();
             }
         };
 
-        window.toggleNewChat = function () {
+        window.toggleNewChat = function() {
             document.getElementById('new_chat_panel')?.classList.toggle('hidden');
             document.getElementById('user_sidebar_container')?.classList.toggle('hidden');
         };
 
-        window.toggleEditProfile = function () {
+        window.toggleEditProfile = function() {
             document.getElementById('edit_profile_panel')?.classList.toggle('hidden');
             document.getElementById('settings_panel')?.classList.toggle('hidden');
         };
 
-        window.toggleAboutModal = function () {
+        window.toggleAboutModal = function() {
             document.getElementById('about_modal')?.classList.toggle('hidden');
         };
 
-        window.toggleAboutPrivacy = function () {
+        window.toggleAboutPrivacy = function() {
             document.getElementById('about_privacy_modal')?.classList.toggle('hidden');
         };
 
-        window.toggleAddGroupMembers = function () {
+        window.toggleAddGroupMembers = function() {
             document.getElementById('add_group_members_panel')?.classList.toggle('hidden');
             document.getElementById('new_chat_panel')?.classList.add('hidden');
         };
 
-        window.toggleCreateGroup = function () {
+        window.toggleCreateGroup = function() {
             document.getElementById('create_group_panel')?.classList.toggle('hidden');
             document.getElementById('add_group_members_panel')?.classList.add('hidden');
         };
 
-        window.toggleNewContact = function () {
+        window.toggleNewContact = function() {
             document.getElementById('new_contact_panel')?.classList.toggle('hidden');
             document.getElementById('new_chat_panel')?.classList.add('hidden');
         };
 
-        window.toggleEditContact = function () {
+        window.toggleEditContact = function() {
             document.getElementById('edit_contact_panel')?.classList.toggle('hidden');
             document.getElementById('contact_info_panel')?.classList.add('hidden');
         };
 
-        window.toggleContactInfo = function () {
+        window.toggleContactInfo = function() {
             const panel = document.getElementById('contact_info_panel');
             if (panel) {
                 panel.classList.toggle('translate-x-full');
             }
         };
 
-        window.backToSidebar = function () {
+        window.backToSidebar = function() {
             document.getElementById('user_sidebar_container').classList.remove('hidden');
             document.getElementById('user_sidebar_container').classList.add('flex', 'w-full');
             document.getElementById('main_chat_column').classList.add('hidden');
@@ -3394,7 +3767,27 @@
             }
         };
 
-        window.selectChat = function (otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
+        window.selectChat = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
+            // Fetch missing info from DOM
+            const sidebarEl = document.getElementById(`user_sidebar_${otherUserId}`);
+            if (sidebarEl) {
+                if (!name || name === 'undefined') name = sidebarEl.getAttribute('data-name');
+                if (!phone || phone === 'undefined') phone = sidebarEl.getAttribute('data-phone') || '';
+                if (!avatar || avatar === 'undefined') avatar = sidebarEl.getAttribute('data-avatar');
+                if (!about || about === 'undefined') about = sidebarEl.getAttribute('data-about') || 'Available';
+            }
+
+            // Try fallback from allContacts if still missing
+            if ((!name || name === 'undefined' || !avatar || avatar === 'undefined') && window.allContacts) {
+                const contact = window.allContacts.find(c => String(c.id) === String(otherUserId));
+                if (contact) {
+                    if (!name || name === 'undefined') name = contact.name || contact.phone;
+                    if (!phone || phone === 'undefined') phone = contact.phone || '';
+                    if (!avatar || avatar === 'undefined') avatar = contact.avatar;
+                    if (!about || about === 'undefined') about = contact.about || 'Available';
+                }
+            }
+
             // If we are in Status mode, switch back to Chats
             const statusView = document.getElementById('status_view_container');
             if (statusView && !statusView.classList.contains('hidden')) {
@@ -3403,7 +3796,8 @@
 
             // Capture search query for highlighting messages
             const searchInput = document.getElementById('sidebar_search');
-            window.activeSearchQuery = (searchInput && searchInput.value.trim().length > 0) ? searchInput.value.trim().toLowerCase() : null;
+            window.activeSearchQuery = (searchInput && searchInput.value.trim().length > 0) ? searchInput.value.trim()
+                .toLowerCase() : null;
             window.activeSearchMsgTime = searchMsgTime || null;
             window._searchScrolled = false;
 
@@ -3413,7 +3807,8 @@
             // Highlight selected item in sidebar
             document.querySelectorAll('.user-chat-item').forEach(el => {
                 el.classList.remove('active');
-                if (el.getAttribute('id') === `user_sidebar_${otherUserId}` || el.getAttribute('data-userid') == otherUserId) {
+                if (el.getAttribute('id') === `user_sidebar_${otherUserId}` || el.getAttribute('data-userid') ==
+                    otherUserId) {
                     el.classList.add('active');
                 }
             });
@@ -3460,7 +3855,8 @@
             window.activeChatName = activeName;
 
             // Use provided avatar or fallback to UI-Avatar
-            const activeAvatar = avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(activeName)}&background=202c33&color=fff`;
+            const activeAvatar = avatar ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(activeName)}&background=202c33&color=fff`;
             window.activeChatAvatar = activeAvatar;
 
             window.activeChatUser = {
@@ -3473,11 +3869,13 @@
 
             document.getElementById('active_chat_title').textContent = activeName;
             document.getElementById('active_chat_subtitle').classList.add('hidden');
-            document.getElementById('active_chat_avatar').innerHTML = `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
+            document.getElementById('active_chat_avatar').innerHTML =
+                `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
 
             // Update Call Dropdown
             document.getElementById('call_dropdown_name').textContent = activeName;
-            document.getElementById('call_dropdown_avatar').innerHTML = `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
+            document.getElementById('call_dropdown_avatar').innerHTML =
+                `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
 
             // Reset Unread Badge for this user
             const badge = document.getElementById(`unread_badge_${otherUserId}`);
@@ -3515,7 +3913,10 @@
                     let text = 'offline';
                     if (data && data.last_changed) {
                         const date = new Date(data.last_changed);
-                        text = 'last seen ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        text = 'last seen ' + date.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
                     }
                     subtitle.textContent = text;
                     subtitle.classList.remove('hidden', 'text-green-600');
@@ -3542,7 +3943,11 @@
                     // Build sorted list (newest first)
                     for (const [key, val] of Object.entries(pinnedData)) {
                         window.pinnedMsgKeys.add(key);
-                        window._pinnedMsgsList.push({ key, text: val.text, time: val.time || 0 });
+                        window._pinnedMsgsList.push({
+                            key,
+                            text: val.text,
+                            time: val.time || 0
+                        });
                     }
                     window._pinnedMsgsList.sort((a, b) => b.time - a.time);
 
@@ -3569,7 +3974,8 @@
 
                 // Check if message is older than clear timestamp
                 const isGroup = window.currentChatId.startsWith('group_');
-                const targetId = isGroup ? window.currentChatId.replace('group_', '') : window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
+                const targetId = isGroup ? window.currentChatId.replace('group_', '') : window.currentChatId
+                    .replace('chat_', '').split('_').find(id => id != window.myUserId);
                 const elementId = isGroup ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                 const clearedTime = window.clearedChats?.[elementId] || 0;
 
@@ -3601,23 +4007,33 @@
                 // If message is from other user and not read, mark it as read since chat is open
                 if (data.sender_id != window.myUserId && data.status !== 'read') {
                     if (document.visibilityState === 'visible') {
-                        update(ref(db, `chats/${window.currentChatId}/messages/${key}`), { status: 'read' });
+                        update(ref(db, `chats/${window.currentChatId}/messages/${key}`), {
+                            status: 'read'
+                        });
                     } else if (data.status === 'sent') {
                         // Chat is selected but tab is hidden, so it's delivered
-                        update(ref(db, `chats/${window.currentChatId}/messages/${key}`), { status: 'delivered' });
+                        update(ref(db, `chats/${window.currentChatId}/messages/${key}`), {
+                            status: 'delivered'
+                        });
                     }
                 }
 
                 const isMe = data.sender_id == window.myUserId;
-                const time = new Date(data.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const time = new Date(data.time * 1000).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
 
                 let mediaContent = '';
                 if (data.type === 'image' && data.file_url) {
-                    mediaContent = `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
+                    mediaContent =
+                        `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
                 } else if (data.type === 'video' && data.file_url) {
-                    mediaContent = `<video src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs rounded-lg mb-2"></video>`;
+                    mediaContent =
+                        `<video src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs rounded-lg mb-2"></video>`;
                 } else if (data.type === 'audio' && data.file_url) {
-                    mediaContent = `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;
+                    mediaContent =
+                        `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;
                 } else if (data.type === 'document' && data.file_url) {
                     mediaContent = `
                         <div class="relative rounded-lg overflow-hidden border border-black/10 bg-black/5 mb-1 cursor-pointer hover:bg-black/10 transition-colors w-[260px] sm:w-[280px]" onclick="window.open('${data.file_url}', '_blank')">
@@ -3640,7 +4056,8 @@
                                 </div>
                             </div>
                         </div>`;
-                } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data.lng) {
+                } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data
+                    .lng) {
                     const lat = parseFloat(data.lat);
                     const lng = parseFloat(data.lng);
                     const isLive = data.type === 'live_location';
@@ -3651,17 +4068,17 @@
 
                             <div class="z-20 relative flex flex-col items-center">
                                 ${isLive ? `
-                                    <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur border border-white/50 flex flex-col items-center justify-center overflow-hidden relative shadow-lg">
-                                        <div class="absolute inset-0 bg-[#1dae75] rounded-full animate-ping opacity-70"></div>
-                                        <div class="w-10 h-10 rounded-full bg-[#202c33] border-2 border-[#1dae75] flex items-center justify-center text-white font-bold text-lg relative z-10">
-                                            {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                        <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur border border-white/50 flex flex-col items-center justify-center overflow-hidden relative shadow-lg">
+                                            <div class="absolute inset-0 bg-[#1dae75] rounded-full animate-ping opacity-70"></div>
+                                            <div class="w-10 h-10 rounded-full bg-[#202c33] border-2 border-[#1dae75] flex items-center justify-center text-white font-bold text-lg relative z-10">
+                                                {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
+                                            </div>
                                         </div>
-                                    </div>
-                                ` : `
-                                    <div class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-[#ea4335]">
-                                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path></svg>
-                                    </div>
-                                `}
+                                    ` : `
+                                        <div class="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-[#ea4335]">
+                                            <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"></path></svg>
+                                        </div>
+                                    `}
                             </div>
 
                             <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" class="absolute inset-0 z-30 flex flex-col justify-end group">
@@ -3675,8 +4092,11 @@
                     if (isLive && data.duration) {
                         const endTime = new Date((data.time + data.duration * 60) * 1000);
                         const diff = endTime - new Date();
-                        const statusText = diff > 0 ? `Live until ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Live location ended';
-                        mediaContent += `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
+                        const statusText = diff > 0 ?
+                            `Live until ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` :
+                            'Live location ended';
+                        mediaContent +=
+                            `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
                     }
                 } else if (data.type === 'call') {
                     const isVoice = data.call_type === 'voice';
@@ -3688,7 +4108,8 @@
                     let durationText = '';
                     if (isCompleted && data.call_duration) {
                         const d = data.call_duration;
-                        if (d >= 3600) durationText = Math.floor(d / 3600) + ' hr ' + Math.floor((d % 3600) / 60) + ' min';
+                        if (d >= 3600) durationText = Math.floor(d / 3600) + ' hr ' + Math.floor((d % 3600) /
+                            60) + ' min';
                         else if (d >= 60) durationText = Math.floor(d / 60) + ' min';
                         else durationText = d + ' secs';
                     } else if (isMissed) {
@@ -3698,18 +4119,21 @@
                     }
 
                     const iconColor = isMissed ? '#ef4444' : (isMe ? '#00a884' : '#8696a0');
-                    const callIcon = isVoice
-                        ? `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>`
-                        : `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`;
+                    const callIcon = isVoice ?
+                        `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"/></svg>` :
+                        `<svg class="w-5 h-5" fill="${iconColor}" viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>`;
 
-                    const arrowIcon = isMe
-                        ? `<svg class="w-4 h-4" fill="${isMissed || isNoAnswer ? '#ef4444' : '#00a884'}" viewBox="0 0 24 24"><path d="M5.5 18.5l1.5-1.5L4 14h16v-2H4l3-3-1.5-1.5L0 13l5.5 5.5z" transform="rotate(180 12 12)"/></svg>`
-                        : `<svg class="w-4 h-4" fill="${isMissed ? '#ef4444' : '#00a884'}" viewBox="0 0 24 24"><path d="M5.5 18.5l1.5-1.5L4 14h16v-2H4l3-3-1.5-1.5L0 13l5.5 5.5z"/></svg>`;
+                    const arrowIcon = isMe ?
+                        `<svg class="w-4 h-4" fill="${isMissed || isNoAnswer ? '#ef4444' : '#00a884'}" viewBox="0 0 24 24"><path d="M5.5 18.5l1.5-1.5L4 14h16v-2H4l3-3-1.5-1.5L0 13l5.5 5.5z" transform="rotate(180 12 12)"/></svg>` :
+                        `<svg class="w-4 h-4" fill="${isMissed ? '#ef4444' : '#00a884'}" viewBox="0 0 24 24"><path d="M5.5 18.5l1.5-1.5L4 14h16v-2H4l3-3-1.5-1.5L0 13l5.5 5.5z"/></svg>`;
 
                     const callLabel = isVoice ? 'Voice call' : 'Video call';
-                    const callTitle = isMissed ? (isVoice ? 'Missed voice call' : 'Missed video call') : callLabel;
+                    const callTitle = isMissed ? (isVoice ? 'Missed voice call' : 'Missed video call') :
+                        callLabel;
 
-                    const tapAction = isMissed && !isMe ? `onclick="event.stopPropagation(); ${isVoice ? 'window.startVoiceCall()' : 'window.startVideoCall()'}" style="cursor:pointer"` : '';
+                    const tapAction = isMissed && !isMe ?
+                        `onclick="event.stopPropagation(); ${isVoice ? 'window.startVoiceCall()' : 'window.startVideoCall()'}" style="cursor:pointer"` :
+                        '';
 
                     mediaContent = `
                         <div class="flex items-center gap-3 py-1 min-w-[180px]" ${tapAction}>
@@ -3737,26 +4161,27 @@
                 }
 
                 // Check if this is the specific searched message (by timestamp)
-                const isSearchMatch = window.activeSearchMsgTime && data.time && data.time == window.activeSearchMsgTime;
+                const isSearchMatch = window.activeSearchMsgTime && data.time && data.time == window
+                    .activeSearchMsgTime;
                 const searchHighlightClass = isSearchMatch ? 'search-msg-highlight' : '';
 
                 const html = `
                     <div class="relative group/msg w-full flex ${isMe ? 'justify-end' : 'justify-start'} mt-1 mb-2 px-2 transition-colors cursor-pointer select-none ${searchHighlightClass} gap-2 items-start" id="msg_${key}" onclick="window.toggleMsgSelection('${key}')">
 
                         ${!isMe ? `
-                        <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 mt-0.5 shadow-sm">
-                            <img src="${activeAvatar}" class="w-full h-full object-cover">
-                        </div>` : ''}
+                            <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 mt-0.5 shadow-sm">
+                                <img src="${activeAvatar}" class="w-full h-full object-cover">
+                            </div>` : ''}
 
                         <!-- Selection Checkbox (Hidden by default) -->
                         ${data.type !== 'call' ? `
-                        <div class="msg-checkbox-container hidden flex-col justify-center px-3 z-10 ${isMe ? 'order-first' : ''}">
-                            <div class="w-5 h-5 border-2 border-gray-400 rounded-md flex items-center justify-center bg-white">
-                                <input type="checkbox" id="checkbox_${key}" class="msg-checkbox opacity-0 absolute w-5 h-5 pointer-events-none">
-                                <svg class="w-4 h-4 text-white pointer-events-none transition-opacity opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            <div class="msg-checkbox-container hidden flex-col justify-center px-3 z-10 ${isMe ? 'order-first' : ''}">
+                                <div class="w-5 h-5 border-2 border-gray-400 rounded-md flex items-center justify-center bg-white">
+                                    <input type="checkbox" id="checkbox_${key}" class="msg-checkbox opacity-0 absolute w-5 h-5 pointer-events-none">
+                                    <svg class="w-4 h-4 text-white pointer-events-none transition-opacity opacity-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
                             </div>
-                        </div>
-                        ` : ''}
+                            ` : ''}
 
                         <style>
                             #checkbox_${key}:checked + svg { opacity: 1; }
@@ -3790,20 +4215,20 @@
                                 <!-- Dropdown List -->
                                 <div class="bg-[#233138] shadow-2xl border border-[#313d45] rounded-xl w-40 py-1 overflow-hidden flex-shrink-0">
                                     ${data.type !== 'call' ? `
-                                    <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
-                                    <button onclick="event.stopPropagation(); /* copy function */" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Copy <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
-                                    <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
-                                    <button onclick="event.stopPropagation(); window.askMetaAi('${key}', '${activeName}', \`${data.text ? data.text.replace(/\`/g, '\\\\`') : ''}\`)" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Ask Meta AI <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8696a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z" class="fill-[#8696a0]"></path></svg></button>
-                                    <button id="pin_btn_${key}" onclick="event.stopPropagation(); if(window.pinnedMsgKeys && window.pinnedMsgKeys.has('${key}')) { window.unpinPrivateMessage('${key}'); } else { window.pinPrivateMessage('${key}'); }" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">
-                                         <span id="pin_btn_text_${key}">Pin</span>
-                                         <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor">
-                                             <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
-                                         </svg>
-                                     </button>
-                                    <button onclick="event.stopPropagation(); window.toggleStarMessage('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors"><span id="star_btn_text_${key}">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                                    <button onclick="event.stopPropagation(); window.toggleMsgSelection('${key}'); window.isSelectionMode=true; document.querySelectorAll('.msg-checkbox-container').forEach(el=>el.classList.remove('hidden'));" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Select <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></button>
-                                    <div class="h-px bg-[#313d45] my-1 mx-2"></div>
-                                    ` : ''}
+                                        <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
+                                        <button onclick="event.stopPropagation(); /* copy function */" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Copy <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+                                        <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
+                                        <button onclick="event.stopPropagation(); window.askMetaAi('${key}', '${activeName}', \`${data.text ? data.text.replace(/\`/g, '\\\\`') : ''}\`)" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Ask Meta AI <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8696a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z" class="fill-[#8696a0]"></path></svg></button>
+                                        <button id="pin_btn_${key}" onclick="event.stopPropagation(); if(window.pinnedMsgKeys && window.pinnedMsgKeys.has('${key}')) { window.unpinPrivateMessage('${key}'); } else { window.pinPrivateMessage('${key}'); }" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">
+                                             <span id="pin_btn_text_${key}">Pin</span>
+                                             <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor">
+                                                 <path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path>
+                                             </svg>
+                                         </button>
+                                        <button onclick="event.stopPropagation(); window.toggleStarMessage('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors"><span id="star_btn_text_${key}">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                                        <button onclick="event.stopPropagation(); window.toggleMsgSelection('${key}'); window.isSelectionMode=true; document.querySelectorAll('.msg-checkbox-container').forEach(el=>el.classList.remove('hidden'));" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Select <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></button>
+                                        <div class="h-px bg-[#313d45] my-1 mx-2"></div>
+                                        ` : ''}
                                     <button onclick="event.stopPropagation(); window.deleteMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Delete <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                                 </div>
                             </div>
@@ -3822,309 +4247,352 @@
                             <div id="reactions_${key}" class="hidden"></div>
                         </div>
                     </div>`;
-                document.getElementById('messages').insertAdjacentHTML('beforeend', html);
-                if (data.reactions) window.renderReactions(key, data.reactions, isMe);
-                // Show pin icon immediately if this message is already pinned
-                if (window.pinnedMsgKeys && window.pinnedMsgKeys.has(key)) {
-                    const icon = document.getElementById('pin_icon_' + key);
-                    if (icon) icon.classList.remove('hidden');
-                }
-
-                // Show star icon if already starred
-                if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
-                    const sIcon = document.getElementById('star_icon_' + key);
-                    if (sIcon) sIcon.classList.remove('hidden');
-                    const btnText = document.getElementById('star_btn_text_' + key);
-                    if (btnText) btnText.textContent = 'Unstar';
-                }
-
-                // If search is active, scroll to first matching message; otherwise scroll to bottom
-                if (isSearchMatch && !window._searchScrolled) {
-                    window._searchScrolled = true;
-                    setTimeout(() => {
-                        const firstMatch = document.querySelector('.search-msg-highlight');
-                        if (firstMatch) {
-                            firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        }
-                    }, 500);
-                } else if (!window.activeSearchQuery) {
-                    scrollToBottom();
-                }
-            });
-
-            window.unsubscribeRemoved = window.onChildRemoved(messagesRef, (snapshot) => {
-                const key = snapshot.key;
-                const msgEl = document.getElementById('msg_' + key);
-                if (msgEl) msgEl.remove();
-                delete window.globalMessages[key];
-            });
-
-            window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
-                const data = snapshot.val();
-                const key = snapshot.key;
-
-                const oldMsg = window.globalMessages[key];
-                const oldReactions = oldMsg ? (oldMsg.reactions || {}) : {};
-                const newReactions = data.reactions || {};
-
-                window.globalMessages[key] = data;
-
-                const isMe = data.sender_id == window.myUserId;
-                if (isMe) {
-                    const tickEl = document.getElementById('tick_' + key);
-                    if (tickEl) {
-                        tickEl.innerHTML = window.getTickSVG(data.status || 'sent');
+                    document.getElementById('messages').insertAdjacentHTML('beforeend', html);
+                    if (data.reactions) window.renderReactions(key, data.reactions, isMe);
+                    // Show pin icon immediately if this message is already pinned
+                    if (window.pinnedMsgKeys && window.pinnedMsgKeys.has(key)) {
+                        const icon = document.getElementById('pin_icon_' + key);
+                        if (icon) icon.classList.remove('hidden');
                     }
-                }
 
-                window.renderReactions(key, newReactions, isMe);
+                    // Show star icon if already starred
+                    if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
+                        const sIcon = document.getElementById('star_icon_' + key);
+                        if (sIcon) sIcon.classList.remove('hidden');
+                        const btnText = document.getElementById('star_btn_text_' + key);
+                        if (btnText) btnText.textContent = 'Unstar';
+                    }
 
-                // Notification for new reactions on MY messages
-                if (isMe) {
-                    for (const [uid, emoji] of Object.entries(newReactions)) {
-                        if (uid != window.myUserId && oldReactions[uid] !== emoji) {
-                            const reactionKey = `${key}_${uid}_${emoji}`;
-                            window.seenReactions = window.seenReactions || new Set();
-                            if (!window.seenReactions.has(reactionKey)) {
-                                window.seenReactions.add(reactionKey);
-                                const reactorName = window.activeChatName || 'Someone';
-                                window.showToast('Reaction', `${reactorName} reacted to your message: ${emoji}`);
-                                if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
-                                    new Notification("Reaction", { body: `${reactorName} reacted: ${emoji}` });
+                    // If search is active, scroll to first matching message; otherwise scroll to bottom
+                    if (isSearchMatch && !window._searchScrolled) {
+                        window._searchScrolled = true;
+                        setTimeout(() => {
+                            const firstMatch = document.querySelector('.search-msg-highlight');
+                            if (firstMatch) {
+                                firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        }, 500);
+                    } else if (!window.activeSearchQuery) {
+                        scrollToBottom();
+                    }
+                });
+
+                window.unsubscribeRemoved = window.onChildRemoved(messagesRef, (snapshot) => {
+                    const key = snapshot.key;
+                    const msgEl = document.getElementById('msg_' + key);
+                    if (msgEl) msgEl.remove();
+                    delete window.globalMessages[key];
+                });
+
+                window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
+                    const data = snapshot.val();
+                    const key = snapshot.key;
+
+                    const oldMsg = window.globalMessages[key];
+                    const oldReactions = oldMsg ? (oldMsg.reactions || {}) : {};
+                    const newReactions = data.reactions || {};
+
+                    window.globalMessages[key] = data;
+
+                    const isMe = data.sender_id == window.myUserId;
+                    if (isMe) {
+                        const tickEl = document.getElementById('tick_' + key);
+                        if (tickEl) {
+                            tickEl.innerHTML = window.getTickSVG(data.status || 'sent');
+                        }
+                    }
+
+                    window.renderReactions(key, newReactions, isMe);
+
+                    // Notification for new reactions on MY messages
+                    if (isMe) {
+                        for (const [uid, emoji] of Object.entries(newReactions)) {
+                            if (uid != window.myUserId && oldReactions[uid] !== emoji) {
+                                const reactionKey = `
+            $ {
+                key
+            }
+            _$ {
+                uid
+            }
+            _$ {
+                emoji
+            }
+            `;
+                                window.seenReactions = window.seenReactions || new Set();
+                                if (!window.seenReactions.has(reactionKey)) {
+                                    window.seenReactions.add(reactionKey);
+                                    const reactorName = window.activeChatName || 'Someone';
+                                    window.showToast('Reaction', `
+            $ {
+                reactorName
+            }
+            reacted to your message: $ {
+                emoji
+            }
+            `);
+                                    if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
+                                        new Notification("Reaction", { body: `
+            $ {
+                reactorName
+            }
+            reacted: $ {
+                emoji
+            }
+            ` });
+                                    }
                                 }
                             }
                         }
                     }
+                });
+
+                // Call updateBlockedUI to refresh UI state for newly selected chat
+                if (window.updateBlockedUI) window.updateBlockedUI();
+            };
+
+            // Handle Tab Visibility (Mark as read when returning to tab)
+            document.addEventListener("visibilitychange", () => {
+                if (document.visibilityState === 'visible' && window.currentChatId) {
+                    for (let key in window.globalMessages) {
+                        let msg = window.globalMessages[key];
+                        if (msg.sender_id != window.myUserId && msg.status !== 'read') {
+                            update(ref(db, `
+            chats / $ {
+                window.currentChatId
+            }
+            /messages/$ {
+                key
+            }
+            `), { status: 'read' });
+                        }
+                    }
                 }
             });
 
-            // Call updateBlockedUI to refresh UI state for newly selected chat
-            if (window.updateBlockedUI) window.updateBlockedUI();
-        };
+            // Handle Notifications Permissions and Token
+            async function requestPermission() {
+                console.log('Requesting permission...');
 
-        // Handle Tab Visibility (Mark as read when returning to tab)
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === 'visible' && window.currentChatId) {
-                for (let key in window.globalMessages) {
-                    let msg = window.globalMessages[key];
-                    if (msg.sender_id != window.myUserId && msg.status !== 'read') {
-                        update(ref(db, `chats/${window.currentChatId}/messages/${key}`), { status: 'read' });
+                if (Notification.permission === 'denied') {
+                    window.showToast('Notifications Blocked', 'Please enable notifications in your browser settings to receive messages.');
+                    return;
+                }
+
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    console.log('Notification permission granted.');
+
+                    try {
+                        // Get FCM Token
+                        // NOTE: For production, you should add your VAPID key here: { vapidKey: '...' }
+                        const currentToken = await getToken(messaging);
+                        if (currentToken) {
+                            console.log('FCM Token:', currentToken);
+                            // Save token to server
+                            await fetch('/save-token', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+                                body: JSON.stringify({ token: currentToken })
+                            });
+                        } else {
+                            console.warn('No registration token available. Request permission to generate one.');
+                        }
+                    } catch (err) {
+                        console.error('An error occurred while retrieving token. ', err);
                     }
+                } else if (permission === 'denied') {
+                    console.warn('Unable to get permission to notify.');
+                    window.showToast('Permission Denied', 'You will not receive notifications until you allow them in your browser.');
                 }
             }
-        });
 
-        // Handle Notifications Permissions and Token
-        async function requestPermission() {
-            console.log('Requesting permission...');
+            requestPermission();
 
-            if (Notification.permission === 'denied') {
-                window.showToast('Notifications Blocked', 'Please enable notifications in your browser settings to receive messages.');
-                return;
-            }
+            // Handle Foreground Messages
+            onMessage(messaging, (payload) => {
+                console.log('Message received. ', payload);
 
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                console.log('Notification permission granted.');
-
-                try {
-                    // Get FCM Token
-                    // NOTE: For production, you should add your VAPID key here: { vapidKey: '...' }
-                    const currentToken = await getToken(messaging);
-                    if (currentToken) {
-                        console.log('FCM Token:', currentToken);
-                        // Save token to server
-                        await fetch('/save-token', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
-                            body: JSON.stringify({ token: currentToken })
-                        });
-                    } else {
-                        console.warn('No registration token available. Request permission to generate one.');
-                    }
-                } catch (err) {
-                    console.error('An error occurred while retrieving token. ', err);
+                // 1. If I am the sender, don't show notification
+                if (payload.data && payload.data.sender_id == window.myUserId) {
+                    return;
                 }
-            } else if (permission === 'denied') {
-                console.warn('Unable to get permission to notify.');
-                window.showToast('Permission Denied', 'You will not receive notifications until you allow them in your browser.');
-            }
-        }
 
-        requestPermission();
+                // 2. If I am already looking at this chat, don't show notification
+                if (payload.data && payload.data.chat_id == window.currentChatId) {
+                    return;
+                }
 
-        // Handle Foreground Messages
-        onMessage(messaging, (payload) => {
-            console.log('Message received. ', payload);
+                const { title, body } = payload.notification;
+                const senderId = payload.data ? payload.data.sender_id : null;
+                const senderName = payload.data ? payload.data.sender_name : 'Someone';
 
-            // 1. If I am the sender, don't show notification
-            if (payload.data && payload.data.sender_id == window.myUserId) {
-                return;
-            }
+                // Use the custom showToast instead of alert
+                window.showToast(title, body, senderId, senderName);
 
-            // 2. If I am already looking at this chat, don't show notification
-            if (payload.data && payload.data.chat_id == window.currentChatId) {
-                return;
-            }
+                // Also trigger standard browser notification if permission granted and tab is hidden
+                if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
+                    new Notification(title, {
+                        body: body,
+                        icon: 'https://cdn-icons-png.flaticon.com/512/733/733585.png' // WhatsApp icon
+                    });
+                }
+            });
 
-            const { title, body } = payload.notification;
-            const senderId = payload.data ? payload.data.sender_id : null;
-            const senderName = payload.data ? payload.data.sender_name : 'Someone';
-
-            // Use the custom showToast instead of alert
-            window.showToast(title, body, senderId, senderName);
-
-            // Also trigger standard browser notification if permission granted and tab is hidden
-            if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
-                new Notification(title, {
-                    body: body,
-                    icon: 'https://cdn-icons-png.flaticon.com/512/733/733585.png' // WhatsApp icon
-                });
-            }
-        });
-
-        // Selection Logic
-        window.isSelectionMode = false;
-        window.isForwardSelection = false;
-        window.selectedMessages = new Set();
-        window._selectedForwardTargets = new Map(); // targetId => { type, name }
-
-        window.selectMessage = function() {
-            window.isSelectionMode = true;
-            document.getElementById('normal_header')?.classList.add('hidden');
-            document.getElementById('selection_header')?.classList.remove('hidden');
-            document.getElementById('selection_header')?.classList.add('flex');
-
-            document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
-            document.getElementById('private_header_more_dropdown')?.classList.add('hidden');
-        };
-
-        window.cancelSelection = function () {
+            // Selection Logic
             window.isSelectionMode = false;
             window.isForwardSelection = false;
-            window.selectedMessages.clear();
+            window.selectedMessages = new Set();
+            window._selectedForwardTargets = new Map(); // targetId => { type, name }
 
-            document.getElementById('normal_header')?.classList.remove('hidden');
-            document.getElementById('selection_header')?.classList.add('hidden');
+            window.selectMessage = function() {
+                window.isSelectionMode = true;
+                document.getElementById('normal_header')?.classList.add('hidden');
+                document.getElementById('selection_header')?.classList.remove('hidden');
+                document.getElementById('selection_header')?.classList.add('flex');
 
-            // Hide selection bottom bar and show normal input container
-            document.getElementById('selection_bottom_bar')?.classList.add('hidden');
-            document.getElementById('normal_input_container')?.classList.remove('hidden');
+                document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.remove('hidden'));
+                document.getElementById('private_header_more_dropdown')?.classList.add('hidden');
+            };
 
-            document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.msg-checkbox').forEach(el => {
-                el.checked = false;
-                const box = el.parentElement;
-                box.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
-                box.classList.add('bg-white', 'border-gray-400');
-            });
-            document.querySelectorAll('[id^="msg_"]').forEach(el => el.classList.remove('bg-blue-100', 'bg-opacity-50'));
-        };
+            window.cancelSelection = function () {
+                window.isSelectionMode = false;
+                window.isForwardSelection = false;
+                window.selectedMessages.clear();
 
-        window.confirmDeleteSelected = function () {
-            if (window.selectedMessages.size === 0) return;
-            window.openDeleteModal(`Delete ${window.selectedMessages.size} message(s)?`, () => {
-                window.selectedMessages.forEach(key => {
-                    remove(ref(db, `chats/${window.currentChatId}/messages/${key}`))
-                        .catch(e => console.error("Batch delete error:", e));
+                document.getElementById('normal_header')?.classList.remove('hidden');
+                document.getElementById('selection_header')?.classList.add('hidden');
+
+                // Hide selection bottom bar and show normal input container
+                document.getElementById('selection_bottom_bar')?.classList.add('hidden');
+                document.getElementById('normal_input_container')?.classList.remove('hidden');
+
+                document.querySelectorAll('.msg-checkbox-container').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.msg-checkbox').forEach(el => {
+                    el.checked = false;
+                    const box = el.parentElement;
+                    box.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
+                    box.classList.add('bg-white', 'border-gray-400');
                 });
-                window.cancelSelection();
-            });
-        };
+                document.querySelectorAll('[id^="msg_"]').forEach(el => el.classList.remove('bg-blue-100', 'bg-opacity-50'));
+            };
 
-        window.openDeleteModal = function (title, onConfirm) {
-            const modal = document.getElementById('delete_modal');
-            const titleEl = document.getElementById('delete_modal_title');
-            const confirmBtn = document.getElementById('delete_confirm_btn');
-
-            if (titleEl) titleEl.textContent = title;
-            if (confirmBtn) {
-                confirmBtn.onclick = function () {
-                    onConfirm();
-                    window.closeDeleteModal();
-                };
+            window.confirmDeleteSelected = function () {
+                if (window.selectedMessages.size === 0) return;
+                window.openDeleteModal(`
+            Delete $ {
+                window.selectedMessages.size
             }
-
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.classList.add('show'), 10);
-        };
-
-        window.closeDeleteModal = function () {
-            const modal = document.getElementById('delete_modal');
-            modal.classList.remove('show');
-            setTimeout(() => modal.classList.add('hidden'), 300);
-        };
-
-        window.toggleMsgSelection = function (key) {
-            if (!window.isSelectionMode && !window.isForwardSelection) return;
-            const msg = window.globalMessages[key];
-            if (msg && msg.type === 'call') return;
-
-            const checkbox = document.getElementById('checkbox_' + key);
-            const msgEl = document.getElementById('msg_' + key);
-            if (!checkbox || !msgEl) return;
-
-            checkbox.checked = !checkbox.checked;
-            const box = checkbox.parentElement;
-
-            if (checkbox.checked) {
-                window.selectedMessages.add(key);
-                msgEl.classList.add('bg-blue-100', 'bg-opacity-50');
-                box.classList.add('bg-[#0d9488]', 'border-[#0d9488]');
-                box.classList.remove('bg-white', 'border-gray-400');
-            } else {
-                window.selectedMessages.delete(key);
-                msgEl.classList.remove('bg-blue-100', 'bg-opacity-50');
-                box.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
-                box.classList.add('bg-white', 'border-gray-400');
+            message(s) ? `, () => {
+                    window.selectedMessages.forEach(key => {
+                        remove(ref(db, `
+            chats / $ {
+                window.currentChatId
             }
+            /messages/$ {
+                key
+            }
+            `))
+                            .catch(e => console.error("Batch delete error:", e));
+                    });
+                    window.cancelSelection();
+                });
+            };
 
-            if (window.selectedMessages.size === 0) {
-                window.cancelSelection();
-            } else {
-                if (window.isSelectionMode) {
-                    document.getElementById('selection_count').textContent = window.selectedMessages.size + ' Selected';
-                } else if (window.isForwardSelection) {
-                    document.getElementById('selection_bottom_count').textContent = window.selectedMessages.size + ' Selected';
+            window.openDeleteModal = function (title, onConfirm) {
+                const modal = document.getElementById('delete_modal');
+                const titleEl = document.getElementById('delete_modal_title');
+                const confirmBtn = document.getElementById('delete_confirm_btn');
+
+                if (titleEl) titleEl.textContent = title;
+                if (confirmBtn) {
+                    confirmBtn.onclick = function () {
+                        onConfirm();
+                        window.closeDeleteModal();
+                    };
                 }
-            }
-        };
 
-        // Forward Modal Operations
-        window.openForwardModal = function (isFromGroup = false) {
-            window.isForwardingFromGroup = isFromGroup;
-            const modal = document.getElementById('forward_modal');
-            const listContainer = document.getElementById('forward_contacts_list');
-            const searchInput = document.getElementById('forward_search_input');
-            const footer = document.getElementById('forward_modal_footer');
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.add('show'), 10);
+            };
 
-            if (!modal || !listContainer) return;
+            window.closeDeleteModal = function () {
+                const modal = document.getElementById('delete_modal');
+                modal.classList.remove('show');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            };
 
-            window._selectedForwardTargets.clear();
-            if (searchInput) searchInput.value = '';
-            if (footer) footer.classList.add('hidden');
+            window.toggleMsgSelection = function (key) {
+                if (!window.isSelectionMode && !window.isForwardSelection) return;
+                const msg = window.globalMessages[key];
+                if (msg && msg.type === 'call') return;
 
-            // Reset My Status checkbox UI
-            const statusBox = document.getElementById('forward_checkbox_box_status');
-            const statusCheck = document.getElementById('forward_checkbox_status');
-            if (statusCheck) statusCheck.checked = false;
-            if (statusBox) {
-                statusBox.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
-                statusBox.classList.add('bg-white', 'border-gray-400');
-                statusBox.querySelector('svg')?.classList.add('hidden');
-            }
+                const checkbox = document.getElementById('checkbox_' + key);
+                const msgEl = document.getElementById('msg_' + key);
+                if (!checkbox || !msgEl) return;
 
-            // Gather contacts from sidebar
-            let html = '';
+                checkbox.checked = !checkbox.checked;
+                const box = checkbox.parentElement;
 
-            // 1. Users
-            const userNodes = document.querySelectorAll('#user_list_container [id^="user_sidebar_"]');
-            userNodes.forEach(node => {
-                const userId = node.id.replace('user_sidebar_', '');
-                const name = node.querySelector('h4')?.textContent.trim() || '';
-                const imgEl = node.querySelector('img');
-                const avatar = imgEl ? imgEl.src : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
-                const about = node.querySelector('p')?.textContent.trim() || 'Available';
+                if (checkbox.checked) {
+                    window.selectedMessages.add(key);
+                    msgEl.classList.add('bg-blue-100', 'bg-opacity-50');
+                    box.classList.add('bg-[#0d9488]', 'border-[#0d9488]');
+                    box.classList.remove('bg-white', 'border-gray-400');
+                } else {
+                    window.selectedMessages.delete(key);
+                    msgEl.classList.remove('bg-blue-100', 'bg-opacity-50');
+                    box.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
+                    box.classList.add('bg-white', 'border-gray-400');
+                }
+
+                if (window.selectedMessages.size === 0) {
+                    window.cancelSelection();
+                } else {
+                    if (window.isSelectionMode) {
+                        document.getElementById('selection_count').textContent = window.selectedMessages.size + ' Selected';
+                    } else if (window.isForwardSelection) {
+                        document.getElementById('selection_bottom_count').textContent = window.selectedMessages.size + ' Selected';
+                    }
+                }
+            };
+
+            // Forward Modal Operations
+            window.openForwardModal = function (isFromGroup = false) {
+                window.isForwardingFromGroup = isFromGroup;
+                const modal = document.getElementById('forward_modal');
+                const listContainer = document.getElementById('forward_contacts_list');
+                const searchInput = document.getElementById('forward_search_input');
+                const footer = document.getElementById('forward_modal_footer');
+
+                if (!modal || !listContainer) return;
+
+                window._selectedForwardTargets.clear();
+                if (searchInput) searchInput.value = '';
+                if (footer) footer.classList.add('hidden');
+
+                // Reset My Status checkbox UI
+                const statusBox = document.getElementById('forward_checkbox_box_status');
+                const statusCheck = document.getElementById('forward_checkbox_status');
+                if (statusCheck) statusCheck.checked = false;
+                if (statusBox) {
+                    statusBox.classList.remove('bg-[#0d9488]', 'border-[#0d9488]');
+                    statusBox.classList.add('bg-white', 'border-gray-400');
+                    statusBox.querySelector('svg')?.classList.add('hidden');
+                }
+
+                // Gather contacts from sidebar
+                let html = '';
+
+                // 1. Users
+                const userNodes = document.querySelectorAll('#user_list_container [id^="user_sidebar_"]');
+                userNodes.forEach(node => {
+                    const userId = node.id.replace('user_sidebar_', '');
+                    const name = node.querySelector('h4')?.textContent.trim() || '';
+                    const imgEl = node.querySelector('img');
+                    const avatar = imgEl ? imgEl.src : `
+            https: //ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
+                    const about = node.querySelector('p')?.textContent.trim() || 'Available';
 
                 html += `
                     <div onclick="window.toggleForwardTargetSelection('${userId}', '${name.replace(/'/g, "\\'")}', 'user')"
@@ -4151,7 +4619,8 @@
                 const groupId = node.id.replace('group_sidebar_', '');
                 const name = node.querySelector('h4')?.textContent.trim() || '';
                 const imgEl = node.querySelector('img');
-                const avatar = imgEl ? imgEl.src : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
+                const avatar = imgEl ? imgEl.src :
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
                 const about = node.querySelector('p')?.textContent.trim() || 'Group chat';
 
                 html += `
@@ -4178,13 +4647,13 @@
             setTimeout(() => modal.classList.add('show'), 10);
         };
 
-        window.closeForwardModal = function () {
+        window.closeForwardModal = function() {
             const modal = document.getElementById('forward_modal');
             modal.classList.remove('show');
             setTimeout(() => modal.classList.add('hidden'), 300);
         };
 
-        window.filterForwardContacts = function () {
+        window.filterForwardContacts = function() {
             const val = document.getElementById('forward_search_input').value.trim().toLowerCase();
             const items = document.querySelectorAll('.forward-target-item');
             items.forEach(item => {
@@ -4199,7 +4668,7 @@
             });
         };
 
-        window.toggleForwardTargetSelection = function (targetId, targetName, type) {
+        window.toggleForwardTargetSelection = function(targetId, targetName, type) {
             const checkbox = document.getElementById('forward_checkbox_' + targetId);
             const box = document.getElementById('forward_checkbox_box_' + targetId);
             if (!checkbox || !box) return;
@@ -4208,7 +4677,10 @@
             const svg = box.querySelector('svg');
 
             if (checkbox.checked) {
-                window._selectedForwardTargets.set(targetId, { type, name: targetName });
+                window._selectedForwardTargets.set(targetId, {
+                    type,
+                    name: targetName
+                });
                 box.classList.add('bg-[#0d9488]', 'border-[#0d9488]');
                 box.classList.remove('bg-white', 'border-gray-400');
                 if (svg) svg.classList.remove('hidden');
@@ -4235,7 +4707,7 @@
             }
         };
 
-        window.sendForwardedMessages = async function () {
+        window.sendForwardedMessages = async function() {
             if (window.isForwardingFromGroup) {
                 if (typeof window.sendGroupForwardedMessages === 'function') {
                     await window.sendGroupForwardedMessages();
@@ -4247,7 +4719,22 @@
 
             const messagesToForward = [];
             window.selectedMessages.forEach(key => {
-                const msg = window.globalMessages[key];
+                let msg = window.globalMessages ? window.globalMessages[key] : null;
+                
+                if (!msg && window.globalMediaCache) {
+                    const cacheItem = window.globalMediaCache.find(m => m.key === key);
+                    if (cacheItem) {
+                        msg = {
+                            type: cacheItem.type,
+                            file_url: cacheItem.url,
+                            file_name: cacheItem.fileName,
+                            text: '',
+                            lat: null,
+                            lng: null
+                        };
+                    }
+                }
+                
                 if (msg) {
                     messagesToForward.push(msg);
                 }
@@ -4309,7 +4796,9 @@
                         try {
                             await fetch('/send', {
                                 method: 'POST',
-                                headers: { 'X-CSRF-TOKEN': csrf },
+                                headers: {
+                                    'X-CSRF-TOKEN': csrf
+                                },
                                 body: formData
                             });
                         } catch (e) {
@@ -4324,7 +4813,7 @@
             }
         };
 
-        window.forwardMsg = function (key) {
+        window.forwardMsg = function(key) {
             window.closeMsgMenu(key);
 
             window.isForwardSelection = true;
@@ -4344,7 +4833,7 @@
         };
 
         // Activates selection mode starting with chosen message
-        window.deleteMsg = function (key) {
+        window.deleteMsg = function(key) {
             window.closeMsgMenu(key);
             const msgData = window.globalMessages[key];
             let typeLabel = 'message';
@@ -4369,18 +4858,27 @@
             if (!callData) return;
             // Only show if I am the callee and call is in 'calling' state
             if (callData.callee_id == window.myUserId && callData.status === 'calling') {
-                window.showIncomingCall(callKey, callData.caller_name, callData.caller_avatar || '', callData.type, callData.group_call_id || null);
+                window.showIncomingCall(callKey, callData.caller_name, callData.caller_avatar || '', callData.type,
+                    callData.group_call_id || null);
                 window._incomingCallerId = callData.caller_id;
                 window._incomingCallType = callData.type;
 
                 // Set up reject function
-                window._rejectCallFn = async function () {
-                    try { await update(ref(db, `calls/${callKey}`), { status: 'rejected' }); } catch (e) { }
-                    setTimeout(async () => { try { await remove(ref(db, `calls/${callKey}`)); } catch (e) { } }, 3000);
+                window._rejectCallFn = async function() {
+                    try {
+                        await update(ref(db, `calls/${callKey}`), {
+                            status: 'rejected'
+                        });
+                    } catch (e) {}
+                    setTimeout(async () => {
+                        try {
+                            await remove(ref(db, `calls/${callKey}`));
+                        } catch (e) {}
+                    }, 3000);
                 };
 
                 // Set up missed call log sender
-                window._sendMissedCallLog = async function () {
+                window._sendMissedCallLog = async function() {
                     const callerId = callData.caller_id;
                     const minId = Math.min(window.myUserId, callerId);
                     const maxId = Math.max(window.myUserId, callerId);
@@ -4389,9 +4887,13 @@
                     try {
                         await push(ref(db, `chats/${chatId}/messages`), {
                             sender_id: callerId,
-                            type: 'call', call_type: callData.type,
-                            call_status: 'missed', call_duration: 0,
-                            text: '', time: now, status: 'sent'
+                            type: 'call',
+                            call_type: callData.type,
+                            call_status: 'missed',
+                            call_duration: 0,
+                            text: '',
+                            time: now,
+                            status: 'sent'
                         });
 
                         const logData = {
@@ -4405,14 +4907,18 @@
                             other_user_avatar: callData.caller_avatar || ''
                         };
                         await push(ref(db, `users/${window.myUserId}/call_logs`), logData);
-                    } catch (e) { console.error('Missed call log error:', e); }
+                    } catch (e) {
+                        console.error('Missed call log error:', e);
+                    }
                 };
 
                 // Auto-dismiss if caller cancels
                 onValue(ref(db, `calls/${callKey}/status`), (snap) => {
                     const st = snap.val();
                     if (st === 'ended' || st === null) {
-                        try { document.getElementById('ic_ringtone').pause(); } catch (e) { }
+                        try {
+                            document.getElementById('ic_ringtone').pause();
+                        } catch (e) {}
                         document.getElementById('incoming_call_overlay').classList.add('hidden');
                         window._incomingCallId = null;
                     }
@@ -4540,7 +5046,8 @@
                 if (isGroup) {
                     activeElementId = `group_sidebar_${window.currentChatId.replace('group_', '')}`;
                 } else {
-                    const targetId = window.currentChatId.replace('chat_', '').split('_').find(id => id != window.myUserId);
+                    const targetId = window.currentChatId.replace('chat_', '').split('_').find(id => id != window
+                        .myUserId);
                     activeElementId = `user_sidebar_${targetId}`;
                 }
 

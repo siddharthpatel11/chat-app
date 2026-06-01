@@ -68,7 +68,7 @@
             @foreach($settings as $item)
                 <div
                     class="flex items-center px-4 py-3.5 hover:bg-[#202c33] rounded-lg cursor-pointer group transition-all"
-                    onclick="{{ $item['title'] == 'Profile' ? 'toggleEditProfile()' : '' }}">
+                    onclick="{{ $item['title'] == 'Profile' ? 'toggleEditProfile()' : ($item['title'] == 'General' ? 'toggleGeneralSettings()' : ($item['title'] == 'Account' ? 'toggleAccountSettings()' : ($item['title'] == 'Privacy' ? 'togglePrivacySettings()' : ($item['title'] == 'Chats' ? 'toggleChatSettings()' : ($item['title'] == 'Video & voice' ? 'toggleVideoVoiceSettings()' : ($item['title'] == 'Notifications' ? 'toggleNotificationsSettings()' : ($item['title'] == 'Keyboard shortcuts' ? 'openKeyboardShortcutsModal()' : ($item['title'] == 'Help and feedback' ? 'toggleHelpFeedbackSettings()' : '')))))))) }}">
                     <div class="w-10 text-[#8696a0] group-hover:text-[#00a884] transition-colors shrink-0">
                         @if($item['icon'] == 'monitor')
                             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"

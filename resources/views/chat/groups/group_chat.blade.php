@@ -25,912 +25,918 @@
 <div id="active_group_chat_content" class="hidden flex-row flex-1 h-full overflow-hidden select-none">
     <!-- Main Chat Column -->
     <div id="group_chat_main_column" class="flex-1 flex flex-col relative h-full min-w-0">
-    <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-20 relative">
-        <!-- Normal Header -->
-        <div id="group_normal_header" class="flex items-center justify-between h-full w-full transition-all duration-300">
-            <div class="flex items-center gap-3">
-                <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
-                    onclick="window.backToSidebar()">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
-                    </svg>
-                </button>
-                <div id="active_group_chat_avatar" onclick="openGroupInfoPanel()"
-                    class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm overflow-hidden transition-transform hover:scale-105 cursor-pointer shrink-0">
-                    <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                </div>
-                <div onclick="openGroupInfoPanel()" class="cursor-pointer min-w-0 flex flex-col justify-center">
-                    <h2 id="active_group_chat_title"
-                        class="text-[15.5px] font-semibold text-[#e9edef] leading-tight truncate">Select a group chat
-                    </h2>
-                    <p id="active_group_chat_subtitle" class="text-xs text-[#8696a0] font-medium mt-0.5 truncate">Group
-                        chat</p>
-                </div>
-            </div>
-
-            <!-- Header Actions -->
-            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-                <!-- Call Button Dropdown -->
-                <div class="relative">
-                    <button id="group_call_btn_pill"
-                        class="hidden sm:flex items-center gap-2.5 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] px-4 py-2 rounded-full cursor-pointer transition-all duration-200 border border-transparent hover:border-[#313d45] focus:outline-none shrink-0 group">
-                        <div
-                            class="flex items-center gap-2 border-r border-[#313d45] pr-2 group-hover:border-[#8696a0]">
-                            <svg class="w-5 h-5 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
-                                </path>
-                            </svg>
-                            <span class="text-sm font-semibold">Call</span>
-                        </div>
-                        <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7">
-                            </path>
+        <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-20 relative">
+            <!-- Normal Header -->
+            <div id="group_normal_header"
+                class="flex items-center justify-between h-full w-full transition-all duration-300">
+                <div class="flex items-center gap-3">
+                    <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
+                        onclick="window.backToSidebar()">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
                         </svg>
                     </button>
-
-                    <!-- Call Dropdown -->
-                    <div id="group_call_dropdown" style="display: none;"
-                        class="hidden absolute top-14 right-0 w-[340px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
-                        <!-- Header with Expand/Collapse -->
-                        <div class="p-4 cursor-pointer hover:bg-white/5 transition-colors flex items-center justify-between"
-                            onclick="window.toggleGroupCallMembersList()">
-                            <div class="flex items-center gap-3">
-                                <div id="group_call_dropdown_avatar"
-                                    class="w-10 h-10 rounded-full overflow-hidden bg-[#2a3942] shrink-0">
-                                    <img src="https://ui-avatars.com/api/?name=Group&background=2a3942&color=fff"
-                                        class="w-full h-full object-cover">
-                                </div>
-                                <div class="flex flex-col min-w-0">
-                                    <span id="group_call_dropdown_name"
-                                        class="text-[#e9edef] font-medium text-[16px] truncate">Group</span>
-                                    <span class="text-[#8696a0] text-xs">Select people</span>
-                                </div>
-                            </div>
-                            <svg id="group_call_chevron"
-                                class="w-5 h-5 text-[#8696a0] transition-transform duration-300" fill="none"
-                                stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
-
-                        <!-- Members List (Hidden by default, shown when expanded) -->
-                        <div id="group_call_members_list"
-                            class="hidden flex flex-col border-t border-white/5 overflow-hidden">
-                            <div class="px-4 py-2 bg-white/5">
-                                <span
-                                    class="text-[12px] text-[#8696a0] font-semibold uppercase tracking-wider">Members</span>
-                            </div>
-                            <div id="group_call_members_container"
-                                class="flex-1 max-h-[280px] overflow-y-auto custom-scrollbar">
-                                <!-- Members rendered here -->
-                            </div>
-
-                            <!-- Voice/Video buttons inside the list -->
-                            <div class="p-4 flex gap-3 border-t border-white/5 bg-[#111b21]">
-                                <button onclick="window.startGroupVoiceCall(true)"
-                                    class="flex-1 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] py-2.5 rounded-full flex items-center justify-center gap-2 font-semibold transition-all active:scale-95">
-                                    <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
-                                        </path>
-                                    </svg>
-                                    Voice
-                                </button>
-                                <button onclick="window.startGroupVideoCall(true)"
-                                    class="flex-1 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] py-2.5 rounded-full flex items-center justify-center gap-2 font-semibold transition-all active:scale-95">
-                                    <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
-                                        </path>
-                                    </svg>
-                                    Video
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Collapsed Footer Actions -->
-                        <div id="group_call_collapsed_footer" class="p-4 flex flex-col gap-3">
-                            <div class="flex gap-3">
-                                <button onclick="window.startGroupVoiceCall(false)"
-                                    class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
-                                        </path>
-                                    </svg>
-                                    Voice Call
-                                </button>
-                                <button onclick="window.startGroupVideoCall(false)"
-                                    class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
-                                        </path>
-                                    </svg>
-                                    Video Call
-                                </button>
-                            </div>
-                            <div class="h-[1px] bg-white/5 my-1"></div>
-                            <button
-                                class="w-full flex items-center gap-3 px-2 py-2 text-[#e9edef] hover:bg-white/5 rounded-lg transition-colors text-sm">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-[#202c33] flex items-center justify-center text-[#8696a0]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.103-1.103">
-                                        </path>
-                                    </svg>
-                                </div>
-                                Send call link
-                            </button>
-                            <button
-                                class="w-full flex items-center gap-3 px-2 py-2 text-[#e9edef] hover:bg-white/5 rounded-lg transition-colors text-sm">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-[#202c33] flex items-center justify-center text-[#8696a0]">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                        </path>
-                                    </svg>
-                                </div>
-                                Schedule call
-                            </button>
-                        </div>
+                    <div id="active_group_chat_avatar" onclick="openGroupInfoPanel()"
+                        class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm overflow-hidden transition-transform hover:scale-105 cursor-pointer shrink-0">
+                        <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <div onclick="openGroupInfoPanel()" class="cursor-pointer min-w-0 flex flex-col justify-center">
+                        <h2 id="active_group_chat_title"
+                            class="text-[15.5px] font-semibold text-[#e9edef] leading-tight truncate">Select a group
+                            chat
+                        </h2>
+                        <p id="active_group_chat_subtitle" class="text-xs text-[#8696a0] font-medium mt-0.5 truncate">
+                            Group
+                            chat</p>
                     </div>
                 </div>
 
-                <!-- Search Icon -->
-                <button onclick="toggleGroupSearchDrawer()"
-                    class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
-                    title="Search">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                </button>
+                <!-- Header Actions -->
+                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                    <!-- Call Button Dropdown -->
+                    <div class="relative">
+                        <button id="group_call_btn_pill"
+                            class="hidden sm:flex items-center gap-2.5 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] px-4 py-2 rounded-full cursor-pointer transition-all duration-200 border border-transparent hover:border-[#313d45] focus:outline-none shrink-0 group">
+                            <div
+                                class="flex items-center gap-2 border-r border-[#313d45] pr-2 group-hover:border-[#8696a0]">
+                                <svg class="w-5 h-5 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                <span class="text-sm font-semibold">Call</span>
+                            </div>
+                            <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7">
+                                </path>
+                            </svg>
+                        </button>
 
-                <!-- Menu Icon -->
-                <button id="group_header_more_btn" onclick="toggleGroupHeaderMoreMenu(event)"
-                    class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
-                    title="Menu">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                        <!-- Call Dropdown -->
+                        <div id="group_call_dropdown" style="display: none;"
+                            class="hidden absolute top-14 right-0 w-[340px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
+                            <!-- Header with Expand/Collapse -->
+                            <div class="p-4 cursor-pointer hover:bg-white/5 transition-colors flex items-center justify-between"
+                                onclick="window.toggleGroupCallMembersList()">
+                                <div class="flex items-center gap-3">
+                                    <div id="group_call_dropdown_avatar"
+                                        class="w-10 h-10 rounded-full overflow-hidden bg-[#2a3942] shrink-0">
+                                        <img src="https://ui-avatars.com/api/?name=Group&background=2a3942&color=fff"
+                                            class="w-full h-full object-cover">
+                                    </div>
+                                    <div class="flex flex-col min-w-0">
+                                        <span id="group_call_dropdown_name"
+                                            class="text-[#e9edef] font-medium text-[16px] truncate">Group</span>
+                                        <span class="text-[#8696a0] text-xs">Select people</span>
+                                    </div>
+                                </div>
+                                <svg id="group_call_chevron"
+                                    class="w-5 h-5 text-[#8696a0] transition-transform duration-300" fill="none"
+                                    stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+
+                            <!-- Members List (Hidden by default, shown when expanded) -->
+                            <div id="group_call_members_list"
+                                class="hidden flex flex-col border-t border-white/5 overflow-hidden">
+                                <div class="px-4 py-2 bg-white/5">
+                                    <span
+                                        class="text-[12px] text-[#8696a0] font-semibold uppercase tracking-wider">Members</span>
+                                </div>
+                                <div id="group_call_members_container"
+                                    class="flex-1 max-h-[280px] overflow-y-auto custom-scrollbar">
+                                    <!-- Members rendered here -->
+                                </div>
+
+                                <!-- Voice/Video buttons inside the list -->
+                                <div class="p-4 flex gap-3 border-t border-white/5 bg-[#111b21]">
+                                    <button onclick="window.startGroupVoiceCall(true)"
+                                        class="flex-1 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] py-2.5 rounded-full flex items-center justify-center gap-2 font-semibold transition-all active:scale-95">
+                                        <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
+                                            </path>
+                                        </svg>
+                                        Voice
+                                    </button>
+                                    <button onclick="window.startGroupVideoCall(true)"
+                                        class="flex-1 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] py-2.5 rounded-full flex items-center justify-center gap-2 font-semibold transition-all active:scale-95">
+                                        <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
+                                            </path>
+                                        </svg>
+                                        Video
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Collapsed Footer Actions -->
+                            <div id="group_call_collapsed_footer" class="p-4 flex flex-col gap-3">
+                                <div class="flex gap-3">
+                                    <button onclick="window.startGroupVoiceCall(false)"
+                                        class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
+                                            </path>
+                                        </svg>
+                                        Voice Call
+                                    </button>
+                                    <button onclick="window.startGroupVideoCall(false)"
+                                        class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
+                                            </path>
+                                        </svg>
+                                        Video Call
+                                    </button>
+                                </div>
+                                <div class="h-[1px] bg-white/5 my-1"></div>
+                                <button
+                                    class="w-full flex items-center gap-3 px-2 py-2 text-[#e9edef] hover:bg-white/5 rounded-lg transition-colors text-sm">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-[#202c33] flex items-center justify-center text-[#8696a0]">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.826a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.103-1.103">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    Send call link
+                                </button>
+                                <button
+                                    class="w-full flex items-center gap-3 px-2 py-2 text-[#e9edef] hover:bg-white/5 rounded-lg transition-colors text-sm">
+                                    <div
+                                        class="w-8 h-8 rounded-full bg-[#202c33] flex items-center justify-center text-[#8696a0]">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    Schedule call
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search Icon -->
+                    <button onclick="toggleGroupSearchDrawer()"
+                        class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                        title="Search">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Menu Icon -->
+                    <button id="group_header_more_btn" onclick="toggleGroupHeaderMoreMenu(event)"
+                        class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                        title="Menu">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Selection Header (Corrected Nesting: Sibling to Normal Header) -->
+            <div id="group_selection_header"
+                class="hidden absolute inset-0 bg-teal-600 items-center justify-between px-4 h-full w-full transition-all duration-300 z-30">
+                <div class="flex items-center gap-4">
+                    <button onclick="cancelGroupSelection()"
+                        class="text-white hover:bg-black/10 p-2 rounded-full transition-colors focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12">
+                            </path>
+                        </svg>
+                    </button>
+                    <span id="group_selection_count" class="text-white font-semibold text-lg">1 Selected</span>
+                </div>
+                <div class="flex items-center">
+                    <button onclick="confirmDeleteGroupSelected()"
+                        class="text-white hover:bg-black/10 p-2 rounded-full transition-colors focus:outline-none"
+                        title="Delete">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pinned Messages Bar (Hidden by default, supports multiple) -->
+        <div id="group_pinned_bar" onclick="window.scrollToCurrentGroupPin && window.scrollToCurrentGroupPin()"
+            class="hidden bg-[#2a3942]/90 backdrop-blur-sm px-4 py-2 flex items-center justify-between border-b border-white/5 cursor-pointer hover:bg-[#384b57] transition-colors z-[15]">
+            <div class="flex items-center gap-3 overflow-hidden">
+                <div class="text-[#00a884] shrink-0">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path
+                            d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z">
                         </path>
                     </svg>
-                </button>
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span id="group_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1 pinned
+                        message</span>
+                    <span id="group_pinned_text" class="text-[#8696a0] text-sm truncate w-full">Message text goes
+                        here...</span>
+                </div>
             </div>
-        </div>
-
-        <!-- Selection Header (Corrected Nesting: Sibling to Normal Header) -->
-        <div id="group_selection_header"
-            class="hidden absolute inset-0 bg-teal-600 items-center justify-between px-4 h-full w-full transition-all duration-300 z-30">
-            <div class="flex items-center gap-4">
-                <button onclick="cancelGroupSelection()"
-                    class="text-white hover:bg-black/10 p-2 rounded-full transition-colors focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12">
-                        </path>
+            <div class="flex items-center gap-1 shrink-0">
+                <button onclick="event.stopPropagation(); window.navigateGroupPin && window.navigateGroupPin(-1)"
+                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors"
+                    title="Previous pin">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
                     </svg>
                 </button>
-                <span id="group_selection_count" class="text-white font-semibold text-lg">1 Selected</span>
-            </div>
-            <div class="flex items-center">
-                <button onclick="confirmDeleteGroupSelected()"
-                    class="text-white hover:bg-black/10 p-2 rounded-full transition-colors focus:outline-none"
-                    title="Delete">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                        </path>
+                <button onclick="event.stopPropagation(); window.navigateGroupPin && window.navigateGroupPin(1)"
+                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors"
+                    title="Next pin">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path>
                     </svg>
                 </button>
             </div>
         </div>
-    </div>
-
-    <!-- Pinned Messages Bar (Hidden by default, supports multiple) -->
-    <div id="group_pinned_bar" onclick="window.scrollToCurrentGroupPin && window.scrollToCurrentGroupPin()"
-        class="hidden bg-[#2a3942]/90 backdrop-blur-sm px-4 py-2 flex items-center justify-between border-b border-white/5 cursor-pointer hover:bg-[#384b57] transition-colors z-[15]">
-        <div class="flex items-center gap-3 overflow-hidden">
-            <div class="text-[#00a884] shrink-0">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                    <path
-                        d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z">
-                    </path>
-                </svg>
-            </div>
-            <div class="flex flex-col min-w-0">
-                <span id="group_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1 pinned message</span>
-                <span id="group_pinned_text" class="text-[#8696a0] text-sm truncate w-full">Message text goes
-                    here...</span>
-            </div>
-        </div>
-        <div class="flex items-center gap-1 shrink-0">
-            <button onclick="event.stopPropagation(); window.navigateGroupPin && window.navigateGroupPin(-1)"
-                class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors"
-                title="Previous pin">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"></path>
-                </svg>
-            </button>
-            <button onclick="event.stopPropagation(); window.navigateGroupPin && window.navigateGroupPin(1)"
-                class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded-full hover:bg-white/5 transition-colors"
-                title="Next pin">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-                    <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"></path>
-                </svg>
-            </button>
-        </div>
-    </div>
 
         <!-- Group Message List -->
         <div id="group_messages" class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]">
         </div>
 
 
-    <!-- Footer with Emoji, Attachment, Reply and Input -->
-    <div class="h-auto min-h-[64px] bg-[#202c33] px-4 py-2 flex flex-col justify-end shrink-0 relative z-20">
+        <!-- Footer with Emoji, Attachment, Reply and Input -->
+        <div class="h-auto min-h-[64px] bg-[#202c33] px-4 py-2 flex flex-col justify-end shrink-0 relative z-20">
 
-        <!-- Replying Block (Moved outside the flex row to be on top) -->
-        <div id="group_replying_to_block"
-            class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
-            <div class="flex flex-col overflow-hidden">
-                <span id="group_replying_to_name" class="font-semibold text-[#00a884] text-[13px] mb-0.5">Replying to
-                    message</span>
-                <span id="group_replying_to_text"
-                    class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
-            </div>
-            <button onclick="cancelGroupReply()"
-                class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <div id="group_normal_input_container" class="flex items-center gap-2 w-full relative">
-            <!-- Emoji Picker Button -->
-            <button type="button" id="group_emoji_toggle_btn" onclick="toggleGroupEmojiPicker()"
-                class="text-[#8696a0] hover:text-[#e9edef] p-2 focus:outline-none shrink-0 transition-colors">
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-                    <path
-                        d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
-                    </path>
-                </svg>
-            </button>
-
-            <!-- Hidden File Input for Group Media -->
-            <input type="file" id="group_file_input" class="hidden"
-                onchange="window.handleGroupFileChange(this)">
-
-            <!-- Attachment Trigger -->
-            <div class="relative shrink-0">
-                <button type="button" id="group_attach_toggle_btn" onclick="window.toggleGroupAttachMenu()"
-                    class="text-gray-500 hover:text-gray-300 p-2 focus:outline-none transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <!-- Replying Block (Moved outside the flex row to be on top) -->
+            <div id="group_replying_to_block"
+                class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
+                <div class="flex flex-col overflow-hidden">
+                    <span id="group_replying_to_name" class="font-semibold text-[#00a884] text-[13px] mb-0.5">Replying
+                        to
+                        message</span>
+                    <span id="group_replying_to_text"
+                        class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
+                </div>
+                <button onclick="cancelGroupReply()"
+                    class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
+                            d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+
+            <div id="group_normal_input_container" class="flex items-center gap-2 w-full relative">
+                <!-- Emoji Picker Button -->
+                <button type="button" id="group_emoji_toggle_btn" onclick="toggleGroupEmojiPicker()"
+                    class="text-[#8696a0] hover:text-[#e9edef] p-2 focus:outline-none shrink-0 transition-colors">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                        <path
+                            d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
                         </path>
                     </svg>
                 </button>
 
-                <!-- Attachment Menu -->
-                <div id="group_attach_menu"
-                    class="hidden absolute bottom-full mb-3 left-0 sm:left-4 bg-[#1f2c34] p-4 rounded-3xl w-[320px] shadow-2xl z-50 transition-all origin-bottom-left">
-                    <div class="grid grid-cols-4 gap-y-6 gap-x-2 place-items-center">
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="window.selectGroupFile('.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip')">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#5f66cd] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Document</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="window.selectGroupFile('image/*;capture=camera')">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#ed517b] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm12 4a3 3 0 11-6 0 3 3 0 016 0z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Camera</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="window.selectGroupFile('image/*,video/*')">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#bf59cf] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Gallery</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="window.selectGroupFile('audio/*')">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#e35920] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Audio</span>
-                        </div>
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer"
-                            onclick="shareGroupLocation()">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-[#1dae75] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
-                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd"
-                                        d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
-                                        clip-rule="evenodd"></path>
-                                </svg>
-                            </div>
-                            <span class="text-gray-300 text-xs">Location</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <!-- Hidden File Input for Group Media -->
+                <input type="file" id="group_file_input" class="hidden"
+                    onchange="window.handleGroupFileChange(this)">
 
-            <!-- Emoji Picker Panel (Toggled with button) -->
-            <div id="group_emoji_picker_container"
-                class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px]">
-                <div class="grid grid-cols-6 place-items-center gap-1 p-3 bg-[#111b21]">
-                    <span onclick="insertEmojiIntoGroupInput('😊')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😊</span>
-                    <span onclick="insertEmojiIntoGroupInput('😂')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😂</span>
-                    <span onclick="insertEmojiIntoGroupInput('😍')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😍</span>
-                    <span onclick="insertEmojiIntoGroupInput('👍')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">👍</span>
-                    <span onclick="insertEmojiIntoGroupInput('❤️')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">❤️</span>
-                    <span onclick="insertEmojiIntoGroupInput('🙌')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙌</span>
-                    <span onclick="insertEmojiIntoGroupInput('😭')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😭</span>
-                    <span onclick="insertEmojiIntoGroupInput('🎉')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎉</span>
-                    <span onclick="insertEmojiIntoGroupInput('🙏')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙏</span>
-                    <span onclick="insertEmojiIntoGroupInput('🎂')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎂</span>
-                    <span onclick="insertEmojiIntoGroupInput('🔥')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🔥</span>
-                    <span onclick="insertEmojiIntoGroupInput('🤝')"
-                        class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🤝</span>
-                </div>
-            </div>
-
-            <!-- Input Area Container -->
-            <div id="group_input_area_container"
-                class="flex-1 relative flex items-center bg-[#2a3942] rounded-xl shadow-sm overflow-hidden">
-                <!-- State 1: Normal Text Input -->
-                <div id="group_text_input_state" class="w-full relative flex items-center">
-                    <input type="text" id="group_msg" oninput="handleGroupInputToggle()"
-                        onkeypress="handleGroupKeyPress(event)" placeholder="Type a message"
-                        class="w-full bg-transparent border-none pl-4 pr-10 py-2.5 text-[15px] focus:ring-0 text-[#d1d7db] placeholder-[#8696a0] min-h-[44px] focus:outline-none">
-                    <!-- Inside Voice to Text Mic Button -->
-                    <button type="button" id="group_inside_mic_btn" onclick="toggleGroupVoiceRecord()"
-                        class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                            <path
-                                d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
-                            </path>
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- State 2: Voice Note Recording UI -->
-                <div id="group_audio_recording_state"
-                    class="hidden w-full items-center justify-between px-3 h-[42px] bg-white">
-                    <button type="button" onclick="cancelGroupVoiceNote()"
-                        class="text-gray-500 hover:text-red-500 focus:outline-none transition-colors">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                            <path
-                                d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z">
-                            </path>
-                        </svg>
-                    </button>
-                    <div class="flex items-center gap-2">
-                        <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
-                        <span id="group_audio_timer" class="text-[15px] font-medium text-gray-700">0:00</span>
-                    </div>
-                    <div class="flex-1 mx-3 flex items-center h-full overflow-hidden">
-                        <!-- Waveform animation effect -->
-                        <div class="flex items-center gap-[3px] h-4 w-full opacity-60 justify-end overflow-hidden">
-                            <div class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]">
-                            </div>
-                            <div
-                                class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
-                            </div>
-                            <div
-                                class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_0.8s_ease-in-out_infinite_0.4s]">
-                            </div>
-                            <div
-                                class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <button id="group_action_btn" onclick="handleGroupActionBtn()"
-                class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-11 h-11 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
-                <svg id="group_mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path
-                        d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
-                    </path>
-                </svg>
-                <svg id="group_send_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                    class="hidden ml-1">
-                    <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
-                    </path>
-                </svg>
-            </button>
-        </div>
-
-        <!-- Group Bottom Selection Bar -->
-        <div id="group_selection_bottom_bar"
-            class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
-            <div class="flex items-center gap-4">
-                <button onclick="window.cancelGroupForwardSelection()"
-                    class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-                <span id="group_selection_bottom_count" class="font-semibold text-base">0 Selected</span>
-            </div>
-            <button onclick="window.openForwardModal(true)"
-                class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95"
-                title="Forward message">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path
-                        d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z">
-                    </path>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    </div> <!-- Close group_chat_main_column -->
-        <!-- Group Search Drawer (Hidden by default) -->
-        <div id="group_search_drawer"
-            class="hidden w-[360px] h-full bg-[#111b21] border-l border-[#313d45] flex flex-col shrink-0">
-            <!-- Search Header -->
-            <div class="h-16 bg-[#202c33] px-4 flex items-center justify-between shrink-0 border-b border-[#313d45]">
-                <div class="flex items-center gap-3 min-w-0">
-                    <button onclick="toggleGroupSearchDrawer()"
-                        class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                <!-- Attachment Trigger -->
+                <div class="relative shrink-0">
+                    <button type="button" id="group_attach_toggle_btn" onclick="window.toggleGroupAttachMenu()"
+                        class="text-gray-500 hover:text-gray-300 p-2 focus:outline-none transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
+                                d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13">
+                            </path>
                         </svg>
                     </button>
-                    <span class="text-[#e9edef] font-medium text-[16px]">Search Messages</span>
-                </div>
-            </div>
 
-            <!-- Search Input Field -->
-            <div class="p-3 bg-[#111b21] border-b border-[#313d45]">
-                <div
-                    class="bg-[#202c33] flex items-center gap-2 px-3 py-2 rounded-lg border border-transparent focus-within:border-[#00a884]">
-                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                    <input type="text" id="group_search_input" oninput="searchGroupMessages()"
-                        placeholder="Search messages..."
-                        class="w-full bg-transparent border-none text-[#e9edef] text-sm focus:ring-0 placeholder-gray-500">
-                </div>
-            </div>
-
-            <!-- Search Results List -->
-            <div id="group_search_results" class="flex-1 overflow-y-auto p-3 space-y-2 select-none">
-                <div class="text-[#8696a0] text-center text-sm py-4">Type to search messages in group</div>
-            </div>
-        </div>
-
-        <!-- Group Information Sidebar Drawer -->
-        <!-- Group Information Sidebar Drawer -->
-        <div id="group_info_panel"
-            class="hidden w-[400px] h-full bg-[#111b21] border-l border-[#313d45] flex flex-col shrink-0 z-40 select-none">
-            <!-- Header -->
-            <div class="h-16 bg-[#111b21] px-4 flex items-center gap-6 shrink-0 z-10">
-                <button onclick="closeGroupInfoPanel()"
-                    class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path
-                            d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z">
-                        </path>
-                    </svg>
-                </button>
-                <span class="text-[#e9edef] text-[16px] font-medium">Group info</span>
-            </div>
-
-            <div
-                class="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent pb-10">
-                <!-- Avatar & Title Section -->
-                <div class="pt-6 pb-4 flex flex-col items-center px-4 shrink-0">
-                    <div id="group_info_avatar_container"
-                        class="w-[200px] h-[200px] rounded-full overflow-hidden mb-4 shadow-lg bg-[#2a3942] flex items-center justify-center cursor-pointer">
-                        <img src="https://ui-avatars.com/api/?name=Group&background=2a3942&color=fff"
-                            id="group_info_avatar" class="w-full h-full object-cover">
-                    </div>
-
-                    <div id="group_info_name_container"
-                        class="flex items-center gap-3 mb-1 w-full justify-center px-4 group">
-                        <h2 class="text-[#e9edef] text-[24px] font-normal truncate text-center" id="group_info_name">
-                            Group Name</h2>
-                        <button onclick="window.startEditGroupName()"
-                            class="text-[#8696a0] hover:text-[#e9edef] transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none"
-                            title="Edit group subject">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                <path
-                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div id="group_info_name_edit_container"
-                        class="hidden items-center gap-2 mb-1 w-full justify-center px-4">
-                        <input type="text" id="group_info_name_input"
-                            class="bg-transparent border-b-2 border-[#00a884] text-[#e9edef] text-[24px] font-normal w-full focus:outline-none focus:ring-0 pb-1"
-                            maxlength="50">
-                        <div class="flex items-center gap-1.5 shrink-0">
-                            <button onclick="window.saveGroupName()"
-                                class="text-[#00a884] hover:text-[#00bfa5] p-1.5 focus:outline-none transition-colors">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
-                                </svg>
-                            </button>
-                            <button onclick="window.cancelEditGroupName()"
-                                class="text-[#f15c6d] hover:text-[#ff7b8b] p-1.5 focus:outline-none transition-colors">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path
-                                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z">
-                                    </path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                    <span class="text-[#8696a0] text-[15px] mb-6">Group · <span id="group_info_member_count_pill"
-                            class="text-[#00a884]">... members</span></span>
-
-                    <!-- Action Buttons Row -->
-                    <div class="flex justify-center gap-3 w-full mb-6 px-4">
-                        <button
-                            class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
-                            onclick="window.startGroupVoiceCall(false)">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                class="text-[#00a884]">
-                                <path
-                                    d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
-                                </path>
-                            </svg>
-                            <span class="text-[#e9edef] text-[14px]">Voice</span>
-                        </button>
-                        <button
-                            class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
-                            onclick="window.startGroupVideoCall(false)">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                class="text-[#00a884]">
-                                <path
-                                    d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
-                                </path>
-                            </svg>
-                            <span class="text-[#e9edef] text-[14px]">Video</span>
-                        </button>
-                        <button
-                            class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
-                            onclick="window.openAddGroupMembersModal()">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                class="text-[#00a884]">
-                                <path
-                                    d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
-                                </path>
-                            </svg>
-                            <span class="text-[#e9edef] text-[14px]">Add</span>
-                        </button>
-                        <button
-                            class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
-                            onclick="window.toggleGroupSearchDrawer()">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                class="text-[#00a884]">
-                                <path
-                                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
-                                </path>
-                            </svg>
-                            <span class="text-[#e9edef] text-[14px]">Search</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Group Description -->
-                <div class="px-6 mb-5 group/desc">
-                    <div id="group_info_description_container" class="flex items-start justify-between gap-2">
-                        <div class="flex-1 min-w-0">
-                            <p id="group_info_description"
-                                class="text-[#00a884] text-[15px] cursor-pointer hover:underline break-words"
-                                onclick="window.startEditGroupDescription()">Add group description</p>
-                        </div>
-                        <button onclick="window.startEditGroupDescription()"
-                            class="text-[#8696a0] hover:text-[#e9edef] opacity-0 group-hover/desc:opacity-100 transition-opacity flex-shrink-0"
-                            title="Edit description">
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                <path
-                                    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
-                                </path>
-                            </svg>
-                        </button>
-                    </div>
-                    <div id="group_info_description_edit_container" class="hidden flex-col gap-2">
-                        <textarea id="group_info_description_input"
-                            class="bg-transparent border-b-2 border-[#00a884] text-[#e9edef] text-[15px] w-full focus:outline-none focus:ring-0 pb-1 resize-none overflow-hidden"
-                            rows="1" placeholder="Add group description" maxlength="500"
-                            oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
-                        <div class="flex justify-end gap-2">
-                            <button onclick="window.cancelEditGroupDescription()"
-                                class="text-[#f15c6d] hover:text-[#ff7b8b] p-1.5 focus:outline-none transition-colors"
-                                title="Cancel">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path
-                                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z">
-                                    </path>
-                                </svg>
-                            </button>
-                            <button onclick="window.saveGroupDescription()"
-                                class="text-[#00a884] hover:text-[#00bfa5] p-1.5 focus:outline-none transition-colors"
-                                title="Save">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Group Created Info -->
-                <div class="px-6 mb-5">
-                    <p id="group_info_created_at" class="text-[#8696a0] text-[14.5px] leading-relaxed">
-                        Group created...
-                    </p>
-                </div>
-
-                <div class="h-[1px] bg-[#313d45] mx-6 mb-5"></div>
-
-                <!-- Media, Links and Docs -->
-                <div class="px-6 py-2 hover:bg-[#202c33]/30 cursor-pointer transition-colors mb-3"
-                    onclick="window.openGroupMediaLibrary()">
-                    <div class="flex justify-between items-center mb-4">
-                        <div class="flex items-center gap-4">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                class="text-[#8696a0]">
-                                <path
-                                    d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z">
-                                </path>
-                            </svg>
-                            <span class="text-[#e9edef] text-[16px]">Media, links and docs</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span id="group_media_count" class="text-[#8696a0] text-[15px]">0</span>
-                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
-                                class="text-[#8696a0] -rotate-90">
-                                <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
-                            </svg>
-                        </div>
-                    </div>
-                    <div id="group_media_container" class="flex gap-2 overflow-hidden">
-                        <!-- Dynamically populated -->
-                    </div>
-                </div>
-
-                <div class="h-[1px] bg-[#313d45] mx-6 mb-3"></div>
-
-                <!-- Starred Messages & Notifications -->
-                <div class="flex flex-col mb-4">
-                    <div onclick="window.openGroupStarredMessages()"
-                        class="px-6 py-3.5 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex justify-between items-center relative">
-                        <div class="flex items-center gap-4">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                class="text-[#8696a0]">
-                                <path
-                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
-                                </path>
-                            </svg>
-                            <span class="text-[#e9edef] text-[16px]">Starred messages</span>
-                            <span id="group_starred_count_badge" class="text-[#8696a0] text-sm ml-2 hidden">0</span>
-                        </div>
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
-                            class="text-[#8696a0] -rotate-90">
-                            <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
-                        </svg>
-                    </div>
-
-                    <!-- Group Starred Messages Panel -->
-                    <div id="group_starred_messages_panel"
-                        class="hidden fixed top-0 right-0 h-screen w-[400px] bg-[#111b21] border-l border-[#313d45] z-[500] flex-col shadow-2xl">
-                        <div
-                            class="h-[64px] bg-[#202c33] flex items-center px-4 gap-6 shrink-0 shadow-sm z-10 border-b border-[#313d45]">
-                            <button
-                                onclick="document.getElementById('group_starred_messages_panel').classList.add('hidden')"
-                                class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-                                </svg>
-                            </button>
-                            <span class="text-[#e9edef] text-[16px] font-medium">Starred messages</span>
-                        </div>
-                        <div id="group_starred_messages_list"
-                            class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#111b21] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent pb-10">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-
-                    <div
-                        class="px-6 py-3.5 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex justify-between items-center">
-                        <div class="flex items-center gap-4">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                                class="text-[#8696a0]">
-                                <path
-                                    d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z">
-                                </path>
-                            </svg>
-                            <span class="text-[#e9edef] text-[16px]">Notification settings</span>
-                        </div>
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
-                            class="text-[#8696a0] -rotate-90">
-                            <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
-
-                <!-- Encryption & Privacy cards -->
-                <div class="px-6 mb-5">
-                    <div class="bg-[#182229] rounded-[16px] overflow-hidden shadow-sm border border-[#202c33]">
-                        <div
-                            class="p-4 py-4 hover:bg-[#202c33] cursor-pointer transition-colors flex items-start gap-4">
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
-                                class="text-[#8696a0] shrink-0 mt-0.5">
-                                <path
-                                    d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z">
-                                </path>
-                            </svg>
-                            <div>
-                                <div class="text-[#e9edef] text-[16px] mb-0.5">Encryption</div>
-                                <div class="text-[#8696a0] text-[14px] leading-snug">Messages are end-to-end encrypted.
-                                    Click to learn more.</div>
+                    <!-- Attachment Menu -->
+                    <div id="group_attach_menu"
+                        class="hidden absolute bottom-full mb-3 left-0 sm:left-4 bg-[#1f2c34] p-4 rounded-3xl w-[320px] shadow-2xl z-50 transition-all origin-bottom-left">
+                        <div class="grid grid-cols-4 gap-y-6 gap-x-2 place-items-center">
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                onclick="window.selectGroupFile('.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip')">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-[#5f66cd] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-300 text-xs">Document</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                onclick="window.selectGroupFile('image/*;capture=camera')">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-[#ed517b] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9zm12 4a3 3 0 11-6 0 3 3 0 016 0z">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-300 text-xs">Camera</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                onclick="window.selectGroupFile('image/*,video/*')">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-[#bf59cf] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-300 text-xs">Gallery</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                onclick="window.selectGroupFile('audio/*')">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-[#e35920] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-300 text-xs">Audio</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer"
+                                onclick="shareGroupLocation()">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-[#1dae75] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                                            clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-300 text-xs">Location</span>
                             </div>
                         </div>
-                        <div class="h-[1px] bg-[#202c33] ml-[54px]"></div>
-                        <div
-                            class="p-4 py-4 hover:bg-[#202c33] cursor-pointer transition-colors flex items-start gap-4">
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
-                                class="text-[#8696a0] shrink-0 mt-0.5">
+                    </div>
+                </div>
+
+                <!-- Emoji Picker Panel (Toggled with button) -->
+                <div id="group_emoji_picker_container"
+                    class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px]">
+                    <div class="grid grid-cols-6 place-items-center gap-1 p-3 bg-[#111b21]">
+                        <span onclick="insertEmojiIntoGroupInput('😊')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😊</span>
+                        <span onclick="insertEmojiIntoGroupInput('😂')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😂</span>
+                        <span onclick="insertEmojiIntoGroupInput('😍')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😍</span>
+                        <span onclick="insertEmojiIntoGroupInput('👍')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">👍</span>
+                        <span onclick="insertEmojiIntoGroupInput('❤️')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">❤️</span>
+                        <span onclick="insertEmojiIntoGroupInput('🙌')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙌</span>
+                        <span onclick="insertEmojiIntoGroupInput('😭')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😭</span>
+                        <span onclick="insertEmojiIntoGroupInput('🎉')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎉</span>
+                        <span onclick="insertEmojiIntoGroupInput('🙏')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙏</span>
+                        <span onclick="insertEmojiIntoGroupInput('🎂')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎂</span>
+                        <span onclick="insertEmojiIntoGroupInput('🔥')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🔥</span>
+                        <span onclick="insertEmojiIntoGroupInput('🤝')"
+                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🤝</span>
+                    </div>
+                </div>
+
+                <!-- Input Area Container -->
+                <div id="group_input_area_container"
+                    class="flex-1 relative flex items-center bg-[#2a3942] rounded-xl shadow-sm overflow-hidden">
+                    <!-- State 1: Normal Text Input -->
+                    <div id="group_text_input_state" class="w-full relative flex items-center">
+                        <input type="text" id="group_msg" oninput="handleGroupInputToggle()"
+                            onkeypress="handleGroupKeyPress(event)" placeholder="Type a message"
+                            class="w-full bg-transparent border-none pl-4 pr-10 py-2.5 text-[15px] focus:ring-0 text-[#d1d7db] placeholder-[#8696a0] min-h-[44px] focus:outline-none">
+                        <!-- Inside Voice to Text Mic Button -->
+                        <button type="button" id="group_inside_mic_btn" onclick="toggleGroupVoiceRecord()"
+                            class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                 <path
-                                    d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z">
+                                    d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
                                 </path>
                             </svg>
-                            <div class="w-full flex justify-between items-center">
-                                <div>
-                                    <div class="text-[#e9edef] text-[16px] mb-0.5">Advanced chat privacy</div>
-                                    <div class="text-[#8696a0] text-[14px]">Off</div>
+                        </button>
+                    </div>
+
+                    <!-- State 2: Voice Note Recording UI -->
+                    <div id="group_audio_recording_state"
+                        class="hidden w-full items-center justify-between px-3 h-[42px] bg-white">
+                        <button type="button" onclick="cancelGroupVoiceNote()"
+                            class="text-gray-500 hover:text-red-500 focus:outline-none transition-colors">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                <path
+                                    d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zm2.46-7.12l1.41-1.41L12 12.59l2.12-2.12 1.41 1.41L13.41 14l2.12 2.12-1.41 1.41L12 15.41l-2.12 2.12-1.41-1.41L10.59 14l-2.13-2.12zM15.5 4l-1-1h-5l-1 1H5v2h14V4z">
+                                </path>
+                            </svg>
+                        </button>
+                        <div class="flex items-center gap-2">
+                            <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
+                            <span id="group_audio_timer" class="text-[15px] font-medium text-gray-700">0:00</span>
+                        </div>
+                        <div class="flex-1 mx-3 flex items-center h-full overflow-hidden">
+                            <!-- Waveform animation effect -->
+                            <div class="flex items-center gap-[3px] h-4 w-full opacity-60 justify-end overflow-hidden">
+                                <div class="w-1 bg-gray-400 rounded-full h-2 animate-[pulse_1s_ease-in-out_infinite]">
+                                </div>
+                                <div
+                                    class="w-1 bg-gray-400 rounded-full h-4 animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
+                                </div>
+                                <div
+                                    class="w-1 bg-gray-400 rounded-full h-3 animate-[pulse_0.8s_ease-in-out_infinite_0.4s]">
+                                </div>
+                                <div
+                                    class="w-1 bg-gray-400 rounded-full h-5 animate-[pulse_1.1s_ease-in-out_infinite_0.1s]">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
+                <button id="group_action_btn" onclick="handleGroupActionBtn()"
+                    class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-11 h-11 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
+                    <svg id="group_mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path
+                            d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
+                        </path>
+                    </svg>
+                    <svg id="group_send_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                        class="hidden ml-1">
+                        <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
 
-                <!-- Members Section -->
-                <div class="px-6 mb-2">
-                    <div class="flex justify-between items-center mb-4">
-                        <span id="group_members_count" class="text-[#8696a0] text-[15px]">... members</span>
-                        <button class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
-                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <!-- Group Bottom Selection Bar -->
+            <div id="group_selection_bottom_bar"
+                class="hidden flex items-center justify-between w-full h-[52px] bg-[#202c33] px-4 py-2 text-[#e9edef] z-20">
+                <div class="flex items-center gap-4">
+                    <button onclick="window.cancelGroupForwardSelection()"
+                        class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    <span id="group_selection_bottom_count" class="font-semibold text-base">0 Selected</span>
+                </div>
+                <button onclick="window.openForwardModal(true)"
+                    class="bg-[#00a884] hover:bg-[#008f72] text-white p-2.5 rounded-full shadow-lg transition-transform focus:outline-none hover:scale-105 active:scale-95"
+                    title="Forward message">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path
+                            d="M12.072 1.061a1 1 0 0 0-1.414 1.414L18.586 10.5H3a1 1 0 1 0 0 2h15.586l-7.928 8.025a1 1 0 1 0 1.414 1.414l9.643-9.761a1 1 0 0 0 0-1.414L12.072 1.061z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+    </div> <!-- Close group_chat_main_column -->
+    <!-- Group Search Drawer (Hidden by default) -->
+    <div id="group_search_drawer"
+        class="hidden w-[360px] h-full bg-[#111b21] border-l border-[#313d45] flex flex-col shrink-0">
+        <!-- Search Header -->
+        <div class="h-16 bg-[#202c33] px-4 flex items-center justify-between shrink-0 border-b border-[#313d45]">
+            <div class="flex items-center gap-3 min-w-0">
+                <button onclick="toggleGroupSearchDrawer()"
+                    class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <span class="text-[#e9edef] font-medium text-[16px]">Search Messages</span>
+            </div>
+        </div>
+
+        <!-- Search Input Field -->
+        <div class="p-3 bg-[#111b21] border-b border-[#313d45]">
+            <div
+                class="bg-[#202c33] flex items-center gap-2 px-3 py-2 rounded-lg border border-transparent focus-within:border-[#00a884]">
+                <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" id="group_search_input" oninput="searchGroupMessages()"
+                    placeholder="Search messages..."
+                    class="w-full bg-transparent border-none text-[#e9edef] text-sm focus:ring-0 placeholder-gray-500">
+            </div>
+        </div>
+
+        <!-- Search Results List -->
+        <div id="group_search_results" class="flex-1 overflow-y-auto p-3 space-y-2 select-none">
+            <div class="text-[#8696a0] text-center text-sm py-4">Type to search messages in group</div>
+        </div>
+    </div>
+
+    <!-- Group Information Sidebar Drawer -->
+    <!-- Group Information Sidebar Drawer -->
+    <div id="group_info_panel"
+        class="hidden w-[400px] h-full bg-[#111b21] border-l border-[#313d45] flex flex-col shrink-0 z-40 select-none">
+        <!-- Header -->
+        <div class="h-16 bg-[#111b21] px-4 flex items-center gap-6 shrink-0 z-10">
+            <button onclick="closeGroupInfoPanel()"
+                class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z">
+                    </path>
+                </svg>
+            </button>
+            <span class="text-[#e9edef] text-[16px] font-medium">Group info</span>
+        </div>
+
+        <div
+            class="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent pb-10">
+            <!-- Avatar & Title Section -->
+            <div class="pt-6 pb-4 flex flex-col items-center px-4 shrink-0">
+                <div id="group_info_avatar_container"
+                    class="w-[200px] h-[200px] rounded-full overflow-hidden mb-4 shadow-lg bg-[#2a3942] flex items-center justify-center cursor-pointer">
+                    <img src="https://ui-avatars.com/api/?name=Group&background=2a3942&color=fff"
+                        id="group_info_avatar" class="w-full h-full object-cover">
+                </div>
+
+                <div id="group_info_name_container"
+                    class="flex items-center gap-3 mb-1 w-full justify-center px-4 group">
+                    <h2 class="text-[#e9edef] text-[24px] font-normal truncate text-center" id="group_info_name">
+                        Group Name</h2>
+                    <button onclick="window.startEditGroupName()"
+                        class="text-[#8696a0] hover:text-[#e9edef] transition-colors flex-shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 focus:outline-none"
+                        title="Edit group subject">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="group_info_name_edit_container"
+                    class="hidden items-center gap-2 mb-1 w-full justify-center px-4">
+                    <input type="text" id="group_info_name_input"
+                        class="bg-transparent border-b-2 border-[#00a884] text-[#e9edef] text-[24px] font-normal w-full focus:outline-none focus:ring-0 pb-1"
+                        maxlength="50">
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <button onclick="window.saveGroupName()"
+                            class="text-[#00a884] hover:text-[#00bfa5] p-1.5 focus:outline-none transition-colors">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
+                            </svg>
+                        </button>
+                        <button onclick="window.cancelEditGroupName()"
+                            class="text-[#f15c6d] hover:text-[#ff7b8b] p-1.5 focus:outline-none transition-colors">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                                 <path
-                                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z">
                                 </path>
                             </svg>
                         </button>
                     </div>
-
-                    <div id="group_members_list" class="flex flex-col">
-                        <!-- Add Member Item -->
-                        <div class="flex items-center gap-4 py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors"
-                            onclick="window.openAddGroupMembersModal()">
-                            <div
-                                class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white shrink-0">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path
-                                        d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <span class="text-[#e9edef] text-[16px]">Add member</span>
-                        </div>
-                    </div>
                 </div>
+                <span class="text-[#8696a0] text-[15px] mb-6">Group · <span id="group_info_member_count_pill"
+                        class="text-[#00a884]">... members</span></span>
 
-                <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
-
-                <!-- Footer Actions -->
-                <div class="flex flex-col mb-8 px-6 pb-4">
-                    <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                            stroke-width="2" class="text-[#8696a0]">
-                            <path
-                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                            </path>
-                        </svg>
-                        <span class="text-[#e9edef] text-[16px]">Add to favourites</span>
-                    </div>
-
-                    <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                            stroke-width="2" class="text-[#8696a0]">
-                            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
-                        </svg>
-                        <span class="text-[#e9edef] text-[16px]">Add to list</span>
-                    </div>
-
-                    <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                <!-- Action Buttons Row -->
+                <div class="flex justify-center gap-3 w-full mb-6 px-4">
+                    <button
+                        class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
+                        onclick="window.startGroupVoiceCall(false)">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                            class="text-[#f15c6d]">
+                            class="text-[#00a884]">
                             <path
-                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z">
+                                d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
                             </path>
                         </svg>
-                        <span class="text-[#f15c6d] text-[16px]">Clear chat</span>
-                    </div>
-
-                    <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                        <span class="text-[#e9edef] text-[14px]">Voice</span>
+                    </button>
+                    <button
+                        class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
+                        onclick="window.startGroupVideoCall(false)">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                            class="text-[#f15c6d]">
+                            class="text-[#00a884]">
                             <path
-                                d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z">
+                                d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
                             </path>
                         </svg>
-                        <span class="text-[#f15c6d] text-[16px]">Exit group</span>
-                    </div>
-
-                    <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                            stroke-width="2" class="text-[#f15c6d]">
-                            <path d="M14.59 10l-4.59-4.59v3.59H2v2h8v3.59L14.59 10zM22 3v18H10V3h12z"></path>
+                        <span class="text-[#e9edef] text-[14px]">Video</span>
+                    </button>
+                    <button
+                        class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
+                        onclick="window.openAddGroupMembersModal()">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#00a884]">
+                            <path
+                                d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
+                            </path>
                         </svg>
-                        <span class="text-[#f15c6d] text-[16px]">Report group</span>
+                        <span class="text-[#e9edef] text-[14px]">Add</span>
+                    </button>
+                    <button
+                        class="flex-1 flex flex-col items-center justify-center py-3.5 rounded-2xl border border-[#313d45] hover:bg-[#202c33] transition-colors gap-2"
+                        onclick="window.toggleGroupSearchDrawer()">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#00a884]">
+                            <path
+                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                            </path>
+                        </svg>
+                        <span class="text-[#e9edef] text-[14px]">Search</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Group Description -->
+            <div class="px-6 mb-5 group/desc">
+                <div id="group_info_description_container" class="flex items-start justify-between gap-2">
+                    <div class="flex-1 min-w-0">
+                        <p id="group_info_description"
+                            class="text-[#00a884] text-[15px] cursor-pointer hover:underline break-words"
+                            onclick="window.startEditGroupDescription()">Add group description</p>
+                    </div>
+                    <button onclick="window.startEditGroupDescription()"
+                        class="text-[#8696a0] hover:text-[#e9edef] opacity-0 group-hover/desc:opacity-100 transition-opacity flex-shrink-0"
+                        title="Edit description">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path
+                                d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+                <div id="group_info_description_edit_container" class="hidden flex-col gap-2">
+                    <textarea id="group_info_description_input"
+                        class="bg-transparent border-b-2 border-[#00a884] text-[#e9edef] text-[15px] w-full focus:outline-none focus:ring-0 pb-1 resize-none overflow-hidden"
+                        rows="1" placeholder="Add group description" maxlength="500"
+                        oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"></textarea>
+                    <div class="flex justify-end gap-2">
+                        <button onclick="window.cancelEditGroupDescription()"
+                            class="text-[#f15c6d] hover:text-[#ff7b8b] p-1.5 focus:outline-none transition-colors"
+                            title="Cancel">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path
+                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z">
+                                </path>
+                            </svg>
+                        </button>
+                        <button onclick="window.saveGroupDescription()"
+                            class="text-[#00a884] hover:text-[#00bfa5] p-1.5 focus:outline-none transition-colors"
+                            title="Save">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
+
+            <!-- Group Created Info -->
+            <div class="px-6 mb-5">
+                <p id="group_info_created_at" class="text-[#8696a0] text-[14.5px] leading-relaxed">
+                    Group created...
+                </p>
+            </div>
+
+            <div class="h-[1px] bg-[#313d45] mx-6 mb-5"></div>
+
+            <!-- Media, Links and Docs -->
+            <div class="px-6 py-2 hover:bg-[#202c33]/30 cursor-pointer transition-colors mb-3"
+                onclick="window.openGroupMediaLibrary()">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="flex items-center gap-4">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#8696a0]">
+                            <path
+                                d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z">
+                            </path>
+                        </svg>
+                        <span class="text-[#e9edef] text-[16px]">Media, links and docs</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="group_media_count" class="text-[#8696a0] text-[15px]">0</span>
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
+                            class="text-[#8696a0] -rotate-90">
+                            <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
+                        </svg>
+                    </div>
+                </div>
+                <div id="group_media_container" class="flex gap-2 overflow-hidden">
+                    <!-- Dynamically populated -->
+                </div>
+            </div>
+
+            <div class="h-[1px] bg-[#313d45] mx-6 mb-3"></div>
+
+            <!-- Starred Messages & Notifications -->
+            <div class="flex flex-col mb-4">
+                <div onclick="window.openGroupStarredMessages()"
+                    class="px-6 py-3.5 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex justify-between items-center relative">
+                    <div class="flex items-center gap-4">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#8696a0]">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z">
+                            </path>
+                        </svg>
+                        <span class="text-[#e9edef] text-[16px]">Starred messages</span>
+                        <span id="group_starred_count_badge" class="text-[#8696a0] text-sm ml-2 hidden">0</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
+                        class="text-[#8696a0] -rotate-90">
+                        <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
+                    </svg>
+                </div>
+
+                <!-- Group Starred Messages Panel -->
+                <div id="group_starred_messages_panel"
+                    class="hidden fixed top-0 right-0 h-screen w-[400px] bg-[#111b21] border-l border-[#313d45] z-[500] flex-col shadow-2xl">
+                    <div
+                        class="h-[64px] bg-[#202c33] flex items-center px-4 gap-6 shrink-0 shadow-sm z-10 border-b border-[#313d45]">
+                        <button
+                            onclick="document.getElementById('group_starred_messages_panel').classList.add('hidden')"
+                            class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+                            </svg>
+                        </button>
+                        <span class="text-[#e9edef] text-[16px] font-medium">Starred messages</span>
+                    </div>
+                    <div id="group_starred_messages_list"
+                        class="flex-1 overflow-y-auto p-4 space-y-3 bg-[#111b21] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-[#374248] [&::-webkit-scrollbar-track]:bg-transparent pb-10">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div
+                    class="px-6 py-3.5 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#8696a0]">
+                            <path
+                                d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z">
+                            </path>
+                        </svg>
+                        <span class="text-[#e9edef] text-[16px]">Notification settings</span>
+                    </div>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
+                        class="text-[#8696a0] -rotate-90">
+                        <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
+
+            <!-- Encryption & Privacy cards -->
+            <div class="px-6 mb-5">
+                <div class="bg-[#182229] rounded-[16px] overflow-hidden shadow-sm border border-[#202c33]">
+                    <div class="p-4 py-4 hover:bg-[#202c33] cursor-pointer transition-colors flex items-start gap-4">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
+                            class="text-[#8696a0] shrink-0 mt-0.5">
+                            <path
+                                d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z">
+                            </path>
+                        </svg>
+                        <div>
+                            <div class="text-[#e9edef] text-[16px] mb-0.5">Encryption</div>
+                            <div class="text-[#8696a0] text-[14px] leading-snug">Messages are end-to-end encrypted.
+                                Click to learn more.</div>
+                        </div>
+                    </div>
+                    <div class="h-[1px] bg-[#202c33] ml-[54px]"></div>
+                    <div class="p-4 py-4 hover:bg-[#202c33] cursor-pointer transition-colors flex items-start gap-4">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
+                            class="text-[#8696a0] shrink-0 mt-0.5">
+                            <path
+                                d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z">
+                            </path>
+                        </svg>
+                        <div class="w-full flex justify-between items-center">
+                            <div>
+                                <div class="text-[#e9edef] text-[16px] mb-0.5">Advanced chat privacy</div>
+                                <div class="text-[#8696a0] text-[14px]">Off</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
+
+            <!-- Members Section -->
+            <div class="px-6 mb-2">
+                <div class="flex justify-between items-center mb-4">
+                    <span id="group_members_count" class="text-[#8696a0] text-[15px]">... members</span>
+                    <button class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                            <path
+                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                            </path>
+                        </svg>
+                    </button>
+                </div>
+
+                <div id="group_members_list" class="flex flex-col">
+                    <!-- Add Member Item -->
+                    <div class="flex items-center gap-4 py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors"
+                        onclick="window.openAddGroupMembersModal()">
+                        <div
+                            class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white shrink-0">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path
+                                    d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
+                                </path>
+                            </svg>
+                        </div>
+                        <span class="text-[#e9edef] text-[16px]">Add member</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
+
+            <!-- Footer Actions -->
+            <div class="flex flex-col mb-8 px-6 pb-4">
+                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                        stroke-width="2" class="text-[#8696a0]">
+                        <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                        </path>
+                    </svg>
+                    <span class="text-[#e9edef] text-[16px]">Add to favourites</span>
+                </div>
+
+                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                        stroke-width="2" class="text-[#8696a0]">
+                        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
+                    </svg>
+                    <span class="text-[#e9edef] text-[16px]">Add to list</span>
+                </div>
+
+                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                        class="text-[#f15c6d]">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z">
+                        </path>
+                    </svg>
+                    <span class="text-[#f15c6d] text-[16px]">Clear chat</span>
+                </div>
+
+                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                        class="text-[#f15c6d]">
+                        <path
+                            d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z">
+                        </path>
+                    </svg>
+                    <span class="text-[#f15c6d] text-[16px]">Exit group</span>
+                </div>
+
+                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                        stroke-width="2" class="text-[#f15c6d]">
+                        <path d="M14.59 10l-4.59-4.59v3.59H2v2h8v3.59L14.59 10zM22 3v18H10V3h12z"></path>
+                    </svg>
+                    <span class="text-[#f15c6d] text-[16px]">Report group</span>
+                </div>
+            </div>
         </div>
+    </div>
 
 </div>
 
@@ -1525,7 +1531,8 @@
 
     window.startGroupVoiceCall = function(groupIdOrUseSelection = false) {
         let isSelection = typeof groupIdOrUseSelection === 'boolean' ? groupIdOrUseSelection : false;
-        let providedGroupId = typeof groupIdOrUseSelection === 'string' || typeof groupIdOrUseSelection === 'number' ? groupIdOrUseSelection : null;
+        let providedGroupId = typeof groupIdOrUseSelection === 'string' || typeof groupIdOrUseSelection ===
+            'number' ? groupIdOrUseSelection : null;
 
         let gId = providedGroupId;
         let gName = 'Group';
@@ -1569,7 +1576,8 @@
 
     window.startGroupVideoCall = function(groupIdOrUseSelection = false) {
         let isSelection = typeof groupIdOrUseSelection === 'boolean' ? groupIdOrUseSelection : false;
-        let providedGroupId = typeof groupIdOrUseSelection === 'string' || typeof groupIdOrUseSelection === 'number' ? groupIdOrUseSelection : null;
+        let providedGroupId = typeof groupIdOrUseSelection === 'string' || typeof groupIdOrUseSelection ===
+            'number' ? groupIdOrUseSelection : null;
 
         let gId = providedGroupId;
         let gName = 'Group';
@@ -1577,7 +1585,7 @@
         let participants = [];
 
         if (providedGroupId) {
-            // Started from calls list, we just pass the ID. We might not have participants array immediately, 
+            // Started from calls list, we just pass the ID. We might not have participants array immediately,
             // but the route can handle it by fetching group members, or the caller will broadcast to the group node.
         } else {
             if (!window.activeChatUser) {
@@ -2624,9 +2632,12 @@
             class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😢</button>
         <button onclick="event.stopPropagation(); window.sendReaction('🙏', window._activeGroupMsgKey, true, event)"
             class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">🙏</button>
-        <button onclick="event.stopPropagation(); window.openFullReactionPicker(window._activeGroupMsgKey, true, event)"
+        <button
+            onclick="event.stopPropagation(); window.openFullReactionPicker(window._activeGroupMsgKey, true, event)"
             class="w-8 h-8 flex items-center justify-center text-[18px] text-[#aebac1] hover:bg-white/10 rounded-full transition-transform hover:scale-125 bg-white/5 ml-1">
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
+            </svg>
         </button>
     </div>
 
@@ -2639,8 +2650,14 @@
                     d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
             </svg></button>
         <button onclick="window.askMetaAiGroupMsg()"
-            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask Meta AI</span>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8696a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z" class="fill-[#8696a0]"></path></svg>
+            class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Ask
+                Meta AI</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8696a0"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z" class="fill-[#8696a0]">
+                </path>
+            </svg>
         </button>
         <button id="group_dropdown_reply_priv" onclick="window.replyPrivatelyFromGroup()"
             class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Reply
@@ -2671,8 +2688,8 @@
 
         <button onclick="window.starGroupMessage()"
             class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span
-                id="group_star_dropdown_btn_text">Star</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24"
-                fill="currentColor">
+                id="group_star_dropdown_btn_text">Star</span> <svg class="w-4 h-4 text-[#8696a0]"
+                viewBox="0 0 24 24" fill="currentColor">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
             </svg></button>
         <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
@@ -3429,20 +3446,20 @@
     window.askMetaAiGroupMsg = function() {
         const messageKey = window._activeGroupMsgKey;
         if (!messageKey) return;
-        
+
         let msgNode = document.getElementById(`group_msg_${messageKey}`);
         if (!msgNode) return;
-        
+
         let senderName = msgNode.querySelector('.text-\\[13px\\]')?.innerText || 'Unknown';
         if (msgNode.classList.contains('justify-end')) {
             senderName = 'You';
         }
-        
+
         let textNode = msgNode.querySelector('.break-words');
         let text = textNode ? textNode.innerText : '';
-        
+
         window.closeGroupMsgDropdown();
-        
+
         if (window.openMetaAiChat) {
             window.openMetaAiChat();
         }
@@ -3735,6 +3752,7 @@
             item.setAttribute('data-name', group.name);
             item.setAttribute('data-groupid', group.id);
             item.setAttribute('data-timestamp', '0');
+            item.setAttribute('data-avatar', group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`);
             item.onclick = function() {
                 window.selectGroupChat(group.id, group.name, group.avatar);
             };
@@ -3816,7 +3834,7 @@
                 const elementId = `group_sidebar_${groupId}`;
                 const clearedTime = window.clearedChats?.[elementId] || 0;
                 if (data.time <= clearedTime) return;
-                
+
                 const key = snapshot.key;
                 const idx = window.groupMessagesCache[groupId].findIndex(m => m.key === key);
                 if (idx === -1) {
@@ -3828,6 +3846,62 @@
                         type: data.type || 'text',
                         file_url: data.file_url || ""
                     });
+
+                    // Populate global media cache
+                    if (data.type !== 'text' && data.file_url) {
+                        window.globalMediaCache = window.globalMediaCache || [];
+                        if (!window.globalMediaCache.find(m => m.key === key)) {
+                            let sName = 'Someone';
+                            if (data.sender_id == window.myUserId) {
+                                sName = 'You';
+                            } else {
+                                const sidebarUser = document.getElementById(`user_sidebar_${data.sender_id}`);
+                                if (sidebarUser) {
+                                    const h4Text = sidebarUser.querySelector('h4')?.textContent;
+                                    sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text.trim() : null) || sidebarUser.getAttribute('data-phone') || 'Someone';
+                                }
+                            }
+
+                            window.globalMediaCache.push({
+                                key: key,
+                                type: data.type,
+                                url: data.file_url,
+                                fileName: data.file_name,
+                                time: data.time,
+                                senderId: data.sender_id,
+                                senderName: sName,
+                                chatId: groupId
+                            });
+                        }
+                    } else if (data.type === 'text' && data.text) {
+                        const urlRegex = /(https?:\/\/[^\s]+)/g;
+                        const links = data.text.match(urlRegex);
+                        if (links) {
+                            window.globalMediaCache = window.globalMediaCache || [];
+                            let sName = data.sender_id == window.myUserId ? 'You' : 'Someone';
+                            if (data.sender_id != window.myUserId) {
+                                const sidebarUser = document.getElementById(`user_sidebar_${data.sender_id}`);
+                                if (sidebarUser) {
+                                    const h4Text = sidebarUser.querySelector('h4')?.textContent;
+                                    sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text.trim() : null) || sidebarUser.getAttribute('data-phone') || 'Someone';
+                                }
+                            }
+                            links.forEach((url, idx) => {
+                                const linkKey = key + '_link_' + idx;
+                                if (!window.globalMediaCache.find(m => m.key === linkKey)) {
+                                    window.globalMediaCache.push({
+                                        key: linkKey,
+                                        type: 'link',
+                                        url: url,
+                                        time: data.time,
+                                        senderId: data.sender_id,
+                                        senderName: sName,
+                                        chatId: groupId
+                                    });
+                                }
+                            });
+                        }
+                    }
                 }
             }
         });
@@ -3915,7 +3989,8 @@
 
             const elementId = `user_sidebar_${userId}`;
             // Skip locked chats if not in locked view
-            if (window.lockedChats && window.lockedChats.includes(elementId) && window.activeSidebarFilter !== 'locked') {
+            if (window.lockedChats && window.lockedChats.includes(elementId) && window
+                .activeSidebarFilter !== 'locked') {
                 return; // Skip this user
             }
 
@@ -4004,7 +4079,8 @@
 
             const elementId = `group_sidebar_${groupId}`;
             // Skip locked groups if not in locked view
-            if (window.lockedChats && window.lockedChats.includes(elementId) && window.activeSidebarFilter !== 'locked') {
+            if (window.lockedChats && window.lockedChats.includes(elementId) && window
+                .activeSidebarFilter !== 'locked') {
                 return; // Skip this group
             }
 
@@ -4237,6 +4313,13 @@
     })();
 
     window.selectGroupChat = function(groupId, name, avatar, searchMsgTime = null) {
+        // Fetch missing info from DOM
+        const sidebarEl = document.getElementById(`group_sidebar_${groupId}`);
+        if (sidebarEl) {
+            if (!name || name === 'undefined') name = sidebarEl.getAttribute('data-name');
+            if (!avatar || avatar === 'undefined') avatar = sidebarEl.getAttribute('data-avatar');
+        }
+
         // Highlight selected group item in sidebar
         document.querySelectorAll('.user-chat-item').forEach(el => {
             el.classList.remove('active');
@@ -4268,6 +4351,25 @@
                     if (titleEl) titleEl.textContent = gData.name;
                     if (infoNameEl) infoNameEl.textContent = gData.name;
                     if (window.activeChatUser) window.activeChatUser.name = gData.name;
+                    window.activeChatName = gData.name;
+                    document.getElementById('active_chat_title').textContent = gData.name;
+                }
+                
+                if (gData.avatar) {
+                    window.activeChatAvatar = gData.avatar;
+                    if (window.activeChatUser) window.activeChatUser.avatar = gData.avatar;
+                    const avatarEl = document.getElementById('active_group_chat_avatar');
+                    if (avatarEl) avatarEl.innerHTML = `<img src="${gData.avatar}" class="w-full h-full object-cover">`;
+                    const infoAvatarEl = document.getElementById('group_info_avatar');
+                    if (infoAvatarEl) infoAvatarEl.src = gData.avatar;
+                } else if (gData.name) {
+                    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(gData.name)}&background=202c33&color=fff`;
+                    window.activeChatAvatar = fallbackAvatar;
+                    if (window.activeChatUser) window.activeChatUser.avatar = fallbackAvatar;
+                    const avatarEl = document.getElementById('active_group_chat_avatar');
+                    if (avatarEl) avatarEl.innerHTML = `<img src="${fallbackAvatar}" class="w-full h-full object-cover">`;
+                    const infoAvatarEl = document.getElementById('group_info_avatar');
+                    if (infoAvatarEl) infoAvatarEl.src = fallbackAvatar;
                 }
 
                 let uList = [];
@@ -4451,7 +4553,7 @@
 
         window.currentChatId = 'group_' + groupId.replace('group_', '');
 
-        const activeName = name;
+        const activeName = name && name !== 'undefined' ? name : 'Group';
         window.activeChatName = activeName;
 
         // --- HIJACK SELECT CHAT ---
@@ -4561,11 +4663,11 @@
 
         window.unsubscribeAdded = window.onChildAdded(messagesRef, (snapshot) => {
             const data = snapshot.val();
-            
+
             const elementId = `group_sidebar_${groupId}`;
             const clearedTime = window.clearedChats?.[elementId] || 0;
             if (data.time && data.time <= clearedTime) return;
-            
+
             const key = snapshot.key;
             window.globalMessages[key] = data;
 
@@ -4632,7 +4734,8 @@
                             </div>
                         </div>
                     </div>`;
-            } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data.lng) {
+            } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data
+                .lng) {
                 const lat = parseFloat(data.lat);
                 const lng = parseFloat(data.lng);
                 const isLive = data.type === 'live_location';
@@ -4667,8 +4770,11 @@
                 if (isLive && data.duration) {
                     const endTime = new Date((data.time + data.duration * 60) * 1000);
                     const diff = endTime - new Date();
-                    const statusText = diff > 0 ? `Live until ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Live location ended';
-                    mediaContent += `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
+                    const statusText = diff > 0 ?
+                        `Live until ${endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` :
+                        'Live location ended';
+                    mediaContent +=
+                        `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
                 }
             }
 
@@ -4867,11 +4973,11 @@
         window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
             const data = snapshot.val();
             const key = snapshot.key;
-            
+
             const oldMsg = window.globalMessages[key];
             const oldReactions = oldMsg ? (oldMsg.reactions || {}) : {};
             const newReactions = data.reactions || {};
-            
+
             window.globalMessages[key] = data;
 
             const isMe = data.sender_id == window.myUserId;
@@ -4898,9 +5004,13 @@
                                 if (contact) reactorName = contact.name || contact.phone;
                             }
                             const groupName = window.activeChatName || 'Group';
-                            window.showToast('Reaction in ' + groupName, `${reactorName} reacted: ${emoji}`);
-                            if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
-                                new Notification(groupName, { body: `${reactorName} reacted: ${emoji}` });
+                            window.showToast('Reaction in ' + groupName,
+                            `${reactorName} reacted: ${emoji}`);
+                            if (Notification.permission === "granted" && document.visibilityState !==
+                                'visible') {
+                                new Notification(groupName, {
+                                    body: `${reactorName} reacted: ${emoji}`
+                                });
                             }
                         }
                     }

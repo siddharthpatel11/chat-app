@@ -723,10 +723,31 @@
     window.currentPrivacyMode = 'all'; // 'all', 'except', 'only'
     window.currentPrivacyContacts = []; // Array of user IDs
     
+    window.syncPrivacyFromStorage = function() {
+        const savedStatus = localStorage.getItem('whatsapp_privacy_status') || 'My contacts';
+        if (savedStatus === 'My contacts' || (!savedStatus.includes('excluded') && !savedStatus.includes('included') && savedStatus !== 'My contacts except...')) {
+            window.currentPrivacyMode = 'all';
+            window.currentPrivacyContacts = [];
+        } else if (savedStatus.includes('excluded') || savedStatus === 'My contacts except...') {
+            window.currentPrivacyMode = 'except';
+            const savedData = localStorage.getItem('whatsapp_privacy_exclude_status');
+            window.currentPrivacyContacts = savedData ? JSON.parse(savedData) : [];
+        } else {
+            window.currentPrivacyMode = 'only';
+            const savedData = localStorage.getItem('whatsapp_privacy_exclude_status_include');
+            window.currentPrivacyContacts = savedData ? JSON.parse(savedData) : [];
+        }
+        updatePrivacyLabel();
+    };
+    
+    // Initial sync
+    window.syncPrivacyFromStorage();
+    
     let tempPrivacyMode = 'all';
     let tempPrivacyContacts = [];
 
     window.openStatusPrivacy = function() {
+        window.syncPrivacyFromStorage(); // Sync again just in case it was changed in settings
         tempPrivacyMode = window.currentPrivacyMode;
         tempPrivacyContacts = [...window.currentPrivacyContacts];
         
@@ -758,6 +779,7 @@
         if (mode === 'all') {
             window.currentPrivacyMode = mode;
             window.currentPrivacyContacts = [];
+            localStorage.setItem('whatsapp_privacy_status', 'My contacts');
             updatePrivacyTexts();
             updatePrivacyLabel();
             window.closeStatusPrivacy();
@@ -793,18 +815,27 @@
     function updatePrivacyLabel() {
         const label = document.getElementById('status_privacy_label');
         const textLabel = document.getElementById('text_status_privacy_label');
+        const settingsLabel = document.getElementById('privacy_status_label');
         
-        let labelText = '';
+        let statusTabLabel = '';
+        let settingsTabLabel = '';
+        
         if (window.currentPrivacyMode === 'all') {
-            labelText = 'Status (Contacts)';
+            statusTabLabel = 'Status (Contacts)';
+            settingsTabLabel = 'My contacts';
         } else if (window.currentPrivacyMode === 'except') {
-            labelText = `Status (${window.currentPrivacyContacts.length} excluded)`;
+            const count = window.currentPrivacyContacts.length;
+            statusTabLabel = `Status (${count} excluded)`;
+            settingsTabLabel = `${count} contact${count !== 1 ? 's' : ''} excluded`;
         } else {
-            labelText = `Status (${window.currentPrivacyContacts.length} included)`;
+            const count = window.currentPrivacyContacts.length;
+            statusTabLabel = `Status (${count} included)`;
+            settingsTabLabel = `${count} contact${count !== 1 ? 's' : ''} included`;
         }
         
-        if (label) label.textContent = labelText;
-        if (textLabel) textLabel.textContent = labelText;
+        if (label) label.textContent = statusTabLabel;
+        if (textLabel) textLabel.textContent = statusTabLabel;
+        if (settingsLabel) settingsLabel.textContent = settingsTabLabel;
     }
 
     window.openContactSelection = function(mode) {
@@ -843,6 +874,18 @@
     window.saveContactSelection = function() {
         window.currentPrivacyMode = tempPrivacyMode;
         window.currentPrivacyContacts = [...tempPrivacyContacts];
+        
+        // Sync to localStorage so settings panel sees it
+        if (window.currentPrivacyMode === 'except') {
+            localStorage.setItem('whatsapp_privacy_exclude_status', JSON.stringify(window.currentPrivacyContacts));
+            const count = window.currentPrivacyContacts.length;
+            localStorage.setItem('whatsapp_privacy_status', `${count} contact${count !== 1 ? 's' : ''} excluded`);
+        } else if (window.currentPrivacyMode === 'only') {
+            localStorage.setItem('whatsapp_privacy_exclude_status_include', JSON.stringify(window.currentPrivacyContacts));
+            const count = window.currentPrivacyContacts.length;
+            localStorage.setItem('whatsapp_privacy_status', `${count} contact${count !== 1 ? 's' : ''} included`);
+        }
+        
         updatePrivacyTexts();
         updatePrivacyLabel();
         

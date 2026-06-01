@@ -100,7 +100,7 @@
     <!-- Bottom Menu Items -->
     <div class="flex flex-col gap-2 w-full items-center mb-2">
         <!-- Media -->
-        <button class="nav-item group" title="Media">
+        <button class="nav-item group" title="Media" onclick="window.openGlobalMediaModal()">
             <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
                     class="text-[#8696a0] group-hover:text-[#e9edef]">
