@@ -41,7 +41,7 @@
             panel.classList.remove('hidden');
             panel.classList.add('flex');
             settings.classList.add('hidden');
-            window.renderPrivacyBlockedContactsList(); // Ensure it's up to date when opened
+            window.updateBlockedUI(); // Ensure it's up to date when opened
         } else {
             panel.classList.add('hidden');
             panel.classList.remove('flex');
@@ -49,23 +49,14 @@
         }
     }
 
-    window.renderPrivacyBlockedContactsList = function() {
+    window.updateBlockedUI = function() {
         const container = document.getElementById('blocked_contacts_list');
         const noContactsMsg = document.getElementById('no_blocked_contacts_msg');
         if (!container) return;
 
         container.innerHTML = '';
         
-        let blockedUsers = [];
-        try {
-            const raw = localStorage.getItem('blocked_users');
-            if (raw && raw !== 'undefined') {
-                blockedUsers = JSON.parse(raw);
-            }
-            if (!Array.isArray(blockedUsers)) blockedUsers = [];
-        } catch (e) {
-            blockedUsers = [];
-        }
+        let blockedUsers = JSON.parse(localStorage.getItem('blocked_users') || '[]');
 
         // Data migration & safety check: ensure all IDs are in 'user_sidebar_XX' format
         let needsUpdate = false;
@@ -170,8 +161,6 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (window.renderPrivacyBlockedContactsList) {
-            window.renderPrivacyBlockedContactsList();
-        }
+        window.updateBlockedUI();
     });
 </script>

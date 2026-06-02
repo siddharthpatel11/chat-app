@@ -49,16 +49,7 @@
 
     function populateAddBlockedModal() {
         const allUsers = [];
-        let blockedUsers = [];
-        try {
-            const raw = localStorage.getItem('blocked_users');
-            if (raw && raw !== 'undefined') {
-                blockedUsers = JSON.parse(raw);
-            }
-            if (!Array.isArray(blockedUsers)) blockedUsers = [];
-        } catch (e) {
-            blockedUsers = [];
-        }
+        const blockedUsers = JSON.parse(localStorage.getItem('blocked_users') || '[]');
 
         document.querySelectorAll('.user-chat-item').forEach(el => {
             const userId = el.getAttribute('data-userid');

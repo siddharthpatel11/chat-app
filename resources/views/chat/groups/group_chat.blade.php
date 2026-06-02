@@ -4353,7 +4353,6 @@
                     if (window.activeChatUser) window.activeChatUser.name = gData.name;
                     window.activeChatName = gData.name;
                     document.getElementById('active_chat_title').textContent = gData.name;
-                }
                 
                 if (gData.avatar) {
                     window.activeChatAvatar = gData.avatar;

@@ -413,4 +413,112 @@ class ChatController extends Controller
 
         return response()->json(['status' => true]);
     }
+
+    // ⚙️ Update Chat Settings (Mute, Lock, Fav, Disappearing)
+    public function updateChatSettings(Request $request)
+    {
+        $factory = (new Factory)
+            ->withServiceAccount(storage_path('app/firebase.json'))
+            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+
+        $db = $factory->createDatabase();
+
+        $request->validate([
+            'chat_id' => 'required',
+            'setting_key' => 'required|string',
+            'setting_value' => 'required'
+        ]);
+
+        $userId = auth()->id() ?? $request->user_id;
+
+        $db->getReference("chats/{$request->chat_id}/settings/{$userId}/{$request->setting_key}")
+            ->set($request->setting_value);
+
+        return response()->json(['status' => true, 'message' => 'Settings updated successfully']);
+    }
+
+    // 🚫 Block/Unblock User
+    public function toggleBlockUser(Request $request)
+    {
+        $factory = (new Factory)
+            ->withServiceAccount(storage_path('app/firebase.json'))
+            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+
+        $db = $factory->createDatabase();
+
+        $request->validate([
+            'blocked_user_id' => 'required',
+            'action' => 'required|in:block,unblock'
+        ]);
+
+        $userId = auth()->id() ?? $request->user_id;
+        
+        if ($request->action === 'block') {
+            $db->getReference("users/{$userId}/blocked/{$request->blocked_user_id}")->set(true);
+            $message = 'User blocked';
+        } else {
+            $db->getReference("users/{$userId}/blocked/{$request->blocked_user_id}")->remove();
+            $message = 'User unblocked';
+        }
+
+        return response()->json(['status' => true, 'message' => $message]);
+    }
+
+    // 🧹 Clear Chat
+    public function clearChat(Request $request)
+    {
+        $factory = (new Factory)
+            ->withServiceAccount(storage_path('app/firebase.json'))
+            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+
+        $db = $factory->createDatabase();
+
+        $request->validate(['chat_id' => 'required']);
+        $userId = auth()->id() ?? $request->user_id;
+
+        $db->getReference("chats/{$request->chat_id}/settings/{$userId}/cleared_at")
+            ->set(now()->timestamp);
+
+        return response()->json(['status' => true, 'message' => 'Chat cleared']);
+    }
+
+    // 🗑️ Delete Chat
+    public function deleteChat(Request $request)
+    {
+        $factory = (new Factory)
+            ->withServiceAccount(storage_path('app/firebase.json'))
+            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+
+        $db = $factory->createDatabase();
+
+        $request->validate(['chat_id' => 'required']);
+        $userId = auth()->id() ?? $request->user_id;
+
+        $db->getReference("chats/{$request->chat_id}/settings/{$userId}/deleted_at")
+            ->set(now()->timestamp);
+
+        return response()->json(['status' => true, 'message' => 'Chat deleted']);
+    }
+
+    // 🚨 Report User/Chat
+    public function reportUser(Request $request)
+    {
+        $request->validate([
+            'reported_id' => 'required',
+            'reason' => 'required|string'
+        ]);
+
+        $userId = auth()->id() ?? $request->user_id;
+        $reportId = 'report_' . time() . '_' . uniqid();
+
+        $db->getReference("reports/{$reportId}")->set([
+            'reporter_id' => $userId,
+            'reported_id' => $request->reported_id,
+            'chat_id' => $request->chat_id ?? null,
+            'reason' => $request->reason,
+            'time' => now()->timestamp
+        ]);
+
+        return response()->json(['status' => true, 'message' => 'Report submitted successfully']);
+    }
 }

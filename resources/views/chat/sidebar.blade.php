@@ -1149,7 +1149,6 @@
                 window.showToast?.(isBlocked ? 'Contact Blocked' : 'Contact Unblocked',
                     `The contact has been ${isBlocked ? 'blocked' : 'unblocked'}.`);
                 if (window.updateBlockedUI) window.updateBlockedUI();
-                if (window.renderPrivacyBlockedContactsList) window.renderPrivacyBlockedContactsList();
             };
 
             window.unblockCurrentContact = function() {

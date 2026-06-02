@@ -34,6 +34,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/delete-contact', [ChatController::class, 'deleteContact']);
     Route::post('/send-group-notification', [ChatController::class, 'sendGroupNotification']);
     Route::post('/meta-ai/ask', [MetaAiController::class, 'ask']);
+
+    // Chat Menu Features (Web)
+    Route::post('/chat/settings', [ChatController::class, 'updateChatSettings']);
+    Route::post('/user/block', [ChatController::class, 'toggleBlockUser']);
+    Route::post('/chat/clear', [ChatController::class, 'clearChat']);
+    Route::post('/chat/delete', [ChatController::class, 'deleteChat']);
+    Route::post('/user/report', [ChatController::class, 'reportUser']);
 });
 
 require __DIR__.'/auth.php';

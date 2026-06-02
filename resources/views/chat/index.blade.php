@@ -1029,10 +1029,7 @@
                                     </svg>
                                 </button>
                             </div>
-                            <div id="chat_blocked_notice" class="hidden flex items-center justify-center w-full py-4 text-[#8696a0] text-[14px]">
-                                You blocked this contact. 
-                                <button onclick="window.toggleBlockContact(window.activeChatUser.id, 'user')" class="text-[#00a884] ml-1 hover:underline focus:outline-none">Tap to unblock.</button>
-                            </div>
+
 
                             <div id="normal_input_container" class="flex items-center gap-2 w-full relative">
                                 <!-- Emoji Picker Button -->
