@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ChatApiController;
 use App\Http\Controllers\Api\GroupApiController;
+use App\Http\Controllers\Api\StatusApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,3 +50,10 @@ Route::get('/group/{groupId}/info', [GroupApiController::class, 'groupInfo']);
 Route::get('/group/{groupId}/messages', [GroupApiController::class, 'getMessages']);
 Route::post('/group/{groupId}/send-message', [GroupApiController::class, 'sendMessage']);
 Route::post('/group/{groupId}/call/initiate', [GroupApiController::class, 'initiateCall']);
+
+// Status Features
+Route::post('/status/create', [StatusApiController::class, 'createStatus']);
+Route::post('/status/privacy', [StatusApiController::class, 'updatePrivacy']);
+Route::post('/status/view', [StatusApiController::class, 'markAsViewed']);
+Route::post('/status/reply', [StatusApiController::class, 'replyToStatus']);
+Route::get('/status/list', [StatusApiController::class, 'listStatuses']);

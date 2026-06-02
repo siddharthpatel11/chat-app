@@ -491,7 +491,8 @@
             text: replyText,
             time: Math.floor(Date.now() / 1000),
             status: 'sent',
-            reply_to_text: statusExcerpt
+            reply_to_text: statusExcerpt,
+            reply_to_name: status.userName || 'Status'
         };
 
         try {

@@ -3752,7 +3752,9 @@
             item.setAttribute('data-name', group.name);
             item.setAttribute('data-groupid', group.id);
             item.setAttribute('data-timestamp', '0');
-            item.setAttribute('data-avatar', group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`);
+            item.setAttribute('data-avatar', group.avatar ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`
+            );
             item.onclick = function() {
                 window.selectGroupChat(group.id, group.name, group.avatar);
             };
@@ -3855,10 +3857,13 @@
                             if (data.sender_id == window.myUserId) {
                                 sName = 'You';
                             } else {
-                                const sidebarUser = document.getElementById(`user_sidebar_${data.sender_id}`);
+                                const sidebarUser = document.getElementById(
+                                    `user_sidebar_${data.sender_id}`);
                                 if (sidebarUser) {
                                     const h4Text = sidebarUser.querySelector('h4')?.textContent;
-                                    sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text.trim() : null) || sidebarUser.getAttribute('data-phone') || 'Someone';
+                                    sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text
+                                            .trim() : null) || sidebarUser.getAttribute('data-phone') ||
+                                        'Someone';
                                 }
                             }
 
@@ -3880,10 +3885,13 @@
                             window.globalMediaCache = window.globalMediaCache || [];
                             let sName = data.sender_id == window.myUserId ? 'You' : 'Someone';
                             if (data.sender_id != window.myUserId) {
-                                const sidebarUser = document.getElementById(`user_sidebar_${data.sender_id}`);
+                                const sidebarUser = document.getElementById(
+                                    `user_sidebar_${data.sender_id}`);
                                 if (sidebarUser) {
                                     const h4Text = sidebarUser.querySelector('h4')?.textContent;
-                                    sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text.trim() : null) || sidebarUser.getAttribute('data-phone') || 'Someone';
+                                    sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text
+                                            .trim() : null) || sidebarUser.getAttribute('data-phone') ||
+                                        'Someone';
                                 }
                             }
                             links.forEach((url, idx) => {
@@ -4353,20 +4361,24 @@
                     if (window.activeChatUser) window.activeChatUser.name = gData.name;
                     window.activeChatName = gData.name;
                     document.getElementById('active_chat_title').textContent = gData.name;
-                
+                }
+
                 if (gData.avatar) {
                     window.activeChatAvatar = gData.avatar;
                     if (window.activeChatUser) window.activeChatUser.avatar = gData.avatar;
                     const avatarEl = document.getElementById('active_group_chat_avatar');
-                    if (avatarEl) avatarEl.innerHTML = `<img src="${gData.avatar}" class="w-full h-full object-cover">`;
+                    if (avatarEl) avatarEl.innerHTML =
+                        `<img src="${gData.avatar}" class="w-full h-full object-cover">`;
                     const infoAvatarEl = document.getElementById('group_info_avatar');
                     if (infoAvatarEl) infoAvatarEl.src = gData.avatar;
                 } else if (gData.name) {
-                    const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(gData.name)}&background=202c33&color=fff`;
+                    const fallbackAvatar =
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(gData.name)}&background=202c33&color=fff`;
                     window.activeChatAvatar = fallbackAvatar;
                     if (window.activeChatUser) window.activeChatUser.avatar = fallbackAvatar;
                     const avatarEl = document.getElementById('active_group_chat_avatar');
-                    if (avatarEl) avatarEl.innerHTML = `<img src="${fallbackAvatar}" class="w-full h-full object-cover">`;
+                    if (avatarEl) avatarEl.innerHTML =
+                        `<img src="${fallbackAvatar}" class="w-full h-full object-cover">`;
                     const infoAvatarEl = document.getElementById('group_info_avatar');
                     if (infoAvatarEl) infoAvatarEl.src = fallbackAvatar;
                 }
@@ -5004,7 +5016,7 @@
                             }
                             const groupName = window.activeChatName || 'Group';
                             window.showToast('Reaction in ' + groupName,
-                            `${reactorName} reacted: ${emoji}`);
+                                `${reactorName} reacted: ${emoji}`);
                             if (Notification.permission === "granted" && document.visibilityState !==
                                 'visible') {
                                 new Notification(groupName, {
