@@ -802,4 +802,82 @@ class ChatApiController extends Controller
 
         return response()->json(['status' => true, 'message' => 'Report submitted successfully']);
     }
+
+    public function deleteMessages(Request $request)
+    {
+        $userId = auth()->id() ?? $request->user_id;
+        $messages = $request->input('messages', []);
+
+        if (empty($messages) || !is_array($messages)) {
+            return response()->json(['status' => false, 'message' => 'No messages provided'], 400);
+        }
+
+        try {
+            foreach ($messages as $msg) {
+                if (isset($msg['chat_id']) && isset($msg['message_id'])) {
+                    $chatId = $msg['chat_id'];
+                    $msgId = $msg['message_id'];
+                    
+                    if (str_starts_with($chatId, 'group_')) {
+                        $this->db->getReference("groups/{$chatId}/messages/{$msgId}")->remove();
+                    } else {
+                        $this->db->getReference("chats/{$chatId}/messages/{$msgId}")->remove();
+                    }
+                }
+            }
+            return response()->json(['status' => true, 'message' => 'Messages deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Error deleting messages: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function forwardMessages(Request $request)
+    {
+        $userId = auth()->id() ?? $request->user_id;
+        $messages = $request->input('messages', []);
+        $targetChatIds = $request->input('target_chat_ids', []);
+
+        if (empty($messages) || empty($targetChatIds)) {
+            return response()->json(['status' => false, 'message' => 'Messages and target chats are required'], 400);
+        }
+
+        try {
+            $messagesToForward = [];
+            foreach ($messages as $msg) {
+                if (isset($msg['chat_id']) && isset($msg['message_id'])) {
+                    $chatId = $msg['chat_id'];
+                    $msgId = $msg['message_id'];
+                    
+                    $msgData = null;
+                    if (str_starts_with($chatId, 'group_')) {
+                        $msgData = $this->db->getReference("groups/{$chatId}/messages/{$msgId}")->getValue();
+                    } else {
+                        $msgData = $this->db->getReference("chats/{$chatId}/messages/{$msgId}")->getValue();
+                    }
+
+                    if ($msgData) {
+                        $msgData['sender_id'] = $userId;
+                        $msgData['time'] = time();
+                        $msgData['status'] = 'sent';
+                        $messagesToForward[] = $msgData;
+                    }
+                }
+            }
+
+            foreach ($targetChatIds as $targetChatId) {
+                foreach ($messagesToForward as $newMsg) {
+                    if (str_starts_with($targetChatId, 'group_')) {
+                        $this->db->getReference("groups/{$targetChatId}/messages")->push($newMsg);
+                    } else {
+                        $this->db->getReference("chats/{$targetChatId}/messages")->push($newMsg);
+                    }
+                }
+            }
+
+            return response()->json(['status' => true, 'message' => 'Messages forwarded successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Error forwarding messages: ' . $e->getMessage()], 500);
+        }
+    }
 }
+

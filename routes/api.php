@@ -57,3 +57,16 @@ Route::post('/status/privacy', [StatusApiController::class, 'updatePrivacy']);
 Route::post('/status/view', [StatusApiController::class, 'markAsViewed']);
 Route::post('/status/reply', [StatusApiController::class, 'replyToStatus']);
 Route::get('/status/list', [StatusApiController::class, 'listStatuses']);
+
+// Meta AI
+Route::post('/meta-ai/ask', [\App\Http\Controllers\Api\MetaAiApiController::class, 'ask']);
+
+
+// Global Media
+Route::get('/media/all', [\App\Http\Controllers\Api\MediaApiController::class, 'getGlobalMedia']);
+
+
+// Global Media Actions
+Route::post('/media/delete', [\App\Http\Controllers\Api\MediaApiController::class, 'deleteMedia']);
+Route::post('/media/forward', [\App\Http\Controllers\Api\MediaApiController::class, 'forwardMedia']);
+

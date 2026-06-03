@@ -1,0 +1,266 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Kreait\Firebase\Factory;
+use App\Models\User;
+
+class MediaApiController extends Controller
+{
+    protected $db;
+
+    public function __construct()
+    {
+        $factory = (new Factory)
+            ->withServiceAccount(base_path(env('FIREBASE_CREDENTIALS')))
+            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+
+        $this->db = $factory->createDatabase();
+    }
+
+    public function getGlobalMedia(Request $request)
+    {
+        $userId = auth()->id() ?? $request->user_id;
+
+        if (!$userId) {
+            return response()->json(['status' => false, 'message' => 'User ID is required'], 400);
+        }
+
+        try {
+            $globalMediaCache = [];
+            $urlRegex = '/(https?:\/\/[^\s]+)/i';
+
+            // 1. Fetch personal chats
+            $allUsers = User::all();
+            foreach ($allUsers as $otherUser) {
+                if ($otherUser->id == $userId) continue;
+
+                $minId = min($userId, $otherUser->id);
+                $maxId = max($userId, $otherUser->id);
+                $chatId = "chat_{$minId}_{$maxId}";
+
+                $messagesRef = $this->db->getReference("chats/{$chatId}/messages")->getValue() ?? [];
+                
+                foreach ($messagesRef as $key => $data) {
+                    $this->processMessageForMedia($data, $key, $chatId, $userId, $globalMediaCache, $urlRegex);
+                }
+            }
+
+            // 2. Fetch groups
+            $groupsRef = $this->db->getReference("groups")->getValue() ?? [];
+            foreach ($groupsRef as $groupId => $groupData) {
+                $groupUsers = $groupData['users'] ?? [];
+                if (in_array((int)$userId, $groupUsers)) {
+                    $messagesRef = $this->db->getReference("groups/{$groupId}/messages")->getValue() ?? [];
+                    
+                    foreach ($messagesRef as $key => $data) {
+                        $this->processMessageForMedia($data, $key, $groupId, $userId, $globalMediaCache, $urlRegex);
+                    }
+                }
+            }
+
+            // 3. Fallback for legacy group formats in chats node (if any)
+            $allChats = $this->db->getReference("chats")->getValue() ?? [];
+            foreach ($allChats as $chatId => $chatData) {
+                if (str_starts_with($chatId, 'group_')) {
+                    // Check if we already processed it
+                    if (isset($groupsRef[$chatId])) continue;
+                    
+                    // We don't have user list, so we have to guess if the user sent a message or received one
+                    // To be safe, if we find any message from the user, we assume they are in the group
+                    $messagesRef = $chatData['messages'] ?? [];
+                    $userIsInvolved = false;
+                    foreach ($messagesRef as $msg) {
+                        if (isset($msg['sender_id']) && $msg['sender_id'] == $userId) {
+                            $userIsInvolved = true;
+                            break;
+                        }
+                    }
+
+                    if ($userIsInvolved) {
+                        foreach ($messagesRef as $key => $data) {
+                            $this->processMessageForMedia($data, $key, $chatId, $userId, $globalMediaCache, $urlRegex);
+                        }
+                    }
+                }
+            }
+
+            // Sort by time descending
+            usort($globalMediaCache, function($a, $b) {
+                return $b['time'] <=> $a['time'];
+            });
+
+            // Apply search filter if provided
+            $searchQuery = $request->input('search');
+            if (!empty($searchQuery)) {
+                $searchQuery = strtolower($searchQuery);
+                $globalMediaCache = array_filter($globalMediaCache, function($item) use ($searchQuery) {
+                    $fileName = strtolower($item['fileName'] ?? '');
+                    $senderName = strtolower($item['senderName'] ?? '');
+                    return str_contains($fileName, $searchQuery) || str_contains($senderName, $searchQuery);
+                });
+                $globalMediaCache = array_values($globalMediaCache);
+            }
+
+            // Format grouped response
+            $media = [];
+            $docs = [];
+            $links = [];
+
+            foreach ($globalMediaCache as $item) {
+                if ($item['type'] === 'image' || $item['type'] === 'video') {
+                    $media[] = $item;
+                } elseif ($item['type'] === 'document') {
+                    $docs[] = $item;
+                } elseif ($item['type'] === 'link') {
+                    $links[] = $item;
+                }
+            }
+
+            return response()->json([
+                'status' => true,
+                'data' => [
+                    'media' => $media,
+                    'docs' => $docs,
+                    'links' => $links,
+                    'all' => $globalMediaCache
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error fetching media: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    private function processMessageForMedia($data, $key, $chatId, $userId, &$globalMediaCache, $urlRegex)
+    {
+        $type = $data['type'] ?? 'text';
+        $senderId = $data['sender_id'] ?? null;
+        
+        if (!$senderId) return;
+
+        $sName = 'Someone';
+        if ($senderId == $userId) {
+            $sName = 'You';
+        } else {
+            $senderUser = User::find($senderId);
+            if ($senderUser) {
+                $sName = $senderUser->name ?? $senderUser->phone ?? 'Someone';
+            }
+        }
+
+        // Check for media
+        if ($type !== 'text' && !empty($data['file_url'])) {
+            $globalMediaCache[] = [
+                'key' => $key,
+                'type' => $type,
+                'url' => $data['file_url'],
+                'senderName' => $sName,
+                'time' => $data['time'] ?? 0,
+                'chatId' => $chatId,
+                'fileName' => $data['file_name'] ?? 'Media',
+                'fileSize' => $data['file_size'] ?? ''
+            ];
+        }
+
+        // Check for links in text
+        if ($type === 'text' && !empty($data['text'])) {
+            if (preg_match_all($urlRegex, $data['text'], $matches)) {
+                foreach ($matches[0] as $idx => $url) {
+                    $linkKey = $key . '_link_' . $idx;
+                    $globalMediaCache[] = [
+                        'key' => $linkKey,
+                        'type' => 'link',
+                        'url' => $url,
+                        'senderName' => $sName,
+                        'time' => $data['time'] ?? 0,
+                        'chatId' => $chatId,
+                        'fileName' => 'Link',
+                        'fileSize' => ''
+                    ];
+                }
+            }
+        }
+    }
+    public function deleteMedia(Request $request)
+    {
+        $userId = auth()->id() ?? $request->user_id;
+        $messages = $request->input('messages', []); // Expecting array of ['chat_id' => '', 'message_id' => '']
+
+        if (empty($messages) || !is_array($messages)) {
+            return response()->json(['status' => false, 'message' => 'No media items provided'], 400);
+        }
+
+        try {
+            foreach ($messages as $msg) {
+                if (isset($msg['chat_id']) && isset($msg['message_id'])) {
+                    $chatId = $msg['chat_id'];
+                    $msgId = $msg['message_id'];
+                    
+                    if (str_starts_with($chatId, 'group_')) {
+                        $this->db->getReference("groups/{$chatId}/messages/{$msgId}")->remove();
+                    } else {
+                        $this->db->getReference("chats/{$chatId}/messages/{$msgId}")->remove();
+                    }
+                }
+            }
+            return response()->json(['status' => true, 'message' => 'Media deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Error deleting media: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function forwardMedia(Request $request)
+    {
+        $userId = auth()->id() ?? $request->user_id;
+        $messages = $request->input('messages', []);
+        $targetChatIds = $request->input('target_chat_ids', []);
+
+        if (empty($messages) || empty($targetChatIds)) {
+            return response()->json(['status' => false, 'message' => 'Media items and target chats are required'], 400);
+        }
+
+        try {
+            $messagesToForward = [];
+            foreach ($messages as $msg) {
+                if (isset($msg['chat_id']) && isset($msg['message_id'])) {
+                    $chatId = $msg['chat_id'];
+                    $msgId = $msg['message_id'];
+                    
+                    $msgData = null;
+                    if (str_starts_with($chatId, 'group_')) {
+                        $msgData = $this->db->getReference("groups/{$chatId}/messages/{$msgId}")->getValue();
+                    } else {
+                        $msgData = $this->db->getReference("chats/{$chatId}/messages/{$msgId}")->getValue();
+                    }
+
+                    if ($msgData) {
+                        $msgData['sender_id'] = $userId;
+                        $msgData['time'] = time();
+                        $msgData['status'] = 'sent';
+                        $messagesToForward[] = $msgData;
+                    }
+                }
+            }
+
+            foreach ($targetChatIds as $targetChatId) {
+                foreach ($messagesToForward as $newMsg) {
+                    if (str_starts_with($targetChatId, 'group_')) {
+                        $this->db->getReference("groups/{$targetChatId}/messages")->push($newMsg);
+                    } else {
+                        $this->db->getReference("chats/{$targetChatId}/messages")->push($newMsg);
+                    }
+                }
+            }
+
+            return response()->json(['status' => true, 'message' => 'Media forwarded successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Error forwarding media: ' . $e->getMessage()], 500);
+        }
+    }
+}
