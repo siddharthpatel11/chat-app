@@ -480,9 +480,39 @@ class ChatApiController extends Controller
             'phone' => $request->phone ?? null,
         ]);
 
+        $token = $user->createToken('auth_token')->plainTextToken;
+
         return response()->json([
             'status' => true,
             'message' => 'User created successfully',
+            'token' => $token,
+            'data' => $user,
+        ]);
+    }
+
+    // Login User via API (Get Sanctum Token)
+    public function loginUser(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid credentials',
+            ], 401);
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Login successful',
+            'token' => $token,
             'data' => $user,
         ]);
     }

@@ -38,7 +38,7 @@
                 <img src="<?php echo e(auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=2a3942&color=fff'); ?>"
                     class="w-full h-full object-cover my-avatar">
             </div>
-            <span class="font-semibold text-[#e9edef]"><?php echo e(auth()->user()->name); ?> (You)</span>
+            <span class="font-semibold text-[#e9edef]"><span class="settings-profile-name"><?php echo e(auth()->user()->name); ?></span> (You)</span>
         </div>
         <div class="flex items-center gap-2">
             <!-- New Chat Icon -->

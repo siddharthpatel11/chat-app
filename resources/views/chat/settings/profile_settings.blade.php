@@ -14,7 +14,7 @@
     <div class="flex-1 overflow-y-auto custom-scrollbar bg-[#111b21]">
         <!-- Title & Search (Matching Image 2) -->
         <div class="px-6 pt-4 pb-2">
-            <h1 class="text-[#e9edef] text-[22px] font-bold mb-4">{{ auth()->user()->name }}</h1>
+            <h1 class="text-[#e9edef] text-[22px] font-bold mb-4 settings-profile-name">{{ auth()->user()->name }}</h1>
             <div
                 class="bg-[#202c33] rounded-full flex items-center px-4 py-2 h-[40px] border-2 border-transparent focus-within:border-[#00a884] transition-all">
                 <svg class="w-4 h-4 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
             <div class="relative flex flex-col items-center">
                 <!-- Name Tag Pill -->
                 <div class="bg-[#3b4a54] px-5 py-1.5 rounded-full mb-[-25px] z-10 shadow-xl border border-[#44535c]">
-                    <span class="text-[#e9edef] text-[15px] font-medium">{{ auth()->user()->name }}</span>
+                    <span class="text-[#e9edef] text-[15px] font-medium settings-profile-name">{{ auth()->user()->name }}</span>
                 </div>
                 <!-- Profile Image Bubble -->
                 <div

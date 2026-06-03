@@ -87,10 +87,12 @@
                 onchange="handleFileUpload(event)">
 
             <!-- About -->
-            <div class="mb-10 group" onclick="openAboutModal()">
+            <div class="mb-10 group">
                 <label class="text-[#8696a0] text-sm font-medium mb-3 block">About</label>
-                <div
-                    class="flex items-center justify-between group-hover:bg-[#202c33]/30 p-2 -mx-2 rounded-lg transition-all cursor-pointer">
+                
+                <div id="about_display_mode"
+                    class="flex items-center justify-between group-hover:bg-[#202c33]/30 p-2 -mx-2 rounded-lg transition-all cursor-pointer"
+                    onclick="toggleAboutEdit()">
                     <div class="flex flex-col">
                         <span class="text-[#e9edef] text-[17px] font-normal"
                             id="profile_about_text"><?php echo e(auth()->user()->about ?? auth()->user()->name); ?></span>
@@ -104,6 +106,23 @@
                             </path>
                         </svg>
                     </button>
+                </div>
+
+                <div id="about_edit_mode" class="hidden flex flex-col pt-2">
+                    <div class="relative border-b-2 border-[#00a884] pb-2 flex items-center gap-3">
+                        <input type="text" id="about_edit_input" value="<?php echo e(auth()->user()->about ?? ''); ?>" maxlength="139"
+                            class="bg-transparent border-none focus:ring-0 text-[#e9edef] text-[17px] w-full p-0"
+                            oninput="updateAboutCounter(this)">
+
+                        <div class="flex items-center gap-4">
+                            <span id="about_char_counter" class="text-[#8696a0] text-sm">139</span>
+                            <button class="text-[#8696a0] hover:text-[#00a884] transition-colors" onclick="saveAbout()">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -239,7 +258,7 @@
                 <img src="<?php echo e(auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=2a3942&color=fff'); ?>"
                     class="w-full h-full object-cover profile-image-preview">
             </div>
-            <span class="text-white font-medium"><?php echo e(auth()->user()->name); ?></span>
+            <span class="text-white font-medium settings-profile-name"><?php echo e(auth()->user()->name); ?></span>
         </div>
         <button onclick="closeViewPhoto()" class="text-white hover:bg-white/10 p-2 rounded-full transition-colors">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
@@ -443,9 +462,13 @@
                     // Update all name displays
                     document.querySelectorAll('#profile_name_text').forEach(el => el.innerText = newName);
 
-                    // Also update settings panel name if it exists
-                    const settingsName = document.querySelector('.settings-profile-name');
-                    if (settingsName) settingsName.innerText = newName;
+                    // Update all settings profile names dynamically
+                    document.querySelectorAll('.settings-profile-name').forEach(el => {
+                        el.innerText = newName;
+                    });
+
+                    // Update global JS variable
+                    window.myUserName = newName;
 
                     document.getElementById('name_display_mode').classList.remove('hidden');
                     document.getElementById('name_edit_mode').classList.add('hidden');
@@ -456,6 +479,64 @@
             .catch(err => {
                 console.error('Error updating name:', err);
                 window.showToast('Error', 'Failed to update name');
+            });
+    }
+
+    // About Edit Logic
+    function toggleAboutEdit() {
+        document.getElementById('about_display_mode').classList.add('hidden');
+        document.getElementById('about_edit_mode').classList.remove('hidden');
+        const input = document.getElementById('about_edit_input');
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+        updateAboutCounter(input);
+    }
+
+    function updateAboutCounter(input) {
+        document.getElementById('about_char_counter').innerText = 139 - input.value.length;
+    }
+
+    function saveAbout() {
+        const newAbout = document.getElementById('about_edit_input').value;
+        if (newAbout.trim() === '') return;
+
+        // Update API
+        fetch('/api/update-profile', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                user_id: window.myUserId,
+                about: newAbout
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status) {
+                    // Update all about text displays
+                    document.querySelectorAll('#profile_about_text').forEach(el => el.innerText = newAbout);
+
+                    // Update subtitle if returned from server
+                    const subtitleElem = document.getElementById('profile_about_subtitle');
+                    if (subtitleElem && data.data && data.data.about_subtitle) {
+                        let subtitle = data.data.about_subtitle;
+                        if (window.formatAboutSubtitle) {
+                            subtitle = window.formatAboutSubtitle(subtitle);
+                        }
+                        subtitleElem.innerText = subtitle;
+                    }
+
+                    document.getElementById('about_display_mode').classList.remove('hidden');
+                    document.getElementById('about_edit_mode').classList.add('hidden');
+
+                    window.showToast('Success', 'About updated successfully');
+                }
+            })
+            .catch(err => {
+                console.error('Error updating about:', err);
+                window.showToast('Error', 'Failed to update about');
             });
     }
 
