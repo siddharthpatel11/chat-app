@@ -51,6 +51,7 @@ Route::post('/chat/settings', [ChatApiController::class, 'updateChatSettings']);
 Route::post('/user/block', [ChatApiController::class, 'toggleBlockUser']);
 Route::post('/chat/clear', [ChatApiController::class, 'clearChat']);
 Route::post('/chat/delete', [ChatApiController::class, 'deleteChat']);
+Route::post('/message/delete', [ChatApiController::class, 'deleteMessage']);
 Route::post('/user/report', [ChatApiController::class, 'reportUser']);
 
 // Group Chat Features

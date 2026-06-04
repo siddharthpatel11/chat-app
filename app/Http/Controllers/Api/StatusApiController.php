@@ -223,6 +223,9 @@ class StatusApiController extends Controller
         $viewedStatuses = [];
 
         foreach ($allStatuses as $creatorId => $creatorStatuses) {
+            if (!is_array($creatorStatuses)) {
+                continue;
+            }
             $filteredForCreator = [];
             
             // Check Privacy if it's someone else's status

@@ -3230,10 +3230,22 @@
             else if (msgData.type === 'location' || msgData.type === 'live_location') typeLabel = 'location';
         }
 
-        window.openDeleteModal(`Delete ${typeLabel}?`, () => {
+        const isMe = msgData && msgData.sender_id == window.myUserId;
+        const isAdmin = window.currentGroupData && window.currentGroupData.admins && 
+            (window.currentGroupData.admins.includes(parseInt(window.myUserId)) || window.currentGroupData.admins.includes(String(window.myUserId)));
+        const canDeleteEveryone = isMe || isAdmin;
+
+        const onConfirmMe = () => {
+            window.set(window.ref(window.db, `groups/${window.currentChatId}/messages/${key}/deleted_for/${window.myUserId}`), true)
+                .catch(e => console.error("Group delete for me error:", e));
+        };
+
+        const onConfirmEveryone = canDeleteEveryone ? () => {
             window.remove(window.ref(window.db, `groups/${window.currentChatId}/messages/${key}`))
-                .catch(e => console.error("Group delete error:", e));
-        });
+                .catch(e => console.error("Group delete for everyone error:", e));
+        } : null;
+
+        window.openDeleteModal(`Delete ${typeLabel}?`, onConfirmMe, onConfirmEveryone);
     };
 
     // Multi-pin state for groups
@@ -3841,6 +3853,7 @@
                 const elementId = `group_sidebar_${groupId}`;
                 const clearedTime = window.clearedChats?.[elementId] || 0;
                 if (data.time <= clearedTime) return;
+                if (data.deleted_for && data.deleted_for[window.myUserId]) return;
 
                 const key = snapshot.key;
                 const idx = window.groupMessagesCache[groupId].findIndex(m => m.key === key);
@@ -3930,6 +3943,15 @@
         window.onChildChanged(messagesRef, (snapshot) => {
             const data = snapshot.val();
             const key = snapshot.key;
+            if (data && data.deleted_for && data.deleted_for[window.myUserId]) {
+                if (window.groupMessagesCache[groupId]) {
+                    window.groupMessagesCache[groupId] = window.groupMessagesCache[groupId].filter(m => m.key !== key);
+                }
+                const msgEl = document.getElementById('msg_' + key);
+                if (msgEl) msgEl.remove();
+                delete window.globalMessages[key];
+                return;
+            }
             if (window.groupMessagesCache[groupId]) {
                 const idx = window.groupMessagesCache[groupId].findIndex(m => m.key === key);
                 if (idx !== -1 && data) {
@@ -4356,6 +4378,7 @@
             window.onValue(groupRef, (snap) => {
                 const gData = snap.val();
                 if (!gData) return;
+                window.currentGroupData = gData;
 
                 // Dynamic Name, Member Count & Users List
                 if (gData.name) {
@@ -4682,6 +4705,7 @@
             const elementId = `group_sidebar_${groupId}`;
             const clearedTime = window.clearedChats?.[elementId] || 0;
             if (data.time && data.time <= clearedTime) return;
+            if (data.deleted_for && data.deleted_for[window.myUserId]) return;
 
             const key = snapshot.key;
             window.globalMessages[key] = data;
@@ -4989,6 +5013,13 @@
         window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
             const data = snapshot.val();
             const key = snapshot.key;
+
+            if (data && data.deleted_for && data.deleted_for[window.myUserId]) {
+                const msgEl = document.getElementById('msg_' + key);
+                if (msgEl) msgEl.remove();
+                delete window.globalMessages[key];
+                return;
+            }
 
             const oldMsg = window.globalMessages[key];
             const oldReactions = oldMsg ? (oldMsg.reactions || {}) : {};

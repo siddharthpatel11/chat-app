@@ -182,12 +182,18 @@ class ChatApiController extends Controller
 
         $clearedAt = $userId ? $this->db->getReference("chats/$chatId/settings/$userId/cleared_at")->getValue() : null;
 
-        if ($messages && $clearedAt) {
+        if ($messages) {
             $filteredMessages = [];
             foreach ($messages as $msgId => $msg) {
-                if (isset($msg['time']) && $msg['time'] >= $clearedAt) {
-                    $filteredMessages[$msgId] = $msg;
+                // Filter by cleared_at
+                if ($clearedAt && isset($msg['time']) && $msg['time'] < $clearedAt) {
+                    continue;
                 }
+                // Filter by deleted_for
+                if (isset($msg['deleted_for']) && is_array($msg['deleted_for']) && isset($msg['deleted_for'][$userId])) {
+                    continue;
+                }
+                $filteredMessages[$msgId] = $msg;
             }
             $messages = $filteredMessages;
         }
@@ -221,11 +227,15 @@ class ChatApiController extends Controller
             ], 400);
         }
 
+        $userId = auth()->id() ?? $request->user_id;
         $messages = $this->db->getReference("chats/$chatId/messages")->getValue();
         $results = [];
 
         if ($messages) {
             foreach ($messages as $msgId => $msg) {
+                if ($userId && isset($msg['deleted_for']) && is_array($msg['deleted_for']) && isset($msg['deleted_for'][$userId])) {
+                    continue;
+                }
                 if (isset($msg['text']) && stripos($msg['text'], $query) !== false) {
                     $results[] = array_merge($msg, ['id' => $msgId]);
                 }
@@ -430,6 +440,9 @@ class ChatApiController extends Controller
                     }
 
                     foreach ($chatData['messages'] as $msgId => $msg) {
+                        if ($userId && isset($msg['deleted_for']) && is_array($msg['deleted_for']) && isset($msg['deleted_for'][$userId])) {
+                            continue;
+                        }
                         if (isset($msg['text']) && stripos($msg['text'], $query) !== false) {
                             $allMsgResults[] = [
                                 'chat_id' => $chatId,
@@ -859,6 +872,65 @@ class ChatApiController extends Controller
             return response()->json(['status' => true, 'message' => 'Messages deleted successfully']);
         } catch (\Exception $e) {
             return response()->json(['status' => false, 'message' => 'Error deleting messages: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteMessage(Request $request)
+    {
+        $request->validate([
+            'chat_id' => 'required|string',
+            'message_id' => 'required|string',
+            'delete_type' => 'required|in:me,everyone',
+        ]);
+
+        $userId = auth()->id() ?? $request->user_id;
+
+        if (!$userId) {
+            return response()->json(['status' => false, 'message' => 'User ID is required'], 400);
+        }
+
+        $chatId = $request->chat_id;
+        $messageId = $request->message_id;
+        $deleteType = $request->delete_type;
+        $isGroup = str_starts_with($chatId, 'group_');
+
+        $basePath = $isGroup ? "groups/$chatId/messages/$messageId" : "chats/$chatId/messages/$messageId";
+
+        try {
+            $messageRef = $this->db->getReference($basePath);
+            $message = $messageRef->getValue();
+
+            if (!$message) {
+                return response()->json(['status' => false, 'message' => 'Message not found'], 404);
+            }
+
+            if ($deleteType === 'everyone') {
+                $isSender = isset($message['sender_id']) && $message['sender_id'] == $userId;
+                
+                $isAdmin = false;
+                if ($isGroup) {
+                    $groupData = $this->db->getReference("groups/$chatId")->getValue();
+                    if ($groupData && in_array($userId, $groupData['admins'] ?? [])) {
+                        $isAdmin = true;
+                    }
+                }
+
+                if (!$isSender && !$isAdmin) {
+                    return response()->json(['status' => false, 'message' => 'You can only delete your own messages for everyone'], 403);
+                }
+
+                // Delete message from Firebase completely
+                $messageRef->remove();
+
+                return response()->json(['status' => true, 'message' => 'Message deleted for everyone']);
+            } else {
+                // Delete for me
+                $this->db->getReference("$basePath/deleted_for/$userId")->set(true);
+
+                return response()->json(['status' => true, 'message' => 'Message deleted for me']);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
 

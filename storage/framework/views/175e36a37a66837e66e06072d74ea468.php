@@ -229,12 +229,13 @@
             <div class="bg-[#233138] w-[90%] max-w-[340px] rounded-[32px] p-6 shadow-2xl transform scale-95 transition-all duration-300 opacity-0"
                 id="delete_modal_content">
                 <h3 id="delete_modal_title" class="text-[#e9edef] text-[16px] font-normal mb-8">Delete message?</h3>
-                <div class="flex justify-end gap-4 items-center">
-                    <button onclick="window.closeDeleteModal()"
-                        class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-4 py-2 rounded-lg transition-colors">Cancel</button>
+                <div class="flex flex-col gap-3 items-end w-full">
+                    <button id="delete_everyone_btn"
+                        class="hidden bg-[#ea005e] text-white font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#ff1a75] transition-all active:scale-95 shadow-lg w-full text-center">Delete for everyone</button>
                     <button id="delete_confirm_btn"
-                        class="bg-[#00a884] text-[#111b21] font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg">Delete
-                        for me</button>
+                        class="bg-[#00a884] text-[#111b21] font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg w-full text-center">Delete for me</button>
+                    <button onclick="window.closeDeleteModal()"
+                        class="text-[#8696a0] font-medium text-[14px] hover:bg-white/5 px-4 py-2 rounded-lg transition-colors w-full text-center">Cancel</button>
                 </div>
             </div>
         </div>
@@ -4342,6 +4343,10 @@
                     return; // Ignore this message because chat was cleared after it was sent
                 }
 
+                if (data.deleted_for && data.deleted_for[window.myUserId]) {
+                    return;
+                }
+
                 // Ignore messages from blocked users
                 if (!isGroup && window.blockedUsers?.includes(elementId) && data.sender_id != window.myUserId) {
                     return;
@@ -4648,6 +4653,13 @@
                     const data = snapshot.val();
                     const key = snapshot.key;
 
+                    if (data && data.deleted_for && data.deleted_for[window.myUserId]) {
+                        const msgEl = document.getElementById('msg_' + key);
+                        if (msgEl) msgEl.remove();
+                        delete window.globalMessages[key];
+                        return;
+                    }
+
                     const oldMsg = window.globalMessages[key];
                     const oldReactions = oldMsg ? (oldMsg.reactions || {}) : {};
                     const newReactions = data.reactions || {};
@@ -4859,17 +4871,30 @@
                 });
             };
 
-            window.openDeleteModal = function (title, onConfirm) {
+            window.openDeleteModal = function (title, onConfirmMe, onConfirmEveryone = null) {
                 const modal = document.getElementById('delete_modal');
                 const titleEl = document.getElementById('delete_modal_title');
                 const confirmBtn = document.getElementById('delete_confirm_btn');
+                const everyoneBtn = document.getElementById('delete_everyone_btn');
 
                 if (titleEl) titleEl.textContent = title;
                 if (confirmBtn) {
                     confirmBtn.onclick = function () {
-                        onConfirm();
+                        onConfirmMe();
                         window.closeDeleteModal();
                     };
+                }
+
+                if (everyoneBtn) {
+                    if (onConfirmEveryone) {
+                        everyoneBtn.classList.remove('hidden');
+                        everyoneBtn.onclick = function () {
+                            onConfirmEveryone();
+                            window.closeDeleteModal();
+                        };
+                    } else {
+                        everyoneBtn.classList.add('hidden');
+                    }
                 }
 
                 modal.classList.remove('hidden');
@@ -5204,10 +5229,19 @@
                 else if (msgData.type === 'document') typeLabel = 'document';
             }
 
-            window.openDeleteModal(`Delete ${typeLabel}?`, () => {
+            const isMe = msgData && msgData.sender_id == window.myUserId;
+
+            const onConfirmMe = () => {
+                set(ref(db, `chats/${window.currentChatId}/messages/${key}/deleted_for/${window.myUserId}`), true)
+                    .catch(e => console.error("Delete for me error:", e));
+            };
+
+            const onConfirmEveryone = isMe ? () => {
                 remove(ref(db, `chats/${window.currentChatId}/messages/${key}`))
-                    .catch(e => console.error("Delete error:", e));
-            });
+                    .catch(e => console.error("Delete for everyone error:", e));
+            } : null;
+
+            window.openDeleteModal(`Delete ${typeLabel}?`, onConfirmMe, onConfirmEveryone);
         };
 
         // === INCOMING CALL LISTENER ===

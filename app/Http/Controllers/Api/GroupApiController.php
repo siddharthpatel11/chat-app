@@ -475,12 +475,18 @@ class GroupApiController extends Controller
         // Optionally, handle "cleared_at" logic for groups if you want users to be able to clear group chat history for themselves
         $clearedAt = $this->db->getReference("groups/$groupId/settings/$userId/cleared_at")->getValue();
 
-        if ($messages && $clearedAt) {
+        if ($messages) {
             $filteredMessages = [];
             foreach ($messages as $msgId => $msg) {
-                if (isset($msg['time']) && $msg['time'] >= $clearedAt) {
-                    $filteredMessages[$msgId] = $msg;
+                // Filter by cleared_at
+                if ($clearedAt && isset($msg['time']) && $msg['time'] < $clearedAt) {
+                    continue;
                 }
+                // Filter by deleted_for
+                if (isset($msg['deleted_for']) && is_array($msg['deleted_for']) && isset($msg['deleted_for'][$userId])) {
+                    continue;
+                }
+                $filteredMessages[$msgId] = $msg;
             }
             $messages = $filteredMessages;
         }

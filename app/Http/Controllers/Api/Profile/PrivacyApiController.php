@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Profile;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Kreait\Firebase\Factory;
 
 class PrivacyApiController extends Controller
 {
