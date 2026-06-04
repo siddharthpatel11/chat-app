@@ -99,6 +99,13 @@
         const labelEl = document.getElementById('privacy_about_label');
         if (labelEl) labelEl.innerText = val;
         
+        if (window.db && window.ref && window.set && window.myUserId && window.myUserId !== '0') {
+            if (val === 'Everyone' || val === 'My contacts' || val === 'Nobody') {
+                window.set(window.ref(window.db, `users/${window.myUserId}/privacy/about`), val)
+                    .catch(err => console.error("Error updating firebase privacy:", err));
+            }
+        }
+        
         if(window.showToast && !val.includes('excluded')) window.showToast('Privacy Updated', 'Setting saved.');
     }
 </script>

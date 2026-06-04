@@ -72,7 +72,7 @@
         <div class="h-[10px] bg-[#0c1317]"></div>
 
         <!-- Media, links and docs -->
-        <div class="p-4 py-5 hover:bg-[#202c33]/30 cursor-pointer transition-colors">
+        <div class="p-4 py-5 hover:bg-[#202c33]/30 cursor-pointer transition-colors" onclick="window.openContactMediaLibrary()">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-3">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#8696a0]">
@@ -83,22 +83,14 @@
                     <span class="text-[#e9edef] text-[16px]">Media, links and docs</span>
                 </div>
                 <div class="flex items-center gap-2">
-                    <span class="text-[#8696a0] text-[14px]">0</span>
+                    <span class="text-[#8696a0] text-[14px]" id="contact_media_count">0</span>
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#8696a0]">
                         <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path>
                     </svg>
                 </div>
             </div>
-            <div class="grid grid-cols-4 gap-2">
-                <!-- Placeholder Media -->
-                <div class="aspect-square rounded-lg bg-[#202c33] overflow-hidden">
-                    <img src="https://picsum.photos/100/100?random=1"
-                        class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity">
-                </div>
-                <div class="aspect-square rounded-lg bg-[#202c33] overflow-hidden">
-                    <img src="https://picsum.photos/100/100?random=2"
-                        class="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity">
-                </div>
+            <div class="grid grid-cols-4 gap-2" id="contact_media_preview_container">
+                <!-- Dynamically populated -->
             </div>
         </div>
 
@@ -186,12 +178,13 @@
         document.getElementById('contact_info_name').textContent = user.name;
         document.getElementById('contact_info_phone').textContent = user.phone || 'No phone number';
         document.getElementById('contact_info_avatar').src = user.avatar;
-        document.getElementById('contact_about_text').textContent = user.about || 'Available';
+        document.getElementById('contact_about_text').textContent = (user.about !== undefined && user.about !== null) ? user.about : 'Available';
 
         // Update placeholders in block/report buttons
         document.querySelectorAll('.contact-name-placeholder').forEach(el => el.textContent = user.name);
         
         if (window.updateContactInfoBlockBtn) window.updateContactInfoBlockBtn();
+        if (window.updateContactInfoMediaSection) window.updateContactInfoMediaSection();
 
         const panel = document.getElementById('contact_info_panel');
         const mainChat = document.getElementById('main_chat_column');
@@ -297,6 +290,91 @@
             window.deleteChatMessages(user.id, 'user');
             window.closeContactInfo();
             window.showToast?.('Report sent', `Contact reported and blocked.`);
+        }
+    };
+
+    window.updateContactInfoMediaSection = function() {
+        if (!window.currentChatId) return;
+        
+        const activeUserId = window.activeChatUser ? window.activeChatUser.id : null;
+        if (!activeUserId) return;
+
+        // Filter global cache for the active chat
+        const chatItems = (window.globalMediaCache || []).filter(m => m.chatId === window.currentChatId);
+
+        // Sort descending by time
+        chatItems.sort((a, b) => b.time - a.time);
+
+        // Update count
+        const countEl = document.getElementById('contact_media_count');
+        if (countEl) {
+            countEl.textContent = chatItems.length;
+        }
+
+        // Preview container
+        const containerEl = document.getElementById('contact_media_preview_container');
+        if (containerEl) {
+            const previewItems = chatItems.slice(0, 4);
+            if (previewItems.length === 0) {
+                containerEl.innerHTML = `<div class="text-[#8696a0] text-sm py-2 col-span-full">No media, links or docs shared yet</div>`;
+            } else {
+                let html = '';
+                previewItems.forEach(item => {
+                    if (item.type === 'image') {
+                        html += `
+                            <div class="aspect-square rounded-lg bg-[#2a3942] overflow-hidden cursor-pointer relative group/item" onclick="event.stopPropagation(); window.openGmViewer('${item.url.replace(/'/g, "\\'")}', 'image', '${(item.fileName || '').replace(/'/g, "\\'")}', '${(item.senderName || '').replace(/'/g, "\\'")}')">
+                                <img src="${item.url}" class="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-200 opacity-80 hover:opacity-100">
+                            </div>`;
+                    } else if (item.type === 'video') {
+                        html += `
+                            <div class="aspect-square rounded-lg bg-[#2a3942] overflow-hidden cursor-pointer relative group/item" onclick="event.stopPropagation(); window.openGmViewer('${item.url.replace(/'/g, "\\'")}', 'video', '${(item.fileName || '').replace(/'/g, "\\'")}', '${(item.senderName || '').replace(/'/g, "\\'")}')">
+                                <video src="${item.url}" class="w-full h-full object-cover group-hover/item:scale-105 transition-transform duration-200 opacity-80"></video>
+                                <div class="absolute inset-0 flex items-center justify-center bg-black/40 group-hover/item:bg-black/20 transition-colors">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-white">
+                                        <path d="M8 5v14l11-7z"></path>
+                                    </svg>
+                                </div>
+                            </div>`;
+                    } else if (item.type === 'audio') {
+                        html += `
+                            <div class="aspect-square bg-[#202c33] rounded-lg border border-[#313d45] overflow-hidden flex flex-col items-center justify-center cursor-pointer group/item hover:bg-[#2a3942] transition-colors relative" onclick="event.stopPropagation(); window.openGmViewer('${item.url.replace(/'/g, "\\'")}', 'audio', '${(item.fileName || '').replace(/'/g, "\\'")}', '${(item.senderName || '').replace(/'/g, "\\'")}')">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#00a884]">
+                                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"></path>
+                                </svg>
+                                <span class="text-[9px] text-[#8696a0] truncate w-full text-center px-1 mt-1">Audio</span>
+                            </div>`;
+                    } else if (item.type === 'document') {
+                        const ext = (item.fileName ? item.fileName.split('.').pop() : 'FILE').toUpperCase();
+                        html += `
+                            <div class="aspect-square bg-[#202c33] rounded-lg border border-[#313d45] overflow-hidden flex flex-col items-center justify-center cursor-pointer group/item hover:bg-[#2a3942] transition-colors relative" onclick="event.stopPropagation(); window.open(${item.url ? `'${item.url.replace(/'/g, "\\'")}'` : 'undefined'}, '_blank')">
+                                <span class="text-[11px] font-bold text-white bg-[#00a884] px-1.5 py-0.5 rounded shadow-sm max-w-[70px] truncate uppercase">${ext}</span>
+                                <span class="text-[9px] text-[#8696a0] truncate w-full text-center px-1 mt-1.5">${item.fileName || 'Document'}</span>
+                            </div>`;
+                    } else if (item.type === 'link') {
+                        let displayDomain = 'Link';
+                        try {
+                            let parsed = new URL(item.url.startsWith('http') ? item.url : 'http://' + item.url);
+                            displayDomain = parsed.hostname.replace('www.', '');
+                        } catch (e) {}
+                        html += `
+                            <div class="aspect-square bg-[#202c33] rounded-lg border border-[#313d45] overflow-hidden flex flex-col items-center justify-center cursor-pointer group/item hover:bg-[#2a3942] transition-colors relative" onclick="event.stopPropagation(); window.open('${item.url.replace(/'/g, "\\'")}', '_blank')">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="text-[#00a884]">
+                                    <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"></path>
+                                </svg>
+                                <span class="text-[9px] text-[#8696a0] truncate w-full text-center px-1 mt-1">${displayDomain}</span>
+                            </div>`;
+                    }
+                });
+                containerEl.innerHTML = html;
+            }
+        }
+    };
+
+    window.openContactMediaLibrary = function() {
+        if (!window.currentChatId) return;
+        const name = window.activeChatUser ? window.activeChatUser.name : 'Contact';
+        if (window.openGlobalMediaModal) {
+            window.openGlobalMediaModal(window.currentChatId, name);
         }
     };
 </script>

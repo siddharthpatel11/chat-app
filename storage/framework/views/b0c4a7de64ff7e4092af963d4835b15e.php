@@ -1905,10 +1905,15 @@
                                 memberAbout = matchUser.about || "Available";
                             }
 
+                            let memberAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=2a3942&color=fff`;
+                            if (matchUser) {
+                                memberAvatar = window.getUserAvatar ? window.getUserAvatar(matchUser.id) : (matchUser.avatar || memberAvatar);
+                            }
+
                             membersHtml += `
                             <div class="flex items-center justify-between py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors">
                                 <div class="flex items-center gap-4">
-                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(memberName.charAt(0))}&background=2a3942&color=fff" class="w-[44px] h-[44px] rounded-full object-cover">
+                                    <img src="${memberAvatar}" class="w-[44px] h-[44px] rounded-full object-cover">
                                     <div class="w-[170px]">
                                         <div class="text-[#e9edef] text-[16px] truncate">${memberName}</div>
                                         <div class="text-[#8696a0] text-[14px] truncate mt-0.5">${memberAbout}</div>
@@ -4546,9 +4551,8 @@
             gContent.classList.add('flex');
         }
 
-        const panel = document.getElementById('settings_panel');
-        if (panel && !panel.classList.contains('hidden')) {
-            window.toggleSettings();
+        if (window.closeAllSettings) {
+            window.closeAllSettings();
         }
 
         if (window.innerWidth < 640) {

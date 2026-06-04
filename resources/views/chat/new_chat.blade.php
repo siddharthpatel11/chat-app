@@ -48,14 +48,14 @@
                     @php
                         $userAvatar = $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name ?: $user->phone) . '&background=2a3942&color=fff';
                     @endphp
-                    <div onclick="window.startNewChat({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->phone ?? '') }}', '{{ $userAvatar }}', '{{ addslashes($user->about ?? 'Available') }}')"
+                    <div id="new_chat_contact_{{ $user->id }}" onclick="window.startNewChat({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->phone ?? '') }}', '{{ $userAvatar }}', '{{ addslashes($user->about ?? 'Available') }}')"
                         class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors new-chat-contact-item" data-name="{{ strtolower($user->name ?: $user->phone) }}">
                         <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0 ml-1">
                             <img src="{{ $userAvatar }}" class="w-full h-full object-cover">
                         </div>
                         <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
                             <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">{{ $user->name ?: $user->phone }}</h4>
-                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">{{ $user->about ?? 'Available' }}</p>
+                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug new-chat-about-text">{{ $user->about ?? 'Available' }}</p>
                         </div>
                     </div>
                 @endforeach

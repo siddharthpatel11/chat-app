@@ -52,9 +52,7 @@
             </div>
             <div class="flex-1 border-b border-[#202c33] py-2 flex flex-col justify-center min-h-[48px]">
                 <div class="text-[#e9edef] text-[17px]"><?php echo e($user->saved_name ?? $user->phone ?? $user->name); ?></div>
-                <?php if($user->about): ?>
-                <div class="text-[#8696a0] text-[14px] line-clamp-1"><?php echo e($user->about); ?></div>
-                <?php endif; ?>
+                <div class="text-[#8696a0] text-[14px] line-clamp-1 exclude-about-text"><?php echo e($user->about ?? ''); ?></div>
             </div>
         </label>
         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -124,6 +122,52 @@
                 localStorage.setItem('whatsapp_privacy_exclude_' + currentPrivacySetting, JSON.stringify(excludedIds));
                 
                 const count = excludedIds.length;
+                
+                if (currentPrivacySetting === 'profile_photo') {
+                    const labelEl = document.getElementById('privacy_profile_photo_label');
+                    const privacyVal = `${count} contact${count !== 1 ? 's' : ''} excluded`;
+                    localStorage.setItem('whatsapp_privacy_profile_photo', privacyVal);
+                    if (labelEl) labelEl.innerText = privacyVal;
+                    
+                    if (window.db && window.ref && window.update && window.myUserId && window.myUserId !== '0') {
+                        window.update(window.ref(window.db, `users/${window.myUserId}/privacy`), {
+                            profile_photo: 'My contacts except...',
+                            profile_photo_exclude: excludedIds
+                        }).catch(err => console.error("Error updating exclude list in firebase:", err));
+                    }
+                }
+                
+                if (currentPrivacySetting === 'last_seen') {
+                    const labelEl = document.getElementById('privacy_last_seen_label');
+                    const lastSeenVal = `${count} contact${count !== 1 ? 's' : ''} excluded`;
+                    const onlineVal = localStorage.getItem('whatsapp_privacy_online_val') || 'Everyone';
+                    
+                    localStorage.setItem('whatsapp_privacy_last_seen_val', lastSeenVal);
+                    localStorage.setItem('whatsapp_privacy_last_seen', lastSeenVal + ', ' + onlineVal);
+                    if (labelEl) labelEl.innerText = lastSeenVal + ', ' + onlineVal;
+                    
+                    if (window.db && window.ref && window.update && window.myUserId && window.myUserId !== '0') {
+                        window.update(window.ref(window.db, `users/${window.myUserId}/privacy`), {
+                            last_seen: 'My contacts except...',
+                            last_seen_exclude: excludedIds
+                        }).catch(err => console.error("Error updating last seen exclude list in firebase:", err));
+                    }
+                }
+                
+                if (currentPrivacySetting === 'about') {
+                    const labelEl = document.getElementById('privacy_about_label');
+                    const privacyVal = `${count} contact${count !== 1 ? 's' : ''} excluded`;
+                    localStorage.setItem('whatsapp_privacy_about', privacyVal);
+                    if (labelEl) labelEl.innerText = privacyVal;
+                    
+                    if (window.db && window.ref && window.update && window.myUserId && window.myUserId !== '0') {
+                        window.update(window.ref(window.db, `users/${window.myUserId}/privacy`), {
+                            about: 'My contacts except...',
+                            about_exclude: excludedIds
+                        }).catch(err => console.error("Error updating about exclude list in firebase:", err));
+                    }
+                }
+                
                 if(window.showToast) window.showToast('Updated', `Settings saved. ${count} contacts ${currentPrivacySetting === 'status_include' ? 'included' : 'excluded'}.`);
             }
         }

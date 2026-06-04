@@ -2641,11 +2641,12 @@
                     const previewMsg = lastMsg && !lastMsg.startsWith('Click to chat') ? prefix + lastMsg :
                         phone || 'Click to chat';
 
+                    const safeAvatar = window.getUserAvatar ? window.getUserAvatar(userId) : avatar;
                     chatsList.insertAdjacentHTML('beforeend', `
-                        <div onclick="window.selectChat(${userId}, '${name.replace(/'/g, "\\'")}', '${phone.replace(/'/g, "\\'")}', '${avatar}', '${about.replace(/'/g, "\\'")}')"
+                        <div onclick="window.selectChat(${userId}, '${name.replace(/'/g, "\\'")}', '${phone.replace(/'/g, "\\'")}', '${safeAvatar}', '${about.replace(/'/g, "\\'")}')"
                             class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
-                                <img src="${avatar}" class="w-full h-full object-cover">
+                                <img src="${safeAvatar}" class="w-full h-full object-cover">
                             </div>
                             <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
                                 <div class="flex justify-between items-center">
@@ -2710,11 +2711,12 @@
                     '';
 
                 if (msgsList) {
+                    const safeAvatar = window.getUserAvatar ? window.getUserAvatar(r.userId) : r.avatar;
                     msgsList.insertAdjacentHTML('beforeend', `
-                        <div onclick="window.selectChat(${r.userId}, '${r.name.replace(/'/g, "\\'")}', '${r.phone.replace(/'/g, "\\'")}', '${r.avatar}', '${r.about.replace(/'/g, "\\'")}', ${r.time || 0})"
+                        <div onclick="window.selectChat(${r.userId}, '${r.name.replace(/'/g, "\\'")}', '${r.phone.replace(/'/g, "\\'")}', '${safeAvatar}', '${r.about.replace(/'/g, "\\'")}', ${r.time || 0})"
                             class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
-                                <img src="${r.avatar}" class="w-full h-full object-cover">
+                                <img src="${safeAvatar}" class="w-full h-full object-cover">
                             </div>
                             <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
                                 <div class="flex justify-between items-center">
@@ -3030,6 +3032,268 @@
         window.selectedMessages = new Set();
         window.isSelectionMode = false;
 
+        window.usersPrivacyData = {};
+
+        window.isAvatarVisible = function(otherUserId) {
+            if (String(otherUserId) === String(window.myUserId)) {
+                return true;
+            }
+            const privacy = window.usersPrivacyData ? window.usersPrivacyData[otherUserId] : null;
+            if (!privacy) {
+                return true;
+            }
+            const mode = privacy.profile_photo || 'Everyone';
+            if (mode === 'Everyone') {
+                return true;
+            }
+            if (mode === 'Nobody') {
+                return false;
+            }
+            if (mode === 'My contacts') {
+                return true;
+            }
+            if (mode === 'My contacts except...' || mode.includes('excluded')) {
+                const excludeList = privacy.profile_photo_exclude || [];
+                if (excludeList.includes(String(window.myUserId)) || excludeList.includes(Number(window.myUserId))) {
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        };
+
+        window.isLastSeenVisible = function(otherUserId) {
+            if (String(otherUserId) === String(window.myUserId)) {
+                return true;
+            }
+            const privacy = window.usersPrivacyData ? window.usersPrivacyData[otherUserId] : null;
+            if (!privacy) {
+                return true;
+            }
+            const mode = privacy.last_seen || 'Everyone';
+            if (mode === 'Everyone') {
+                return true;
+            }
+            if (mode === 'Nobody') {
+                return false;
+            }
+            if (mode === 'My contacts') {
+                return true;
+            }
+            if (mode === 'My contacts except...' || mode.includes('excluded')) {
+                const excludeList = privacy.last_seen_exclude || [];
+                // Only users in excludeList can see it (inverted logic)
+                if (excludeList.includes(String(window.myUserId)) || excludeList.includes(Number(window.myUserId))) {
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        };
+
+        window.isOnlineVisible = function(otherUserId) {
+            if (String(otherUserId) === String(window.myUserId)) {
+                return true;
+            }
+            const privacy = window.usersPrivacyData ? window.usersPrivacyData[otherUserId] : null;
+            if (!privacy) {
+                return true;
+            }
+            const onlineMode = privacy.online || 'Everyone';
+            if (onlineMode === 'Everyone') {
+                return true;
+            }
+            if (onlineMode === 'Same as last seen') {
+                return window.isLastSeenVisible(otherUserId);
+            }
+            return true;
+        };
+
+        window.updateActiveChatSubtitle = function(statusData = null) {
+            const subtitle = document.getElementById('active_chat_subtitle');
+            if (!subtitle || !window.activeChatUser) return;
+            
+            const otherUserId = window.activeChatUser.id;
+            
+            if (statusData) {
+                window.latestActiveChatStatusData = statusData;
+            }
+            
+            const data = window.latestActiveChatStatusData;
+            if (!data) {
+                subtitle.classList.add('hidden');
+                return;
+            }
+            
+            const isOnline = data.state === 'online';
+            
+            if (isOnline) {
+                if (window.isOnlineVisible && window.isOnlineVisible(otherUserId)) {
+                    subtitle.textContent = 'online';
+                    subtitle.classList.remove('hidden', 'text-gray-500');
+                    subtitle.classList.add('text-green-600');
+                } else {
+                    if (window.isLastSeenVisible && window.isLastSeenVisible(otherUserId) && data.last_changed) {
+                        const date = new Date(data.last_changed);
+                        const text = 'last seen ' + date.toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        subtitle.textContent = text;
+                        subtitle.classList.remove('hidden', 'text-green-600');
+                        subtitle.classList.add('text-gray-500');
+                    } else {
+                        subtitle.classList.add('hidden');
+                    }
+                }
+            } else {
+                if (window.isLastSeenVisible && window.isLastSeenVisible(otherUserId) && data.last_changed) {
+                    const date = new Date(data.last_changed);
+                    const text = 'last seen ' + date.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    subtitle.textContent = text;
+                    subtitle.classList.remove('hidden', 'text-green-600');
+                    subtitle.classList.add('text-gray-500');
+                } else {
+                    subtitle.classList.add('hidden');
+                }
+            }
+        };
+
+        window.isAboutVisible = function(otherUserId) {
+            if (String(otherUserId) === String(window.myUserId)) {
+                return true;
+            }
+            const privacy = window.usersPrivacyData ? window.usersPrivacyData[otherUserId] : null;
+            if (!privacy) {
+                return true;
+            }
+            const mode = privacy.about || 'Everyone';
+            if (mode === 'Everyone') {
+                return true;
+            }
+            if (mode === 'Nobody') {
+                return false;
+            }
+            if (mode === 'My contacts') {
+                return true;
+            }
+            if (mode === 'My contacts except...' || mode.includes('excluded')) {
+                const excludeList = privacy.about_exclude || [];
+                // Only users in excludeList can see it (inverted logic)
+                if (excludeList.includes(String(window.myUserId)) || excludeList.includes(Number(window.myUserId))) {
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        };
+
+        window.getUserAvatar = function(userId, forceFallback = false) {
+            const contact = window.allContacts ? window.allContacts.find(c => String(c.id) === String(userId)) : null;
+            const name = contact ? (contact.saved_name || contact.name || contact.phone) : 'Contact';
+            const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
+            
+            if (forceFallback) {
+                return fallbackUrl;
+            }
+            
+            if (!window.isAvatarVisible(userId)) {
+                return fallbackUrl;
+            }
+            
+            return (contact && contact.avatar) ? contact.avatar : fallbackUrl;
+        };
+
+        window.applyAllAvatarsPrivacy = function() {
+            if (!window.allContacts) return;
+            
+            window.allContacts.forEach(contact => {
+                const userId = contact.id;
+                const avatarUrl = window.getUserAvatar(userId);
+                const originalAbout = contact.about || 'Available';
+                const safeAbout = (window.isAboutVisible && window.isAboutVisible(userId)) ? originalAbout : '';
+                
+                // 1. Update sidebar list item img
+                const sidebarImg = document.querySelector(`#user_sidebar_${userId} img`);
+                if (sidebarImg) {
+                    sidebarImg.src = avatarUrl;
+                }
+                
+                // 2. Update data-avatar and data-about attributes of sidebar item
+                const sidebarItem = document.getElementById(`user_sidebar_${userId}`);
+                if (sidebarItem) {
+                    sidebarItem.setAttribute('data-avatar', avatarUrl);
+                    sidebarItem.setAttribute('data-about', safeAbout);
+                }
+
+                // 3. Update new chat panel item img and about text
+                const newChatImg = document.querySelector(`#new_chat_contact_${userId} img`);
+                if (newChatImg) {
+                    newChatImg.src = avatarUrl;
+                }
+                const newChatAbout = document.querySelector(`#new_chat_contact_${userId} .new-chat-about-text`);
+                if (newChatAbout) {
+                    newChatAbout.textContent = safeAbout;
+                }
+
+                // 4. Update exclude list contact item avatar and about text
+                const excludeCheckbox = document.querySelector(`input[name="exclude_contact"][value="${userId}"]`);
+                if (excludeCheckbox) {
+                    const labelEl = excludeCheckbox.closest('label');
+                    if (labelEl) {
+                        const img = labelEl.querySelector('.w-12.h-12 img');
+                        if (img) {
+                            img.src = avatarUrl;
+                        }
+                        const excludeAbout = labelEl.querySelector('.exclude-about-text');
+                        if (excludeAbout) {
+                            excludeAbout.textContent = safeAbout;
+                        }
+                    }
+                }
+            });
+            
+            // 4. Update active chat avatar
+            if (window.activeChatUser) {
+                const activeUserId = window.activeChatUser.id;
+                const avatarUrl = window.getUserAvatar(activeUserId);
+                
+                const activeChatAvatarImg = document.querySelector('#active_chat_avatar img');
+                if (activeChatAvatarImg) {
+                    activeChatAvatarImg.src = avatarUrl;
+                }
+                
+                const callDropdownAvatarImg = document.querySelector('#call_dropdown_avatar img');
+                if (callDropdownAvatarImg) {
+                    callDropdownAvatarImg.src = avatarUrl;
+                }
+                
+                const contactInfoAvatarImg = document.getElementById('contact_info_avatar');
+                if (contactInfoAvatarImg) {
+                    contactInfoAvatarImg.src = avatarUrl;
+                }
+                
+                window.activeChatUser.avatar = avatarUrl;
+
+                // Update contact info panel about text
+                const aboutText = document.getElementById('contact_about_text');
+                if (aboutText) {
+                    const originalAbout = window.allContacts ? (window.allContacts.find(c => String(c.id) === String(activeUserId))?.about || 'Available') : 'Available';
+                    const safeAbout = (window.isAboutVisible && window.isAboutVisible(activeUserId)) ? originalAbout : '';
+                    window.activeChatUser.about = safeAbout;
+                    aboutText.textContent = safeAbout;
+                }
+            }
+
+            // 5. Update active chat subtitle
+            if (window.updateActiveChatSubtitle) {
+                window.updateActiveChatSubtitle();
+            }
+        };
+
         // Firebase Presence System
         if (window.myUserId !== '0') {
             const connectedRef = ref(db, ".info/connected");
@@ -3046,6 +3310,79 @@
                             last_changed: serverTimestamp(),
                         });
                     });
+                }
+            });
+
+            // Sync local privacy settings to Firebase on startup
+            try {
+                // Profile photo
+                const savedProfilePhoto = localStorage.getItem('whatsapp_privacy_profile_photo') || 'My contacts';
+                let profilePhotoVal = savedProfilePhoto;
+                let profilePhotoExcludedIds = [];
+                
+                if (savedProfilePhoto.includes('excluded') || savedProfilePhoto === 'My contacts except...') {
+                    profilePhotoVal = 'My contacts except...';
+                    const savedExclude = localStorage.getItem('whatsapp_privacy_exclude_profile_photo');
+                    if (savedExclude) {
+                        profilePhotoExcludedIds = JSON.parse(savedExclude);
+                    }
+                }
+                
+                // Last seen and online
+                const savedLastSeen = localStorage.getItem('whatsapp_privacy_last_seen_val') || 'Nobody';
+                const savedOnline = localStorage.getItem('whatsapp_privacy_online_val') || 'Everyone';
+                let lastSeenVal = savedLastSeen;
+                let lastSeenExcludedIds = [];
+                
+                if (savedLastSeen.includes('excluded') || savedLastSeen === 'My contacts except...') {
+                    lastSeenVal = 'My contacts except...';
+                    const savedExclude = localStorage.getItem('whatsapp_privacy_exclude_last_seen');
+                    if (savedExclude) {
+                        lastSeenExcludedIds = JSON.parse(savedExclude);
+                    }
+                }
+
+                // About
+                const savedAbout = localStorage.getItem('whatsapp_privacy_about') || 'Nobody';
+                let aboutVal = savedAbout;
+                let aboutExcludedIds = [];
+                
+                if (savedAbout.includes('excluded') || savedAbout === 'My contacts except...') {
+                    aboutVal = 'My contacts except...';
+                    const savedExclude = localStorage.getItem('whatsapp_privacy_exclude_about');
+                    if (savedExclude) {
+                        aboutExcludedIds = JSON.parse(savedExclude);
+                    }
+                }
+                
+                window.update(window.ref(window.db, `users/${window.myUserId}/privacy`), {
+                    profile_photo: profilePhotoVal,
+                    profile_photo_exclude: profilePhotoExcludedIds,
+                    last_seen: lastSeenVal,
+                    last_seen_exclude: lastSeenExcludedIds,
+                    online: savedOnline,
+                    about: aboutVal,
+                    about_exclude: aboutExcludedIds
+                }).catch(err => console.error("Error syncing startup privacy to firebase:", err));
+            } catch(e) {
+                console.error("Error parsing local privacy settings on startup:", e);
+            }
+
+            // Global Privacy Listener for all users
+            const privacyRef = window.ref(window.db, 'users');
+            window.onValue(privacyRef, (snapshot) => {
+                const usersData = snapshot.val();
+                window.usersPrivacyData = {};
+                if (usersData) {
+                    for (const [userId, userData] of Object.entries(usersData)) {
+                        if (userData.privacy) {
+                            window.usersPrivacyData[userId] = userData.privacy;
+                        }
+                    }
+                }
+                // Apply privacy settings to update all avatars in the UI
+                if (window.applyAllAvatarsPrivacy) {
+                    window.applyAllAvatarsPrivacy();
                 }
             });
 
@@ -3188,6 +3525,10 @@
                     if (sidebarItem && data.time) {
                         sidebarItem.setAttribute('data-timestamp', data.time);
                         if (window.sortSidebar) window.sortSidebar();
+                    }
+
+                    if (window.currentChatId === chatId && window.updateContactInfoMediaSection) {
+                        window.updateContactInfoMediaSection();
                     }
 
                     // If message is for me, and I am not currently looking at this chat, mark it as delivered
@@ -3553,9 +3894,8 @@
 
             document.getElementById('sidebar_resizer').classList.remove('hidden');
 
-            const panel = document.getElementById('settings_panel');
-            if (panel && !panel.classList.contains('hidden')) {
-                window.toggleSettings();
+            if (window.closeAllSettings) {
+                window.closeAllSettings();
             }
         };
 
@@ -3587,9 +3927,8 @@
 
             document.getElementById('sidebar_resizer').classList.remove('hidden');
 
-            const panel = document.getElementById('settings_panel');
-            if (panel && !panel.classList.contains('hidden')) {
-                window.toggleSettings();
+            if (window.closeAllSettings) {
+                window.closeAllSettings();
             }
         };
 
@@ -3616,10 +3955,8 @@
             document.getElementById('status_view_container').classList.remove('hidden');
             document.getElementById('status_view_container').classList.add('flex');
 
-            // Close settings if open
-            const panel = document.getElementById('settings_panel');
-            if (panel && !panel.classList.contains('hidden')) {
-                window.toggleSettings();
+            if (window.closeAllSettings) {
+                window.closeAllSettings();
             }
         };
 
@@ -3647,10 +3984,8 @@
             document.getElementById('calls_main_column')?.classList.remove('hidden');
             document.getElementById('calls_main_column')?.classList.add('flex');
 
-            // Close settings if open
-            const panel = document.getElementById('settings_panel');
-            if (panel && !panel.classList.contains('hidden')) {
-                window.toggleSettings();
+            if (window.closeAllSettings) {
+                window.closeAllSettings();
             }
 
             // Load logs
@@ -3840,10 +4175,8 @@
             document.getElementById('active_chat_content')?.classList.remove('hidden');
             document.getElementById('active_chat_content')?.classList.add('flex');
 
-            // Close settings if open
-            const panel = document.getElementById('settings_panel');
-            if (panel && !panel.classList.contains('hidden')) {
-                window.toggleSettings();
+            if (window.closeAllSettings) {
+                window.closeAllSettings();
             }
 
             // Mobile view handling
@@ -3870,18 +4203,23 @@
             const activeName = name ? name : phone;
             window.activeChatName = activeName;
 
-            // Use provided avatar or fallback to UI-Avatar
-            const activeAvatar = avatar ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(activeName)}&background=202c33&color=fff`;
+            // Use privacy-safe avatar
+            const activeAvatar = window.getUserAvatar ? window.getUserAvatar(otherUserId) : (avatar ||
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(activeName)}&background=202c33&color=fff`);
             window.activeChatAvatar = activeAvatar;
 
+            const safeAbout = (window.isAboutVisible && window.isAboutVisible(otherUserId)) ? (about || 'Available') : '';
             window.activeChatUser = {
                 id: otherUserId,
                 name: activeName,
                 phone: phone,
                 avatar: activeAvatar,
-                about: about || 'Available'
+                about: safeAbout
             };
+
+            if (window.updateContactInfoMediaSection) {
+                window.updateContactInfoMediaSection();
+            }
 
             document.getElementById('active_chat_title').textContent = activeName;
             document.getElementById('active_chat_subtitle').classList.add('hidden');
@@ -3910,33 +4248,38 @@
                 // Update global activeChatUser with latest about info
                 if (data && window.activeChatUser && window.activeChatUser.id == otherUserId) {
                     if (data.about) {
-                        window.activeChatUser.about = data.about;
+                        const safeAbout = (window.isAboutVisible && window.isAboutVisible(otherUserId)) ? data.about : '';
+                        window.activeChatUser.about = safeAbout;
                     }
 
                     // If Contact Info panel is open and showing this user, update it live
                     const panel = document.getElementById('contact_info_panel');
                     if (panel && !panel.classList.contains('translate-x-full')) {
                         const aboutText = document.getElementById('contact_about_text');
-                        if (aboutText) aboutText.textContent = window.activeChatUser.about;
+                        if (aboutText) aboutText.textContent = window.activeChatUser.about || '';
                     }
                 }
 
-                if (data && data.state === 'online') {
-                    subtitle.textContent = 'online';
-                    subtitle.classList.remove('hidden', 'text-gray-500');
-                    subtitle.classList.add('text-green-600');
+                if (window.updateActiveChatSubtitle) {
+                    window.updateActiveChatSubtitle(data);
                 } else {
-                    let text = 'offline';
-                    if (data && data.last_changed) {
-                        const date = new Date(data.last_changed);
-                        text = 'last seen ' + date.toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        });
+                    if (data && data.state === 'online') {
+                        subtitle.textContent = 'online';
+                        subtitle.classList.remove('hidden', 'text-gray-500');
+                        subtitle.classList.add('text-green-600');
+                    } else {
+                        let text = 'offline';
+                        if (data && data.last_changed) {
+                            const date = new Date(data.last_changed);
+                            text = 'last seen ' + date.toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                        }
+                        subtitle.textContent = text;
+                        subtitle.classList.remove('hidden', 'text-green-600');
+                        subtitle.classList.add('text-gray-500');
                     }
-                    subtitle.textContent = text;
-                    subtitle.classList.remove('hidden', 'text-green-600');
-                    subtitle.classList.add('text-gray-500');
                 }
             });
 

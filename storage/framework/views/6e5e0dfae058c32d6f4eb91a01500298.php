@@ -48,14 +48,14 @@
                     <?php
                         $userAvatar = $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name ?: $user->phone) . '&background=2a3942&color=fff';
                     ?>
-                    <div onclick="window.startNewChat(<?php echo e($user->id); ?>, '<?php echo e(addslashes($user->name)); ?>', '<?php echo e(addslashes($user->phone ?? '')); ?>', '<?php echo e($userAvatar); ?>', '<?php echo e(addslashes($user->about ?? 'Available')); ?>')"
+                    <div id="new_chat_contact_<?php echo e($user->id); ?>" onclick="window.startNewChat(<?php echo e($user->id); ?>, '<?php echo e(addslashes($user->name)); ?>', '<?php echo e(addslashes($user->phone ?? '')); ?>', '<?php echo e($userAvatar); ?>', '<?php echo e(addslashes($user->about ?? 'Available')); ?>')"
                         class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors new-chat-contact-item" data-name="<?php echo e(strtolower($user->name ?: $user->phone)); ?>">
                         <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0 ml-1">
                             <img src="<?php echo e($userAvatar); ?>" class="w-full h-full object-cover">
                         </div>
                         <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
                             <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal"><?php echo e($user->name ?: $user->phone); ?></h4>
-                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug"><?php echo e($user->about ?? 'Available'); ?></p>
+                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug new-chat-about-text"><?php echo e($user->about ?? 'Available'); ?></p>
                         </div>
                     </div>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>

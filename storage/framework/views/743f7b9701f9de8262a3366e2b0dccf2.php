@@ -163,14 +163,87 @@
 </div>
 
 <script>
+    window.closeAllSettings = function() {
+        const settingsPanels = [
+            'settings_panel',
+            'edit_profile_panel',
+            'general_settings_panel',
+            'privacy_settings_panel',
+            'chats_settings_panel',
+            'video_voice_settings_panel',
+            'notifications_settings_panel',
+            'help_feedback_settings_panel',
+            'account_settings_panel',
+            'security_settings_panel',
+            'privacy_last_seen_panel',
+            'privacy_status_panel',
+            'privacy_profile_photo_panel',
+            'privacy_about_panel',
+            'privacy_exclude_panel',
+            'privacy_blocked_contacts_panel',
+            'chats_wallpaper_panel',
+            'chats_upload_quality_panel',
+            'chats_auto_download_panel',
+            'notifications_taskbar_panel',
+            'notifications_banner_panel',
+            'notifications_subpanel'
+        ];
+        settingsPanels.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+            }
+        });
+        const shortcuts = document.getElementById('settings_shortcuts_view');
+        if (shortcuts) {
+            shortcuts.classList.add('hidden');
+            shortcuts.classList.remove('flex');
+        }
+        document.getElementById('nav_profile')?.classList.remove('active');
+        
+        // Restore main chat column if it was hidden
+        const chatColumn = document.getElementById('main_chat_column');
+        if (chatColumn) {
+            chatColumn.classList.remove('hidden');
+            chatColumn.classList.add('flex');
+        }
+    };
+
     window.toggleSettings = function() {
         const panel = document.getElementById('settings_panel');
         const sidebar = document.getElementById('user_sidebar_container');
         const shortcuts = document.getElementById('settings_shortcuts_view');
-        const profile = document.getElementById('profile_details_view');
         const chatColumn = document.getElementById('main_chat_column');
 
-        if (panel.classList.contains('hidden')) {
+        // Check if settings_panel or ANY settings subpanel is currently visible
+        const settingsPanels = [
+            'settings_panel', 'edit_profile_panel', 'general_settings_panel', 'privacy_settings_panel',
+            'chats_settings_panel', 'video_voice_settings_panel', 'notifications_settings_panel',
+            'help_feedback_settings_panel', 'account_settings_panel', 'security_settings_panel',
+            'privacy_last_seen_panel', 'privacy_status_panel', 'privacy_profile_photo_panel',
+            'privacy_about_panel', 'privacy_exclude_panel', 'privacy_blocked_contacts_panel',
+            'chats_wallpaper_panel', 'chats_upload_quality_panel', 'chats_auto_download_panel',
+            'notifications_taskbar_panel', 'notifications_banner_panel', 'notifications_subpanel'
+        ];
+        
+        let isAnySettingsVisible = false;
+        for (const id of settingsPanels) {
+            const el = document.getElementById(id);
+            if (el && !el.classList.contains('hidden')) {
+                isAnySettingsVisible = true;
+                break;
+            }
+        }
+
+        if (isAnySettingsVisible) {
+            window.closeAllSettings();
+            if (sidebar) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('sm:flex');
+            }
+            document.getElementById('nav_chats')?.classList.add('active');
+        } else {
             panel.classList.remove('hidden');
             panel.classList.add('flex');
             if (sidebar) {
@@ -187,23 +260,6 @@
             }
             document.getElementById('nav_chats')?.classList.remove('active');
             document.getElementById('nav_profile')?.classList.add('active');
-        } else {
-            panel.classList.add('hidden');
-            panel.classList.remove('flex');
-            if (sidebar) {
-                sidebar.classList.remove('hidden');
-                sidebar.classList.add('sm:flex');
-            }
-            if (shortcuts) {
-                shortcuts.classList.add('hidden');
-                shortcuts.classList.remove('flex');
-            }
-            if (chatColumn) {
-                chatColumn.classList.remove('hidden');
-                chatColumn.classList.add('flex');
-            }
-            document.getElementById('nav_chats')?.classList.add('active');
-            document.getElementById('nav_profile')?.classList.remove('active');
         }
     }
 </script>

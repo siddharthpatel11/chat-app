@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\Cache;
 
 class PrivacyApiController extends Controller
 {
+    protected $db;
+
+    public function __construct()
+    {
+        if (file_exists(storage_path('app/firebase.json'))) {
+            $factory = (new Factory)
+                ->withServiceAccount(storage_path('app/firebase.json'))
+                ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+
+            $this->db = $factory->createDatabase();
+        }
+    }
+
     /**
      * Get Privacy Settings
      */
@@ -68,6 +81,34 @@ class PrivacyApiController extends Controller
         }
 
         Cache::put("settings_privacy_{$userId}", $settings);
+
+        if ($this->db) {
+            $privacyData = [];
+            if (isset($settings['profile_photo'])) {
+                $val = 'My contacts';
+                if ($settings['profile_photo'] === 'everyone') $val = 'Everyone';
+                elseif ($settings['profile_photo'] === 'nobody') $val = 'Nobody';
+                elseif ($settings['profile_photo'] === 'contacts') $val = 'My contacts';
+                $privacyData['profile_photo'] = $val;
+            }
+            if (isset($settings['about'])) {
+                $val = 'Everyone';
+                if ($settings['about'] === 'everyone') $val = 'Everyone';
+                elseif ($settings['about'] === 'nobody') $val = 'Nobody';
+                elseif ($settings['about'] === 'contacts') $val = 'My contacts';
+                $privacyData['about'] = $val;
+            }
+            if (isset($settings['last_seen'])) {
+                $val = 'Everyone';
+                if ($settings['last_seen'] === 'everyone') $val = 'Everyone';
+                elseif ($settings['last_seen'] === 'nobody') $val = 'Nobody';
+                elseif ($settings['last_seen'] === 'contacts') $val = 'My contacts';
+                $privacyData['last_seen'] = $val;
+            }
+            if (!empty($privacyData)) {
+                $this->db->getReference("users/{$userId}/privacy")->update($privacyData);
+            }
+        }
 
         return response()->json([
             'success' => true,

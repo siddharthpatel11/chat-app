@@ -127,6 +127,7 @@
 
 <script>
     window.globalMediaCache = window.globalMediaCache || [];
+    window.activeGmChatIdFilter = null;
     let currentGlobalMediaTab = 'media';
     let gmSortOrder = 'desc';
     let gmSelectMode = false;
@@ -136,9 +137,24 @@
     let activeGmDropdownChatId = null;
 
 
-    window.openGlobalMediaModal = function() {
+    window.openGlobalMediaModal = function(chatId = null, chatName = null) {
+        window.activeGmChatIdFilter = chatId;
         const modal = document.getElementById('global_media_modal');
         const content = document.getElementById('global_media_modal_content');
+        
+        // Update Title and Subtitle dynamically
+        const titleEl = document.querySelector('#global_media_modal h3');
+        const subtitleEl = document.querySelector('#global_media_modal span');
+        if (titleEl && subtitleEl) {
+            if (chatId) {
+                titleEl.textContent = 'Media, links and docs';
+                subtitleEl.textContent = chatName ? `Chat with ${chatName}` : 'This chat';
+            } else {
+                titleEl.textContent = 'Media';
+                subtitleEl.textContent = 'Media from all chats';
+            }
+        }
+
         modal.classList.remove('hidden');
         setTimeout(() => {
             modal.classList.add('show');
@@ -151,6 +167,7 @@
         modal.classList.remove('show');
         setTimeout(() => {
             modal.classList.add('hidden');
+            window.activeGmChatIdFilter = null; // reset filter
         }, 300);
     };
 
@@ -609,12 +626,17 @@
         let items = [];
         const searchVal = document.getElementById('gm_search_input')?.value.toLowerCase() || '';
         
+        let sourceCache = window.globalMediaCache || [];
+        if (window.activeGmChatIdFilter) {
+            sourceCache = sourceCache.filter(m => m.chatId === window.activeGmChatIdFilter);
+        }
+
         if (currentGlobalMediaTab === 'media') {
-            items = window.globalMediaCache.filter(m => m.type === 'image' || m.type === 'video');
+            items = sourceCache.filter(m => m.type === 'image' || m.type === 'video');
         } else if (currentGlobalMediaTab === 'docs') {
-            items = window.globalMediaCache.filter(m => m.type === 'document');
+            items = sourceCache.filter(m => m.type === 'document');
         } else if (currentGlobalMediaTab === 'links') {
-            items = window.globalMediaCache.filter(m => m.type === 'link');
+            items = sourceCache.filter(m => m.type === 'link');
         }
 
         // Apply search filter

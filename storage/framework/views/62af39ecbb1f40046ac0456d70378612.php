@@ -138,6 +138,19 @@
         const labelEl = document.getElementById('privacy_last_seen_label');
         if (labelEl) labelEl.innerText = combined;
         
+        if (window.db && window.ref && window.update && window.myUserId && window.myUserId !== '0') {
+            if (lastSeen === 'Everyone' || lastSeen === 'My contacts' || lastSeen === 'Nobody') {
+                window.update(window.ref(window.db, `users/${window.myUserId}/privacy`), {
+                    last_seen: lastSeen,
+                    online: online
+                }).catch(err => console.error("Error updating firebase privacy:", err));
+            } else {
+                window.update(window.ref(window.db, `users/${window.myUserId}/privacy`), {
+                    online: online
+                }).catch(err => console.error("Error updating firebase privacy:", err));
+            }
+        }
+        
         if(window.showToast && !lastSeen.includes('excluded')) window.showToast('Privacy Updated', 'Setting saved.');
     }
 </script>

@@ -314,11 +314,37 @@
 
             // Filter and Organize
             for (const userId in data) {
+                if (!userId || userId === 'undefined') {
+                    try {
+                        window.remove(window.ref(window.db, `statuses/${userId}`));
+                    } catch (e) {
+                        console.error('Delete invalid user status error:', e);
+                    }
+                    continue;
+                }
                 const userStatuses = [];
                 for (const statusId in data[userId]) {
+                    if (!statusId || statusId === 'undefined') {
+                        try {
+                            window.remove(window.ref(window.db, `statuses/${userId}/${statusId}`));
+                        } catch (e) {
+                            console.error('Delete invalid status key error:', e);
+                        }
+                        continue;
+                    }
                     const status = data[userId][statusId];
                     status.id = statusId;
                     
+                    // Check if it's a ghost/skeleton status (missing timestamp or core properties)
+                    if (status.timestamp === undefined || status.timestamp === null || isNaN(status.timestamp)) {
+                        try {
+                            window.remove(window.ref(window.db, `statuses/${userId}/${statusId}`));
+                        } catch (e) {
+                            console.error('Delete ghost status error:', e);
+                        }
+                        continue;
+                    }
+
                     // Apply Privacy Filtering
                     if (userId != window.myUserId) {
                         const mode = status.privacyMode || 'all';
@@ -385,6 +411,9 @@
             
             const isHidden = hiddenUsers.includes(userId);
 
+            const fallbackAvatar = (lastStatus.userAvatar && lastStatus.userAvatar !== 'undefined') ? lastStatus.userAvatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(lastStatus.userName || 'User')}&background=2a3942&color=fff`;
+            const displayMediaUrl = (lastStatus.mediaUrl && lastStatus.mediaUrl !== 'undefined') ? lastStatus.mediaUrl : fallbackAvatar;
+
             const html = `
                 <div onclick="window.openStatusByUserId('${userId}')"
                     class="px-4 py-3 flex items-center justify-between gap-4 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-[#202c33]/50 ${allViewed ? 'opacity-70' : ''}">
@@ -403,7 +432,7 @@
                                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M8 5v14l11-7z"></path></svg>
                                             </div>
                                         </div>` :
-                                        `<img src="${lastStatus.mediaUrl}" class="w-full h-full object-cover" onerror="this.src='${lastStatus.userAvatar}'">`
+                                        `<img src="${displayMediaUrl}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${fallbackAvatar}';">`
                                     )
                                 }
                             </div>
@@ -488,8 +517,12 @@
             } else {
                 avatar.classList.remove('hidden');
                 textPreview.classList.add('hidden');
-                avatar.src = lastStatus.mediaUrl;
-                avatar.onerror = () => { avatar.src = lastStatus.userAvatar; };
+                const myFallbackAvatar = (lastStatus.userAvatar && lastStatus.userAvatar !== 'undefined') ? lastStatus.userAvatar : "<?php echo e(auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=2a3942&color=fff'); ?>";
+                avatar.src = (lastStatus.mediaUrl && lastStatus.mediaUrl !== 'undefined') ? lastStatus.mediaUrl : myFallbackAvatar;
+                avatar.onerror = () => { 
+                    avatar.onerror = null; 
+                    avatar.src = myFallbackAvatar; 
+                };
                 inner.style.backgroundColor = '#2a3942';
                 inner.innerHTML = ''; // Clear any video content
                 inner.appendChild(avatar);
