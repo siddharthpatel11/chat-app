@@ -1,5 +1,5 @@
 <div id="settings_panel"
-    class="hidden flex-col w-[30%] sm:min-w-[350px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden">
+    class="hidden flex-col w-[30%] sm:min-w-[300px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden">
     <!-- Header -->
     <div class="h-16 bg-[#202c33] px-6 flex items-center gap-6 shrink-0 border-b border-[#313d45]">
         <button onclick="toggleSettings()" class="text-[#aebac1] hover:text-white transition-colors">
@@ -200,6 +200,10 @@
             shortcuts.classList.add('hidden');
             shortcuts.classList.remove('flex');
         }
+        const overlay = document.getElementById('wallpaper_preview_overlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+        }
         document.getElementById('nav_profile')?.classList.remove('active');
         
         // Restore main chat column if it was hidden
@@ -215,6 +219,10 @@
         const sidebar = document.getElementById('user_sidebar_container');
         const shortcuts = document.getElementById('settings_shortcuts_view');
         const chatColumn = document.getElementById('main_chat_column');
+        const chatContainer = document.getElementById('chat_view_container');
+        const callsSidebar = document.getElementById('calls_sidebar_container');
+        const callsMain = document.getElementById('calls_main_column');
+        const statusContainer = document.getElementById('status_view_container');
 
         // Check if settings_panel or ANY settings subpanel is currently visible
         const settingsPanels = [
@@ -238,17 +246,75 @@
 
         if (isAnySettingsVisible) {
             window.closeAllSettings();
-            if (sidebar) {
-                sidebar.classList.remove('hidden');
-                sidebar.classList.add('sm:flex');
+            
+            // Restore the tab that was active before settings opened
+            const lastTab = window.preSettingsActiveTab || 'nav_chats';
+            if (lastTab === 'nav_calls') {
+                if (window.showCalls) window.showCalls();
+            } else if (lastTab === 'nav_status') {
+                if (window.showStatus) window.showStatus();
+            } else if (lastTab === 'nav_archived') {
+                if (window.showArchivedChats) window.showArchivedChats();
+            } else {
+                if (window.showChats) window.showChats();
             }
-            document.getElementById('nav_chats')?.classList.add('active');
         } else {
+            // Store the active tab before opening settings
+            const activeNav = document.querySelector('.nav-item.active');
+            window.preSettingsActiveTab = activeNav ? activeNav.id : 'nav_chats';
+
             panel.classList.remove('hidden');
             panel.classList.add('flex');
-            if (sidebar) {
-                sidebar.classList.add('hidden');
-                sidebar.classList.remove('sm:flex');
+            
+            // Hide all overlapping left sidebar panel containers
+            const leftSidebarIds = [
+                'user_sidebar_container',
+                'calls_sidebar_container',
+                'status_view_container',
+                'new_chat_panel',
+                'add_group_members_panel',
+                'create_group_panel',
+                'new_contact_panel'
+            ];
+            leftSidebarIds.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex', 'sm:flex');
+                }
+            });
+
+            if (callsMain) {
+                callsMain.classList.add('hidden');
+                callsMain.classList.remove('flex');
+            }
+
+            // Close right panels
+            if (window.closeContactInfo) window.closeContactInfo();
+            if (window.closeGroupInfoPanel) window.closeGroupInfoPanel();
+            if (window.closeEditContact) window.closeEditContact();
+            if (window.closeAllSearchPanels) {
+                window.closeAllSearchPanels();
+            } else {
+                const searchSidebar = document.getElementById('search_sidebar');
+                if (searchSidebar) {
+                    searchSidebar.classList.add('hidden');
+                    searchSidebar.classList.remove('flex');
+                }
+                const groupSearchDrawer = document.getElementById('group_search_drawer');
+                if (groupSearchDrawer) {
+                    groupSearchDrawer.classList.add('hidden');
+                    groupSearchDrawer.classList.remove('flex');
+                }
+            }
+            const starredMsgs = document.getElementById('starred_messages_panel');
+            if (starredMsgs) starredMsgs.classList.add('hidden');
+            const groupStarredMsgs = document.getElementById('group_starred_messages_panel');
+            if (groupStarredMsgs) groupStarredMsgs.classList.add('hidden');
+
+            if (chatContainer) {
+                chatContainer.classList.remove('hidden');
+                chatContainer.classList.add('flex');
             }
             if (shortcuts) {
                 shortcuts.classList.remove('hidden');
@@ -258,7 +324,8 @@
                 chatColumn.classList.add('hidden');
                 chatColumn.classList.remove('flex');
             }
-            document.getElementById('nav_chats')?.classList.remove('active');
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_profile')?.classList.add('active');
         }
     }

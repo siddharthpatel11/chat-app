@@ -205,12 +205,14 @@
             if (newWidth > maxWidth) newWidth = maxWidth;
             if (newWidth < minWidth) newWidth = minWidth;
 
-            sidebar.style.width = `${newWidth}px`;
+            if (window.updateAllSidebarsWidth) {
+                window.updateAllSidebarsWidth(`${newWidth}px`);
+            } else {
+                sidebar.style.width = `${newWidth}px`;
+                const chatSidebar = document.getElementById('user_sidebar_container');
+                if (chatSidebar) chatSidebar.style.width = `${newWidth}px`;
+            }
             localStorage.setItem('sidebarWidth', `${newWidth}px`);
-
-            // Also update the chat sidebar to keep them in sync if you want
-            const chatSidebar = document.getElementById('user_sidebar_container');
-            if (chatSidebar) chatSidebar.style.width = `${newWidth}px`;
         });
 
         document.addEventListener('mouseup', () => {

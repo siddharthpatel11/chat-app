@@ -1,5 +1,5 @@
 <div id="account_settings_panel"
-    class="hidden flex-col w-[30%] sm:min-w-[350px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden">
+    class="hidden flex-col w-full sm:w-[30%] sm:min-w-[350px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden">
     <!-- Header -->
     <div class="h-16 bg-[#202c33] px-6 flex items-center gap-6 shrink-0 border-b border-[#313d45]">
         <button onclick="toggleAccountSettings()" class="text-[#aebac1] hover:text-white transition-colors">

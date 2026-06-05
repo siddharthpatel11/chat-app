@@ -3,7 +3,7 @@
         <div class="grid grid-cols-2 gap-x-12 gap-y-12 max-w-lg w-full mb-[10%]">
             
             <!-- Start Call -->
-            <div class="flex flex-col items-center gap-4 group cursor-pointer" onclick="window.openNewGroupCallModal()">
+            <div class="flex flex-col items-center gap-4 group cursor-pointer" onclick="window.openNewCallModal()">
                 <div class="w-32 h-32 rounded-3xl bg-[#202c33] flex items-center justify-center group-hover:bg-[#2a3942] transition-colors border border-transparent group-hover:border-[#313d45]">
                     <svg viewBox="0 0 24 24" width="36" height="36" fill="currentColor" class="text-[#8696a0] group-hover:text-[#e9edef] transition-colors">
                         <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path>

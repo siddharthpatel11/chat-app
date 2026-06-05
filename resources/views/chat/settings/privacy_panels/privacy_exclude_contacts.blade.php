@@ -1,5 +1,5 @@
 <div id="privacy_exclude_panel"
-    class="hidden flex-col w-[30%] sm:min-w-[350px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden z-[60] absolute top-0 left-0">
+    class="hidden flex-col w-full sm:w-[30%] sm:min-w-[350px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden z-[60] absolute top-0 left-0">
     <!-- Header -->
     <div class="h-16 bg-[#202c33] px-6 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-6">

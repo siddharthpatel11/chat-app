@@ -122,10 +122,10 @@
         document.getElementById('edit_contact_first_name').focus();
     }
 
-    function closeEditContact() {
+    window.closeEditContact = function() {
         const panel = document.getElementById('edit_contact_panel');
-        panel.classList.add('translate-x-full');
-    }
+        if (panel) panel.classList.add('translate-x-full');
+    };
 
     async function updateExistingContact() {
         const userId = window.activeChatUser?.id;

@@ -632,6 +632,65 @@
         document.getElementById('media_status_editor').classList.add('hidden');
     };
 
+    async function getEditedFile(item) {
+        if (item.type !== 'image') return item.file;
+
+        const hasEdits = (item.rotation && item.rotation !== 0) || 
+                         (item.filter && item.filter !== 'none') || 
+                         item.canvasData;
+        if (!hasEdits) {
+            return item.file;
+        }
+
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+
+                if (item.canvasData) {
+                    const overlayImg = new Image();
+                    overlayImg.onload = () => {
+                        tempCanvas.width = overlayImg.width;
+                        tempCanvas.height = overlayImg.height;
+
+                        tempCtx.filter = item.filter || 'none';
+                        tempCtx.save();
+                        tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+                        tempCtx.rotate((item.rotation * Math.PI) / 180);
+                        tempCtx.drawImage(img, -tempCanvas.width / 2, -tempCanvas.height / 2, tempCanvas.width, tempCanvas.height);
+                        tempCtx.restore();
+
+                        tempCtx.filter = 'none';
+                        tempCtx.drawImage(overlayImg, 0, 0);
+
+                        tempCanvas.toBlob((blob) => {
+                            const editedFile = new File([blob], item.file.name, { type: 'image/jpeg' });
+                            resolve(editedFile);
+                        }, 'image/jpeg', 0.9);
+                    };
+                    overlayImg.src = item.canvasData;
+                } else {
+                    tempCanvas.width = img.width;
+                    tempCanvas.height = img.height;
+
+                    tempCtx.filter = item.filter || 'none';
+                    tempCtx.save();
+                    tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+                    tempCtx.rotate((item.rotation * Math.PI) / 180);
+                    tempCtx.drawImage(img, -tempCanvas.width / 2, -tempCanvas.height / 2, tempCanvas.width, tempCanvas.height);
+                    tempCtx.restore();
+
+                    tempCanvas.toBlob((blob) => {
+                        const editedFile = new File([blob], item.file.name, { type: 'image/jpeg' });
+                        resolve(editedFile);
+                    }, 'image/jpeg', 0.9);
+                }
+            };
+            img.src = item.url;
+        });
+    }
+
     window.postMediaStatus = async function () {
         if (selectedMediaItems.length === 0) return;
 
@@ -645,10 +704,11 @@
         try {
             for (let i = 0; i < selectedMediaItems.length; i++) {
                 const item = selectedMediaItems[i];
+                const fileToUpload = await getEditedFile(item);
 
                 // Upload to local Laravel server instead of Firebase Storage
                 const formData = new FormData();
-                formData.append('file', item.file);
+                formData.append('file', fileToUpload);
                 formData.append('_token', '{{ csrf_token() }}');
 
                 const response = await fetch('/upload-status-media', {

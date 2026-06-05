@@ -45,12 +45,12 @@
         }
     </style>
 
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('👍', event)">👍</button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('❤️', event)">❤️</button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('😂', event)">😂</button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('😮', event)">😮</button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('😢', event)">😢</button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('🙏', event)">🙏</button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('👍', event)"><span class="emoji-text">👍</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('❤️', event)"><span class="emoji-text">❤️</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('😂', event)"><span class="emoji-text">😂</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('😮', event)"><span class="emoji-text">😮</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('😢', event)"><span class="emoji-text">😢</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('🙏', event)"><span class="emoji-text">🙏</span></button>
 </div>
 
 <script>
@@ -294,7 +294,7 @@
                             <div class="text-[#e9edef] text-[15px]">You</div>
                             <div class="text-[#8696a0] text-[13px]">Click to remove</div>
                         </div>
-                        <div class="text-[20px]">${emoji}</div>
+                        <div class="text-[20px]"><span class="emoji-text">${emoji}</span></div>
                     </div>
                 `;
                 continue;
@@ -313,7 +313,7 @@
                 <div class="flex items-center gap-3 p-3 rounded-lg">
                     <img src="${avatar}" class="w-10 h-10 rounded-full object-cover shrink-0">
                     <div class="flex-1 text-[#e9edef] text-[15px]">${name}</div>
-                    <div class="text-[20px]">${emoji}</div>
+                    <div class="text-[20px]"><span class="emoji-text">${emoji}</span></div>
                 </div>
             `;
         }
@@ -376,7 +376,7 @@
 
         let html = '<div class="flex items-center gap-0.5">';
         sortedEmojis.forEach(emoji => {
-            html += `<span class="text-[12px] leading-none">${emoji}</span>`;
+            html += `<span class="emoji-text text-[12px] leading-none">${emoji}</span>`;
         });
         if (total > 1) {
             html += `<span class="text-[11px] text-[#8696a0] font-medium ml-0.5 leading-none">${total}</span>`;

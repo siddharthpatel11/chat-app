@@ -21,8 +21,24 @@
             html.light-theme img,
             html.light-theme video,
             html.light-theme canvas,
-            html.light-theme iframe {
+            html.light-theme iframe,
+            html.light-theme .emoji-text {
                 filter: invert(1) hue-rotate(180deg);
+            }
+            
+            html.light-theme .emoji-text {
+                display: inline-block;
+            }
+            
+            html.light-theme emoji-picker {
+                filter: invert(1) hue-rotate(180deg);
+                --background: #f0f2f5 !important;
+                --border-color: #e9edef !important;
+                --input-background: #ffffff !important;
+                --input-color: #111b21 !important;
+                --input-border-color: #e9edef !important;
+                --indicator-color: #00a884 !important;
+                --button-hover-background: #e9edef !important;
             }
             
             html.light-theme .bg-transparent {
@@ -70,6 +86,40 @@
                 background-color: rgba(0, 168, 132, 0.08);
                 pointer-events: none;
                 z-index: 0;
+            }
+
+            @media (min-width: 640px) {
+                #user_sidebar_container,
+                #calls_sidebar_container,
+                #settings_panel,
+                #edit_profile_panel,
+                #general_settings_panel,
+                #privacy_settings_panel,
+                #chats_settings_panel,
+                #video_voice_settings_panel,
+                #notifications_settings_panel,
+                #help_feedback_settings_panel,
+                #account_settings_panel,
+                #security_settings_panel,
+                #privacy_last_seen_panel,
+                #privacy_status_panel,
+                #privacy_profile_photo_panel,
+                #privacy_about_panel,
+                #privacy_exclude_panel,
+                #privacy_blocked_contacts_panel,
+                #chats_wallpaper_panel,
+                #chats_upload_quality_panel,
+                #chats_auto_download_panel,
+                #notifications_taskbar_panel,
+                #notifications_banner_panel,
+                #notifications_subpanel,
+                #new_chat_panel,
+                #add_group_members_panel,
+                #create_group_panel,
+                #new_contact_panel,
+                #status_sidebar {
+                    min-width: 300px !important;
+                }
             }
         </style>
     @endpush
@@ -452,12 +502,12 @@
             @include('chat.contacts.edit_contact')
             @include('chat.sidebar')
             @include('chat.calls_sidebar')
-            @include('chat.calls_main_column')
-            @include('chat.calls.add_favourite_modal')
-            @include('chat.media_gallery')
             <div id="sidebar_resizer"
                 class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]">
             </div>
+            @include('chat.calls_main_column')
+            @include('chat.calls.add_favourite_modal')
+            @include('chat.media_gallery')
 
             <!-- Media Preview Modal -->
             <div id="media_preview_modal"
@@ -644,6 +694,24 @@
             <div id="chat_view_container" class="flex-1 flex h-full overflow-hidden relative">
                 @include('chat.settings_shortcuts')
                 <div id="main_chat_column" class="flex flex-col flex-1 h-full relative transition-all duration-300">
+                    <!-- Lock Overlay to hide messages during lock/unlock prompts -->
+                    <div id="chat_lock_overlay" class="hidden absolute inset-0 bg-[#0b141a] z-[150] flex flex-col items-center justify-center text-center px-4 transition-all duration-300">
+                        <div class="flex flex-col items-center animate-pulse">
+                            <div class="w-16 h-16 bg-[#202c33] rounded-full flex items-center justify-center mb-4 shadow-lg border border-white/5">
+                                <svg viewBox="0 0 24 24" height="28" width="28" fill="#00a884">
+                                    <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-[#e9edef] text-[16px] font-normal tracking-wide">Chat is Locked</h3>
+                            <p class="text-[#8696a0] text-[13px] mt-1">Unlock to view messages</p>
+                        </div>
+                    </div>
+                    <script>
+                        if (localStorage.getItem('app_lock_hash')) {
+                            document.getElementById('chat_lock_overlay').classList.remove('hidden');
+                        }
+                    </script>
+
                     <!-- Empty State -->
                     <div id="chat_empty_state"
                         class="flex-1 flex flex-col items-center justify-center bg-[#0b141a] text-center px-4 z-20">
@@ -1462,6 +1530,13 @@
 
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <script>
+        window.wrapEmojis = function(text) {
+            if (!text) return '';
+            // Matches Regional Indicators (flags) or emojis with optional skin tones and ZWJ joins
+            const emojiRegex = /(\p{Regional_Indicator}{2}|(\p{Emoji_Presentation}|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?)(\u200D(\p{Emoji_Presentation}|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?))*)/gu;
+            return text.replace(emojiRegex, '<span class="emoji-text">$1</span>');
+        };
+
         function toggleEmojiPicker() {
             const picker = document.getElementById('emoji_picker_container');
             picker.classList.toggle('hidden');
@@ -2891,12 +2966,17 @@
 
         window.toggleSearchPanel = function() {
             const sidebar = document.getElementById('search_sidebar');
-            const chatMain = document.querySelector('.flex.flex-col.w-full.sm\\:w-\\[70\\%\\]');
-            sidebar.classList.toggle('hidden');
-            if (!sidebar.classList.contains('hidden')) {
+            if (!sidebar) return;
+            const isHidden = sidebar.classList.contains('hidden');
+            if (isHidden) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
                 document.getElementById('search_messages_input').focus();
                 document.getElementById('no_results_text').querySelector('p').textContent =
                     `Search for messages with ${document.getElementById('active_chat_title').textContent}`;
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('flex');
             }
         };
 
@@ -3613,14 +3693,19 @@
             });
         }
 
-        // SVG Ticks Helper
         window.toggleSearchPanel = function() {
             const sidebar = document.getElementById('search_sidebar');
-            sidebar.classList.toggle('hidden');
-            if (!sidebar.classList.contains('hidden')) {
+            if (!sidebar) return;
+            const isHidden = sidebar.classList.contains('hidden');
+            if (isHidden) {
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('flex');
                 document.getElementById('search_messages_input').focus();
                 document.getElementById('no_results_text').querySelector('p').textContent =
                     `Search for messages with ${document.getElementById('active_chat_title').textContent}`;
+            } else {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('flex');
             }
         };
 
@@ -4029,7 +4114,7 @@
             document.getElementById('status_view_container').classList.add('hidden');
             document.getElementById('status_view_container').classList.remove('flex');
 
-            document.getElementById('sidebar_resizer').classList.add('hidden');
+            document.getElementById('sidebar_resizer').classList.remove('hidden');
 
             // Show calls views
             document.getElementById('calls_sidebar_container')?.classList.remove('hidden');
@@ -4049,14 +4134,53 @@
 
         // Sidebar Resizer Logic
         (function() {
+            window.updateAllSidebarsWidth = function(width) {
+                const sidebarIds = [
+                    'user_sidebar_container',
+                    'calls_sidebar_container',
+                    'settings_panel',
+                    'edit_profile_panel',
+                    'general_settings_panel',
+                    'privacy_settings_panel',
+                    'chats_settings_panel',
+                    'video_voice_settings_panel',
+                    'notifications_settings_panel',
+                    'help_feedback_settings_panel',
+                    'account_settings_panel',
+                    'security_settings_panel',
+                    'privacy_last_seen_panel',
+                    'privacy_status_panel',
+                    'privacy_profile_photo_panel',
+                    'privacy_about_panel',
+                    'privacy_exclude_panel',
+                    'privacy_blocked_contacts_panel',
+                    'chats_wallpaper_panel',
+                    'chats_upload_quality_panel',
+                    'chats_auto_download_panel',
+                    'notifications_taskbar_panel',
+                    'notifications_banner_panel',
+                    'notifications_subpanel',
+                    'new_chat_panel',
+                    'add_group_members_panel',
+                    'create_group_panel',
+                    'new_contact_panel',
+                    'status_sidebar'
+                ];
+                sidebarIds.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.style.width = width;
+                    }
+                });
+            };
+
             const resizer = document.getElementById('sidebar_resizer');
-            const sidebar = document.getElementById('user_sidebar_container');
             let isResizing = false;
 
             // Load saved width
             const savedWidth = localStorage.getItem('sidebarWidth');
             if (savedWidth && window.innerWidth >= 640) {
-                sidebar.style.width = savedWidth;
+                window.updateAllSidebarsWidth(savedWidth);
             }
 
             resizer.addEventListener('mousedown', (e) => {
@@ -4075,7 +4199,7 @@
                 if (newWidth > maxWidth) newWidth = maxWidth;
                 if (newWidth < minWidth) newWidth = minWidth;
 
-                sidebar.style.width = `${newWidth}px`;
+                window.updateAllSidebarsWidth(`${newWidth}px`);
                 localStorage.setItem('sidebarWidth', `${newWidth}px`);
             });
 
@@ -4227,6 +4351,7 @@
             const privateSearch = document.getElementById('search_sidebar');
             if (privateSearch) {
                 privateSearch.classList.add('hidden');
+                privateSearch.classList.remove('flex');
             }
             const searchInput = document.getElementById('search_messages_input');
             if (searchInput) {
@@ -4777,12 +4902,12 @@
                             <div id="menu_${key}" class="hidden absolute top-8 ${isMe ? 'right-0' : 'left-0'} z-50 flex flex-col ${isMe ? 'items-end' : 'items-start'} gap-1.5 transform transition-all duration-200">
                                 <!-- Reaction Strip -->
                                 <div class="bg-[#233138] rounded-full px-2 py-1.5 flex items-center gap-1 shadow-2xl border border-[#313d45] w-max">
-                                    <button onclick="event.stopPropagation(); window.sendReaction('👍', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">👍</button>
-                                    <button onclick="event.stopPropagation(); window.sendReaction('❤️', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">❤️</button>
-                                    <button onclick="event.stopPropagation(); window.sendReaction('😂', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😂</button>
-                                    <button onclick="event.stopPropagation(); window.sendReaction('😮', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😮</button>
-                                    <button onclick="event.stopPropagation(); window.sendReaction('😢', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😢</button>
-                                    <button onclick="event.stopPropagation(); window.sendReaction('🙏', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">🙏</button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('👍', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">👍</span></button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('❤️', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">❤️</span></button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('😂', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😂</span></button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('😮', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😮</span></button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('😢', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😢</span></button>
+                                    <button onclick="event.stopPropagation(); window.sendReaction('🙏', '${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">🙏</span></button>
                                     <button onclick="event.stopPropagation(); window.openFullReactionPicker('${key}', false, event)" class="w-8 h-8 flex items-center justify-center text-[18px] text-[#aebac1] hover:bg-white/10 rounded-full transition-transform hover:scale-125 bg-white/5 ml-1">
                                         <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
                                     </button>
@@ -4816,7 +4941,9 @@
                                 if (callLink) {
                                     return window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
                                 }
-                                return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${isSearchMatch ? window.highlightSearchText(data.text) : data.text}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
+                                const textToRender = isSearchMatch ? window.highlightSearchText(data.text) : data.text;
+                                const htmlText = window.wrapEmojis ? window.wrapEmojis(textToRender) : textToRender;
+                                return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
                             })() : ''}
 
                             <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2 bg-transparent">
@@ -4896,38 +5023,14 @@
                     if (isMe) {
                         for (const [uid, emoji] of Object.entries(newReactions)) {
                             if (uid != window.myUserId && oldReactions[uid] !== emoji) {
-                                const reactionKey = `
-            $ {
-                key
-            }
-            _$ {
-                uid
-            }
-            _$ {
-                emoji
-            }
-            `;
+                                const reactionKey = `${key}_${uid}_${emoji}`;
                                 window.seenReactions = window.seenReactions || new Set();
                                 if (!window.seenReactions.has(reactionKey)) {
                                     window.seenReactions.add(reactionKey);
                                     const reactorName = window.activeChatName || 'Someone';
-                                    window.showToast('Reaction', `
-            $ {
-                reactorName
-            }
-            reacted to your message: $ {
-                emoji
-            }
-            `);
+                                    window.showToast('Reaction', `${reactorName} reacted to your message: ${emoji}`);
                                     if (Notification.permission === "granted" && document.visibilityState !== 'visible') {
-                                        new Notification("Reaction", { body: `
-            $ {
-                reactorName
-            }
-            reacted: $ {
-                emoji
-            }
-            ` });
+                                        new Notification("Reaction", { body: `${reactorName} reacted: ${emoji}` });
                                     }
                                 }
                             }
@@ -4945,14 +5048,7 @@
                     for (let key in window.globalMessages) {
                         let msg = window.globalMessages[key];
                         if (msg.sender_id != window.myUserId && msg.status !== 'read') {
-                            update(ref(db, `
-            chats / $ {
-                window.currentChatId
-            }
-            /messages/$ {
-                key
-            }
-            `), { status: 'read' });
+                            update(ref(db, `chats/${window.currentChatId}/messages/${key}`), { status: 'read' });
                         }
                     }
                 }
@@ -5067,20 +5163,9 @@
 
             window.confirmDeleteSelected = function () {
                 if (window.selectedMessages.size === 0) return;
-                window.openDeleteModal(`
-            Delete $ {
-                window.selectedMessages.size
-            }
-            message(s) ? `, () => {
+                window.openDeleteModal(`Delete ${window.selectedMessages.size} message(s)?`, () => {
                     window.selectedMessages.forEach(key => {
-                        remove(ref(db, `
-            chats / $ {
-                window.currentChatId
-            }
-            /messages/$ {
-                key
-            }
-            `))
+                        remove(ref(db, `chats/${window.currentChatId}/messages/${key}`))
                             .catch(e => console.error("Batch delete error:", e));
                     });
                     window.cancelSelection();
@@ -5714,6 +5799,79 @@
             // Render contacts list and chips
             window.renderGroupCallContacts();
             window.renderGroupCallChips();
+        };
+
+        window.openNewCallModal = function() {
+            const modal = document.getElementById('new_call_modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            const searchInput = document.getElementById('new_call_search_input');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            window.renderNewCallContacts();
+        };
+
+        window.closeNewCallModal = function() {
+            const modal = document.getElementById('new_call_modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        window.renderNewCallContacts = function() {
+            const listEl = document.getElementById('new_call_contacts_list');
+            if (!listEl) return;
+
+            const searchQuery = (document.getElementById('new_call_search_input')?.value || '').toLowerCase().trim();
+            listEl.innerHTML = '';
+
+            if (!window.allContacts || window.allContacts.length === 0) {
+                listEl.innerHTML = `<div class="p-10 text-center text-[#8696a0] text-sm">No contacts available</div>`;
+                return;
+            }
+
+            const filtered = window.allContacts.filter(c => {
+                if (String(c.id) === String(window.myUserId) || c.id === 'meta_ai') return false;
+                const name = (c.saved_name || c.name || c.phone || '').toLowerCase();
+                const phone = (c.phone || '').toLowerCase();
+                return name.includes(searchQuery) || phone.includes(searchQuery);
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="p-10 text-center text-[#8696a0] text-sm">No matching contacts found</div>`;
+                return;
+            }
+
+            filtered.forEach(c => {
+                const displayName = c.saved_name || c.name || c.phone;
+                const displayAvatar = c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+                
+                const itemHtml = `
+                    <div class="flex items-center justify-between p-3 rounded-lg hover:bg-[#202c33] transition-colors border-b border-gray-800/20">
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
+                            <div class="w-11 h-11 rounded-full overflow-hidden bg-[#2a3942] shrink-0">
+                                <img src="${displayAvatar}" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex flex-col min-w-0">
+                                <span class="text-[#e9edef] text-[16px] font-normal truncate">${displayName}</span>
+                                <span class="text-[#8696a0] text-[13px] truncate mt-0.5">${c.phone || ''}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-[#00a884] shrink-0">
+                            <button onclick="window.closeNewCallModal(); window.startVideoCall('${c.id}', '${displayName.replace(/'/g, "\\'")}', '${displayAvatar}')" class="hover:bg-[#202c33] p-2 rounded-full transition-colors" title="Video call">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path></svg>
+                            </button>
+                            <button onclick="window.closeNewCallModal(); window.startVoiceCall('${c.id}', '${displayName.replace(/'/g, "\\'")}', '${displayAvatar}')" class="hover:bg-[#202c33] p-2 rounded-full transition-colors" title="Voice call">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"></path></svg>
+                            </button>
+                        </div>
+                    </div>`;
+                listEl.insertAdjacentHTML('beforeend', itemHtml);
+            });
         };
 
         window.closeNewGroupCallModal = function() {
@@ -6564,6 +6722,39 @@
 
     @include('chat.app_lock')
     @include('chat.add_to_list_modal')
+
+    <!-- New Call Modal -->
+    <div id="new_call_modal"
+        class="hidden fixed inset-0 z-[160] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-[400px] bg-[#111b21] rounded-2xl flex flex-col h-[550px] border border-white/5 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-['Inter']">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 bg-[#202c33] border-b border-white/5 shrink-0">
+                <h3 class="text-[#e9edef] text-[19px] font-semibold">New call</h3>
+                <button onclick="window.closeNewCallModal()" class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Search Area -->
+            <div class="p-3 bg-[#111b21] border-b border-white/5 shrink-0">
+                <div class="bg-[#202c33] flex items-center gap-3 px-4 py-2 rounded-lg border border-transparent focus-within:border-[#00a884] transition-all">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" id="new_call_search_input" oninput="window.renderNewCallContacts()"
+                        placeholder="Search name or number"
+                        class="bg-transparent border-none text-[#e9edef] text-sm focus:ring-0 placeholder-[#8696a0] p-0 w-full outline-none">
+                </div>
+            </div>
+
+            <!-- Contacts List -->
+            <div id="new_call_contacts_list" class="flex-1 overflow-y-auto custom-scrollbar p-2 flex flex-col gap-1">
+                <!-- Contacts will be populated here -->
+            </div>
+        </div>
+    </div>
 
     <!-- New Group Call Modal -->
     <div id="new_group_call_modal"

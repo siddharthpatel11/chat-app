@@ -78,6 +78,20 @@
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
+    window.showChatLockOverlay = function() {
+        const overlay = document.getElementById('chat_lock_overlay');
+        if (overlay) {
+            overlay.classList.remove('hidden');
+        }
+    };
+
+    window.hideChatLockOverlay = function() {
+        const overlay = document.getElementById('chat_lock_overlay');
+        if (overlay) {
+            overlay.classList.add('hidden');
+        }
+    };
+
     const pwd1 = document.getElementById('app_lock_pwd_1');
     const pwd2 = document.getElementById('app_lock_pwd_2');
     const saveBtn = document.getElementById('app_lock_save_btn');
@@ -115,6 +129,7 @@
             window.lockApp();
         } else {
             // Open setup modal
+            window.showChatLockOverlay?.();
             pwd1.value = '';
             pwd2.value = '';
             validateSetupInputs();
@@ -131,6 +146,7 @@
     };
 
     window.closeAppLockSetup = function() {
+        window.hideChatLockOverlay?.();
         const modal = document.getElementById('app_lock_setup_modal');
         const content = document.getElementById('app_lock_setup_content');
         content.classList.remove('scale-100', 'opacity-100');
@@ -154,6 +170,7 @@
     };
 
     window.lockApp = function() {
+        window.showChatLockOverlay?.();
         document.getElementById('app_lock_screen').classList.remove('hidden');
         document.getElementById('app_lock_unlock_input').value = '';
         document.getElementById('app_lock_unlock_error').classList.add('hidden');
@@ -169,6 +186,7 @@
         
         if (hash === storedHash) {
             document.getElementById('app_lock_screen').classList.add('hidden');
+            window.hideChatLockOverlay?.();
         } else {
             document.getElementById('app_lock_unlock_error').classList.remove('hidden');
             const inputEl = document.getElementById('app_lock_unlock_input');
@@ -196,6 +214,7 @@
 
     // Chat Unlock Logic
     window.openLockedChatsPrompt = function() {
+        window.showChatLockOverlay?.();
         document.getElementById('chat_unlock_input').value = '';
         document.getElementById('chat_unlock_error').classList.add('hidden');
         const modal = document.getElementById('chat_unlock_modal');
@@ -210,6 +229,7 @@
     };
 
     window.closeChatUnlockModal = function() {
+        window.hideChatLockOverlay?.();
         const modal = document.getElementById('chat_unlock_modal');
         const content = document.getElementById('chat_unlock_content');
         content.classList.remove('scale-100', 'opacity-100');

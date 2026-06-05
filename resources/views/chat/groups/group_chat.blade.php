@@ -2648,17 +2648,17 @@
     <div class="bg-[#233138] rounded-full shadow-lg border border-[#313d45] px-2 py-1.5 flex items-center gap-1 mb-2 absolute"
         style="top: -46px; left: 0; width: max-content;">
         <button onclick="event.stopPropagation(); window.sendReaction('👍', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">👍</button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">👍</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('❤️', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">❤️</button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">❤️</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('😂', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😂</button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😂</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('😮', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😮</button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😮</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('😢', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">😢</button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😢</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('🙏', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125">🙏</button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">🙏</span></button>
         <button
             onclick="event.stopPropagation(); window.openFullReactionPicker(window._activeGroupMsgKey, true, event)"
             class="w-8 h-8 flex items-center justify-center text-[18px] text-[#aebac1] hover:bg-white/10 rounded-full transition-transform hover:scale-125 bg-white/5 ml-1">
@@ -5034,7 +5034,8 @@
                             if (callLink) {
                                 return window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
                             }
-                            return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${msgText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
+                            const htmlText = window.wrapEmojis ? window.wrapEmojis(msgText) : msgText;
+                            return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
                         })() : ''}
 
                         <div class="flex items-center justify-end gap-1 absolute bottom-0.5 right-2 bg-transparent">

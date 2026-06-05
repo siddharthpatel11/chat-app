@@ -1,5 +1,5 @@
 <div id="chats_wallpaper_panel"
-    class="hidden flex-col w-[30%] sm:min-w-[350px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden">
+    class="hidden flex-col w-full sm:w-[30%] sm:min-w-[350px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden">
     <!-- Header -->
     <div class="h-16 bg-[#202c33] px-6 flex items-center gap-6 shrink-0 border-b border-[#313d45]">
         <button onclick="toggleChatWallpaperPanel()" class="text-[#aebac1] hover:text-white transition-colors">
@@ -34,7 +34,7 @@
 <!-- Wallpaper Preview Overlay -->
 <div id="wallpaper_preview_overlay" class="hidden absolute top-0 right-0 w-[calc(100%-64px)] sm:w-[calc(100%-72px)] h-full z-[40] flex pointer-events-none bg-transparent">
     <!-- Left space taken by the panel -->
-    <div class="w-[30%] sm:min-w-[350px] shrink-0"></div>
+    <div class="w-full sm:w-[30%] sm:min-w-[350px] shrink-0"></div>
 
     <!-- Right Preview Area -->
     <div class="flex-1 flex flex-col h-full bg-[#0b141a] pointer-events-auto">
