@@ -60,7 +60,7 @@ class ChatController extends Controller
             } elseif (str_starts_with($mimeType, 'audio/')) {
                 $type = 'audio';
             } else {
-                $type = 'document';                         
+                $type = 'document';
             }
 
             $fileName = $file->getClientOriginalName();
@@ -76,6 +76,8 @@ class ChatController extends Controller
             $type = $request->type;
             $lat = $request->lat;
             $lng = $request->lng;
+        } elseif ($request->type === 'scheduled_call') {
+            $type = 'scheduled_call';
         }
 
         $data = [
@@ -93,6 +95,16 @@ class ChatController extends Controller
             'time' => microtime(true),
             'status' => 'sent',
         ];
+
+        if ($type === 'scheduled_call') {
+            $data['call_name'] = $request->call_name;
+            $data['description'] = $request->description;
+            $data['start_time'] = (int)$request->start_time;
+            $data['end_time'] = $request->has('end_time') && $request->end_time ? (int)$request->end_time : null;
+            $data['call_type'] = $request->call_type;
+            $data['require_approval'] = filter_var($request->require_approval, FILTER_VALIDATE_BOOLEAN);
+            $data['group_call_id'] = $request->group_call_id;
+        }
 
         // Determine node (chats or groups)
         $isGroup = str_starts_with($chatId, 'group_');
@@ -127,6 +139,8 @@ class ChatController extends Controller
             $notificationBody = '📍 Location';
         } elseif ($type === 'live_location') {
             $notificationBody = '📍 Live Location';
+        } elseif ($type === 'scheduled_call') {
+            $notificationBody = '📅 Scheduled call: ' . ($request->call_name ?? 'Call');
         }
 
         if ($isGroup) {
@@ -143,8 +157,9 @@ class ChatController extends Controller
                 $notificationTitle = $groupName;
                 $finalBody = $senderName . ": " . $notificationBody;
 
-                foreach ($receivers as $user) {
-                    $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $user->fcm_token)
+                $tokens = $receivers->pluck('fcm_token')->filter()->toArray();
+                if (!empty($tokens)) {
+                    $message = \Kreait\Firebase\Messaging\CloudMessage::new()
                         ->withNotification(\Kreait\Firebase\Messaging\Notification::create($notificationTitle, $finalBody))
                         ->withData([
                             'chat_id' => $chatId, // Keep group_ prefix for frontend
@@ -154,7 +169,11 @@ class ChatController extends Controller
                             'group_id' => (string)$chatId,
                             'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
                         ]);
-                    try { $messaging->send($message); } catch (\Exception $e) {}
+                    try {
+                        $messaging->sendMulticast($message, $tokens);
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('FCM Multicast Group Send Error: ' . $e->getMessage());
+                    }
                 }
             }
         } else {
@@ -392,8 +411,9 @@ class ChatController extends Controller
             $notificationBody = $senderName . ': 📄 Document';
         }
 
-        foreach ($receivers as $user) {
-            $message = \Kreait\Firebase\Messaging\CloudMessage::withTarget('token', $user->fcm_token)
+        $tokens = $receivers->pluck('fcm_token')->filter()->toArray();
+        if (!empty($tokens)) {
+            $message = \Kreait\Firebase\Messaging\CloudMessage::new()
                 ->withNotification(\Kreait\Firebase\Messaging\Notification::create($notificationTitle, $notificationBody))
                 ->withData([
                     'chat_id' => 'group_' . $groupId,
@@ -405,9 +425,9 @@ class ChatController extends Controller
                 ]);
 
             try {
-                $messaging->send($message);
+                $messaging->sendMulticast($message, $tokens);
             } catch (\Exception $e) {
-                \Illuminate\Support\Facades\Log::error('Group FCM Send Error: ' . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error('Group FCM Multicast Send Error: ' . $e->getMessage());
             }
         }
 
@@ -452,7 +472,7 @@ class ChatController extends Controller
         ]);
 
         $userId = auth()->id() ?? $request->user_id;
-        
+
         if ($request->action === 'block') {
             $db->getReference("users/{$userId}/blocked/{$request->blocked_user_id}")->set(true);
             $message = 'User blocked';

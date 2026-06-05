@@ -311,9 +311,60 @@
             <h1 class="text-white text-[28px] font-semibold mb-2">{{ $name }}</h1>
             <div class="flex items-center gap-1.5">
                 <span id="vc_status"
-                    class="text-[#8696a0] text-[15px]">{{ $role === 'caller' ? 'Calling Group' : 'Connecting' }}</span>
+                    class="text-[#8696a0] text-[15px]">{{ (isset($groupCallId) && str_starts_with($groupCallId, 'cl_')) ? 'Waiting for others to join' : ($role === 'caller' ? 'Calling Group' : 'Connecting') }}</span>
                 <span class="flex gap-0.5" id="vc_dots"><span class="vd1 text-[#8696a0]">.</span><span
                         class="vd2 text-[#8696a0]">.</span><span class="vd3 text-[#8696a0]">.</span></span>
+            </div>
+        </div>
+
+        <!-- Approval Request Prompt for host -->
+        <div id="approval_prompt" class="hidden fixed top-6 left-1/2 -translate-x-1/2 z-[300] bg-[#233138] border border-white/10 rounded-2xl p-4 shadow-2xl flex flex-col gap-3 w-80 animate-in slide-in-from-top duration-300">
+            <div class="flex items-center gap-3">
+                <img id="approval_avatar" class="w-10 h-10 rounded-full object-cover" src="">
+                <div class="flex flex-col min-w-0">
+                    <span id="approval_name" class="text-white font-medium text-sm truncate">User</span>
+                    <span class="text-xs text-[#8696a0]">wants to join the call</span>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="window.declineParticipant()" class="flex-1 py-1.5 bg-[#ef4444]/10 hover:bg-[#ef4444]/20 text-[#ef4444] rounded-lg text-sm font-semibold transition-colors focus:outline-none">Decline</button>
+                <button onclick="window.approveParticipant()" class="flex-1 py-1.5 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] rounded-lg text-sm font-semibold transition-colors focus:outline-none">Approve</button>
+            </div>
+        </div>
+
+        <!-- Waiting Approval Overlay for guests -->
+        <div id="link_waiting_overlay" class="hidden fixed inset-0 z-[250] bg-[#111b21] flex flex-col items-center justify-center p-6 text-center">
+            <div class="flex flex-col items-center gap-6">
+                <div class="w-20 h-20 rounded-full bg-[#00a884]/10 flex items-center justify-center text-[#00a884] animate-pulse">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <h3 class="text-[#e9edef] text-xl font-semibold">Waiting for approval...</h3>
+                    <p class="text-[#8696a0] text-sm max-w-xs">The call organizer needs to approve your request to join.</p>
+                </div>
+                <button onclick="window.location.href='/chat'" class="mt-4 px-6 py-2 bg-white/5 hover:bg-white/10 text-white rounded-full text-sm font-semibold transition-colors focus:outline-none">
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- Declined Overlay for guests -->
+        <div id="declined_overlay" class="hidden fixed inset-0 z-[250] bg-[#111b21] flex flex-col items-center justify-center p-6 text-center">
+            <div class="flex flex-col items-center gap-6">
+                <div class="w-20 h-20 rounded-full bg-[#ef4444]/10 flex items-center justify-center text-[#ef4444]">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <h3 class="text-[#e9edef] text-xl font-semibold">Request Declined</h3>
+                    <p class="text-[#8696a0] text-sm max-w-xs">Your request to join this call was declined by the organizer.</p>
+                </div>
+                <button onclick="window.location.href='/chat'" class="mt-4 px-6 py-2 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] rounded-full text-sm font-semibold transition-colors focus:outline-none">
+                    Go Back
+                </button>
             </div>
         </div>
 
@@ -465,7 +516,7 @@
 
         async function startGroupCall() {
             if (!groupId) groupId = 'gc_' + MY_USER_ID + '_' + Date.now();
-            document.getElementById('vc_status').textContent = 'Calling Group';
+            document.getElementById('vc_status').textContent = (groupId && groupId.startsWith('cl_')) ? 'Waiting for others to join' : 'Calling Group';
             ensureGroupCall();
             const targets = new URLSearchParams(window.location.search).get('participants');
             if (targets) { targets.split(',').forEach(tid => { if (tid != MY_USER_ID) inviteToGroup(tid); }); }
@@ -507,24 +558,84 @@
         }
 
         async function ensureGroupCall() {
-            await set(ref(db, `group_calls/${groupId}/participants/${MY_USER_ID}`), {
-                name: MY_NAME,
-                avatar: MY_AVATAR,
-                status: 'connected',
-                joined_at: Date.now()
-            });
-            await set(ref(db, `group_calls/${groupId}/type`), 'video');
-            setupParticipantListener();
+            const participantsSnap = await get(ref(db, `group_calls/${groupId}/participants`));
+            const participantsVal = participantsSnap.val() || {};
+            const participantIds = Object.keys(participantsVal);
+
+            const isExplicitCaller = new URLSearchParams(window.location.search).get('role') === 'caller';
+            const isHost = isExplicitCaller || participantIds.length === 0 || participantIds.includes(String(MY_USER_ID));
+
+            const requireApprovalQuery = new URLSearchParams(window.location.search).get('require_approval') === 'true';
+
+            if (isHost) {
+                if (requireApprovalQuery) {
+                    await set(ref(db, `group_calls/${groupId}/require_approval`), true);
+                }
+                await set(ref(db, `group_calls/${groupId}/participants/${MY_USER_ID}`), {
+                    name: MY_NAME,
+                    avatar: MY_AVATAR,
+                    status: 'connected',
+                    joined_at: Date.now(),
+                    is_host: true
+                });
+                await set(ref(db, `group_calls/${groupId}/type`), 'video');
+                setupParticipantListener();
+            } else {
+                const requireApprovalSnap = await get(ref(db, `group_calls/${groupId}/require_approval`));
+                const requireApproval = requireApprovalSnap.val() === true;
+
+                if (requireApproval) {
+                    const myParticipantRef = ref(db, `group_calls/${groupId}/participants/${MY_USER_ID}`);
+                    const myParticipantSnap = await get(myParticipantRef);
+                    const myParticipantVal = myParticipantSnap.val();
+
+                    if (!myParticipantVal || myParticipantVal.status !== 'connected') {
+                        document.getElementById('link_waiting_overlay').classList.remove('hidden');
+
+                        await set(myParticipantRef, {
+                            name: MY_NAME,
+                            avatar: MY_AVATAR,
+                            status: 'waiting_approval',
+                            joined_at: Date.now()
+                        });
+
+                        onValue(myParticipantRef, (snap) => {
+                            const val = snap.val();
+                            if (val) {
+                                if (val.status === 'connected') {
+                                    document.getElementById('link_waiting_overlay').classList.add('hidden');
+                                    setupParticipantListener();
+                                } else if (val.status === 'declined') {
+                                    document.getElementById('link_waiting_overlay').classList.add('hidden');
+                                    document.getElementById('declined_overlay').classList.remove('hidden');
+                                    setTimeout(() => {
+                                        window.location.href = '/chat';
+                                    }, 4000);
+                                }
+                            }
+                        });
+                        return;
+                    }
+                }
+
+                await set(ref(db, `group_calls/${groupId}/participants/${MY_USER_ID}`), {
+                    name: MY_NAME,
+                    avatar: MY_AVATAR,
+                    status: 'connected',
+                    joined_at: Date.now()
+                });
+                setupParticipantListener();
+            }
         }
 
         function setupParticipantListener() {
             if (participantListenerSet || !groupId) return;
             participantListenerSet = true;
 
-            // Listen for anyone who joins the group call participants node
             onChildAdded(ref(db, `group_calls/${groupId}/participants`), (snap) => {
                 const uid = parseInt(snap.key);
-                if (uid !== MY_USER_ID) {
+                const p = snap.val();
+                if (uid !== MY_USER_ID && p.status === 'connected') {
                     console.log("Establishing mesh connection with participant:", uid);
                     connectToPeer(uid);
                 }
@@ -532,16 +643,35 @@
 
             onValue(ref(db, `group_calls/${groupId}/participants`), (snap) => {
                 const data = snap.val() || {};
+
+                const myEntry = data[MY_USER_ID];
+                const isHost = myEntry && myEntry.is_host === true;
+
+                if (isHost) {
+                    Object.entries(data).forEach(([uid, p]) => {
+                        if (p.status === 'waiting_approval') {
+                            window.showApprovalPrompt(uid, p.name, p.avatar);
+                        }
+                    });
+                }
+
+                Object.entries(data).forEach(([uid, p]) => {
+                    const rId = parseInt(uid);
+                    if (rId !== MY_USER_ID && p.status === 'connected' && !extraPeers[rId]) {
+                        console.log("Peer transitioned to connected, initiating connection:", rId);
+                        connectToPeer(rId);
+                    }
+                });
+
                 if (!data[MY_USER_ID]) ensureGroupCall();
                 updateParticipantStrip(data);
                 updateParticipantNames(data);
 
-                // Cleanup removed participants
                 const boxes = document.querySelectorAll('.video-box[id^="box_"]');
                 boxes.forEach(box => {
                     const uid = box.id.replace('box_', '');
                     if (uid === 'self') return;
-                    if (!data[uid] || data[uid].status === 'left') {
+                    if (!data[uid] || data[uid].status === 'left' || data[uid].status === 'declined') {
                         box.remove();
                         if (extraPeers[uid]) {
                             extraPeers[uid].close();
@@ -685,7 +815,7 @@
                     type: 'call', call_type: 'video', call_status: status,
                     call_duration: duration, text: '', time: now, status: 'sent'
                 });
-                
+
                 const logData = {
                     type: 'video',
                     status: status,
@@ -707,6 +837,29 @@
         window.openContactPicker = function () { document.getElementById('contact_picker').classList.remove('hidden'); };
         window.closeContactPicker = function () { document.getElementById('contact_picker').classList.add('hidden'); };
         window.selectContact = function (uid, name, avatar) { if (!extraPeers[uid]) inviteToGroup(uid); closeContactPicker(); };
+
+        window.activeApprovalUid = null;
+        window.showApprovalPrompt = function(uid, name, avatar) {
+            if (window.activeApprovalUid === uid) return;
+            window.activeApprovalUid = uid;
+            document.getElementById('approval_avatar').src = avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
+            document.getElementById('approval_name').textContent = name;
+            document.getElementById('approval_prompt').classList.remove('hidden');
+        };
+        window.approveParticipant = async function() {
+            if (!window.activeApprovalUid) return;
+            const uid = window.activeApprovalUid;
+            window.activeApprovalUid = null;
+            document.getElementById('approval_prompt').classList.add('hidden');
+            await update(ref(db, `group_calls/${groupId}/participants/${uid}`), { status: 'connected' });
+        };
+        window.declineParticipant = async function() {
+            if (!window.activeApprovalUid) return;
+            const uid = window.activeApprovalUid;
+            window.activeApprovalUid = null;
+            document.getElementById('approval_prompt').classList.add('hidden');
+            await update(ref(db, `group_calls/${groupId}/participants/${uid}`), { status: 'declined' });
+        };
 
         init();
         window.addEventListener('beforeunload', () => { if (!ended) endVCall(); });

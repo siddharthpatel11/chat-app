@@ -219,6 +219,10 @@
     };
 
     window.openMetaAiChat = function() {
+        if (typeof window.closeAllSearchPanels === 'function') {
+            window.closeAllSearchPanels();
+        }
+
         // Update nav UI
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById('nav_meta_ai').classList.add('active');
@@ -694,59 +698,3 @@
     };
 </script>
 
-<!-- Meta AI Contact Info Panel -->
-<div id="meta_ai_info_panel" class="absolute top-0 right-0 w-full md:w-[400px] h-full bg-[#111b21] transform translate-x-full transition-transform duration-300 z-50 flex flex-col border-l border-[#313d45]">
-    <!-- Header -->
-    <div class="h-[60px] bg-[#202c33] flex items-center px-6 gap-6 shrink-0">
-        <button onclick="window.closeMetaAiInfo()" class="text-[#aebac1] hover:text-[#e9edef] focus:outline-none">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                <path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path>
-            </svg>
-        </button>
-        <h2 class="text-[#e9edef] text-[16px] font-medium">Contact info</h2>
-    </div>
-    
-    <div class="flex-1 overflow-y-auto custom-scrollbar">
-        <!-- Profile Info -->
-        <div class="bg-[#111b21] flex flex-col items-center py-8 px-4">
-            <div class="w-48 h-48 rounded-full mb-5 flex items-center justify-center shadow-lg" style="background: linear-gradient(135deg, #106cff 0%, #00d2ff 100%);">
-                <svg viewBox="0 0 24 24" width="96" height="96" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z" class="fill-white"></path>
-                </svg>
-            </div>
-            <h1 class="text-[#e9edef] text-2xl font-normal mb-1">Meta AI</h1>
-            <p class="text-[#8696a0] text-sm">AI Assistant</p>
-        </div>
-        
-        <div class="h-2 bg-[#0c1317]"></div>
-        
-        <!-- About -->
-        <div class="bg-[#111b21] px-8 py-4">
-            <p class="text-[#8696a0] text-sm mb-1">About</p>
-            <p class="text-[#e9edef] text-[15px]">I am Meta AI, an intelligent assistant designed to help you with answering questions and completing tasks.</p>
-        </div>
-        
-        <div class="h-2 bg-[#0c1317]"></div>
-        
-        <!-- Actions -->
-        <div class="bg-[#111b21] py-2">
-            <button onclick="if(confirm('Clear this chat?')) { window.clearMetaAiChat(); }; window.closeMetaAiInfo()" class="w-full flex items-center gap-6 px-8 py-3 hover:bg-[#202c33] transition-colors group focus:outline-none">
-                <div class="text-[#f15c6d]">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                </div>
-                <span class="text-[#f15c6d] text-[15px]">Clear chat</span>
-            </button>
-            <button onclick="if(confirm('Delete this chat?')) { window.clearMetaAiChat(); window.backToSidebar(); }; window.closeMetaAiInfo()" class="w-full flex items-center gap-6 px-8 py-3 hover:bg-[#202c33] transition-colors group focus:outline-none">
-                <div class="text-[#f15c6d]">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                        <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                    </svg>
-                </div>
-                <span class="text-[#f15c6d] text-[15px]">Delete chat</span>
-            </button>
-        </div>
-    </div>
-</div>

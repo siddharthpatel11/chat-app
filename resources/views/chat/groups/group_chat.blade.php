@@ -25,7 +25,7 @@
 <div id="active_group_chat_content" class="hidden flex-row flex-1 h-full overflow-hidden select-none">
     <!-- Main Chat Column -->
     <div id="group_chat_main_column" class="flex-1 flex flex-col relative h-full min-w-0">
-        <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-20 relative">
+        <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-[45] relative">
             <!-- Normal Header -->
             <div id="group_normal_header"
                 class="flex items-center justify-between h-full w-full transition-all duration-300">
@@ -80,7 +80,7 @@
 
                         <!-- Call Dropdown -->
                         <div id="group_call_dropdown" style="display: none;"
-                            class="hidden absolute top-14 right-0 w-[340px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
+                            class="hidden absolute top-full mt-2 right-0 w-[340px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
                             <!-- Header with Expand/Collapse -->
                             <div class="p-4 cursor-pointer hover:bg-white/5 transition-colors flex items-center justify-between"
                                 onclick="window.toggleGroupCallMembersList()">
@@ -162,7 +162,7 @@
                                     </button>
                                 </div>
                                 <div class="h-[1px] bg-white/5 my-1"></div>
-                                <button
+                                <button onclick="window.openNewCallLinkModal()"
                                     class="w-full flex items-center gap-3 px-2 py-2 text-[#e9edef] hover:bg-white/5 rounded-lg transition-colors text-sm">
                                     <div
                                         class="w-8 h-8 rounded-full bg-[#202c33] flex items-center justify-center text-[#8696a0]">
@@ -175,7 +175,7 @@
                                     </div>
                                     Send call link
                                 </button>
-                                <button
+                                <button onclick="window.openScheduleCallModal()"
                                     class="w-full flex items-center gap-3 px-2 py-2 text-[#e9edef] hover:bg-white/5 rounded-lg transition-colors text-sm">
                                     <div
                                         class="w-8 h-8 rounded-full bg-[#202c33] flex items-center justify-center text-[#8696a0]">
@@ -403,32 +403,41 @@
 
                 <!-- Emoji Picker Panel (Toggled with button) -->
                 <div id="group_emoji_picker_container"
-                    class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px]">
-                    <div class="grid grid-cols-6 place-items-center gap-1 p-3 bg-[#111b21]">
-                        <span onclick="insertEmojiIntoGroupInput('😊')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😊</span>
-                        <span onclick="insertEmojiIntoGroupInput('😂')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😂</span>
-                        <span onclick="insertEmojiIntoGroupInput('😍')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😍</span>
-                        <span onclick="insertEmojiIntoGroupInput('👍')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">👍</span>
-                        <span onclick="insertEmojiIntoGroupInput('❤️')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">❤️</span>
-                        <span onclick="insertEmojiIntoGroupInput('🙌')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙌</span>
-                        <span onclick="insertEmojiIntoGroupInput('😭')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">😭</span>
-                        <span onclick="insertEmojiIntoGroupInput('🎉')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎉</span>
-                        <span onclick="insertEmojiIntoGroupInput('🙏')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🙏</span>
-                        <span onclick="insertEmojiIntoGroupInput('🎂')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🎂</span>
-                        <span onclick="insertEmojiIntoGroupInput('🔥')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🔥</span>
-                        <span onclick="insertEmojiIntoGroupInput('🤝')"
-                            class="text-2xl cursor-pointer hover:scale-110 p-1.5 rounded transition-all hover:bg-[#202c33]">🤝</span>
+                    class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px] sm:w-[350px]">
+                    <!-- The actual picker (Uses system dark/light mode automatically) -->
+                    <emoji-picker id="group_emoji_picker" class="w-full"
+                        style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
+
+                    <!-- Bottom Tabs Bar (WhatsApp Style) -->
+                    <div
+                        class="h-[50px] bg-gray-100 dark:bg-[#2a3942] border-t border-gray-200 dark:border-gray-700 flex items-center justify-center shrink-0">
+                        <!-- Emoji Tab (Active) -->
+                        <button
+                            class="flex-1 flex justify-center py-2 h-full items-center relative transition-colors bg-gray-200 dark:bg-[#384b57]">
+                            <svg viewBox="0 0 24 24" width="24" height="24"
+                                class="text-gray-600 dark:text-gray-300" fill="currentColor">
+                                <path
+                                    d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
+                                </path>
+                            </svg>
+                            <div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
+                        </button>
+                        <!-- GIF Tab -->
+                        <button
+                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                            <span
+                                class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
+                        </button>
+                        <!-- Sticker Tab -->
+                        <button
+                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                            <svg viewBox="0 0 24 24" width="24" height="24"
+                                class="text-gray-500 dark:text-gray-400" fill="currentColor">
+                                <path
+                                    d="M14.5 3h-5C6.46 3 4 5.46 4 8.5v7C4 18.54 6.46 21 9.5 21h4l6-6v-6.5C19.5 5.46 17.04 3 14.5 3zm-2.5 16h-2.5C7.57 19 6 17.43 6 15.5v-7C6 6.57 7.57 5 9.5 5h5C16.43 5 18 6.57 18 8.5v5.09l-4.5 4.5V19h-1.5zM17 14h-2.5c-.83 0-1.5.67-1.5 1.5V18l4-4z">
+                                </path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
@@ -1265,6 +1274,19 @@
         }
         document.getElementById('group_emoji_picker_container')?.classList.add('hidden');
     };
+
+    // Add listener for group emoji picker component clicks
+    const groupEmojiPicker = document.getElementById('group_emoji_picker');
+    if (groupEmojiPicker) {
+        groupEmojiPicker.addEventListener('emoji-click', event => {
+            const input = document.getElementById('group_msg');
+            if (input) {
+                input.value += event.detail.unicode;
+                if (typeof handleGroupInputToggle === 'function') handleGroupInputToggle();
+                input.focus();
+            }
+        });
+    }
 
     window.selectGroupFile = function(accepts) {
         let fileInput = document.getElementById('group_file_input');
@@ -2996,7 +3018,8 @@
         const attachMenu = document.getElementById('group_attach_menu');
         const attachBtn = document.getElementById('group_attach_toggle_btn');
         if (attachMenu && !attachMenu.classList.contains('hidden')) {
-            if (!attachMenu.contains(e.target) && !attachBtn.contains(e.target)) {
+            const path = e.composedPath();
+            if (!path.includes(attachMenu) && !path.includes(attachBtn)) {
                 attachMenu.classList.add('hidden');
             }
         }
@@ -3005,7 +3028,8 @@
         const emojiPicker = document.getElementById('group_emoji_picker_container');
         const emojiBtn = document.getElementById('group_emoji_toggle_btn');
         if (emojiPicker && !emojiPicker.classList.contains('hidden')) {
-            if (!emojiPicker.contains(e.target) && !emojiBtn.contains(e.target)) {
+            const path = e.composedPath();
+            if (!path.includes(emojiPicker) && !path.includes(emojiBtn)) {
                 emojiPicker.classList.add('hidden');
             }
         }
@@ -4226,32 +4250,50 @@
                 if (r.isGroup) {
                     msgsList.insertAdjacentHTML('beforeend', `
                         <div onclick="window.selectGroupChat('${r.groupId}', '${r.name.replace(/'/g, "\\'")}', '${r.avatar}', ${r.time || 0})"
-                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item" data-groupid="${r.groupId}">
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors relative group user-chat-item" data-groupid="${r.groupId}">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                                 <img src="${r.avatar}" class="w-full h-full object-cover">
                             </div>
-                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                                 <div class="flex justify-between items-center">
                                     <h4 class="text-[16px] text-[#e9edef] truncate mr-2 font-normal">${r.name}</h4>
                                     <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${timeStr}</span>
                                 </div>
                                 <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${prefix}${highlightedMsg}</p>
+                            </div>
+                            <!-- Dropdown Trigger Button with Gradient Overlay -->
+                            <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                                <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, '${r.groupId}', '${r.name.replace(/'/g, "\\'")}', 'group')"
+                                    class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                                    <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                                        <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     `);
                 } else {
                     msgsList.insertAdjacentHTML('beforeend', `
                         <div onclick="window.selectChat(${r.userId}, '${r.name.replace(/'/g, "\\'")}', '${r.phone.replace(/'/g, "\\'")}', '${r.avatar}', '${r.about.replace(/'/g, "\\'")}', ${r.time || 0})"
-                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item" data-userid="${r.userId}">
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors relative group user-chat-item" data-userid="${r.userId}">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                                 <img src="${r.avatar}" class="w-full h-full object-cover">
                             </div>
-                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                                 <div class="flex justify-between items-center">
                                     <h4 class="text-[16px] text-[#e9edef] truncate mr-2 font-normal">${r.name}</h4>
                                     <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${timeStr}</span>
                                 </div>
                                 <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${prefix}${highlightedMsg}</p>
+                            </div>
+                            <!-- Dropdown Trigger Button with Gradient Overlay -->
+                            <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                                <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, ${r.userId}, '${r.name.replace(/'/g, "\\'")}', 'user')"
+                                    class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                                    <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                                        <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     `);
@@ -4348,6 +4390,10 @@
     })();
 
     window.selectGroupChat = function(groupId, name, avatar, searchMsgTime = null) {
+        if (typeof window.closeAllSearchPanels === 'function') {
+            window.closeAllSearchPanels();
+        }
+
         // Fetch missing info from DOM
         const sidebarEl = document.getElementById(`group_sidebar_${groupId}`);
         if (sidebarEl) {
@@ -4815,6 +4861,44 @@
                     mediaContent +=
                         `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
                 }
+            } else if (data.type === 'scheduled_call') {
+                const startStr = new Date(data.start_time * 1000).toLocaleString([], {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const isVideo = data.call_type === 'video';
+                const approvalParam = data.require_approval ? '&require_approval=true' : '';
+                const callLink = `${window.location.origin}/chat/groups/${data.call_type}-call?group_call_id=${data.group_call_id}&name=${encodeURIComponent(data.call_name)}${approvalParam}`;
+
+                mediaContent = `
+                    <div class="mb-2 relative rounded-2xl overflow-hidden border border-white/5 bg-[#1f2c34] w-[270px] max-w-[100%] shadow-lg p-4 text-[#e9edef] font-['Inter']">
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-full bg-[#202c33] flex items-center justify-center text-[#00a884] shrink-0 border border-white/5">
+                                ${isVideo ? `
+                                    <svg class="w-5 h-5 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                ` : `
+                                    <svg class="w-5 h-5 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                    </svg>
+                                `}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[15px] font-semibold truncate leading-tight">${data.call_name}</div>
+                                <div class="text-[12px] text-[#8696a0] mt-1">${startStr}</div>
+                                ${data.description ? `<div class="text-xs text-[#8696a0] mt-2 italic line-clamp-2">${data.description}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="mt-4 flex gap-2 pt-3 border-t border-white/5">
+                            <button onclick="window.open('${callLink}', '_blank')" class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-2 rounded-xl text-center text-sm font-bold transition-all active:scale-[0.98] focus:outline-none">
+                                Join call
+                            </button>
+                        </div>
+                    </div>`;
             }
 
             let replyPreviewHtml = '';
@@ -4945,7 +5029,13 @@
                         ${replyPreviewHtml}
                         ${mediaContent}
 
-                        ${msgText ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${msgText}<span class="inline-block w-[99px] h-[1px]"></span></div>` : ''}
+                        ${msgText ? (() => {
+                            const callLink = window.parseCallLink(data.text || msgText);
+                            if (callLink) {
+                                return window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
+                            }
+                            return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${msgText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
+                        })() : ''}
 
                         <div class="flex items-center justify-end gap-1 absolute bottom-0.5 right-2 bg-transparent">
                             <span id="star_icon_${key}" class="hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>

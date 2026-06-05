@@ -27,7 +27,7 @@
 
         <!-- Action Buttons -->
         <div class="flex justify-center gap-2 px-4 mb-6">
-            <button
+            <button onclick="window.toggleSearchPanel(); window.closeContactInfo()"
                 class="flex-1 max-w-[100px] h-[72px] rounded-xl border border-[#313d45] hover:bg-[#202c33] flex flex-col items-center justify-center gap-2 transition-all group">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
                     class="text-[#00a884] group-hover:scale-110 transition-transform">
@@ -37,7 +37,7 @@
                 </svg>
                 <span class="text-[#e9edef] text-xs">Search</span>
             </button>
-            <button
+            <button onclick="window.startVideoCall(); window.closeContactInfo()"
                 class="flex-1 max-w-[100px] h-[72px] rounded-xl border border-[#313d45] hover:bg-[#202c33] flex flex-col items-center justify-center gap-2 transition-all group">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
                     class="text-[#00a884] group-hover:scale-110 transition-transform">
@@ -47,7 +47,7 @@
                 </svg>
                 <span class="text-[#e9edef] text-xs">Video</span>
             </button>
-            <button
+            <button onclick="window.startVoiceCall(); window.closeContactInfo()"
                 class="flex-1 max-w-[100px] h-[72px] rounded-xl border border-[#313d45] hover:bg-[#202c33] flex flex-col items-center justify-center gap-2 transition-all group">
                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
                     class="text-[#00a884] group-hover:scale-110 transition-transform">

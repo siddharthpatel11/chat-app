@@ -63,6 +63,8 @@ class ChatApiController extends Controller
             $type = $request->type;
             $lat = $request->lat;
             $lng = $request->lng;
+        } elseif ($request->type === 'scheduled_call') {
+            $type = 'scheduled_call';
         }
 
         // Check if blocked
@@ -99,6 +101,16 @@ class ChatApiController extends Controller
             'status' => 'sent',
         ];
 
+        if ($type === 'scheduled_call') {
+            $data['call_name'] = $request->call_name;
+            $data['description'] = $request->description;
+            $data['start_time'] = (int)$request->start_time;
+            $data['end_time'] = $request->has('end_time') && $request->end_time ? (int)$request->end_time : null;
+            $data['call_type'] = $request->call_type;
+            $data['require_approval'] = filter_var($request->require_approval, FILTER_VALIDATE_BOOLEAN);
+            $data['group_call_id'] = $request->group_call_id;
+        }
+
         // Push to Realtime Database
         $this->db->getReference("chats/$chatId/messages")->push($data);
 
@@ -129,6 +141,9 @@ class ChatApiController extends Controller
         }
         if ($type == 'live_location') {
             $notifyText = '🔴 Live location';
+        }
+        if ($type == 'scheduled_call') {
+            $notifyText = '📅 Scheduled call: ' . ($request->call_name ?? 'Call');
         }
 
         // Send FCM Notification to all other users in system with a token

@@ -12,8 +12,26 @@
         background: linear-gradient(to left, #2a3942 50%, transparent 100%) !important;
     }
 
+    .user-chat-item.active:hover .options-btn-gradient {
+        background: linear-gradient(to left, #374248 50%, transparent 100%) !important;
+    }
+
     .user-chat-item.active {
         background-color: #2a3942 !important;
+    }
+
+    .user-chat-item.active:hover {
+        background-color: #374248 !important;
+    }
+
+    /* Hide divider borders on hover and active state with smooth transition */
+    .user-chat-item > div.flex-1 {
+        transition: border-color 0.15s ease-in-out;
+    }
+
+    .user-chat-item:hover > div.flex-1,
+    .user-chat-item.active > div.flex-1 {
+        border-color: transparent !important;
     }
 
     /* Hover triggers for the mute submenu */

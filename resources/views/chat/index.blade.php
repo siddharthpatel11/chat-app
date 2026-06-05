@@ -20,7 +20,8 @@
             
             html.light-theme img,
             html.light-theme video,
-            html.light-theme canvas {
+            html.light-theme canvas,
+            html.light-theme iframe {
                 filter: invert(1) hue-rotate(180deg);
             }
             
@@ -705,7 +706,7 @@
                     </div>
 
                     <div id="active_chat_content" class="hidden flex-col flex-1 h-full overflow-hidden">
-                        <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-10 relative">
+                        <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-[45] relative">
                             <!-- Normal Header -->
                             <div id="normal_header"
                                 class="flex items-center justify-between h-full w-full transition-all duration-300">
@@ -764,7 +765,7 @@
 
                                         <!-- Call Dropdown -->
                                         <div id="call_dropdown" style="display: none;"
-                                            class="hidden absolute top-14 right-0 w-[350px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
+                                            class="hidden absolute top-full mt-2 right-0 w-[350px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
                                             <style>
                                                 #call_dropdown.show {
                                                     transform: scale(1);
@@ -813,7 +814,7 @@
 
                                             <!-- Menu List Options -->
                                             <div class="flex flex-col py-1">
-                                                <button
+                                                <button onclick="window.openNewGroupCallModal()"
                                                     class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
                                                     <div
                                                         class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
@@ -826,7 +827,7 @@
                                                     </div>
                                                     <span class="text-[16px]">New group call</span>
                                                 </button>
-                                                <button
+                                                <button onclick="window.openNewCallLinkModal()"
                                                     class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
                                                     <div
                                                         class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
@@ -839,7 +840,7 @@
                                                     </div>
                                                     <span class="text-[16px]">Send call link</span>
                                                 </button>
-                                                <button
+                                                <button onclick="window.openScheduleCallModal()"
                                                     class="flex items-center gap-5 px-6 py-3.5 hover:bg-[#202c33] text-[#e9edef] transition-colors group/opt text-left">
                                                     <div
                                                         class="w-6 h-6 flex items-center justify-center text-[#8696a0] group-hover/opt:text-[#e9edef]">
@@ -1770,7 +1771,49 @@
         initCallDropdown();
         setTimeout(initCallDropdown, 500);
 
-        // --- DYNAMIC CALL NAVIGATION ---
+        // --- CALL LINK PARSING & RENDERING ---
+        window.parseCallLink = function(text) {
+            if (!text) return null;
+            const regex = /(https?:\/\/[^\s]+)?\/chat\/groups\/(video|voice)-call\?group_call_id=([a-zA-Z0-9_-]+)/;
+            const match = text.match(regex);
+            if (!match) return null;
+            let fullUrl = match[0];
+            if (!fullUrl.startsWith('http')) {
+                fullUrl = window.location.origin + fullUrl;
+            }
+            return {
+                url: fullUrl,
+                type: match[2],
+                id: match[3]
+            };
+        };
+
+        window.renderCallLinkHTML = function(url, type, isMe) {
+            const isVideo = type === 'video';
+            const iconSvg = isVideo 
+                ? `<svg class="w-5 h-5 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`
+                : `<svg class="w-5 h-5 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>`;
+            const typeLabel = isVideo ? 'Video' : 'Voice';
+            
+            return `
+            <div class="flex flex-col gap-2.5 p-1.5 w-[260px] select-text">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-[#00a884]/20 flex items-center justify-center shrink-0">
+                        ${iconSvg}
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-[#e9edef] font-semibold text-[14.5px]">Call link</span>
+                        <span class="text-[12px] text-[#8696a0] truncate">Click to join this ${typeLabel.toLowerCase()} call</span>
+                    </div>
+                </div>
+                <div class="h-px bg-white/10 my-1"></div>
+                <a href="${url}" target="_blank" onclick="event.stopPropagation();" class="w-full py-2 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] rounded-lg text-center font-bold text-sm block transition-all active:scale-[0.98] select-none">
+                    Join call
+                </a>
+            </div>
+            `;
+        };
+
         // --- DYNAMIC CALL NAVIGATION ---
         window.startVoiceCall = function(userId, name, avatar) {
             let uId = userId,
@@ -2354,6 +2397,7 @@
 
             document.getElementById('msg').focus();
         }
+        window.emitMessage = emitMessage;
 
         // Triggered by normal chat bar
         function send() {
@@ -2635,16 +2679,25 @@
                     const safeAvatar = window.getUserAvatar ? window.getUserAvatar(userId) : avatar;
                     chatsList.insertAdjacentHTML('beforeend', `
                         <div onclick="window.selectChat(${userId}, '${name.replace(/'/g, "\\'")}', '${phone.replace(/'/g, "\\'")}', '${safeAvatar}', '${about.replace(/'/g, "\\'")}')"
-                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors relative group user-chat-item" data-userid="${userId}">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                                 <img src="${safeAvatar}" class="w-full h-full object-cover">
                             </div>
-                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                                 <div class="flex justify-between items-center">
                                     <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${highlightedName}</h4>
                                     <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${lastTime}</span>
                                 </div>
                                 <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${previewMsg}</p>
+                            </div>
+                            <!-- Dropdown Trigger Button with Gradient Overlay -->
+                            <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                                <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, ${userId}, '${name.replace(/'/g, "\\'")}', 'user')"
+                                    class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                                    <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                                        <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     `);
@@ -2705,16 +2758,25 @@
                     const safeAvatar = window.getUserAvatar ? window.getUserAvatar(r.userId) : r.avatar;
                     msgsList.insertAdjacentHTML('beforeend', `
                         <div onclick="window.selectChat(${r.userId}, '${r.name.replace(/'/g, "\\'")}', '${r.phone.replace(/'/g, "\\'")}', '${safeAvatar}', '${r.about.replace(/'/g, "\\'")}', ${r.time || 0})"
-                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors">
+                            class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors relative group user-chat-item" data-userid="${r.userId}">
                             <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                                 <img src="${safeAvatar}" class="w-full h-full object-cover">
                             </div>
-                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
+                            <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                                 <div class="flex justify-between items-center">
                                     <h4 class="text-[16px] text-[#e9edef] truncate mr-2 font-normal">${r.name}</h4>
                                     <span class="text-[12px] text-[#8696a0] whitespace-nowrap">${timeStr}</span>
                                 </div>
                                 <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug">${prefix}${highlightedMsg}</p>
+                            </div>
+                            <!-- Dropdown Trigger Button with Gradient Overlay -->
+                            <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                                <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, ${r.userId}, '${r.name.replace(/'/g, "\\'")}', 'user')"
+                                    class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                                    <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                                        <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </div>
                     `);
@@ -4034,13 +4096,39 @@
         };
 
         window.toggleNewChat = function() {
-            document.getElementById('new_chat_panel')?.classList.toggle('hidden');
-            document.getElementById('user_sidebar_container')?.classList.toggle('hidden');
+            const sidebar = document.getElementById('user_sidebar_container');
+            const newChatPanel = document.getElementById('new_chat_panel');
+            if (!sidebar || !newChatPanel) return;
+
+            if (newChatPanel.classList.contains('hidden')) {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('sm:flex');
+                newChatPanel.classList.remove('hidden');
+                newChatPanel.classList.add('sm:flex');
+            } else {
+                newChatPanel.classList.add('hidden');
+                newChatPanel.classList.remove('sm:flex');
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('sm:flex');
+            }
         };
 
         window.toggleEditProfile = function() {
-            document.getElementById('edit_profile_panel')?.classList.toggle('hidden');
-            document.getElementById('settings_panel')?.classList.toggle('hidden');
+            const editPanel = document.getElementById('edit_profile_panel');
+            const settingsPanel = document.getElementById('settings_panel');
+            if (!editPanel || !settingsPanel) return;
+
+            if (editPanel.classList.contains('hidden')) {
+                settingsPanel.classList.add('hidden');
+                settingsPanel.classList.remove('flex');
+                editPanel.classList.remove('hidden');
+                editPanel.classList.add('flex');
+            } else {
+                editPanel.classList.add('hidden');
+                editPanel.classList.remove('flex');
+                settingsPanel.classList.remove('hidden');
+                settingsPanel.classList.add('flex');
+            }
         };
 
         window.toggleAboutModal = function() {
@@ -4052,18 +4140,67 @@
         };
 
         window.toggleAddGroupMembers = function() {
-            document.getElementById('add_group_members_panel')?.classList.toggle('hidden');
-            document.getElementById('new_chat_panel')?.classList.add('hidden');
+            // If the local function toggleAddMembers from add_group_members.blade.php exists, use it
+            if (typeof toggleAddMembers === 'function') {
+                toggleAddMembers();
+            } else {
+                const addMembersPanel = document.getElementById('add_group_members_panel');
+                const newChatPanel = document.getElementById('new_chat_panel');
+                if (addMembersPanel && newChatPanel) {
+                    if (addMembersPanel.classList.contains('hidden')) {
+                        newChatPanel.classList.add('hidden');
+                        newChatPanel.classList.remove('sm:flex');
+                        addMembersPanel.classList.remove('hidden');
+                        addMembersPanel.classList.add('flex');
+                    } else {
+                        addMembersPanel.classList.add('hidden');
+                        addMembersPanel.classList.remove('flex');
+                        newChatPanel.classList.remove('hidden');
+                        newChatPanel.classList.add('sm:flex');
+                    }
+                }
+            }
         };
 
         window.toggleCreateGroup = function() {
-            document.getElementById('create_group_panel')?.classList.toggle('hidden');
-            document.getElementById('add_group_members_panel')?.classList.add('hidden');
+            const createGroupPanel = document.getElementById('create_group_panel');
+            const addMembersPanel = document.getElementById('add_group_members_panel');
+            if (!createGroupPanel || !addMembersPanel) return;
+
+            if (createGroupPanel.classList.contains('hidden')) {
+                addMembersPanel.classList.add('hidden');
+                addMembersPanel.classList.remove('flex');
+                createGroupPanel.classList.remove('hidden');
+                createGroupPanel.classList.add('flex');
+            } else {
+                createGroupPanel.classList.add('hidden');
+                createGroupPanel.classList.remove('flex');
+                addMembersPanel.classList.remove('hidden');
+                addMembersPanel.classList.add('flex');
+            }
         };
 
         window.toggleNewContact = function() {
-            document.getElementById('new_contact_panel')?.classList.toggle('hidden');
-            document.getElementById('new_chat_panel')?.classList.add('hidden');
+            // If the local function toggleNewContact from new_contact.blade.php exists, use it
+            if (typeof toggleNewContact === 'function') {
+                toggleNewContact();
+            } else {
+                const newContactPanel = document.getElementById('new_contact_panel');
+                const newChatPanel = document.getElementById('new_chat_panel');
+                if (newContactPanel && newChatPanel) {
+                    if (newContactPanel.classList.contains('hidden')) {
+                        newChatPanel.classList.add('hidden');
+                        newChatPanel.classList.remove('sm:flex');
+                        newContactPanel.classList.remove('hidden');
+                        newContactPanel.classList.add('sm:flex');
+                    } else {
+                        newContactPanel.classList.add('hidden');
+                        newContactPanel.classList.remove('sm:flex');
+                        newChatPanel.classList.remove('hidden');
+                        newChatPanel.classList.add('sm:flex');
+                    }
+                }
+            }
         };
 
         window.toggleEditContact = function() {
@@ -4085,9 +4222,52 @@
             document.getElementById('main_chat_column').classList.remove('flex');
         };
 
+        window.closeAllSearchPanels = function() {
+            // 1. Private / Meta AI Search
+            const privateSearch = document.getElementById('search_sidebar');
+            if (privateSearch) {
+                privateSearch.classList.add('hidden');
+            }
+            const searchInput = document.getElementById('search_messages_input');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            const clearBtn = document.getElementById('clear_search_btn');
+            if (clearBtn) {
+                clearBtn.classList.add('hidden');
+            }
+            const resultsList = document.getElementById('search_results_list');
+            if (resultsList) {
+                resultsList.innerHTML = '';
+            }
+            const noResults = document.getElementById('no_results_text');
+            if (noResults) {
+                noResults.classList.remove('hidden');
+            }
+
+            // 2. Group Search
+            const groupSearch = document.getElementById('group_search_drawer');
+            if (groupSearch) {
+                groupSearch.classList.add('hidden');
+                groupSearch.classList.remove('flex');
+            }
+            const groupSearchInput = document.getElementById('group_search_input');
+            if (groupSearchInput) {
+                groupSearchInput.value = '';
+            }
+            const groupSearchResults = document.getElementById('group_search_results');
+            if (groupSearchResults) {
+                groupSearchResults.innerHTML = `<div class="text-[#8696a0] text-center text-sm py-4">Type to search messages in group</div>`;
+            }
+        };
+
         window.closeChat = function() {
             window.activeChatUser = null;
             document.getElementById('chat_empty_state')?.classList.remove('hidden');
+
+            if (typeof window.closeAllSearchPanels === 'function') {
+                window.closeAllSearchPanels();
+            }
 
             // Hide all chat contents
             document.getElementById('active_chat_content')?.classList.add('hidden');
@@ -4107,6 +4287,9 @@
         };
 
         window.selectChat = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
+            if (typeof window.closeAllSearchPanels === 'function') {
+                window.closeAllSearchPanels();
+            }
             // Fetch missing info from DOM
             const sidebarEl = document.getElementById(`user_sidebar_${otherUserId}`);
             if (sidebarEl) {
@@ -4351,7 +4534,7 @@
                     lastDateString = dateHeader;
                     const headerHtml = `
                         <div class="flex justify-center my-3 sticky top-0 z-[5]">
-                            <div class="bg-[#d1d7db]/90 backdrop-blur-sm text-[#54656f] text-[11px] px-3 py-1 rounded-lg shadow-sm font-semibold uppercase tracking-wider">
+                            <div class="bg-[#182229]/90 backdrop-blur-sm text-[#8696a0] text-[11px] px-3 py-1 rounded-lg shadow-sm font-medium uppercase tracking-wider border border-[#202c33]">
                                 ${dateHeader}
                             </div>
                         </div>`;
@@ -4452,6 +4635,44 @@
                         mediaContent +=
                             `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
                     }
+                } else if (data.type === 'scheduled_call') {
+                    const startStr = new Date(data.start_time * 1000).toLocaleString([], {
+                        weekday: 'short',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    const isVideo = data.call_type === 'video';
+                    const approvalParam = data.require_approval ? '&require_approval=true' : '';
+                    const callLink = `${window.location.origin}/chat/groups/${data.call_type}-call?group_call_id=${data.group_call_id}&name=${encodeURIComponent(data.call_name)}${approvalParam}`;
+
+                    mediaContent = `
+                        <div class="mb-2 relative rounded-2xl overflow-hidden border border-white/5 bg-[#1f2c34] w-[270px] max-w-[100%] shadow-lg p-4 text-[#e9edef] font-['Inter']">
+                            <div class="flex items-start gap-3">
+                                <div class="w-10 h-10 rounded-full bg-[#202c33] flex items-center justify-center text-[#00a884] shrink-0 border border-white/5">
+                                    ${isVideo ? `
+                                        <svg class="w-5 h-5 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    ` : `
+                                        <svg class="w-5 h-5 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                        </svg>
+                                    `}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-[15px] font-semibold truncate leading-tight">${data.call_name}</div>
+                                    <div class="text-[12px] text-[#8696a0] mt-1">${startStr}</div>
+                                    ${data.description ? `<div class="text-xs text-[#8696a0] mt-2 italic line-clamp-2">${data.description}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="mt-4 flex gap-2 pt-3 border-t border-white/5">
+                                <button onclick="window.open('${callLink}', '_blank')" class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-2 rounded-xl text-center text-sm font-bold transition-all active:scale-[0.98] focus:outline-none">
+                                    Join call
+                                </button>
+                            </div>
+                        </div>`;
                 } else if (data.type === 'call') {
                     const isVoice = data.call_type === 'voice';
                     const isMissed = data.call_status === 'missed' || data.call_status === 'rejected';
@@ -4590,11 +4811,17 @@
                             ${replyBlock}
                             ${mediaContent}
 
-                            ${data.text ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${isSearchMatch ? window.highlightSearchText(data.text) : data.text}<span class="inline-block w-[99px] h-[1px]"></span></div>` : ''}
+                            ${data.text ? (() => {
+                                const callLink = window.parseCallLink(data.text);
+                                if (callLink) {
+                                    return window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
+                                }
+                                return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${isSearchMatch ? window.highlightSearchText(data.text) : data.text}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
+                            })() : ''}
 
                             <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2 bg-transparent">
                                 <span id="star_icon_${key}" class="msg-star-icon hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
-                                <span id="pin_icon_${key}" class="msg-pin-icon hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"></path></svg></span>
+                                <span id="pin_icon_${key}" class="msg-pin-icon hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg></span>
                                 <span class="text-[11px] text-[#8696a0] select-none leading-none">${time}</span>
                                 ${isMe ? `<span id="tick_${key}" class="shrink-0 flex items-center justify-center leading-none">${window.getTickSVG(data.status || 'sent')}</span>` : ''}
                             </div>
@@ -5457,6 +5684,877 @@
             if (lastMsgEl) lastMsgEl.textContent = isTargetGroup ? 'Group chat' : 'Click to chat';
         };
 
+        // --- NEW GROUP CALL MODAL LOGIC ---
+        window.selectedGroupCallUsers = new Set();
+
+        window.openNewGroupCallModal = function() {
+            // Close the call dropdown
+            const callDropdown = document.getElementById('call_dropdown');
+            if (callDropdown) {
+                callDropdown.style.display = 'none';
+                callDropdown.classList.remove('show');
+            }
+
+            // Show the modal
+            const modal = document.getElementById('new_group_call_modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            // Reset selection state
+            window.selectedGroupCallUsers.clear();
+            document.getElementById('group_call_search_input').value = '';
+
+            // Pre-select the current active chat user if available
+            if (window.activeChatUser && window.activeChatUser.id !== 'meta_ai') {
+                window.selectedGroupCallUsers.add(String(window.activeChatUser.id));
+            }
+
+            // Render contacts list and chips
+            window.renderGroupCallContacts();
+            window.renderGroupCallChips();
+        };
+
+        window.closeNewGroupCallModal = function() {
+            const modal = document.getElementById('new_group_call_modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        window.renderGroupCallContacts = function() {
+            const listEl = document.getElementById('group_call_contacts_list');
+            if (!listEl) return;
+
+            const searchQuery = document.getElementById('group_call_search_input').value.toLowerCase().trim();
+            listEl.innerHTML = '';
+
+            if (!window.allContacts || window.allContacts.length === 0) {
+                listEl.innerHTML = `<div class="p-10 text-center text-[#8696a0] text-sm">No contacts available</div>`;
+                return;
+            }
+
+            const filtered = window.allContacts.filter(c => {
+                // Exclude current user & Meta AI
+                if (String(c.id) === String(window.myUserId) || c.id === 'meta_ai') return false;
+                
+                const name = (c.saved_name || c.name || c.phone || '').toLowerCase();
+                const phone = (c.phone || '').toLowerCase();
+                return name.includes(searchQuery) || phone.includes(searchQuery);
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="p-10 text-center text-[#8696a0] text-sm">No matching contacts</div>`;
+                return;
+            }
+
+            filtered.forEach(c => {
+                const isSelected = window.selectedGroupCallUsers.has(String(c.id));
+                const displayName = c.saved_name || c.name || c.phone;
+                const displayAvatar = c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+
+                const itemHtml = `
+                    <div onclick="window.toggleGroupCallUser('${c.id}')"
+                        class="flex items-center gap-4 px-6 py-3 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-gray-800/30">
+                        <!-- Checkbox -->
+                        <div class="relative flex items-center shrink-0">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                                onclick="event.stopPropagation(); window.toggleGroupCallUser('${c.id}')"
+                                class="w-5 h-5 rounded border-[#313d45] bg-transparent text-[#00a884] focus:ring-0 focus:ring-offset-0 cursor-pointer">
+                        </div>
+                        <!-- Avatar -->
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-[#2a3942] shrink-0">
+                            <img src="${displayAvatar}" class="w-full h-full object-cover">
+                        </div>
+                        <!-- Name / Phone -->
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[#e9edef] text-[15px] font-medium truncate">${displayName}</div>
+                            <div class="text-[#8696a0] text-xs truncate">${c.phone || ''}</div>
+                        </div>
+                    </div>`;
+                listEl.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        };
+
+        window.toggleGroupCallUser = function(userId) {
+            const uidStr = String(userId);
+            if (window.selectedGroupCallUsers.has(uidStr)) {
+                window.selectedGroupCallUsers.delete(uidStr);
+            } else {
+                window.selectedGroupCallUsers.add(uidStr);
+            }
+            window.renderGroupCallContacts();
+            window.renderGroupCallChips();
+        };
+
+        window.renderGroupCallChips = function() {
+            const container = document.getElementById('group_call_selected_chips');
+            if (!container) return;
+
+            container.innerHTML = '';
+            
+            if (window.selectedGroupCallUsers.size === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+
+            window.selectedGroupCallUsers.forEach(uid => {
+                const contact = window.allContacts.find(c => String(c.id) === String(uid));
+                if (!contact) return;
+
+                const displayName = contact.saved_name || contact.name || contact.phone;
+                const displayAvatar = contact.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+
+                const chipHtml = `
+                    <div class="flex items-center gap-1.5 bg-[#202c33] pl-1.5 pr-2.5 py-1 rounded-full text-white text-sm shrink-0 border border-white/5">
+                        <img src="${displayAvatar}" class="w-6 h-6 rounded-full object-cover">
+                        <span class="max-w-[80px] truncate text-[#e9edef]">${displayName}</span>
+                        <button onclick="window.toggleGroupCallUser('${uid}')" class="text-[#8696a0] hover:text-white transition-colors focus:outline-none ml-0.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>`;
+                container.insertAdjacentHTML('beforeend', chipHtml);
+            });
+        };
+
+        window.startGroupCallFromModal = function(type) {
+            if (window.selectedGroupCallUsers.size === 0) {
+                alert('Please select at least one contact.');
+                return;
+            }
+
+            const participants = Array.from(window.selectedGroupCallUsers);
+            const callGroupId = 'gc_' + window.myUserId + '_' + Date.now();
+            
+            // Generate query parameters
+            const params = new URLSearchParams({
+                name: 'Group Call',
+                avatar: '',
+                role: 'caller',
+                group_id: callGroupId,
+                participants: participants.join(',')
+            });
+
+            // Redirect to group voice/video call page
+            const callPath = type === 'video' ? '/chat/groups/video-call?' : '/chat/groups/voice-call?';
+            window.location.href = callPath + params.toString();
+        };
+
+        // --- NEW CALL LINK MODAL HANDLERS ---
+        window.currentCallLinkType = 'video';
+        window.currentCallLinkApproval = false;
+        window.currentCallLinkId = '';
+
+        window.openNewCallLinkModal = function() {
+            // Close call dropdowns
+            const callDropdown = document.getElementById('call_dropdown');
+            if (callDropdown) {
+                callDropdown.classList.remove('show');
+                setTimeout(() => {
+                    callDropdown.style.display = 'none';
+                    callDropdown.classList.add('hidden');
+                }, 200);
+            }
+            
+            // Set type to 'video' by default
+            window.currentCallLinkType = 'video';
+            window.currentCallLinkApproval = false;
+            // Generate a random call ID
+            window.currentCallLinkId = 'cl_' + Math.random().toString(36).substr(2, 9);
+            
+            // Initialize target recipient
+            window.shareTargetChatId = window.currentChatId || '';
+            window.shareTargetChatName = window.activeChatName || 'Select Chat';
+            const targetLabel = document.getElementById('call_link_target_name');
+            if (targetLabel) targetLabel.textContent = window.shareTargetChatName;
+
+            // Update UI elements
+            window.updateCallLinkUI();
+            
+            // Show modal
+            document.getElementById('new_call_link_modal').classList.remove('hidden');
+        };
+
+        window.closeNewCallLinkModal = function() {
+            document.getElementById('new_call_link_modal').classList.add('hidden');
+            // Hide dropdown if open
+            document.getElementById('call_link_type_menu').classList.add('hidden');
+        };
+
+        window.toggleCallLinkTypeDropdown = function(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('call_link_type_menu');
+            menu.classList.toggle('hidden');
+        };
+
+        window.setCallLinkType = function(type) {
+            window.currentCallLinkType = type;
+            document.getElementById('call_link_type_menu').classList.add('hidden');
+            window.updateCallLinkUI();
+        };
+
+        window.toggleCallLinkApproval = function() {
+            window.currentCallLinkApproval = !window.currentCallLinkApproval;
+            const toggle = document.getElementById('call_link_approval_toggle');
+            const circle = document.getElementById('call_link_approval_circle');
+            
+            if (window.currentCallLinkApproval) {
+                toggle.classList.remove('bg-[#2f3b43]');
+                toggle.classList.add('bg-[#00a884]');
+                circle.classList.remove('translate-x-0', 'bg-[#8696a0]');
+                circle.classList.add('translate-x-5', 'bg-[#111b21]');
+            } else {
+                toggle.classList.remove('bg-[#00a884]');
+                toggle.classList.add('bg-[#2f3b43]');
+                circle.classList.remove('translate-x-5', 'bg-[#111b21]');
+                circle.classList.add('translate-x-0', 'bg-[#8696a0]');
+            }
+            window.updateCallLinkUI();
+        };
+
+        window.updateCallLinkUI = function() {
+            const type = window.currentCallLinkType;
+            const label = document.getElementById('call_link_type_label');
+            const iconContainer = document.getElementById('call_link_type_icon');
+            
+            const videoCheck = document.getElementById('call_link_type_check_video');
+            const voiceCheck = document.getElementById('call_link_type_check_voice');
+            
+            if (type === 'video') {
+                label.textContent = 'Video';
+                iconContainer.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
+                videoCheck.classList.remove('hidden');
+                voiceCheck.classList.add('hidden');
+            } else {
+                label.textContent = 'Voice';
+                iconContainer.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>`;
+                videoCheck.classList.add('hidden');
+                voiceCheck.classList.remove('hidden');
+            }
+            
+            // Construct Link
+            const approvalParam = window.currentCallLinkApproval ? '&require_approval=true' : '';
+            const link = `${window.location.origin}/chat/groups/${type}-call?group_call_id=${window.currentCallLinkId}&name=${type === 'video' ? 'Video+Call' : 'Voice+Call'}${approvalParam}`;
+            const el = document.getElementById('call_link_input');
+            if (el.tagName === 'INPUT') el.value = link; else el.textContent = link;
+        };
+
+        window.copyCallLink = function() {
+            const el = document.getElementById('call_link_input');
+            const linkText = el.value || el.textContent;
+            navigator.clipboard.writeText(linkText).then(() => {
+                const normalIcon = document.getElementById('copy_icon_normal');
+                const successIcon = document.getElementById('copy_icon_success');
+                normalIcon.classList.add('hidden');
+                successIcon.classList.remove('hidden');
+                
+                // Show a toast
+                if (window.showToast) {
+                    window.showToast('Copied', 'Call link copied to clipboard!');
+                } else {
+                    alert('Call link copied to clipboard!');
+                }
+                
+                setTimeout(() => {
+                    normalIcon.classList.remove('hidden');
+                    successIcon.classList.add('hidden');
+                }, 2000);
+            });
+        };
+
+        window.joinCallFromLink = function() {
+            const el = document.getElementById('call_link_input');
+            window.open(el.value || el.textContent, '_blank');
+        };
+
+        window.sendCallLinkToChat = function() {
+            const el = document.getElementById('call_link_input');
+            const linkText = el.value || el.textContent;
+            const targetChatId = window.shareTargetChatId;
+            
+            if (!targetChatId) {
+                alert('Please select a target chat first.');
+                return;
+            }
+            
+            // Temporarily swap currentChatId to send to the chosen recipient
+            const originalChatId = window.currentChatId;
+            window.currentChatId = targetChatId;
+            
+            if (typeof window.emitMessage === 'function') {
+                window.emitMessage(linkText);
+                window.closeNewCallLinkModal();
+                if (window.showToast) {
+                    window.showToast('Call Link Sent', 'Call link sent successfully!');
+                }
+            } else {
+                alert('Cannot send call link.');
+            }
+            
+            // Restore original active chat
+            window.currentChatId = originalChatId;
+        };
+
+        // Click outside type menu closes it
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('call_link_type_menu');
+            const btn = document.getElementById('call_link_type_btn');
+            if (menu && !menu.classList.contains('hidden') && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // --- SCHEDULE CALL MODAL HANDLERS ---
+        window.currentScheduleCallType = 'video';
+        window.currentScheduleApproval = false;
+        window.isEndTimeRemoved = false;
+
+        window.openScheduleCallModal = function() {
+            // Close dropdowns
+            const callDropdown = document.getElementById('call_dropdown');
+            if (callDropdown) {
+                callDropdown.classList.remove('show');
+                setTimeout(() => {
+                    callDropdown.style.display = 'none';
+                    callDropdown.classList.add('hidden');
+                }, 200);
+            }
+            const groupCallDropdown = document.getElementById('group_call_dropdown');
+            if (groupCallDropdown) {
+                groupCallDropdown.classList.remove('show');
+                setTimeout(() => {
+                    groupCallDropdown.style.display = 'none';
+                    groupCallDropdown.classList.add('hidden');
+                }, 200);
+            }
+
+            // Set default call name
+            const currentUserName = "{{ auth()->user()->name ?? 'User' }}";
+            document.getElementById('schedule_call_name').value = `${currentUserName}'s call`;
+            document.getElementById('schedule_call_desc').value = '';
+
+            // Set default dates & times
+            const now = new Date();
+            
+            // Format YYYY-MM-DD
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const defaultDate = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('schedule_start_date').value = defaultDate;
+            document.getElementById('schedule_end_date').value = defaultDate;
+
+            // Format HH:MM (start call 30 mins from now, rounded to 5 mins)
+            let start = new Date(now.getTime() + 30 * 60 * 1000);
+            let minutes = start.getMinutes();
+            minutes = Math.ceil(minutes / 5) * 5;
+            if (minutes >= 60) {
+                start.setHours(start.getHours() + 1);
+                minutes = 0;
+            }
+            start.setMinutes(minutes);
+            
+            const startHour = String(start.getHours()).padStart(2, '0');
+            const startMin = String(start.getMinutes()).padStart(2, '0');
+            document.getElementById('schedule_start_time').value = `${startHour}:${startMin}`;
+
+            // End call 30 mins after start
+            let end = new Date(start.getTime() + 30 * 60 * 1000);
+            const endHour = String(end.getHours()).padStart(2, '0');
+            const endMin = String(end.getMinutes()).padStart(2, '0');
+            document.getElementById('schedule_end_time').value = `${endHour}:${endMin}`;
+
+            // Reset dropdown & toggle state
+            window.currentScheduleCallType = 'video';
+            window.currentScheduleApproval = false;
+            window.isEndTimeRemoved = false;
+            window.updateScheduleCallTypeUI();
+            
+            // Reset approval UI
+            const toggle = document.getElementById('schedule_approval_toggle');
+            const circle = document.getElementById('schedule_approval_circle');
+            toggle.classList.remove('bg-[#00a884]');
+            toggle.classList.add('bg-[#2f3b43]');
+            circle.classList.remove('translate-x-5', 'bg-[#111b21]');
+            circle.classList.add('translate-x-0', 'bg-[#8696a0]');
+
+            // Reset End Time container & button
+            document.getElementById('schedule_end_datetime_container').classList.remove('hidden');
+            document.getElementById('schedule_toggle_endtime_text').textContent = 'Remove end time';
+            document.getElementById('schedule_toggle_endtime_btn').querySelector('svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>';
+
+            // Hide Emojis trays
+            document.getElementById('schedule_name_emoji_tray').classList.add('hidden');
+            document.getElementById('schedule_desc_emoji_tray').classList.add('hidden');
+
+            // Initialize target recipient
+            window.shareTargetChatId = window.currentChatId || '';
+            window.shareTargetChatName = window.activeChatName || 'Select Chat';
+            const targetLabel = document.getElementById('schedule_target_name');
+            if (targetLabel) targetLabel.textContent = window.shareTargetChatName;
+
+            // Show Modal
+            document.getElementById('schedule_call_modal').classList.remove('hidden');
+        };
+
+        window.closeScheduleCallModal = function() {
+            document.getElementById('schedule_call_modal').classList.add('hidden');
+        };
+
+        window.toggleScheduleEndTime = function() {
+            window.isEndTimeRemoved = !window.isEndTimeRemoved;
+            const container = document.getElementById('schedule_end_datetime_container');
+            const text = document.getElementById('schedule_toggle_endtime_text');
+            const btn = document.getElementById('schedule_toggle_endtime_btn');
+            
+            if (window.isEndTimeRemoved) {
+                container.classList.add('hidden');
+                text.textContent = 'Add end time';
+                btn.querySelector('svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>';
+            } else {
+                container.classList.remove('hidden');
+                text.textContent = 'Remove end time';
+                btn.querySelector('svg').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>';
+            }
+        };
+
+        window.toggleScheduleCallTypeDropdown = function(event) {
+            event.stopPropagation();
+            document.getElementById('schedule_call_type_menu').classList.toggle('hidden');
+        };
+
+        window.setScheduleCallType = function(type) {
+            window.currentScheduleCallType = type;
+            document.getElementById('schedule_call_type_menu').classList.add('hidden');
+            window.updateScheduleCallTypeUI();
+        };
+
+        window.updateScheduleCallTypeUI = function() {
+            const type = window.currentScheduleCallType;
+            const label = document.getElementById('schedule_call_type_label');
+            const icon = document.getElementById('schedule_call_type_icon');
+            
+            if (type === 'video') {
+                label.textContent = 'Video';
+                icon.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>';
+            } else {
+                label.textContent = 'Voice';
+                icon.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>';
+            }
+        };
+
+        window.toggleScheduleApproval = function() {
+            window.currentScheduleApproval = !window.currentScheduleApproval;
+            const toggle = document.getElementById('schedule_approval_toggle');
+            const circle = document.getElementById('schedule_approval_circle');
+            
+            if (window.currentScheduleApproval) {
+                toggle.classList.remove('bg-[#2f3b43]');
+                toggle.classList.add('bg-[#00a884]');
+                circle.classList.remove('translate-x-0', 'bg-[#8696a0]');
+                circle.classList.add('translate-x-5', 'bg-[#111b21]');
+            } else {
+                toggle.classList.remove('bg-[#00a884]');
+                toggle.classList.add('bg-[#2f3b43]');
+                circle.classList.remove('translate-x-5', 'bg-[#111b21]');
+                circle.classList.add('translate-x-0', 'bg-[#8696a0]');
+            }
+        };
+
+        window.toggleScheduleCallNameEmoji = function() {
+            document.getElementById('schedule_name_emoji_tray').classList.toggle('hidden');
+            document.getElementById('schedule_desc_emoji_tray').classList.add('hidden');
+        };
+
+        window.toggleScheduleCallDescEmoji = function() {
+            document.getElementById('schedule_desc_emoji_tray').classList.toggle('hidden');
+            document.getElementById('schedule_name_emoji_tray').classList.add('hidden');
+        };
+
+        window.insertScheduleNameEmoji = function(emoji) {
+            const input = document.getElementById('schedule_call_name');
+            input.value += emoji;
+            input.focus();
+        };
+
+        window.insertScheduleDescEmoji = function(emoji) {
+            const input = document.getElementById('schedule_call_desc');
+            input.value += emoji;
+            input.focus();
+        };
+
+        window.submitScheduledCall = async function() {
+            const targetChatId = window.shareTargetChatId;
+            if (!targetChatId) {
+                alert('Please select a target chat to send this scheduled call invitation to.');
+                return;
+            }
+
+            const callName = document.getElementById('schedule_call_name').value.trim();
+            const desc = document.getElementById('schedule_call_desc').value.trim();
+            const startDateVal = document.getElementById('schedule_start_date').value;
+            const startTimeVal = document.getElementById('schedule_start_time').value;
+            
+            if (!callName) {
+                alert('Please enter a call name.');
+                return;
+            }
+            if (!startDateVal || !startTimeVal) {
+                alert('Please select start date and time.');
+                return;
+            }
+
+            const startDateTime = new Date(`${startDateVal}T${startTimeVal}`);
+            if (isNaN(startDateTime.getTime())) {
+                alert('Invalid start date or time.');
+                return;
+            }
+
+            let endDateTime = null;
+            if (!window.isEndTimeRemoved) {
+                const endDateVal = document.getElementById('schedule_end_date').value;
+                const endTimeVal = document.getElementById('schedule_end_time').value;
+                if (!endDateVal || !endTimeVal) {
+                    alert('Please select end date and time or click "Remove end time".');
+                    return;
+                }
+                endDateTime = new Date(`${endDateVal}T${endTimeVal}`);
+                if (isNaN(endDateTime.getTime())) {
+                    alert('Invalid end date or time.');
+                    return;
+                }
+                if (endDateTime <= startDateTime) {
+                    alert('End date/time must be after start date/time.');
+                    return;
+                }
+            }
+
+            // Constraints check: not more than 1 year in future
+            const oneYearLater = new Date();
+            oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+            if (startDateTime > oneYearLater) {
+                alert('Call cannot be scheduled more than one year in the future.');
+                return;
+            }
+
+            // Generate unique group call id
+            const callId = 'sc_' + Math.random().toString(36).substr(2, 9);
+            const startTimestamp = Math.floor(startDateTime.getTime() / 1000);
+            const endTimestamp = endDateTime ? Math.floor(endDateTime.getTime() / 1000) : null;
+
+            // Prepare message data
+            const msgData = {
+                type: 'scheduled_call',
+                sender_id: window.myUserId,
+                time: Math.floor(Date.now() / 1000),
+                status: 'sent',
+                call_name: callName,
+                description: desc,
+                start_time: startTimestamp,
+                end_time: endTimestamp,
+                call_type: window.currentScheduleCallType,
+                require_approval: window.currentScheduleApproval,
+                group_call_id: callId
+            };
+
+            // Send via POST request to Laravel backend which routes to chats or groups accordingly
+            const fd = new FormData();
+            fd.append('chat_id', targetChatId);
+            fd.append('type', 'scheduled_call');
+            fd.append('call_name', callName);
+            fd.append('description', desc);
+            fd.append('start_time', startTimestamp);
+            if (endTimestamp) fd.append('end_time', endTimestamp);
+            fd.append('call_type', window.currentScheduleCallType);
+            fd.append('require_approval', window.currentScheduleApproval);
+            fd.append('group_call_id', callId);
+
+            // Close modal and show toast immediately for a responsive, optimistic UI experience
+            window.closeScheduleCallModal();
+            if (window.showToast) window.showToast('Call Scheduled', 'Scheduled call posted successfully!');
+
+            try {
+                fetch('/send', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': window.csrf || document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: fd
+                }).then(async res => {
+                    const resData = await res.json();
+                    if (!resData.status) {
+                        console.error('Failed to schedule call:', resData);
+                    }
+                }).catch(e => {
+                    console.error('Schedule Call Error:', e);
+                });
+            } catch (e) {
+                console.error('Schedule Call Error:', e);
+            }
+        };
+
+        // Close dropdown menus when clicking outside
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('schedule_call_type_menu');
+            const btn = document.getElementById('schedule_call_type_btn');
+            if (menu && !menu.classList.contains('hidden') && btn && !btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        // --- DIALER MODAL HANDLERS ---
+        window.openDialerModal = function() {
+            // Close call dropdowns if open
+            const callDropdown = document.getElementById('call_dropdown');
+            if (callDropdown) {
+                callDropdown.style.display = 'none';
+                callDropdown.classList.remove('show');
+            }
+            const groupCallDropdown = document.getElementById('group_call_dropdown');
+            if (groupCallDropdown) {
+                groupCallDropdown.style.display = 'none';
+                groupCallDropdown.classList.remove('show');
+            }
+
+            // Reset dialer input
+            const input = document.getElementById('dialer_number_input');
+            if (input) {
+                input.value = '';
+            }
+
+            // Show dialer modal
+            const modal = document.getElementById('dialer_modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        };
+
+        window.closeDialerModal = function() {
+            const modal = document.getElementById('dialer_modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+        };
+
+        window.pressDialKey = function(key) {
+            const input = document.getElementById('dialer_number_input');
+            if (!input) return;
+
+            let val = input.value;
+            if (key === 'backspace') {
+                input.value = val.slice(0, -1);
+            } else {
+                // Limit phone number input to a reasonable length
+                if (val.length < 20) {
+                    input.value = val + key;
+                }
+            }
+        };
+
+        window.submitDialerCall = async function(callType) {
+            const input = document.getElementById('dialer_number_input');
+            if (!input) return;
+
+            const phone = input.value.trim();
+            if (!phone) {
+                if (window.showToast) {
+                    window.showToast('Call Error', 'Please enter a phone number to call.');
+                } else {
+                    alert('Please enter a phone number to call.');
+                }
+                return;
+            }
+
+            if (window.showToast) {
+                window.showToast('Checking number', 'Checking if number is on WhatsApp...');
+            }
+
+            try {
+                const response = await fetch('/api/check-phone', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': window.csrf || document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    },
+                    body: JSON.stringify({ phone: phone })
+                });
+
+                const data = await response.json();
+                if (data.status && data.user) {
+                    // Number is valid and user exists
+                    window.closeDialerModal();
+                    const targetUser = data.user;
+                    if (callType === 'video') {
+                        window.startVideoCall(targetUser.id, targetUser.name, targetUser.avatar);
+                    } else {
+                        window.startVoiceCall(targetUser.id, targetUser.name, targetUser.avatar);
+                    }
+                } else {
+                    // Number not on WhatsApp
+                    if (window.showToast) {
+                        window.showToast('Call Failed', data.message || 'This phone number is not on WhatsApp.');
+                    } else {
+                        alert(data.message || 'This phone number is not on WhatsApp.');
+                    }
+                }
+            } catch (error) {
+                console.error('Dialer verification error:', error);
+                if (window.showToast) {
+                    window.showToast('Network Error', 'Could not verify the phone number.');
+                } else {
+                    alert('Could not verify the phone number.');
+                }
+            }
+        };
+
+        // --- SHARE SELECTOR HANDLERS ---
+        window.shareSelectorMode = null; // 'call_link' or 'schedule'
+        window.shareTargetChatId = '';
+        window.shareTargetChatName = '';
+
+        window.openShareSelector = function(mode) {
+            window.shareSelectorMode = mode;
+            
+            // Show modal
+            const modal = document.getElementById('share_selector_modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            // Clear search
+            const search = document.getElementById('share_search_input');
+            if (search) search.value = '';
+
+            // Render list
+            window.renderShareSelectorList();
+        };
+
+        window.closeShareSelector = function() {
+            const modal = document.getElementById('share_selector_modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        window.renderShareSelectorList = function() {
+            const listEl = document.getElementById('share_chats_list');
+            if (!listEl) return;
+
+            listEl.innerHTML = '';
+            const q = (document.getElementById('share_search_input')?.value || '').toLowerCase().trim();
+
+            let items = [];
+            
+            // 1. Add all contacts from window.allContacts
+            if (window.allContacts) {
+                window.allContacts.forEach(c => {
+                    if (String(c.id) === String(window.myUserId) || c.id === 'meta_ai') return;
+                    
+                    const minId = Math.min(window.myUserId, c.id);
+                    const maxId = Math.max(window.myUserId, c.id);
+                    const chatId = `chat_${minId}_${maxId}`;
+                    
+                    items.push({
+                        id: chatId,
+                        name: c.saved_name || c.name || c.phone,
+                        avatar: c.avatar || '',
+                        phone: c.phone || ''
+                    });
+                });
+            }
+
+            // 2. Add all groups from sidebar
+            const groupNodes = document.querySelectorAll('#user_list_container [id^="group_sidebar_"]');
+            groupNodes.forEach(node => {
+                const groupId = node.id.replace('group_sidebar_', '');
+                const groupName = node.getAttribute('data-name') || node.querySelector('h4')?.textContent?.trim() || 'Group';
+                const groupAvatar = node.getAttribute('data-avatar') || node.querySelector('img')?.src || '';
+                
+                items.push({
+                    id: 'group_' + groupId,
+                    name: groupName,
+                    avatar: groupAvatar,
+                    phone: 'Group Chat'
+                });
+            });
+
+            // Filter items based on search query
+            const filtered = items.filter(item => {
+                return item.name.toLowerCase().includes(q) || item.phone.toLowerCase().includes(q);
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="p-10 text-center text-[#8696a0] text-sm">No matching chats found</div>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const displayName = item.name;
+                const displayAvatar = item.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+                
+                const itemHtml = `
+                    <div onclick="window.selectShareTarget('${item.id}', '${displayName.replace(/'/g, "\\'")}')"
+                        class="flex items-center gap-4 px-6 py-3 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-gray-800/30">
+                        <div class="w-10 h-10 rounded-full overflow-hidden bg-[#2a3942] shrink-0">
+                            <img src="${displayAvatar}" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-[#e9edef] text-[15px] font-medium truncate">${displayName}</div>
+                            <div class="text-[#8696a0] text-xs truncate">${item.phone || ''}</div>
+                        </div>
+                    </div>`;
+                listEl.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        };
+
+        window.selectShareTarget = function(chatId, chatName) {
+            window.shareTargetChatId = chatId;
+            window.shareTargetChatName = chatName;
+
+            // Update UI elements in active modals
+            if (window.shareSelectorMode === 'call_link') {
+                const targetLabel = document.getElementById('call_link_target_name');
+                if (targetLabel) targetLabel.textContent = chatName;
+            } else if (window.shareSelectorMode === 'schedule') {
+                const targetLabel = document.getElementById('schedule_target_name');
+                if (targetLabel) targetLabel.textContent = chatName;
+            }
+
+            window.closeShareSelector();
+        };
+
+        // Keyboard support for dialer modal
+        document.addEventListener('keydown', function(e) {
+            const dialerModal = document.getElementById('dialer_modal');
+            if (!dialerModal || dialerModal.classList.contains('hidden')) {
+                return; // Dialer is not open
+            }
+
+            const allowedKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '#', '+'];
+            if (allowedKeys.includes(e.key)) {
+                e.preventDefault();
+                window.pressDialKey(e.key);
+            } else if (e.key === 'Backspace') {
+                e.preventDefault();
+                window.pressDialKey('backspace');
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                window.closeDialerModal();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                window.submitDialerCall('voice'); // default to voice call on Enter key
+            }
+        });
+
         window.loadStarredMessages();
     </script>
 
@@ -5466,4 +6564,526 @@
 
     @include('chat.app_lock')
     @include('chat.add_to_list_modal')
+
+    <!-- New Group Call Modal -->
+    <div id="new_group_call_modal"
+        class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-[420px] bg-[#111b21] rounded-2xl flex flex-col h-[600px] border border-white/5 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <!-- Header -->
+            <div class="flex items-center gap-6 px-6 py-4 bg-[#202c33] border-b border-white/5 shrink-0">
+                <button onclick="window.closeNewGroupCallModal()" class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <h3 class="text-[#e9edef] text-[19px] font-semibold">New group call</h3>
+            </div>
+
+            <!-- Search Area -->
+            <div class="p-3 bg-[#111b21] border-b border-white/5 shrink-0">
+                <div class="bg-[#202c33] flex items-center gap-3 px-4 py-2 rounded-lg border border-transparent focus-within:border-[#00a884] transition-all">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" id="group_call_search_input" oninput="window.renderGroupCallContacts()"
+                        placeholder="Search name or number"
+                        class="bg-transparent border-none text-[#e9edef] text-sm focus:ring-0 placeholder-[#8696a0] p-0 w-full outline-none">
+                </div>
+            </div>
+
+            <!-- Selected Chips Area -->
+            <div id="group_call_selected_chips"
+                class="hidden flex items-center gap-2 px-6 py-3 bg-[#111b21] border-b border-white/5 overflow-x-auto custom-scrollbar shrink-0">
+                <!-- Selected user chips will be populated here -->
+            </div>
+
+            <!-- Contacts List -->
+            <div id="group_call_contacts_list" class="flex-1 overflow-y-auto custom-scrollbar">
+                <!-- Contacts will be populated here -->
+            </div>
+
+            <!-- Bottom Floating Action Bar -->
+            <div class="p-4 bg-[#202c33] border-t border-white/5 shrink-0 flex gap-3 justify-end">
+                <button onclick="window.startGroupCallFromModal('voice')"
+                    class="bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-sm shrink-0">
+                    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"></path>
+                    </svg>
+                    Voice
+                </button>
+                <button onclick="window.startGroupCallFromModal('video')"
+                    class="bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-sm shrink-0">
+                    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path>
+                    </svg>
+                    Video
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dialer / Call a Number Modal -->
+    <div id="dialer_modal"
+        class="hidden fixed inset-0 z-[160] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-[360px] bg-[#111b21] rounded-3xl flex flex-col border border-white/5 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-['Inter']">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 bg-[#202c33] border-b border-white/5 shrink-0">
+                <h3 class="text-[#e9edef] text-[18px] font-semibold">Call a number</h3>
+                <button onclick="window.closeDialerModal()" class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Number Display -->
+            <div class="p-6 bg-[#111b21] flex flex-col items-center shrink-0">
+                <input type="text" id="dialer_number_input" readonly placeholder="Enter number"
+                    class="bg-transparent border-none text-[#e9edef] text-center text-3xl font-light w-full focus:ring-0 placeholder-[#8696a0] p-0 outline-none select-all tracking-wide">
+            </div>
+
+            <!-- Dialpad Keys Grid -->
+            <div class="px-6 pb-6 bg-[#111b21] flex flex-col items-center">
+                <div class="grid grid-cols-3 gap-x-6 gap-y-4 max-w-[280px] w-full">
+                    <!-- Key buttons -->
+                    <button onclick="window.pressDialKey('1')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>1</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">&nbsp;</span>
+                    </button>
+                    <button onclick="window.pressDialKey('2')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>2</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">abc</span>
+                    </button>
+                    <button onclick="window.pressDialKey('3')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>3</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">def</span>
+                    </button>
+                    <button onclick="window.pressDialKey('4')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>4</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">ghi</span>
+                    </button>
+                    <button onclick="window.pressDialKey('5')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>5</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">jkl</span>
+                    </button>
+                    <button onclick="window.pressDialKey('6')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>6</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">mno</span>
+                    </button>
+                    <button onclick="window.pressDialKey('7')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>7</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">pqrs</span>
+                    </button>
+                    <button onclick="window.pressDialKey('8')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>8</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">tuv</span>
+                    </button>
+                    <button onclick="window.pressDialKey('9')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>9</span>
+                        <span class="text-[9px] text-[#8696a0] uppercase -mt-1 font-semibold">wxyz</span>
+                    </button>
+                    <button onclick="window.pressDialKey('*')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex items-center justify-center transition-all focus:outline-none shadow-sm">
+                        *
+                    </button>
+                    <button onclick="window.pressDialKey('0')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex flex-col items-center justify-center transition-all focus:outline-none shadow-sm">
+                        <span>0</span>
+                        <span class="text-[9px] text-[#808d96] -mt-1 font-semibold">+</span>
+                    </button>
+                    <button onclick="window.pressDialKey('#')" class="w-14 h-14 rounded-full bg-[#202c33] hover:bg-[#2a3942] active:bg-[#3b4a54] text-[#e9edef] text-2xl font-normal flex items-center justify-center transition-all focus:outline-none shadow-sm">
+                        #
+                    </button>
+                </div>
+
+                <!-- Call Actions & Backspace -->
+                <div class="flex items-center justify-between gap-6 w-full max-w-[280px] mt-6 px-2">
+                    <!-- Backspace -->
+                    <button onclick="window.pressDialKey('backspace')" class="w-12 h-12 text-[#8696a0] hover:text-[#e9edef] flex items-center justify-center transition-colors focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414-6.414A2 2 0 0110.828 5H19a2 2 0 012 2v10a2 2 0 01-2 2h-8.172a2 2 0 01-1.414-.586L3 12z"></path>
+                        </svg>
+                    </button>
+
+                    <!-- Green Call Buttons (Voice & Video) -->
+                    <div class="flex gap-4">
+                        <button onclick="window.submitDialerCall('voice')" class="w-14 h-14 rounded-full bg-[#00a884] hover:bg-[#06cf9c] active:scale-95 text-[#111b21] flex items-center justify-center shadow-lg transition-all focus:outline-none">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"></path>
+                            </svg>
+                        </button>
+                        <button onclick="window.submitDialerCall('video')" class="w-14 h-14 rounded-full bg-[#00a884] hover:bg-[#06cf9c] active:scale-95 text-[#111b21] flex items-center justify-center shadow-lg transition-all focus:outline-none">
+                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schedule Call Modal -->
+    <div id="schedule_call_modal"
+        class="hidden fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <style>
+            /* Custom styling for inputs inside schedule call modal */
+            #schedule_call_modal input[type="date"],
+            #schedule_call_modal input[type="time"] {
+                background-color: transparent !important;
+                color: #e9edef !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+                padding-right: 32px !important;
+                width: 100% !important;
+                cursor: pointer;
+                font-family: inherit;
+                -webkit-appearance: none;
+                appearance: none;
+            }
+            
+            /* Remove native date/time indicator icons but keep picker functional */
+            #schedule_call_modal input[type="date"]::-webkit-calendar-picker-indicator,
+            #schedule_call_modal input[type="time"]::-webkit-calendar-picker-indicator {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100%;
+                height: 100%;
+                opacity: 0 !important;
+                cursor: pointer;
+                z-index: 10;
+            }
+            
+            /* Clean textarea styling */
+            #schedule_call_modal textarea {
+                background-color: transparent !important;
+                color: #e9edef !important;
+                border: none !important;
+                outline: none !important;
+                box-shadow: none !important;
+                width: 100% !important;
+                font-family: inherit;
+            }
+        </style>
+        <div class="w-full max-w-[420px] bg-[#111b21] rounded-2xl flex flex-col border border-white/5 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 bg-[#202c33] border-b border-white/5 shrink-0">
+                <div class="flex items-center gap-3">
+                    <button onclick="window.closeScheduleCallModal()" class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    <h3 class="text-[#e9edef] text-[20px] font-bold">Schedule call</h3>
+                </div>
+            </div>
+
+            <!-- Body Content -->
+            <div class="p-6 flex flex-col gap-5 overflow-y-auto max-h-[500px] custom-scrollbar">
+                <!-- Call Name -->
+                <div class="flex flex-col gap-1 w-full relative">
+                    <label class="text-[#8696a0] text-xs font-normal">Call name</label>
+                    <div class="relative w-full flex items-center border-b border-gray-600/30 py-1 focus-within:border-[#00a884] transition-all">
+                        <input type="text" id="schedule_call_name" class="w-full bg-transparent border-none text-[#e9edef] text-[16px] focus:ring-0 p-0 pr-8 placeholder-gray-500 outline-none">
+                        <button type="button" class="absolute right-0 text-[#8696a0] hover:text-white focus:outline-none" onclick="window.toggleScheduleCallNameEmoji()">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </button>
+                    </div>
+                    <!-- Popular Emojis Tray for Call Name -->
+                    <div id="schedule_name_emoji_tray" class="hidden flex items-center gap-1.5 p-2 bg-[#202c33] rounded-lg mt-1 overflow-x-auto">
+                        <span onclick="window.insertScheduleNameEmoji('😊')" class="text-xl cursor-pointer hover:scale-110 transition-transform">😊</span>
+                        <span onclick="window.insertScheduleNameEmoji('😂')" class="text-xl cursor-pointer hover:scale-110 transition-transform">😂</span>
+                        <span onclick="window.insertScheduleNameEmoji('😍')" class="text-xl cursor-pointer hover:scale-110 transition-transform">😍</span>
+                        <span onclick="window.insertScheduleNameEmoji('👍')" class="text-xl cursor-pointer hover:scale-110 transition-transform">👍</span>
+                        <span onclick="window.insertScheduleNameEmoji('❤️')" class="text-xl cursor-pointer hover:scale-110 transition-transform">❤️</span>
+                        <span onclick="window.insertScheduleNameEmoji('🙌')" class="text-xl cursor-pointer hover:scale-110 transition-transform">🙌</span>
+                        <span onclick="window.insertScheduleNameEmoji('😭')" class="text-xl cursor-pointer hover:scale-110 transition-transform">😭</span>
+                        <span onclick="window.insertScheduleNameEmoji('🎉')" class="text-xl cursor-pointer hover:scale-110 transition-transform">🎉</span>
+                        <span onclick="window.insertScheduleNameEmoji('🙏')" class="text-xl cursor-pointer hover:scale-110 transition-transform">🙏</span>
+                        <span onclick="window.insertScheduleNameEmoji('🔥')" class="text-xl cursor-pointer hover:scale-110 transition-transform">🔥</span>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="flex flex-col gap-1 w-full relative">
+                    <label class="text-[#8696a0] text-xs font-normal">Description (optional)</label>
+                    <div class="relative w-full flex items-center border border-gray-600/30 rounded-lg p-2.5 bg-[#202c33]/30 focus-within:border-[#00a884] transition-all">
+                        <textarea id="schedule_call_desc" rows="2" class="w-full bg-transparent border-none text-[#e9edef] text-[15px] focus:ring-0 p-0 pr-8 placeholder-gray-500 outline-none resize-none" placeholder="Description (optional)"></textarea>
+                        <button type="button" class="absolute top-2.5 right-2.5 text-[#8696a0] hover:text-white focus:outline-none" onclick="window.toggleScheduleCallDescEmoji()">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </button>
+                    </div>
+                    <!-- Popular Emojis Tray for Description -->
+                    <div id="schedule_desc_emoji_tray" class="hidden flex items-center gap-1.5 p-2 bg-[#202c33] rounded-lg mt-1 overflow-x-auto">
+                        <span onclick="window.insertScheduleDescEmoji('😊')" class="text-xl cursor-pointer hover:scale-110 transition-transform">😊</span>
+                        <span onclick="window.insertScheduleDescEmoji('😂')" class="text-xl cursor-pointer hover:scale-110 transition-transform">😂</span>
+                        <span onclick="window.insertScheduleDescEmoji('😍')" class="text-xl cursor-pointer hover:scale-110 transition-transform">😍</span>
+                        <span onclick="window.insertScheduleDescEmoji('👍')" class="text-xl cursor-pointer hover:scale-110 transition-transform">👍</span>
+                        <span onclick="window.insertScheduleDescEmoji('❤️')" class="text-xl cursor-pointer hover:scale-110 transition-transform">❤️</span>
+                        <span onclick="window.insertScheduleDescEmoji('🙌')" class="text-xl cursor-pointer hover:scale-110 transition-transform">🙌</span>
+                        <span onclick="window.insertScheduleDescEmoji('😭')" class="text-xl cursor-pointer hover:scale-110 transition-transform">😭</span>
+                        <span onclick="window.insertScheduleDescEmoji('🎉')" class="text-xl cursor-pointer hover:scale-110 transition-transform">🎉</span>
+                        <span onclick="window.insertScheduleDescEmoji('🙏')" class="text-xl cursor-pointer hover:scale-110 transition-transform">🙏</span>
+                        <span onclick="window.insertScheduleDescEmoji('🔥')" class="text-xl cursor-pointer hover:scale-110 transition-transform">🔥</span>
+                    </div>
+                </div>
+
+                <!-- Start Date and Time -->
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-[#8696a0] text-xs font-normal">Start date and time</label>
+                    <div class="flex gap-4">
+                        <div class="flex-1 border-b border-gray-600/30 py-1 flex items-center justify-between focus-within:border-[#00a884] transition-all relative">
+                            <input type="date" id="schedule_start_date" class="w-full bg-transparent border-none text-[#e9edef] text-[15px] focus:ring-0 p-0 outline-none">
+                            <svg class="w-5 h-5 text-[#8696a0] absolute right-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1 border-b border-gray-600/30 py-1 flex items-center justify-between focus-within:border-[#00a884] transition-all relative">
+                            <input type="time" id="schedule_start_time" class="w-full bg-transparent border-none text-[#e9edef] text-[15px] focus:ring-0 p-0 outline-none">
+                            <svg class="w-5 h-5 text-[#8696a0] absolute right-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- End Date and Time -->
+                <div id="schedule_end_datetime_container" class="flex flex-col gap-1.5">
+                    <label class="text-[#8696a0] text-xs font-normal">End date and time</label>
+                    <div class="flex gap-4">
+                        <div class="flex-1 border-b border-gray-600/30 py-1 flex items-center justify-between focus-within:border-[#00a884] transition-all relative">
+                            <input type="date" id="schedule_end_date" class="w-full bg-transparent border-none text-[#e9edef] text-[15px] focus:ring-0 p-0 outline-none">
+                            <svg class="w-5 h-5 text-[#8696a0] absolute right-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1 border-b border-gray-600/30 py-1 flex items-center justify-between focus-within:border-[#00a884] transition-all relative">
+                            <input type="time" id="schedule_end_time" class="w-full bg-transparent border-none text-[#e9edef] text-[15px] focus:ring-0 p-0 outline-none">
+                            <svg class="w-5 h-5 text-[#8696a0] absolute right-0 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toggle End Time Button -->
+                <button type="button" id="schedule_toggle_endtime_btn" onclick="window.toggleScheduleEndTime()" class="text-[#00a884] hover:text-[#06cf9c] text-sm font-medium flex items-center gap-1.5 focus:outline-none self-start mt-1 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <span id="schedule_toggle_endtime_text">Remove end time</span>
+                </button>
+
+                <p class="text-[#8696a0] text-xs leading-normal">
+                    Events with call links can't be more than one year in the future
+                </p>
+
+                <!-- Call Type -->
+                <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                    <span class="text-[#e9edef] text-[15px] font-normal">Call type</span>
+                    <div class="relative">
+                        <button type="button" id="schedule_call_type_btn" onclick="window.toggleScheduleCallTypeDropdown(event)" class="flex items-center gap-2 bg-[#202c33] hover:bg-[#2a3942] text-[#00a884] px-4 py-2.5 rounded-full border border-white/5 transition-all text-sm font-semibold focus:outline-none">
+                            <span id="schedule_call_type_icon">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </span>
+                            <span id="schedule_call_type_label">Video</span>
+                            <svg class="w-3.5 h-3.5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+
+                        <div id="schedule_call_type_menu" class="hidden absolute right-0 bottom-full mb-1.5 w-[140px] bg-[#233138] border border-white/5 rounded-xl shadow-2xl z-[200] py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                            <button type="button" onclick="window.setScheduleCallType('video')" class="w-full flex items-center justify-between px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                    <span>Video</span>
+                                </div>
+                            </button>
+                            <button type="button" onclick="window.setScheduleCallType('voice')" class="w-full flex items-center justify-between px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+                                    <span>Voice</span>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Send invitation to -->
+                <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                    <span class="text-[#e9edef] text-[15px] font-normal">Send invitation to</span>
+                    <button type="button" onclick="window.openShareSelector('schedule')" class="flex items-center gap-1.5 bg-[#202c33] hover:bg-[#2a3942] text-[#00a884] px-4 py-2.5 rounded-lg border border-white/5 transition-all text-sm font-semibold focus:outline-none">
+                        <span id="schedule_target_name">Select Chat</span>
+                        <svg class="w-3.5 h-3.5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Require approval to join -->
+                <div class="flex items-center justify-between border-t border-white/5 pt-4">
+                    <span class="text-[#e9edef] text-[15px] font-normal">Require approval to join</span>
+                    <button type="button" onclick="window.toggleScheduleApproval()" id="schedule_approval_toggle" 
+                        class="w-10 h-5 flex items-center rounded-full p-0.5 transition-all duration-200 bg-[#2f3b43] focus:outline-none">
+                        <div class="bg-[#8696a0] w-4 h-4 rounded-full transform transition-transform duration-200 translate-x-0" id="schedule_approval_circle"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer actions -->
+            <div class="px-6 py-4 bg-[#202c33] border-t border-white/5 flex items-center justify-end shrink-0">
+                <button type="button" onclick="window.submitScheduledCall()" class="w-12 h-12 rounded-full bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] flex items-center justify-center shadow-lg transition-all active:scale-95 focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Call Link Modal -->
+    <div id="new_call_link_modal"
+        class="hidden fixed inset-0 z-[150] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-[420px] bg-[#111b21] rounded-2xl flex flex-col border border-white/5 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 bg-[#202c33] border-b border-white/5">
+                <h3 class="text-[#e9edef] text-[20px] font-bold">New call link</h3>
+                <button onclick="window.closeNewCallLinkModal()" class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Body Content -->
+            <div class="p-6 flex flex-col gap-6">
+                <!-- Selector & Link Input Row -->
+                <div class="flex items-center gap-3">
+                    <!-- Custom Dropdown Trigger -->
+                    <div class="relative">
+                        <button id="call_link_type_btn" onclick="window.toggleCallLinkTypeDropdown(event)"
+                            class="flex items-center gap-2 bg-[#202c33] hover:bg-[#2a3942] text-[#00a884] px-4 py-2.5 rounded-lg border border-white/5 transition-all text-sm font-semibold focus:outline-none">
+                            <span id="call_link_type_icon">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                            </span>
+                            <span id="call_link_type_label">Video</span>
+                            <svg class="w-3.5 h-3.5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- Custom Dropdown Menu -->
+                        <div id="call_link_type_menu" class="hidden absolute left-0 top-full mt-1.5 w-[160px] bg-[#233138] border border-white/5 rounded-xl shadow-2xl z-[200] py-1.5 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                            <button onclick="window.setCallLinkType('video')" class="w-full flex items-center justify-between px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span>Video</span>
+                                </div>
+                                <svg id="call_link_type_check_video" class="w-4 h-4 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </button>
+                            <button onclick="window.setCallLinkType('voice')" class="w-full flex items-center justify-between px-4 py-2.5 text-sm text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                                <div class="flex items-center gap-3">
+                                    <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                    </svg>
+                                    <span>Voice</span>
+                                </div>
+                                <svg id="call_link_type_check_voice" class="w-4 h-4 text-[#00a884] hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Input Link with Copy Button -->
+                    <div class="flex-1 min-w-0 bg-[#202c33] flex items-center gap-3 pl-4 pr-2.5 py-2.5 rounded-lg border border-white/5 transition-all">
+                        <span id="call_link_input"
+                            class="text-[#e9edef] text-sm focus:ring-0 p-0 w-full outline-none select-all select-text font-mono truncate"></span>
+                        <button onclick="window.copyCallLink()" id="call_link_copy_btn" class="text-[#8696a0] hover:text-[#e9edef] p-1.5 hover:bg-white/5 rounded-lg transition-all focus:outline-none shrink-0" title="Copy Link">
+                            <svg id="copy_icon_normal" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            <svg id="copy_icon_success" class="w-5 h-5 text-[#00a884] hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Helper Text -->
+                <p class="text-[#8696a0] text-sm leading-relaxed">
+                    Anyone with this app can use this link to join this call. Only share it with people you trust.
+                </p>
+
+                <!-- Send link to -->
+                <div class="flex items-center justify-between py-3 border-t border-white/5">
+                    <span class="text-[#e9edef] text-sm font-medium">Send link to</span>
+                    <button type="button" onclick="window.openShareSelector('call_link')" class="flex items-center gap-1.5 bg-[#202c33] hover:bg-[#2a3942] text-[#00a884] px-4 py-2 rounded-lg border border-white/5 transition-all text-sm font-semibold focus:outline-none">
+                        <span id="call_link_target_name">Select Chat</span>
+                        <svg class="w-3.5 h-3.5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Approval Toggle Switch -->
+                <div class="flex items-center justify-between py-2 border-t border-white/5">
+                    <span class="text-[#e9edef] text-sm font-medium">Require approval to join</span>
+                    <button onclick="window.toggleCallLinkApproval()" id="call_link_approval_toggle" 
+                        class="w-10 h-5 flex items-center rounded-full p-0.5 transition-all duration-200 bg-[#2f3b43] focus:outline-none">
+                        <div class="bg-[#8696a0] w-4 h-4 rounded-full transform transition-transform duration-200 translate-x-0" id="call_link_approval_circle"></div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer actions -->
+            <div class="px-6 py-4 bg-[#202c33] border-t border-white/5 flex items-center justify-between shrink-0 font-['Inter']">
+                <button onclick="window.joinCallFromLink()" class="text-[#00a884] hover:text-[#06cf9c] font-bold text-base transition-colors focus:outline-none">
+                    Join call
+                </button>
+                <button onclick="window.sendCallLinkToChat()"
+                    class="bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-[15px] focus:outline-none shrink-0">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+                    </svg>
+                    <span class="whitespace-nowrap">Send link to chat</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Selector Modal (select user or group to send link/scheduled call to) -->
+    <div id="share_selector_modal"
+        class="hidden fixed inset-0 z-[250] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="w-full max-w-[380px] bg-[#111b21] rounded-2xl flex flex-col h-[500px] border border-white/5 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-4 bg-[#202c33] border-b border-white/5 shrink-0">
+                <h3 class="text-[#e9edef] text-[18px] font-semibold">Send to...</h3>
+                <button onclick="window.closeShareSelector()" class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Search -->
+            <div class="p-3 bg-[#111b21] border-b border-white/5 shrink-0">
+                <div class="bg-[#202c33] flex items-center gap-3 px-4 py-2 rounded-lg border border-transparent focus-within:border-[#00a884] transition-all">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" id="share_search_input" oninput="window.renderShareSelectorList()"
+                        placeholder="Search contact or group"
+                        class="bg-transparent border-none text-[#e9edef] text-sm focus:ring-0 placeholder-[#8696a0] p-0 w-full outline-none">
+                </div>
+            </div>
+
+            <!-- List -->
+            <div id="share_chats_list" class="flex-1 overflow-y-auto custom-scrollbar">
+                <!-- Chats will be populated dynamically from DOM -->
+            </div>
+        </div>
+    </div>
 </x-app-layout>
