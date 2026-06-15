@@ -88,16 +88,25 @@
         const newChatPanel = document.getElementById('new_chat_panel');
         
         if (newContactPanel.classList.contains('hidden')) {
+            // Hide new chat panel the same way toggleNewChat shows it
             newChatPanel.classList.add('hidden');
             newChatPanel.classList.remove('sm:flex');
+
+            // Show new contact panel
             newContactPanel.classList.remove('hidden');
-            newContactPanel.classList.add('sm:flex');
+            newContactPanel.style.display = 'flex';
+            newContactPanel.style.flexDirection = 'column';
+
             document.getElementById('new_contact_first_name').focus();
         } else {
+            // Hide new contact panel
             newContactPanel.classList.add('hidden');
-            newContactPanel.classList.remove('sm:flex');
+            newContactPanel.style.display = '';
+
+            // Show new chat panel the same way toggleNewChat shows it
             newChatPanel.classList.remove('hidden');
             newChatPanel.classList.add('sm:flex');
+
             // reset form
             document.getElementById('new_contact_first_name').value = '';
             document.getElementById('new_contact_last_name').value = '';
@@ -192,8 +201,9 @@
                 }
                 
                 // Hide new contact panel
-                document.getElementById('new_contact_panel').classList.add('hidden');
-                document.getElementById('new_contact_panel').classList.remove('sm:flex');
+                const ncPanel = document.getElementById('new_contact_panel');
+                ncPanel.classList.add('hidden');
+                ncPanel.style.display = '';
                 
                 // Hide new chat panel if open
                 const newChatPanel = document.getElementById('new_chat_panel');

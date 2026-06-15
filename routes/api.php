@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BroadcastApiController;
 use App\Http\Controllers\Api\ChatApiController;
 use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\MediaApiController;
@@ -64,6 +65,15 @@ Route::get('/group/{groupId}/info', [GroupApiController::class, 'groupInfo']);
 Route::get('/group/{groupId}/messages', [GroupApiController::class, 'getMessages']);
 Route::post('/group/{groupId}/send-message', [GroupApiController::class, 'sendMessage']);
 Route::post('/group/{groupId}/call/initiate', [GroupApiController::class, 'initiateCall']);
+
+// Broadcast Chat Features
+Route::post('/broadcast/create', [BroadcastApiController::class, 'create']);
+Route::get('/broadcast/list', [BroadcastApiController::class, 'list']);
+Route::post('/broadcast/{broadcastId}/add-recipients', [BroadcastApiController::class, 'addRecipients']);
+Route::post('/broadcast/{broadcastId}/remove-recipient', [BroadcastApiController::class, 'removeRecipient']);
+Route::post('/broadcast/{broadcastId}/delete', [BroadcastApiController::class, 'delete']);
+Route::get('/broadcast/{broadcastId}/messages', [BroadcastApiController::class, 'getMessages']);
+Route::post('/broadcast/{broadcastId}/send-message', [BroadcastApiController::class, 'sendMessage']);
 
 // Status Features
 Route::post('/status/create', [StatusApiController::class, 'createStatus']);

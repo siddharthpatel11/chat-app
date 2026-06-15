@@ -17,7 +17,7 @@
             html.light-theme {
                 filter: invert(1) hue-rotate(180deg);
             }
-            
+
             html.light-theme img,
             html.light-theme video,
             html.light-theme canvas,
@@ -25,11 +25,11 @@
             html.light-theme .emoji-text {
                 filter: invert(1) hue-rotate(180deg);
             }
-            
+
             html.light-theme .emoji-text {
                 display: inline-block;
             }
-            
+
             html.light-theme emoji-picker {
                 filter: invert(1) hue-rotate(180deg);
                 --background: #f0f2f5 !important;
@@ -40,7 +40,7 @@
                 --indicator-color: #00a884 !important;
                 --button-hover-background: #e9edef !important;
             }
-            
+
             html.light-theme .bg-transparent {
                 /* Fix for transparent backgrounds looking weird when inverted if they have borders */
             }
@@ -437,12 +437,12 @@
                 opacity: 1;
             }
         </style>
-        
+
         <script>
             window.applyGlobalWallpaper = function() {
                 const color = localStorage.getItem('whatsapp_wallpaper_color') || '#0b141a';
                 const doodles = localStorage.getItem('whatsapp_wallpaper_doodles') !== 'false';
-                
+
                 const bgElements = document.querySelectorAll('.chat-bg');
                 bgElements.forEach(el => {
                     el.style.backgroundColor = color;
@@ -455,7 +455,7 @@
                     }
                 });
             };
-            
+
             document.addEventListener('DOMContentLoaded', () => {
                 window.applyGlobalWallpaper();
             });
@@ -501,6 +501,11 @@
             @include('chat.contacts.new_contact')
             @include('chat.contacts.edit_contact')
             @include('chat.sidebar')
+            @include('chat.broadcasts.broadcast_panel')
+            @include('chat.broadcasts.new_broadcast_panel')
+            @include('chat.broadcasts.broadcast_info')
+            @include('chat.broadcasts.change_name_modal')
+            @include('chat.broadcasts.edit_recipients_panel')
             @include('chat.calls_sidebar')
             <div id="sidebar_resizer"
                 class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]">
@@ -1865,11 +1870,11 @@
 
         window.renderCallLinkHTML = function(url, type, isMe) {
             const isVideo = type === 'video';
-            const iconSvg = isVideo 
+            const iconSvg = isVideo
                 ? `<svg class="w-5 h-5 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>`
                 : `<svg class="w-5 h-5 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>`;
             const typeLabel = isVideo ? 'Video' : 'Voice';
-            
+
             return `
             <div class="flex flex-col gap-2.5 p-1.5 w-[260px] select-text">
                 <div class="flex items-center gap-3">
@@ -3245,21 +3250,21 @@
         window.updateActiveChatSubtitle = function(statusData = null) {
             const subtitle = document.getElementById('active_chat_subtitle');
             if (!subtitle || !window.activeChatUser) return;
-            
+
             const otherUserId = window.activeChatUser.id;
-            
+
             if (statusData) {
                 window.latestActiveChatStatusData = statusData;
             }
-            
+
             const data = window.latestActiveChatStatusData;
             if (!data) {
                 subtitle.classList.add('hidden');
                 return;
             }
-            
+
             const isOnline = data.state === 'online';
-            
+
             if (isOnline) {
                 if (window.isOnlineVisible && window.isOnlineVisible(otherUserId)) {
                     subtitle.textContent = 'online';
@@ -3328,33 +3333,33 @@
             const contact = window.allContacts ? window.allContacts.find(c => String(c.id) === String(userId)) : null;
             const name = contact ? (contact.saved_name || contact.name || contact.phone) : 'Contact';
             const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2a3942&color=fff`;
-            
+
             if (forceFallback) {
                 return fallbackUrl;
             }
-            
+
             if (!window.isAvatarVisible(userId)) {
                 return fallbackUrl;
             }
-            
+
             return (contact && contact.avatar) ? contact.avatar : fallbackUrl;
         };
 
         window.applyAllAvatarsPrivacy = function() {
             if (!window.allContacts) return;
-            
+
             window.allContacts.forEach(contact => {
                 const userId = contact.id;
                 const avatarUrl = window.getUserAvatar(userId);
                 const originalAbout = contact.about || 'Available';
                 const safeAbout = (window.isAboutVisible && window.isAboutVisible(userId)) ? originalAbout : '';
-                
+
                 // 1. Update sidebar list item img
                 const sidebarImg = document.querySelector(`#user_sidebar_${userId} img`);
                 if (sidebarImg) {
                     sidebarImg.src = avatarUrl;
                 }
-                
+
                 // 2. Update data-avatar and data-about attributes of sidebar item
                 const sidebarItem = document.getElementById(`user_sidebar_${userId}`);
                 if (sidebarItem) {
@@ -3388,27 +3393,27 @@
                     }
                 }
             });
-            
+
             // 4. Update active chat avatar
             if (window.activeChatUser) {
                 const activeUserId = window.activeChatUser.id;
                 const avatarUrl = window.getUserAvatar(activeUserId);
-                
+
                 const activeChatAvatarImg = document.querySelector('#active_chat_avatar img');
                 if (activeChatAvatarImg) {
                     activeChatAvatarImg.src = avatarUrl;
                 }
-                
+
                 const callDropdownAvatarImg = document.querySelector('#call_dropdown_avatar img');
                 if (callDropdownAvatarImg) {
                     callDropdownAvatarImg.src = avatarUrl;
                 }
-                
+
                 const contactInfoAvatarImg = document.getElementById('contact_info_avatar');
                 if (contactInfoAvatarImg) {
                     contactInfoAvatarImg.src = avatarUrl;
                 }
-                
+
                 window.activeChatUser.avatar = avatarUrl;
 
                 // Update contact info panel about text
@@ -3452,7 +3457,7 @@
                 const savedProfilePhoto = localStorage.getItem('whatsapp_privacy_profile_photo') || 'My contacts';
                 let profilePhotoVal = savedProfilePhoto;
                 let profilePhotoExcludedIds = [];
-                
+
                 if (savedProfilePhoto.includes('excluded') || savedProfilePhoto === 'My contacts except...') {
                     profilePhotoVal = 'My contacts except...';
                     const savedExclude = localStorage.getItem('whatsapp_privacy_exclude_profile_photo');
@@ -3460,13 +3465,13 @@
                         profilePhotoExcludedIds = JSON.parse(savedExclude);
                     }
                 }
-                
+
                 // Last seen and online
                 const savedLastSeen = localStorage.getItem('whatsapp_privacy_last_seen_val') || 'Nobody';
                 const savedOnline = localStorage.getItem('whatsapp_privacy_online_val') || 'Everyone';
                 let lastSeenVal = savedLastSeen;
                 let lastSeenExcludedIds = [];
-                
+
                 if (savedLastSeen.includes('excluded') || savedLastSeen === 'My contacts except...') {
                     lastSeenVal = 'My contacts except...';
                     const savedExclude = localStorage.getItem('whatsapp_privacy_exclude_last_seen');
@@ -3479,7 +3484,7 @@
                 const savedAbout = localStorage.getItem('whatsapp_privacy_about') || 'Nobody';
                 let aboutVal = savedAbout;
                 let aboutExcludedIds = [];
-                
+
                 if (savedAbout.includes('excluded') || savedAbout === 'My contacts except...') {
                     aboutVal = 'My contacts except...';
                     const savedExclude = localStorage.getItem('whatsapp_privacy_exclude_about');
@@ -3487,7 +3492,7 @@
                         aboutExcludedIds = JSON.parse(savedExclude);
                     }
                 }
-                
+
                 window.update(window.ref(window.db, `users/${window.myUserId}/privacy`), {
                     profile_photo: profilePhotoVal,
                     profile_photo_exclude: profilePhotoExcludedIds,
@@ -3578,7 +3583,7 @@
                                     sName = sidebarUser.getAttribute('data-name') || (h4Text ? h4Text.trim() : null) || sidebarUser.getAttribute('data-phone') || 'Someone';
                                 }
                             }
-                            
+
                             window.globalMediaCache.push({
                                 key: key,
                                 type: data.type,
@@ -4004,7 +4009,35 @@
             return '#607d8b';
         };
 
+        window.closeAllSidebarPanels = function() {
+            const panels = [
+                'new_chat_panel',
+                'new_contact_panel',
+                'edit_contact_panel',
+                'add_group_members_panel',
+                'create_group_panel',
+                'broadcast_panel',
+                'new_broadcast_panel'
+            ];
+            panels.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.classList.add('hidden');
+                    el.classList.remove('sm:flex', 'flex');
+                    el.style.display = '';
+                }
+            });
+
+            // Cleanly close info and edit panels to restore main_chat_column layout
+            if (window.closeContactInfo) window.closeContactInfo();
+            if (window.closeBroadcastInfo) window.closeBroadcastInfo();
+            if (window.closeEditRecipients) window.closeEditRecipients();
+        };
+
         window.showChats = function() {
+            // Close other sidebar panels
+            window.closeAllSidebarPanels();
+
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_chats').classList.add('active');
@@ -4038,6 +4071,9 @@
         };
 
         window.showArchivedChats = function() {
+            // Close other sidebar panels
+            window.closeAllSidebarPanels();
+
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_archived')?.classList.add('active');
@@ -4071,6 +4107,9 @@
         };
 
         window.showStatus = function() {
+            // Close all sidebar panels
+            window.closeAllSidebarPanels();
+
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_status').classList.add('active');
@@ -4099,6 +4138,9 @@
         };
 
         window.showCalls = function() {
+            // Close all sidebar panels
+            window.closeAllSidebarPanels();
+
             // Update Navigation UI
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_calls')?.classList.add('active');
@@ -4301,29 +4343,6 @@
                 createGroupPanel.classList.remove('flex');
                 addMembersPanel.classList.remove('hidden');
                 addMembersPanel.classList.add('flex');
-            }
-        };
-
-        window.toggleNewContact = function() {
-            // If the local function toggleNewContact from new_contact.blade.php exists, use it
-            if (typeof toggleNewContact === 'function') {
-                toggleNewContact();
-            } else {
-                const newContactPanel = document.getElementById('new_contact_panel');
-                const newChatPanel = document.getElementById('new_chat_panel');
-                if (newContactPanel && newChatPanel) {
-                    if (newContactPanel.classList.contains('hidden')) {
-                        newChatPanel.classList.add('hidden');
-                        newChatPanel.classList.remove('sm:flex');
-                        newContactPanel.classList.remove('hidden');
-                        newContactPanel.classList.add('sm:flex');
-                    } else {
-                        newContactPanel.classList.add('hidden');
-                        newContactPanel.classList.remove('sm:flex');
-                        newChatPanel.classList.remove('hidden');
-                        newChatPanel.classList.add('sm:flex');
-                    }
-                }
             }
         };
 
@@ -5406,7 +5425,7 @@
             const messagesToForward = [];
             window.selectedMessages.forEach(key => {
                 let msg = window.globalMessages ? window.globalMessages[key] : null;
-                
+
                 if (!msg && window.globalMediaCache) {
                     const cacheItem = window.globalMediaCache.find(m => m.key === key);
                     if (cacheItem) {
@@ -5420,7 +5439,7 @@
                         };
                     }
                 }
-                
+
                 if (msg) {
                     messagesToForward.push(msg);
                 }
@@ -5849,7 +5868,7 @@
             filtered.forEach(c => {
                 const displayName = c.saved_name || c.name || c.phone;
                 const displayAvatar = c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
-                
+
                 const itemHtml = `
                     <div class="flex items-center justify-between p-3 rounded-lg hover:bg-[#202c33] transition-colors border-b border-gray-800/20">
                         <div class="flex items-center gap-4 flex-1 min-w-0">
@@ -5897,7 +5916,7 @@
             const filtered = window.allContacts.filter(c => {
                 // Exclude current user & Meta AI
                 if (String(c.id) === String(window.myUserId) || c.id === 'meta_ai') return false;
-                
+
                 const name = (c.saved_name || c.name || c.phone || '').toLowerCase();
                 const phone = (c.phone || '').toLowerCase();
                 return name.includes(searchQuery) || phone.includes(searchQuery);
@@ -5918,7 +5937,7 @@
                         class="flex items-center gap-4 px-6 py-3 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-gray-800/30">
                         <!-- Checkbox -->
                         <div class="relative flex items-center shrink-0">
-                            <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                            <input type="checkbox" ${isSelected ? 'checked' : ''}
                                 onclick="event.stopPropagation(); window.toggleGroupCallUser('${c.id}')"
                                 class="w-5 h-5 rounded border-[#313d45] bg-transparent text-[#00a884] focus:ring-0 focus:ring-offset-0 cursor-pointer">
                         </div>
@@ -5952,7 +5971,7 @@
             if (!container) return;
 
             container.innerHTML = '';
-            
+
             if (window.selectedGroupCallUsers.size === 0) {
                 container.classList.add('hidden');
                 return;
@@ -5989,7 +6008,7 @@
 
             const participants = Array.from(window.selectedGroupCallUsers);
             const callGroupId = 'gc_' + window.myUserId + '_' + Date.now();
-            
+
             // Generate query parameters
             const params = new URLSearchParams({
                 name: 'Group Call',
@@ -6019,13 +6038,13 @@
                     callDropdown.classList.add('hidden');
                 }, 200);
             }
-            
+
             // Set type to 'video' by default
             window.currentCallLinkType = 'video';
             window.currentCallLinkApproval = false;
             // Generate a random call ID
             window.currentCallLinkId = 'cl_' + Math.random().toString(36).substr(2, 9);
-            
+
             // Initialize target recipient
             window.shareTargetChatId = window.currentChatId || '';
             window.shareTargetChatName = window.activeChatName || 'Select Chat';
@@ -6034,7 +6053,7 @@
 
             // Update UI elements
             window.updateCallLinkUI();
-            
+
             // Show modal
             document.getElementById('new_call_link_modal').classList.remove('hidden');
         };
@@ -6061,7 +6080,7 @@
             window.currentCallLinkApproval = !window.currentCallLinkApproval;
             const toggle = document.getElementById('call_link_approval_toggle');
             const circle = document.getElementById('call_link_approval_circle');
-            
+
             if (window.currentCallLinkApproval) {
                 toggle.classList.remove('bg-[#2f3b43]');
                 toggle.classList.add('bg-[#00a884]');
@@ -6080,10 +6099,10 @@
             const type = window.currentCallLinkType;
             const label = document.getElementById('call_link_type_label');
             const iconContainer = document.getElementById('call_link_type_icon');
-            
+
             const videoCheck = document.getElementById('call_link_type_check_video');
             const voiceCheck = document.getElementById('call_link_type_check_voice');
-            
+
             if (type === 'video') {
                 label.textContent = 'Video';
                 iconContainer.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`;
@@ -6095,7 +6114,7 @@
                 videoCheck.classList.add('hidden');
                 voiceCheck.classList.remove('hidden');
             }
-            
+
             // Construct Link
             const approvalParam = window.currentCallLinkApproval ? '&require_approval=true' : '';
             const link = `${window.location.origin}/chat/groups/${type}-call?group_call_id=${window.currentCallLinkId}&name=${type === 'video' ? 'Video+Call' : 'Voice+Call'}${approvalParam}`;
@@ -6111,14 +6130,14 @@
                 const successIcon = document.getElementById('copy_icon_success');
                 normalIcon.classList.add('hidden');
                 successIcon.classList.remove('hidden');
-                
+
                 // Show a toast
                 if (window.showToast) {
                     window.showToast('Copied', 'Call link copied to clipboard!');
                 } else {
                     alert('Call link copied to clipboard!');
                 }
-                
+
                 setTimeout(() => {
                     normalIcon.classList.remove('hidden');
                     successIcon.classList.add('hidden');
@@ -6135,16 +6154,16 @@
             const el = document.getElementById('call_link_input');
             const linkText = el.value || el.textContent;
             const targetChatId = window.shareTargetChatId;
-            
+
             if (!targetChatId) {
                 alert('Please select a target chat first.');
                 return;
             }
-            
+
             // Temporarily swap currentChatId to send to the chosen recipient
             const originalChatId = window.currentChatId;
             window.currentChatId = targetChatId;
-            
+
             if (typeof window.emitMessage === 'function') {
                 window.emitMessage(linkText);
                 window.closeNewCallLinkModal();
@@ -6154,7 +6173,7 @@
             } else {
                 alert('Cannot send call link.');
             }
-            
+
             // Restore original active chat
             window.currentChatId = originalChatId;
         };
@@ -6199,7 +6218,7 @@
 
             // Set default dates & times
             const now = new Date();
-            
+
             // Format YYYY-MM-DD
             const yyyy = now.getFullYear();
             const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -6217,7 +6236,7 @@
                 minutes = 0;
             }
             start.setMinutes(minutes);
-            
+
             const startHour = String(start.getHours()).padStart(2, '0');
             const startMin = String(start.getMinutes()).padStart(2, '0');
             document.getElementById('schedule_start_time').value = `${startHour}:${startMin}`;
@@ -6233,7 +6252,7 @@
             window.currentScheduleApproval = false;
             window.isEndTimeRemoved = false;
             window.updateScheduleCallTypeUI();
-            
+
             // Reset approval UI
             const toggle = document.getElementById('schedule_approval_toggle');
             const circle = document.getElementById('schedule_approval_circle');
@@ -6270,7 +6289,7 @@
             const container = document.getElementById('schedule_end_datetime_container');
             const text = document.getElementById('schedule_toggle_endtime_text');
             const btn = document.getElementById('schedule_toggle_endtime_btn');
-            
+
             if (window.isEndTimeRemoved) {
                 container.classList.add('hidden');
                 text.textContent = 'Add end time';
@@ -6297,7 +6316,7 @@
             const type = window.currentScheduleCallType;
             const label = document.getElementById('schedule_call_type_label');
             const icon = document.getElementById('schedule_call_type_icon');
-            
+
             if (type === 'video') {
                 label.textContent = 'Video';
                 icon.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>';
@@ -6311,7 +6330,7 @@
             window.currentScheduleApproval = !window.currentScheduleApproval;
             const toggle = document.getElementById('schedule_approval_toggle');
             const circle = document.getElementById('schedule_approval_circle');
-            
+
             if (window.currentScheduleApproval) {
                 toggle.classList.remove('bg-[#2f3b43]');
                 toggle.classList.add('bg-[#00a884]');
@@ -6358,7 +6377,7 @@
             const desc = document.getElementById('schedule_call_desc').value.trim();
             const startDateVal = document.getElementById('schedule_start_date').value;
             const startTimeVal = document.getElementById('schedule_start_time').value;
-            
+
             if (!callName) {
                 alert('Please enter a call name.');
                 return;
@@ -6579,7 +6598,7 @@
 
         window.openShareSelector = function(mode) {
             window.shareSelectorMode = mode;
-            
+
             // Show modal
             const modal = document.getElementById('share_selector_modal');
             if (modal) {
@@ -6611,16 +6630,16 @@
             const q = (document.getElementById('share_search_input')?.value || '').toLowerCase().trim();
 
             let items = [];
-            
+
             // 1. Add all contacts from window.allContacts
             if (window.allContacts) {
                 window.allContacts.forEach(c => {
                     if (String(c.id) === String(window.myUserId) || c.id === 'meta_ai') return;
-                    
+
                     const minId = Math.min(window.myUserId, c.id);
                     const maxId = Math.max(window.myUserId, c.id);
                     const chatId = `chat_${minId}_${maxId}`;
-                    
+
                     items.push({
                         id: chatId,
                         name: c.saved_name || c.name || c.phone,
@@ -6636,7 +6655,7 @@
                 const groupId = node.id.replace('group_sidebar_', '');
                 const groupName = node.getAttribute('data-name') || node.querySelector('h4')?.textContent?.trim() || 'Group';
                 const groupAvatar = node.getAttribute('data-avatar') || node.querySelector('img')?.src || '';
-                
+
                 items.push({
                     id: 'group_' + groupId,
                     name: groupName,
@@ -6658,7 +6677,7 @@
             filtered.forEach(item => {
                 const displayName = item.name;
                 const displayAvatar = item.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
-                
+
                 const itemHtml = `
                     <div onclick="window.selectShareTarget('${item.id}', '${displayName.replace(/'/g, "\\'")}')"
                         class="flex items-center gap-4 px-6 py-3 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-gray-800/30">
@@ -6931,7 +6950,7 @@
                 -webkit-appearance: none;
                 appearance: none;
             }
-            
+
             /* Remove native date/time indicator icons but keep picker functional */
             #schedule_call_modal input[type="date"]::-webkit-calendar-picker-indicator,
             #schedule_call_modal input[type="time"]::-webkit-calendar-picker-indicator {
@@ -6946,7 +6965,7 @@
                 cursor: pointer;
                 z-index: 10;
             }
-            
+
             /* Clean textarea styling */
             #schedule_call_modal textarea {
                 background-color: transparent !important;
@@ -7110,7 +7129,7 @@
                 <!-- Require approval to join -->
                 <div class="flex items-center justify-between border-t border-white/5 pt-4">
                     <span class="text-[#e9edef] text-[15px] font-normal">Require approval to join</span>
-                    <button type="button" onclick="window.toggleScheduleApproval()" id="schedule_approval_toggle" 
+                    <button type="button" onclick="window.toggleScheduleApproval()" id="schedule_approval_toggle"
                         class="w-10 h-5 flex items-center rounded-full p-0.5 transition-all duration-200 bg-[#2f3b43] focus:outline-none">
                         <div class="bg-[#8696a0] w-4 h-4 rounded-full transform transition-transform duration-200 translate-x-0" id="schedule_approval_circle"></div>
                     </button>
@@ -7222,7 +7241,7 @@
                 <!-- Approval Toggle Switch -->
                 <div class="flex items-center justify-between py-2 border-t border-white/5">
                     <span class="text-[#e9edef] text-sm font-medium">Require approval to join</span>
-                    <button onclick="window.toggleCallLinkApproval()" id="call_link_approval_toggle" 
+                    <button onclick="window.toggleCallLinkApproval()" id="call_link_approval_toggle"
                         class="w-10 h-5 flex items-center rounded-full p-0.5 transition-all duration-200 bg-[#2f3b43] focus:outline-none">
                         <div class="bg-[#8696a0] w-4 h-4 rounded-full transform transition-transform duration-200 translate-x-0" id="call_link_approval_circle"></div>
                     </button>

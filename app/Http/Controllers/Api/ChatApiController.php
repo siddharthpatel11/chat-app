@@ -303,9 +303,8 @@ class ChatApiController extends Controller
                 }
             }
         }
-
-        // Create new chat
-        $chatId = 'chat_'.time().'_'.uniqid();
+        // Create new chat using the standard formulaic ID format
+        $chatId = 'chat_' . min($users[0], $users[1]) . '_' . max($users[0], $users[1]);
 
         $data = [
             'users' => $users,
