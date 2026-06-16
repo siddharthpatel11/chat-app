@@ -1,6 +1,6 @@
 <div id="broadcast_lists_panel"
     class="hidden flex-col w-[30%] sm:min-w-[300px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden z-[60]">
-    
+
     <!-- Header -->
     <div class="h-16 bg-[#202c33] px-6 flex items-center gap-6 shrink-0 border-b border-[#313d45]">
         <button onclick="toggleBroadcastPanel()" class="text-[#aebac1] hover:text-white transition-colors">
@@ -27,7 +27,7 @@
                 <p class="text-xs text-[#8696a0] mt-0.5">Remaining</p>
             </div>
         </div>
-        
+
         <!-- Progress Bar -->
         <div class="w-full bg-[#202c33] h-[5px] rounded-full overflow-hidden mt-1 relative">
             <div id="broadcast_progress_bar" class="bg-[#00a884] h-full transition-all duration-300" style="width: 0%;"></div>
@@ -42,7 +42,7 @@
         <div class="px-5 pt-4 pb-2">
             <span class="text-[#8696a0] text-xs font-semibold uppercase tracking-wider">Your broadcasts</span>
         </div>
-        
+
         <div id="broadcast_lists_container" class="flex-1">
             <!-- Dynamic lists loaded by JS -->
             <div id="broadcast_empty_state" class="flex flex-col items-center justify-center py-16 px-6 text-center">
@@ -52,7 +52,7 @@
                 <p class="text-[#8696a0] text-[14px]">No broadcast lists yet</p>
                 <p class="text-[#667781] text-[12px] mt-1">Tap the + button to create one</p>
             </div>
-            
+
             <div id="broadcasts_active_list" class="space-y-0.5"></div>
         </div>
 
@@ -105,11 +105,11 @@
             const itemHtml = `
                 <div onclick="window.openBroadcastChat('${list.id}', true)"
                     class="flex relative items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors user-chat-item user-chat-item-broadcast group"
-                    id="${itemId}" 
+                    id="${itemId}"
                     data-name="${escapeHtml(list.name)}"
-                    data-avatar="https://ui-avatars.com/api/?name=B&background=00a884&color=fff" 
+                    data-avatar="https://ui-avatars.com/api/?name=B&background=00a884&color=fff"
                     data-phone="Broadcast (${list.recipients.length} recipients)"
-                    data-about="Broadcast List: ${list.recipients.map(r => r.name).join(', ')}" 
+                    data-about="Broadcast List: ${list.recipients.map(r => r.name).join(', ')}"
                     data-userid="broadcast_${list.id}"
                     data-timestamp="${lastMsgTime}">
                     <div class="w-12 h-12 rounded-full bg-[#00a884]/20 flex items-center justify-center shrink-0 text-[#00a884]">
@@ -156,7 +156,7 @@
                 </div>
             `;
             container.insertAdjacentHTML('beforeend', itemHtml);
-            
+
             // Apply pin state if pinned
             const isPinned = window.pinnedChats && window.pinnedChats.includes(itemId);
             const pinIcon = document.getElementById(`pin_icon_broadcast_${list.id}`);
@@ -176,10 +176,10 @@
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
         const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-        
+
         const opt = { day: '2-digit', month: 'short' };
         const dateStr = `${startOfMonth.toLocaleDateString('en-GB', opt)} - ${endOfMonth.toLocaleDateString('en-GB', opt)}`;
-        
+
         const dateRangeEl = document.getElementById('broadcast_date_range');
         if (dateRangeEl) {
             dateRangeEl.textContent = dateStr;
@@ -187,7 +187,7 @@
 
         // Initialize Broadcast Lists from LocalStorage
         window.broadcastLists = JSON.parse(localStorage.getItem('broadcast_lists') || '[]');
-        
+
         // Update stats
         window.updateBroadcastStats();
         window.renderBroadcastLists();
@@ -214,7 +214,7 @@
                             const usersArray = Array.isArray(b.recipients_info)
                                 ? b.recipients_info.map(r => r.id)
                                 : (b.users || []);
-                            
+
                             const recipients = usersArray.map(uid => {
                                 const found = window.allContacts ? window.allContacts.find(c => String(c.id) === String(uid)) : null;
                                 return {
@@ -247,11 +247,11 @@
                                 const localMsgsKey = 'bcast_msgs_broadcast_' + b.id;
                                 const localMsgs = JSON.parse(localStorage.getItem(localMsgsKey) || '[]');
                                 const localMsgsMap = new Map(localMsgs.map(m => [m.id, m]));
-                                
+
                                 firebaseMsgs.forEach(m => {
                                     localMsgsMap.set(m.id, m);
                                 });
-                                
+
                                 const mergedMsgs = Array.from(localMsgsMap.values()).sort((a, b) => a.time - b.time);
                                 localStorage.setItem(localMsgsKey, JSON.stringify(mergedMsgs));
                             }
@@ -342,7 +342,7 @@
                         localStorage.setItem('broadcast_lists', JSON.stringify(window.broadcastLists));
                         window.renderBroadcastLists();
                         window.showToast?.('Success', 'Broadcast list deleted.');
-                        
+
                         // If the deleted list was active, close the chat window
                         if (window.currentChatId === targetId) {
                             document.getElementById('active_chat_content')?.classList.add('hidden');
@@ -383,7 +383,7 @@
     window.toggleBroadcastPanel = function() {
         const panel = document.getElementById('broadcast_lists_panel');
         const mainSidebar = document.getElementById('user_sidebar_container');
-        
+
         if (panel.classList.contains('hidden')) {
             // Hide main sidebar
             if (mainSidebar) {
@@ -459,7 +459,7 @@
             const item = document.createElement('div');
             item.className = "flex items-center px-4 py-3 hover:bg-[#202c33] cursor-pointer transition-colors border-b border-[#202c33]/30 relative group";
             item.onclick = () => window.openBroadcastChat(list.id);
-            
+
             item.innerHTML = `
                 <div class="w-12 h-12 rounded-full bg-[#00a884]/20 flex items-center justify-center shrink-0 text-[#00a884]">
                     <svg viewBox="0 0 16 16" width="24" height="24" fill="currentColor">
@@ -509,10 +509,10 @@
         if (window.selectChat) {
             window.activeBroadcastList = list;
             window.selectChat(
-                `broadcast_${list.id}`, 
-                list.name, 
-                `Broadcast (${list.recipients.length} recipients)`, 
-                'https://ui-avatars.com/api/?name=B&background=00a884&color=fff', 
+                `broadcast_${list.id}`,
+                list.name,
+                `Broadcast (${list.recipients.length} recipients)`,
+                'https://ui-avatars.com/api/?name=B&background=00a884&color=fff',
                 `Broadcast List: ${list.recipients.map(r => r.name).join(', ')}`
             );
         }
@@ -524,13 +524,13 @@
             window.showToast?.('Info', 'No messages to export.');
             return;
         }
-        
+
         let textContent = `Chat history with Broadcast List: ${listName}\n\n`;
         bcastMessages.forEach(msg => {
             const timeStr = new Date(msg.time * 1000).toLocaleString();
             textContent += `[${timeStr}] You: ${msg.caption || msg.text}\n`;
         });
-        
+
         const blob = new Blob([textContent], { type: 'text/plain' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -584,7 +584,7 @@
             if (item && document.getElementById('search_results_container')?.contains(item)) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 const bcastId = item.getAttribute('data-userid');
                 const listId = bcastId.replace('broadcast_', '');
                 const list = window.broadcastLists?.find(l => l.id === listId);
@@ -602,16 +602,16 @@
             const originalFilterSidebar = window.filterSidebar;
             window.filterSidebar = function() {
                 originalFilterSidebar.apply(this, arguments);
-                
+
                 const searchQuery = document.getElementById('sidebar_search').value.toLowerCase().trim();
                 if (searchQuery === '') return;
-                
+
                 const chatsList = document.getElementById('search_chats_list');
                 const msgsList = document.getElementById('search_messages_list');
                 const chatsSection = document.getElementById('search_chats_section');
                 const msgsSection = document.getElementById('search_messages_section');
                 const noResults = document.getElementById('sidebar_no_results');
-                
+
                 // 1. Fix unquoted ID calls for broadcast lists in the Chats search results
                 if (chatsList) {
                     const broadcastChatItems = chatsList.querySelectorAll('.user-chat-item[data-userid^="broadcast_"]');
@@ -624,12 +624,12 @@
                             const avatar = 'https://ui-avatars.com/api/?name=B&background=00a884&color=fff';
                             const phone = `Broadcast (${list.recipients.length} recipients)`;
                             const aboutEsc = `Broadcast List: ${list.recipients.map(r => r.name).join(', ')}`.replace(/'/g, "\\'");
-                            
+
                             item.removeAttribute('onclick');
                             item.onclick = function() {
                                 window.selectChat(bcastId, list.name, phone, avatar, `Broadcast List: ${list.recipients.map(r => r.name).join(', ')}`);
                             };
-                            
+
                             const optBtn = item.querySelector('.options-btn-gradient button');
                             if (optBtn) {
                                 optBtn.removeAttribute('onclick');
@@ -641,12 +641,12 @@
                         }
                     });
                 }
-                
+
                 // 2. Search and append broadcast messages to the Messages search results
                 let bcastMsgResults = [];
                 const escQ = searchQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const highlightRegex = new RegExp(`(${escQ})`, 'gi');
-                
+
                 window.broadcastLists?.forEach(list => {
                     const chatId = 'broadcast_' + list.id;
                     const bcastMessages = JSON.parse(localStorage.getItem('bcast_msgs_' + chatId) || '[]');
@@ -661,7 +661,7 @@
                         }
                     });
                 });
-                
+
                 if (bcastMsgResults.length > 0 && msgsList) {
                     bcastMsgResults.forEach(r => {
                         const msgTime = r.msg.time ? new Date(r.msg.time * 1000) : null;
@@ -676,15 +676,15 @@
                             else if (diffDays < 7) timeStr = msgTime.toLocaleDateString([], { weekday: 'long' });
                             else timeStr = msgTime.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
                         }
-                        
+
                         const highlightedMsg = r.msg.text.replace(highlightRegex, '<span class="text-[#00a884] font-medium">$1</span>');
                         const prefix = '<span class="text-[#8696a0]">✓ You: </span>';
                         const avatar = 'https://ui-avatars.com/api/?name=B&background=00a884&color=fff';
-                        
+
                         const safeName = r.list.name;
                         const safePhone = `Broadcast (${r.list.recipients.length} recipients)`;
                         const safeAbout = `Broadcast List: ${r.list.recipients.map(re => re.name).join(', ')}`;
-                        
+
                         const bcastMsgHtml = `
                             <div class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors relative group user-chat-item" data-userid="${r.chatId}">
                                 <div class="w-12 h-12 rounded-full bg-[#00a884]/20 flex items-center justify-center shrink-0 text-[#00a884]">
@@ -708,15 +708,15 @@
                                 </div>
                             </div>
                         `;
-                        
+
                         const tempDiv = document.createElement('div');
                         tempDiv.innerHTML = bcastMsgHtml.trim();
                         const element = tempDiv.firstChild;
-                        
+
                         element.onclick = function() {
                             window.selectChat(r.chatId, safeName, safePhone, avatar, safeAbout, r.msg.time || 0);
                         };
-                        
+
                         const optBtn = element.querySelector('.options-btn-gradient button');
                         if (optBtn) {
                             optBtn.onclick = function(e) {
@@ -724,10 +724,10 @@
                                 window.toggleUserContextMenu(e, r.chatId, safeName, 'user');
                             };
                         }
-                        
+
                         msgsList.appendChild(element);
                     });
-                    
+
                     if (msgsSection) msgsSection.classList.remove('hidden');
                     if (noResults) noResults.classList.add('hidden');
                 }
@@ -745,7 +745,7 @@
                     // Set active highlight on the clicked item
                     const activeItem = document.getElementById(`user_sidebar_${otherUserId}`);
                     if (activeItem) activeItem.classList.add('active');
-                    
+
                     // Set current chat state
                     window.currentChatId = otherUserId;
                     window.activeChatName = name;
@@ -757,7 +757,7 @@
                         avatar: window.activeChatAvatar,
                         about: about
                     };
-                    
+
                     // Unsubscribe previous Firebase listeners
                     if (window.statusUnsubscribe) window.statusUnsubscribe();
                     if (window.unsubscribeAdded) window.unsubscribeAdded();
@@ -767,25 +767,31 @@
                         window.unsubscribePinnedMsg();
                         window.unsubscribePinnedMsg = null;
                     }
-                    
+
+                    // Hide pinned bars when switching to broadcast chat
+                    const privatePinBar = document.getElementById('private_pinned_bar');
+                    if (privatePinBar) privatePinBar.classList.add('hidden');
+                    const groupPinBar = document.getElementById('group_pinned_bar');
+                    if (groupPinBar) groupPinBar.classList.add('hidden');
+
                     // Toggle views
                     document.getElementById('chat_empty_state')?.classList.add('hidden');
                     document.getElementById('active_group_chat_content')?.classList.add('hidden');
                     document.getElementById('meta_ai_content')?.classList.add('hidden');
                     document.getElementById('active_chat_content')?.classList.remove('hidden');
                     document.getElementById('active_chat_content')?.classList.add('flex');
-                    
+
                     // Hide call buttons for broadcast lists
                     const callBtn = document.getElementById('call_btn_pill');
                     if (callBtn) {
                         callBtn.style.setProperty('display', 'none', 'important');
                     }
-                    
+
                     // Set title and subtitle in the chat header
                     const titleEl = document.getElementById('active_chat_title');
                     const subtitleEl = document.getElementById('active_chat_subtitle');
                     const avatarEl = document.getElementById('active_chat_avatar');
-                    
+
                     if (titleEl) titleEl.textContent = name;
                     if (subtitleEl) {
                         subtitleEl.textContent = phone;
@@ -801,15 +807,15 @@
                              </div>
                         `;
                     }
-                    
+
                     // Clear messages box and render local broadcast history
                     const messagesContainer = document.getElementById('messages');
                     if (messagesContainer) {
                         messagesContainer.innerHTML = '';
-                        
+
                         const bcastMessages = JSON.parse(localStorage.getItem('bcast_msgs_' + otherUserId) || '[]');
                         let lastDateString = null;
-                        
+
                         bcastMessages.forEach((msg, index) => {
                             const dateHeader = window.getDateHeader ? window.getDateHeader(msg.time) : new Date(msg.time * 1000).toLocaleDateString();
                             if (dateHeader !== lastDateString) {
@@ -822,9 +828,9 @@
                                     </div>`;
                                 messagesContainer.insertAdjacentHTML('beforeend', headerHtml);
                             }
-                            
+
                             const timeStr = msg.time ? new Date(msg.time * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-                            
+
                             // Build media preview/content if available
                             let mediaContent = '';
                             if (msg.type === 'image' && msg.file_url) {
@@ -901,16 +907,10 @@
                             const hasText = !!textToRender;
 
                             const msgHtml = `
-                                <div class="flex justify-end mb-2 pr-4 pl-12 relative group/msg" id="msg_broadcast_msg_${index}">
-                                    <div class="bg-[#005c4b] text-white rounded-lg px-2.5 py-1.5 shadow-sm max-w-[85%] relative min-w-[80px]">
+                                <div class="relative group/msg w-full flex justify-end mt-1 mb-2 px-2 transition-colors cursor-pointer select-none gap-2 items-start" id="msg_broadcast_msg_${index}">
+                                    <div class="max-w-[85%] sm:max-w-[70%] relative px-2.5 py-1.5 shadow-sm rounded-lg bg-[#005c4b] rounded-tr-none transform transition-transform group-active/msg:scale-[0.98] text-white text-left min-w-[80px]">
                                         ${mediaContent}
-                                        ${hasText ? `
-                                            <div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">
-                                                ${escapeHtml(textToRender)}<span class="inline-block w-[99px] h-[1px]"></span>
-                                            </div>
-                                        ` : `
-                                            <div class="h-[10px]"></div>
-                                        `}
+                                        ${hasText ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">${escapeHtml(textToRender)}<span class="inline-block w-[99px] h-[1px]"></span></div>` : `<div class="h-[10px]"></div>`}
                                         <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2 bg-transparent select-none">
                                             <span class="text-[11px] text-[#8696a0] select-none leading-none">${timeStr}</span>
                                             <span class="shrink-0 flex items-center justify-center leading-none">
@@ -926,11 +926,11 @@
                             `;
                             messagesContainer.insertAdjacentHTML('beforeend', msgHtml);
                         });
-                        
+
                         const parent = messagesContainer.parentElement;
                         if (parent) parent.scrollTop = parent.scrollHeight;
                     }
-                    
+
                     if (window.applyGlobalWallpaper) window.applyGlobalWallpaper();
                     document.getElementById('msg')?.focus();
                 } else {
@@ -938,13 +938,13 @@
                     if (callBtn) {
                         callBtn.style.display = '';
                     }
-                    
+
                     originalSelectChat.apply(this, arguments);
                     if (window.applyGlobalWallpaper) window.applyGlobalWallpaper();
                 }
             };
         }
-        
+
         let lastBroadcastSentText = '';
         let lastBroadcastSentTime = 0;
 
@@ -1069,7 +1069,7 @@
                                                 if (textMatch) {
                                                     const childRef = window.ref(window.db, `chats/${recipientChatId}/messages/${child.key}`);
                                                     window.update(childRef, { is_broadcast: true }).catch(err => {});
-                                                    
+
                                                     // Sync media details from firebase back to broadcast history
                                                     const currentBcastMsgs = JSON.parse(localStorage.getItem('bcast_msgs_' + chatId) || '[]');
                                                     const targetMsg = currentBcastMsgs.find(m => m.id === tempMsgId || (m.type === msgType && m.time >= nowSec - 10 && m.time <= nowSec + 10 && (!m.file_url || m.file_url.startsWith('blob:'))));
@@ -1079,7 +1079,7 @@
                                                         if (val.lat) targetMsg.lat = val.lat;
                                                         if (val.lng) targetMsg.lng = val.lng;
                                                         localStorage.setItem('bcast_msgs_' + chatId, JSON.stringify(currentBcastMsgs));
-                                                        
+
                                                         if (window.currentChatId === chatId && window.selectChat) {
                                                             window.selectChat(chatId, list.name, `Broadcast (${list.recipients.length} recipients)`);
                                                         }
@@ -1196,7 +1196,7 @@
                 if (window.currentChatId && window.currentChatId.startsWith('broadcast_')) {
                     if (event) event.stopPropagation();
                     if (!dropdown) return;
-                    
+
                     const isHidden = dropdown.classList.contains('hidden');
                     if (isHidden) {
                         // Render broadcast main menu
@@ -1278,21 +1278,21 @@
                     const clearBtn = document.getElementById('clear_search_btn');
                     const resultsList = document.getElementById('search_results_list');
                     const noResults = document.getElementById('no_results_text');
-                    
+
                     if (!query.trim()) {
                         if (clearBtn) clearBtn.classList.add('hidden');
                         if (resultsList) resultsList.innerHTML = '';
                         if (noResults) noResults.classList.remove('hidden');
                         return;
                     }
-                    
+
                     if (clearBtn) clearBtn.classList.remove('hidden');
                     if (noResults) noResults.classList.add('hidden');
-                    
+
                     const searchTerm = query.toLowerCase();
                     const bcastMessages = JSON.parse(localStorage.getItem('bcast_msgs_' + window.currentChatId) || '[]');
                     const results = [];
-                    
+
                     bcastMessages.forEach((msg, index) => {
                         const text = msg.caption || msg.text || '';
                         if (text.toLowerCase().includes(searchTerm)) {
@@ -1304,7 +1304,7 @@
                             });
                         }
                     });
-                    
+
                     results.sort((a, b) => b.time - a.time);
                     if (window.renderMessageSearchResults) {
                         window.renderMessageSearchResults(results, searchTerm);
