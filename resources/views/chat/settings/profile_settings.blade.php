@@ -170,6 +170,7 @@
             'general_settings_panel',
             'privacy_settings_panel',
             'chats_settings_panel',
+            'chats_hide_panel',
             'video_voice_settings_panel',
             'notifications_settings_panel',
             'help_feedback_settings_panel',

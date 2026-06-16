@@ -12,7 +12,7 @@
 
     <!-- Scrollable Content -->
     <div class="flex-1 overflow-y-auto custom-scrollbar bg-[#111b21] py-4">
-        
+
         <!-- Display Section -->
         <div class="px-6 mb-2 mt-2">
             <h3 class="text-[#8696a0] text-[14px] font-medium mb-3">Display</h3>
@@ -64,6 +64,18 @@
         <div class="flex items-center justify-between py-4 hover:bg-[#202c33] px-6 transition-colors group cursor-pointer" onclick="toggleAutoDownloadPanel()">
             <div class="flex-1 pr-4">
                 <div class="text-[#e9edef] text-[16px]">Media auto-download</div>
+            </div>
+            <div class="text-[#8696a0] group-hover:text-[#e9edef] transition-colors">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Hide Chat -->
+        <div class="flex items-center justify-between py-4 hover:bg-[#202c33] px-6 transition-colors group cursor-pointer" onclick="toggleHideChatPanel()">
+            <div class="flex-1 pr-4">
+                <div class="text-[#e9edef] text-[16px]">Hide Chat</div>
             </div>
             <div class="text-[#8696a0] group-hover:text-[#e9edef] transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -133,16 +145,16 @@
         const savedTheme = localStorage.getItem('whatsapp_chat_theme') || 'System default';
         const themeLabel = document.getElementById('chat_theme_label');
         if (themeLabel) themeLabel.innerText = savedTheme;
-        
+
         // Toggles
         const spellCheck = localStorage.getItem('whatsapp_chat_spell_check') !== 'false';
         const replaceEmoji = localStorage.getItem('whatsapp_chat_replace_emoji') !== 'false';
         const enterSend = localStorage.getItem('whatsapp_chat_enter_send') !== 'false';
-        
+
         const scToggle = document.getElementById('chat_spell_check_toggle');
         const reToggle = document.getElementById('chat_replace_emoji_toggle');
         const esToggle = document.getElementById('chat_enter_send_toggle');
-        
+
         if (scToggle) scToggle.checked = spellCheck;
         if (reToggle) reToggle.checked = replaceEmoji;
         if (esToggle) esToggle.checked = enterSend;

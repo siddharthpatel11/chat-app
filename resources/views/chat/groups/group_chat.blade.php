@@ -4527,6 +4527,17 @@
     })();
 
     window.selectGroupChat = function(groupId, name, avatar, searchMsgTime = null) {
+        const elementId = `group_sidebar_${groupId}`;
+        if (window.hiddenChats && window.hiddenChats.includes(elementId)) {
+            window.promptHiddenChatClickUnlock(function() {
+                window.selectGroupChatOriginal(groupId, name, avatar, searchMsgTime);
+            });
+        } else {
+            window.selectGroupChatOriginal(groupId, name, avatar, searchMsgTime);
+        }
+    };
+
+    window.selectGroupChatOriginal = function(groupId, name, avatar, searchMsgTime = null) {
         if (typeof window.closeAllSearchPanels === 'function') {
             window.closeAllSearchPanels();
         }

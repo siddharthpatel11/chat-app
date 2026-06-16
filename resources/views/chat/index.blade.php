@@ -483,6 +483,7 @@
             @include('chat.settings.chats_panels.chats_upload_quality')
             @include('chat.settings.chats_panels.chats_auto_download')
             @include('chat.settings.chats_panels.chats_wallpaper')
+            @include('chat.settings.chats_panels.chats_hide')
             @include('chat.settings.account')
             @include('chat.settings.security_notifications')
             @include('chat.settings.video_voice_panels.video_voice')
@@ -4563,6 +4564,17 @@
         };
 
         window.selectChat = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
+            const elementId = `user_sidebar_${otherUserId}`;
+            if (window.hiddenChats && window.hiddenChats.includes(elementId)) {
+                window.promptHiddenChatClickUnlock(function() {
+                    window.selectChatOriginal(otherUserId, name, phone, avatar, about, searchMsgTime);
+                });
+            } else {
+                window.selectChatOriginal(otherUserId, name, phone, avatar, about, searchMsgTime);
+            }
+        };
+
+        window.selectChatOriginal = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
             if (typeof window.closeAllSearchPanels === 'function') {
                 window.closeAllSearchPanels();
             }

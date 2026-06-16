@@ -639,6 +639,7 @@
             // Archive, Lock, Mute management
             window.archivedChats = JSON.parse(localStorage.getItem('archived_chats') || '[]');
             window.lockedChats = JSON.parse(localStorage.getItem('locked_chats') || '[]');
+            window.hiddenChats = JSON.parse(localStorage.getItem('hidden_chats') || '[]');
             window.mutedChats = JSON.parse(localStorage.getItem('muted_chats') || '{}');
 
             // Block, Clear, Delete management
@@ -867,6 +868,11 @@
                     
                     // Hide locked chats from all other views
                     if (filter !== 'locked' && window.lockedChats.includes(item.id)) {
+                        matchesFilter = false;
+                    }
+                    
+                    // Hide hidden chats from all views
+                    if (window.hiddenChats && window.hiddenChats.includes(item.id)) {
                         matchesFilter = false;
                     }
 
