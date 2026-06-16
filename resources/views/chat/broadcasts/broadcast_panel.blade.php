@@ -905,7 +905,7 @@
                                     <div class="bg-[#005c4b] text-white rounded-lg px-2.5 py-1.5 shadow-sm max-w-[85%] relative min-w-[80px]">
                                         ${mediaContent}
                                         ${hasText ? `
-                                            <div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">
+                                            <div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">
                                                 ${escapeHtml(textToRender)}<span class="inline-block w-[99px] h-[1px]"></span>
                                             </div>
                                         ` : `

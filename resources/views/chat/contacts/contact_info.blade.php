@@ -174,6 +174,13 @@
             return;
         }
 
+        // Close search sidebar if open
+        const searchSidebar = document.getElementById('search_sidebar');
+        if (searchSidebar) {
+            searchSidebar.classList.add('hidden');
+            searchSidebar.classList.remove('flex');
+        }
+
         // Populate Panel with User Data
         document.getElementById('contact_info_name').textContent = user.name;
         document.getElementById('contact_info_phone').textContent = user.phone || 'No phone number';

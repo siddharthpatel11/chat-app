@@ -117,6 +117,13 @@
         const list = window.activeBroadcastList;
         if (!list) return;
 
+        // Close search sidebar if open
+        const searchSidebar = document.getElementById('search_sidebar');
+        if (searchSidebar) {
+            searchSidebar.classList.add('hidden');
+            searchSidebar.classList.remove('flex');
+        }
+
         // Populate details
         document.getElementById('bcast_info_name').textContent = list.name;
         document.getElementById('bcast_info_subtitle').textContent = `Broadcast List · ${list.recipients.length} recipients`;

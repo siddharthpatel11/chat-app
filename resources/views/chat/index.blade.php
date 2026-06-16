@@ -1278,9 +1278,9 @@
 
                                     <!-- State 1: Normal Text Input -->
                                     <div id="text_input_state" class="w-full relative flex items-center">
-                                        <input type="text" id="msg" oninput="handleInputToggle()"
-                                            onkeypress="handleKeyPress(event)" placeholder="Type a message"
-                                            class="w-full bg-transparent border-none pl-4 pr-10 py-2.5 text-[15px] focus:ring-0 text-[#d1d7db] placeholder-[#8696a0] min-h-[44px]">
+                                        <textarea id="msg" oninput="handleInputToggle(); autoResizeTextarea(this)"
+                                            onkeydown="handleTextareaKey(event)" placeholder="Type a message" rows="1"
+                                            class="w-full bg-transparent border-none pl-4 pr-10 py-2.5 text-[15px] focus:ring-0 text-[#d1d7db] placeholder-[#8696a0] min-h-[44px] max-h-32 resize-none overflow-y-auto custom-scrollbar leading-normal"></textarea>
                                         <!-- INSIDE MIC (Voice-to-Text) -->
                                         <button type="button" id="inside_mic_btn" onclick="toggleVoiceRecord()"
                                             class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
@@ -1650,6 +1650,7 @@
             msgInput.value += event.detail.unicode;
             msgInput.focus();
             handleInputToggle();
+            autoResizeTextarea(msgInput);
         });
 
         let recognition = null;
@@ -2374,8 +2375,16 @@
             document.getElementById('media_preview_modal').classList.add('hidden');
         }
 
-        function handleKeyPress(e) {
-            if (e.key === 'Enter') send();
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+
+        function handleTextareaKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                send();
+            }
         }
 
         // Core Send Function (used for text & modal)
@@ -2433,7 +2442,11 @@
                     msgData.reply_to_name = window.replyingToName || 'Member';
                 }
 
-                document.getElementById('msg').value = "";
+                const msgEl = document.getElementById('msg');
+                if (msgEl) {
+                    msgEl.value = "";
+                    autoResizeTextarea(msgEl);
+                }
                 clearFile();
                 cancelReply();
                 if (typeof handleInputToggle === 'function') handleInputToggle();
@@ -2458,7 +2471,11 @@
             }
 
             // Reset inputs
-            document.getElementById('msg').value = "";
+            const msgEl = document.getElementById('msg');
+            if (msgEl) {
+                msgEl.value = "";
+                autoResizeTextarea(msgEl);
+            }
             clearFile();
             cancelReply();
             if (typeof handleInputToggle === 'function') handleInputToggle();
@@ -2974,6 +2991,16 @@
             if (!sidebar) return;
             const isHidden = sidebar.classList.contains('hidden');
             if (isHidden) {
+                // Close other panels
+                if (window.closeContactInfo) window.closeContactInfo();
+                if (window.closeGroupInfoPanel) window.closeGroupInfoPanel();
+                if (window.closeBroadcastInfo) window.closeBroadcastInfo();
+                const metaAiPanel = document.getElementById('meta_ai_info_panel');
+                if (metaAiPanel) {
+                    metaAiPanel.classList.add('translate-x-full');
+                    metaAiPanel.classList.remove('translate-x-0');
+                }
+
                 sidebar.classList.remove('hidden');
                 sidebar.classList.add('flex');
                 document.getElementById('search_messages_input').focus();
@@ -3703,6 +3730,16 @@
             if (!sidebar) return;
             const isHidden = sidebar.classList.contains('hidden');
             if (isHidden) {
+                // Close other panels
+                if (window.closeContactInfo) window.closeContactInfo();
+                if (window.closeGroupInfoPanel) window.closeGroupInfoPanel();
+                if (window.closeBroadcastInfo) window.closeBroadcastInfo();
+                const metaAiPanel = document.getElementById('meta_ai_info_panel');
+                if (metaAiPanel) {
+                    metaAiPanel.classList.add('translate-x-full');
+                    metaAiPanel.classList.remove('translate-x-0');
+                }
+
                 sidebar.classList.remove('hidden');
                 sidebar.classList.add('flex');
                 document.getElementById('search_messages_input').focus();
@@ -4860,10 +4897,10 @@
                                 ${callIcon}
                             </div>
                             <div class="flex-1 min-w-0">
-                                <div class="text-[14px] font-semibold ${isMissed ? 'text-red-600' : 'text-gray-900'} leading-tight">${callTitle}</div>
+                                <div class="text-[14px] font-semibold ${isMissed ? 'text-red-600' : 'text-[#e9edef]'} leading-tight">${callTitle}</div>
                                 <div class="flex items-center gap-1 mt-0.5">
                                     ${arrowIcon}
-                                    <span class="text-[12px] ${isMissed ? 'text-red-500' : 'text-gray-500'}">${durationText}</span>
+                                    <span class="text-[12px] ${isMissed ? 'text-red-500' : 'text-[#8696a0]'}">${durationText}</span>
                                 </div>
                             </div>
                         </div>`;
@@ -4962,7 +4999,7 @@
                                 }
                                 const textToRender = isSearchMatch ? window.highlightSearchText(data.text) : data.text;
                                 const htmlText = window.wrapEmojis ? window.wrapEmojis(textToRender) : textToRender;
-                                return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
+                                return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
                             })() : ''}
 
                             <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2 bg-transparent">

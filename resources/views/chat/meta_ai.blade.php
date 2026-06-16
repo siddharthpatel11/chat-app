@@ -682,6 +682,13 @@
     };
 
     window.openMetaAiInfo = function() {
+        // Close search sidebar if open
+        const searchSidebar = document.getElementById('search_sidebar');
+        if (searchSidebar) {
+            searchSidebar.classList.add('hidden');
+            searchSidebar.classList.remove('flex');
+        }
+
         const panel = document.getElementById('meta_ai_info_panel');
         if (panel) {
             panel.classList.remove('translate-x-full');

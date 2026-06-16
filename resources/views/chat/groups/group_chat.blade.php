@@ -425,8 +425,7 @@
                         <!-- GIF Tab -->
                         <button
                             class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
-                            <span
-                                class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
+                            <span class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
                         </button>
                         <!-- Sticker Tab -->
                         <button
@@ -446,9 +445,10 @@
                     class="flex-1 relative flex items-center bg-[#2a3942] rounded-xl shadow-sm overflow-hidden">
                     <!-- State 1: Normal Text Input -->
                     <div id="group_text_input_state" class="w-full relative flex items-center">
-                        <input type="text" id="group_msg" oninput="handleGroupInputToggle()"
-                            onkeypress="handleGroupKeyPress(event)" placeholder="Type a message"
-                            class="w-full bg-transparent border-none pl-4 pr-10 py-2.5 text-[15px] focus:ring-0 text-[#d1d7db] placeholder-[#8696a0] min-h-[44px] focus:outline-none">
+                        <textarea id="group_msg"
+                            oninput="handleGroupInputToggle(); if(typeof autoResizeTextarea === 'function') autoResizeTextarea(this)"
+                            onkeydown="handleGroupKeyPress(event)" placeholder="Type a message" rows="1"
+                            class="w-full bg-transparent border-none pl-4 pr-10 py-2.5 text-[15px] focus:ring-0 text-[#d1d7db] placeholder-[#8696a0] min-h-[44px] max-h-32 resize-none overflow-y-auto custom-scrollbar leading-normal focus:outline-none"></textarea>
                         <!-- Inside Voice to Text Mic Button -->
                         <button type="button" id="group_inside_mic_btn" onclick="toggleGroupVoiceRecord()"
                             class="absolute right-3 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors">
@@ -1249,8 +1249,14 @@
 </div>
 
 <script>
+    window.autoResizeTextarea = function(el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+    };
+
     window.handleGroupKeyPress = function(e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
             sendGroupMessage();
         }
     };
@@ -1270,6 +1276,7 @@
         if (input) {
             input.value += emoji;
             handleGroupInputToggle();
+            if (typeof autoResizeTextarea === 'function') autoResizeTextarea(input);
             input.focus();
         }
         document.getElementById('group_emoji_picker_container')?.classList.add('hidden');
@@ -1283,6 +1290,7 @@
             if (input) {
                 input.value += event.detail.unicode;
                 if (typeof handleGroupInputToggle === 'function') handleGroupInputToggle();
+                if (typeof autoResizeTextarea === 'function') autoResizeTextarea(input);
                 input.focus();
             }
         });
@@ -1670,6 +1678,7 @@
         if (!text || !window.currentChatId) return;
 
         input.value = '';
+        if (typeof autoResizeTextarea === 'function') autoResizeTextarea(input);
         input.focus();
 
         if (typeof handleGroupInputToggle === 'function') handleGroupInputToggle();
@@ -1688,6 +1697,7 @@
         }
 
         input.value = '';
+        if (typeof autoResizeTextarea === 'function') autoResizeTextarea(input);
         if (typeof handleGroupInputToggle === 'function') handleGroupInputToggle();
 
         try {
@@ -1806,6 +1816,13 @@
     window.openGroupInfoPanel = function() {
         const u = window.activeChatUser;
         if (!u) return;
+
+        // Close search sidebar if open
+        const searchSidebar = document.getElementById('search_sidebar');
+        if (searchSidebar) {
+            searchSidebar.classList.add('hidden');
+            searchSidebar.classList.remove('flex');
+        }
 
         document.getElementById('group_info_name').textContent = u.name;
         document.getElementById('group_info_avatar').src = u.avatar ||
@@ -1927,9 +1944,11 @@
                                 memberAbout = matchUser.about || "Available";
                             }
 
-                            let memberAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=2a3942&color=fff`;
+                            let memberAvatar =
+                                `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=2a3942&color=fff`;
                             if (matchUser) {
-                                memberAvatar = window.getUserAvatar ? window.getUserAvatar(matchUser.id) : (matchUser.avatar || memberAvatar);
+                                memberAvatar = window.getUserAvatar ? window.getUserAvatar(matchUser
+                                    .id) : (matchUser.avatar || memberAvatar);
                             }
 
                             membersHtml += `
@@ -2648,17 +2667,23 @@
     <div class="bg-[#233138] rounded-full shadow-lg border border-[#313d45] px-2 py-1.5 flex items-center gap-1 mb-2 absolute"
         style="top: -46px; left: 0; width: max-content;">
         <button onclick="event.stopPropagation(); window.sendReaction('👍', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">👍</span></button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span
+                class="emoji-text">👍</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('❤️', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">❤️</span></button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span
+                class="emoji-text">❤️</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('😂', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😂</span></button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span
+                class="emoji-text">😂</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('😮', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😮</span></button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span
+                class="emoji-text">😮</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('😢', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">😢</span></button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span
+                class="emoji-text">😢</span></button>
         <button onclick="event.stopPropagation(); window.sendReaction('🙏', window._activeGroupMsgKey, true, event)"
-            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span class="emoji-text">🙏</span></button>
+            class="w-8 h-8 flex items-center justify-center text-lg hover:bg-white/10 rounded-full transition-transform hover:scale-125"><span
+                class="emoji-text">🙏</span></button>
         <button
             onclick="event.stopPropagation(); window.openFullReactionPicker(window._activeGroupMsgKey, true, event)"
             class="w-8 h-8 flex items-center justify-center text-[18px] text-[#aebac1] hover:bg-white/10 rounded-full transition-transform hover:scale-125 bg-white/5 ml-1">
@@ -3255,12 +3280,14 @@
         }
 
         const isMe = msgData && msgData.sender_id == window.myUserId;
-        const isAdmin = window.currentGroupData && window.currentGroupData.admins && 
-            (window.currentGroupData.admins.includes(parseInt(window.myUserId)) || window.currentGroupData.admins.includes(String(window.myUserId)));
+        const isAdmin = window.currentGroupData && window.currentGroupData.admins &&
+            (window.currentGroupData.admins.includes(parseInt(window.myUserId)) || window.currentGroupData.admins
+                .includes(String(window.myUserId)));
         const canDeleteEveryone = isMe || isAdmin;
 
         const onConfirmMe = () => {
-            window.set(window.ref(window.db, `groups/${window.currentChatId}/messages/${key}/deleted_for/${window.myUserId}`), true)
+            window.set(window.ref(window.db,
+                    `groups/${window.currentChatId}/messages/${key}/deleted_for/${window.myUserId}`), true)
                 .catch(e => console.error("Group delete for me error:", e));
         };
 
@@ -3969,7 +3996,8 @@
             const key = snapshot.key;
             if (data && data.deleted_for && data.deleted_for[window.myUserId]) {
                 if (window.groupMessagesCache[groupId]) {
-                    window.groupMessagesCache[groupId] = window.groupMessagesCache[groupId].filter(m => m.key !== key);
+                    window.groupMessagesCache[groupId] = window.groupMessagesCache[groupId].filter(m => m
+                        .key !== key);
                 }
                 const msgEl = document.getElementById('msg_' + key);
                 if (msgEl) msgEl.remove();
@@ -4871,7 +4899,8 @@
                 });
                 const isVideo = data.call_type === 'video';
                 const approvalParam = data.require_approval ? '&require_approval=true' : '';
-                const callLink = `${window.location.origin}/chat/groups/${data.call_type}-call?group_call_id=${data.group_call_id}&name=${encodeURIComponent(data.call_name)}${approvalParam}`;
+                const callLink =
+                    `${window.location.origin}/chat/groups/${data.call_type}-call?group_call_id=${data.group_call_id}&name=${encodeURIComponent(data.call_name)}${approvalParam}`;
 
                 mediaContent = `
                     <div class="mb-2 relative rounded-2xl overflow-hidden border border-white/5 bg-[#1f2c34] w-[270px] max-w-[100%] shadow-lg p-4 text-[#e9edef] font-['Inter']">
@@ -5035,7 +5064,7 @@
                                 return window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
                             }
                             const htmlText = window.wrapEmojis ? window.wrapEmojis(msgText) : msgText;
-                            return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
+                            return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
                         })() : ''}
 
                         <div class="flex items-center justify-end gap-1 absolute bottom-0.5 right-2 bg-transparent">
