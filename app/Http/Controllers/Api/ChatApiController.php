@@ -948,6 +948,66 @@ class ChatApiController extends Controller
         }
     }
 
+    public function editMessage(Request $request)
+    {
+        $request->validate([
+            'chat_id' => 'required|string',
+            'message_id' => 'required|string',
+            'message' => 'required|string',
+        ]);
+
+        $userId = auth()->id() ?? $request->user_id;
+
+        if (!$userId) {
+            return response()->json(['status' => false, 'message' => 'User ID is required'], 400);
+        }
+
+        $chatId = $request->chat_id;
+        $messageId = $request->message_id;
+        $newMessageText = $request->message;
+        
+        $isGroup = str_starts_with($chatId, 'group_');
+        $firebaseChatId = $chatId;
+        if ($isGroup && str_starts_with($firebaseChatId, 'group_group_')) {
+            $firebaseChatId = substr($firebaseChatId, 6);
+        }
+        $basePath = $isGroup ? "groups/$firebaseChatId/messages/$messageId" : "chats/$chatId/messages/$messageId";
+
+        try {
+            $messageRef = $this->db->getReference($basePath);
+            $message = $messageRef->getValue();
+
+            if (!$message) {
+                return response()->json(['status' => false, 'message' => 'Message not found'], 404);
+            }
+
+            $isSender = isset($message['sender_id']) && $message['sender_id'] == $userId;
+
+            if (!$isSender) {
+                return response()->json(['status' => false, 'message' => 'You can only edit your own messages'], 403);
+            }
+
+            // Update message in Firebase
+            $messageRef->update([
+                'text' => $newMessageText,
+                'is_edited' => true,
+                'edited_at' => now()->timestamp,
+            ]);
+
+            // Update chat metadata with last message info if needed
+            if (!$isGroup) {
+                $this->db->getReference("chats/$chatId")->update([
+                    'last_message' => $newMessageText,
+                    'updated_at' => now()->timestamp,
+                ]);
+            }
+
+            return response()->json(['status' => true, 'message' => 'Message edited successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function forwardMessages(Request $request)
     {
         $userId = auth()->id() ?? $request->user_id;

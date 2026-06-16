@@ -5,16 +5,16 @@ use App\Http\Controllers\Api\ChatApiController;
 use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\MediaApiController;
 use App\Http\Controllers\Api\MetaAiApiController;
-use App\Http\Controllers\Api\Profile\GeneralApiController;
-use App\Http\Controllers\Api\Profile\ProfileApiController;
 use App\Http\Controllers\Api\Profile\AccountApiController;
-use App\Http\Controllers\Api\Profile\PrivacyApiController;
 use App\Http\Controllers\Api\Profile\ChatsApiController;
-use App\Http\Controllers\Api\Profile\NotificationsApiController;
-use App\Http\Controllers\Api\Profile\VideoVoiceApiController;
-use App\Http\Controllers\Api\Profile\KeyboardShortcutsApiController;
+use App\Http\Controllers\Api\Profile\GeneralApiController;
 use App\Http\Controllers\Api\Profile\HelpFeedbackApiController;
+use App\Http\Controllers\Api\Profile\KeyboardShortcutsApiController;
 use App\Http\Controllers\Api\Profile\LogoutApiController;
+use App\Http\Controllers\Api\Profile\NotificationsApiController;
+use App\Http\Controllers\Api\Profile\PrivacyApiController;
+use App\Http\Controllers\Api\Profile\ProfileApiController;
+use App\Http\Controllers\Api\Profile\VideoVoiceApiController;
 use App\Http\Controllers\Api\StatusApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -23,14 +23,14 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::post('/send-message',[ChatApiController::class,'send']);
-Route::get('/messages/{chatId}',[ChatApiController::class,'messages']);
-Route::get('/messages/{chatId}/search',[ChatApiController::class,'searchInChat']);
+Route::post('/send-message', [ChatApiController::class, 'send']);
+Route::get('/messages/{chatId}', [ChatApiController::class, 'messages']);
+Route::get('/messages/{chatId}/search', [ChatApiController::class, 'searchInChat']);
 
-Route::post('/create-chat',[ChatApiController::class,'createChat']);
-Route::get('/chats',[ChatApiController::class,'chatList']);
+Route::post('/create-chat', [ChatApiController::class, 'createChat']);
+Route::get('/chats', [ChatApiController::class, 'chatList']);
 
-Route::post('/save-token',[ChatApiController::class,'saveToken']);
+Route::post('/save-token', [ChatApiController::class, 'saveToken']);
 Route::post('/update-live-location', [ChatApiController::class, 'updateLiveLocation']);
 
 Route::get('/users', [ChatApiController::class, 'users']);
@@ -53,6 +53,7 @@ Route::post('/user/block', [ChatApiController::class, 'toggleBlockUser']);
 Route::post('/chat/clear', [ChatApiController::class, 'clearChat']);
 Route::post('/chat/delete', [ChatApiController::class, 'deleteChat']);
 Route::post('/message/delete', [ChatApiController::class, 'deleteMessage']);
+Route::post('/message/edit', [ChatApiController::class, 'editMessage']);
 Route::post('/user/report', [ChatApiController::class, 'reportUser']);
 
 // Group Chat Features
@@ -132,5 +133,3 @@ Route::get('/media/all', [MediaApiController::class, 'getGlobalMedia']);
 // Global Media Actions
 Route::post('/media/delete', [MediaApiController::class, 'deleteMedia']);
 Route::post('/media/forward', [MediaApiController::class, 'forwardMedia']);
-
-

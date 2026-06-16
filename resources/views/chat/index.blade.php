@@ -698,7 +698,7 @@
 
             <div id="chat_view_container" class="flex-1 flex h-full overflow-hidden relative">
                 @include('chat.settings_shortcuts')
-                <div id="main_chat_column" class="flex flex-col flex-1 h-full relative transition-all duration-300">
+                <div id="main_chat_column" class="flex flex-col flex-1 h-full relative transition-all duration-300 min-w-0">
                     <!-- Lock Overlay to hide messages during lock/unlock prompts -->
                     <div id="chat_lock_overlay" class="hidden absolute inset-0 bg-[#0b141a] z-[150] flex flex-col items-center justify-center text-center px-4 transition-all duration-300">
                         <div class="flex flex-col items-center animate-pulse">
@@ -1047,8 +1047,8 @@
                         <!-- Pinned Messages Bar (Hidden by default, supports multiple) -->
                         <div id="private_pinned_bar"
                             onclick="window.scrollToCurrentPin && window.scrollToCurrentPin()"
-                            class="hidden bg-[#2a3942]/90 backdrop-blur-sm px-4 py-2 flex items-center justify-between border-b border-white/5 cursor-pointer hover:bg-[#384b57] transition-colors z-[15]">
-                            <div class="flex items-center gap-3 overflow-hidden">
+                            class="hidden bg-[#2a3942]/90 backdrop-blur-sm px-4 py-2 flex items-center justify-between border-b border-white/5 cursor-pointer hover:bg-[#384b57] transition-colors z-[15] w-full max-w-full min-w-0 overflow-hidden">
+                            <div class="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
                                 <div class="text-[#00a884] shrink-0">
                                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                         <path
@@ -1056,11 +1056,11 @@
                                         </path>
                                     </svg>
                                 </div>
-                                <div class="flex flex-col min-w-0">
+                                <div class="flex flex-col min-w-0 flex-1">
                                     <span id="private_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1
                                         pinned message</span>
                                     <span id="private_pinned_text"
-                                        class="text-[#8696a0] text-sm truncate w-full">Message text goes here...</span>
+                                        class="text-[#8696a0] text-sm truncate block w-full">Message text goes here...</span>
                                 </div>
                             </div>
                             <div class="flex items-center gap-1 shrink-0">
@@ -1097,6 +1097,22 @@
                                         class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
                                 </div>
                                 <button onclick="cancelReply()"
+                                    class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            <!-- Editing Block -->
+                            <div id="editing_to_block"
+                                class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
+                                <div class="flex flex-col overflow-hidden">
+                                    <span class="font-semibold text-[#00a884] text-[13px]">Edit message</span>
+                                    <span id="editing_to_text"
+                                        class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
+                                </div>
+                                <button onclick="window.cancelEdit()"
                                     class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -2395,6 +2411,40 @@
             }
             if (msgText === "" && !fileObj) return;
 
+            if (window.editingMessageKey) {
+                const isGroup = window.currentChatId.startsWith('group_');
+                let path = '';
+                if (isGroup) {
+                    let firebaseChatId = window.currentChatId;
+                    if (firebaseChatId.startsWith('group_group_')) {
+                        firebaseChatId = firebaseChatId.substring(6);
+                    }
+                    path = `groups/${firebaseChatId}/messages/${window.editingMessageKey}`;
+                } else {
+                    path = `chats/${window.currentChatId}/messages/${window.editingMessageKey}`;
+                }
+
+                try {
+                    await window.update(window.ref(window.db, path), {
+                        text: msgText,
+                        is_edited: true,
+                        edited_at: Math.floor(Date.now() / 1000)
+                    });
+                    
+                    if (!isGroup) {
+                        window.update(window.ref(window.db, `chats/${window.currentChatId}`), {
+                            'last_message': msgText,
+                            'updated_at': Math.floor(Date.now() / 1000)
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error editing message:", e);
+                }
+
+                window.cancelEdit();
+                return;
+            }
+
             const msgInput = document.getElementById('msg');
             if (msgInput && msgInput.disabled) {
                 alert('You do not have permission to send messages to this group.');
@@ -2575,6 +2625,37 @@
             window.replyingToName = null;
             window.replyingToText = null;
             document.getElementById('replying_to_block').classList.add('hidden');
+        };
+
+        window.editingMessageKey = null;
+
+        window.startEdit = function(key) {
+            window.closeMsgMenu(key);
+            const msgData = window.globalMessages[key];
+            if (!msgData || msgData.type !== 'text') return;
+
+            window.cancelReply();
+
+            window.editingMessageKey = key;
+            const text = msgData.text || "";
+
+            document.getElementById('editing_to_block').classList.remove('hidden');
+            document.getElementById('editing_to_text').textContent = text;
+            
+            const textarea = document.getElementById('msg');
+            textarea.value = text;
+            textarea.focus();
+            autoResizeTextarea(textarea);
+            if (typeof handleInputToggle === 'function') handleInputToggle();
+        };
+
+        window.cancelEdit = function() {
+            window.editingMessageKey = null;
+            document.getElementById('editing_to_block').classList.add('hidden');
+            const textarea = document.getElementById('msg');
+            textarea.value = "";
+            autoResizeTextarea(textarea);
+            if (typeof handleInputToggle === 'function') handleInputToggle();
         };
 
         // Multi-pin state
@@ -4973,6 +5054,9 @@
                                     ${data.type !== 'call' ? `
                                         <button onclick="event.stopPropagation(); window.replyTo('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Reply <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg></button>
                                         <button onclick="event.stopPropagation(); /* copy function */" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Copy <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></button>
+                                        ${isMe && data.type === 'text' ? `
+                                            <button onclick="event.stopPropagation(); window.startEdit('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Edit <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></button>
+                                        ` : ''}
                                         <button onclick="event.stopPropagation(); window.forwardMsg('${key}')" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Forward <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg></button>
                                         <button onclick="event.stopPropagation(); window.askMetaAi('${key}', '${activeName}', \`${data.text ? data.text.replace(/\`/g, '\\\\`') : ''}\`)" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">Ask Meta AI <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#8696a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 8a4 4 0 0 1 4 4c0 2.21-1.79 4-4 4s-4-1.79-4-4a4 4 0 0 1 4-4z" class="fill-[#8696a0]"></path></svg></button>
                                         <button id="pin_btn_${key}" onclick="event.stopPropagation(); if(window.pinnedMsgKeys && window.pinnedMsgKeys.has('${key}')) { window.unpinPrivateMessage('${key}'); } else { window.pinPrivateMessage('${key}'); }" class="w-full text-left px-4 py-2 text-sm text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors">
@@ -5005,6 +5089,7 @@
                             <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2 bg-transparent">
                                 <span id="star_icon_${key}" class="msg-star-icon hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></span>
                                 <span id="pin_icon_${key}" class="msg-pin-icon hidden shrink-0"><svg viewBox="0 0 24 24" width="14" height="14" fill="#8696a0"><path d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z"/></svg></span>
+                                ${data.is_edited ? `<span class="edited-label text-[10px] text-[#8696a0] select-none italic mr-0.5">Edited</span>` : ''}
                                 <span class="text-[11px] text-[#8696a0] select-none leading-none">${time}</span>
                                 ${isMe ? `<span id="tick_${key}" class="shrink-0 flex items-center justify-center leading-none">${window.getTickSVG(data.status || 'sent')}</span>` : ''}
                             </div>
@@ -5070,6 +5155,32 @@
                         const tickEl = document.getElementById('tick_' + key);
                         if (tickEl) {
                             tickEl.innerHTML = window.getTickSVG(data.status || 'sent');
+                        }
+                    }
+
+                    // Update text if message was edited
+                    const bubbleEl = document.getElementById('bubble_' + key);
+                    if (bubbleEl) {
+                        const textDiv = bubbleEl.querySelector('.break-words');
+                        if (textDiv && data.text) {
+                            const callLink = window.parseCallLink(data.text);
+                            let newHtmlText = '';
+                            if (callLink) {
+                                newHtmlText = window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
+                            } else {
+                                const isSearchMatch = window.activeSearchMsgTime && data.time && data.time == window.activeSearchMsgTime;
+                                const textToRender = isSearchMatch ? window.highlightSearchText(data.text) : data.text;
+                                newHtmlText = (window.wrapEmojis ? window.wrapEmojis(textToRender) : textToRender) + '<span class="inline-block w-[99px] h-[1px]"></span>';
+                            }
+                            textDiv.innerHTML = newHtmlText;
+                        }
+
+                        // Add Edited indicator if not present
+                        if (data.is_edited) {
+                            const timeSpan = bubbleEl.querySelector('span.text-\\[11px\\]') || bubbleEl.querySelector('span:not(.edited-label):not(.msg-star-icon):not(.msg-pin-icon):not(#tick_' + key + ')');
+                            if (timeSpan && !bubbleEl.querySelector('.edited-label')) {
+                                timeSpan.insertAdjacentHTML('beforebegin', '<span class="edited-label text-[10px] text-[#8696a0] select-none italic mr-0.5">Edited</span>');
+                            }
                         }
                     }
 
