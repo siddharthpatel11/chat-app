@@ -56,6 +56,10 @@ Route::post('/message/delete', [ChatApiController::class, 'deleteMessage']);
 Route::post('/message/edit', [ChatApiController::class, 'editMessage']);
 Route::post('/user/report', [ChatApiController::class, 'reportUser']);
 
+// Hide Chat Settings API
+Route::get('/settings/hide-chat', [ChatApiController::class, 'getHideChatSettings']);
+Route::post('/settings/hide-chat', [ChatApiController::class, 'saveHideChatSettings']);
+
 // Group Chat Features
 Route::post('/group/create', [GroupApiController::class, 'createGroup']);
 Route::post('/group/{groupId}/add-members', [GroupApiController::class, 'addMembers']);

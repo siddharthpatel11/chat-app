@@ -1056,5 +1056,69 @@ class ChatApiController extends Controller
             return response()->json(['status' => false, 'message' => 'Error forwarding messages: ' . $e->getMessage()], 500);
         }
     }
+
+    // 🔒 Get Hide Chat Settings (Password hash and Hidden Chats)
+    public function getHideChatSettings(Request $request)
+    {
+        $userId = $request->user_id ?? auth()->id();
+        if (!$userId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User ID is required'
+            ], 400);
+        }
+        
+        $settings = $this->db->getReference("users/{$userId}/hide_chat_settings")->getValue() ?: [
+            'hidden_chats' => [],
+            'password' => null,
+            'password_hash' => null
+        ];
+
+        // Ensure both password and password_hash are populated
+        if (!isset($settings['password'])) {
+            $settings['password'] = $settings['password_hash'] ?? null;
+        }
+        if (!isset($settings['password_hash'])) {
+            $settings['password_hash'] = $settings['password'] ?? null;
+        }
+
+        return response()->json([
+            'status' => true,
+            'data' => $settings
+        ]);
+    }
+
+    // 🔒 Save Hide Chat Settings
+    public function saveHideChatSettings(Request $request)
+    {
+        $request->validate([
+            'password' => 'nullable|string',
+            'password_hash' => 'nullable|string',
+            'hidden_chats' => 'nullable|array'
+        ]);
+
+        $userId = $request->user_id ?? auth()->id();
+        if (!$userId) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User ID is required'
+            ], 400);
+        }
+        
+        $pwd = $request->input('password') ?? $request->input('password_hash');
+
+        $settings = [
+            'password' => $pwd,
+            'password_hash' => $pwd,
+            'hidden_chats' => $request->input('hidden_chats', [])
+        ];
+
+        $this->db->getReference("users/{$userId}/hide_chat_settings")->set($settings);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Hide Chat settings updated successfully'
+        ]);
+    }
 }
 

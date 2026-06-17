@@ -83,14 +83,25 @@
     let checkPhoneTimeout = null;
     let validContactUser = null;
 
+
+
     function toggleNewContact() {
         const newContactPanel = document.getElementById('new_contact_panel');
         const newChatPanel = document.getElementById('new_chat_panel');
+        const sidebar = document.getElementById('user_sidebar_container');
         
         if (newContactPanel.classList.contains('hidden')) {
-            // Hide new chat panel the same way toggleNewChat shows it
-            newChatPanel.classList.add('hidden');
-            newChatPanel.classList.remove('sm:flex');
+            // Check if new chat panel was open
+            const wasNewChatOpen = newChatPanel && !newChatPanel.classList.contains('hidden');
+            if (wasNewChatOpen) {
+                newContactPanel.setAttribute('data-opened-from', 'new_chat');
+                newChatPanel.classList.add('hidden');
+                newChatPanel.classList.remove('sm:flex');
+            } else {
+                newContactPanel.setAttribute('data-opened-from', 'sidebar');
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('sm:flex');
+            }
 
             // Show new contact panel
             newContactPanel.classList.remove('hidden');
@@ -99,13 +110,21 @@
 
             document.getElementById('new_contact_first_name').focus();
         } else {
+            const openedFrom = newContactPanel.getAttribute('data-opened-from') || 'sidebar';
+            
             // Hide new contact panel
             newContactPanel.classList.add('hidden');
             newContactPanel.style.display = '';
 
-            // Show new chat panel the same way toggleNewChat shows it
-            newChatPanel.classList.remove('hidden');
-            newChatPanel.classList.add('sm:flex');
+            if (openedFrom === 'new_chat') {
+                // Show new chat panel
+                newChatPanel.classList.remove('hidden');
+                newChatPanel.classList.add('sm:flex');
+            } else {
+                // Show main sidebar
+                sidebar.classList.remove('hidden');
+                sidebar.classList.add('sm:flex');
+            }
 
             // reset form
             document.getElementById('new_contact_first_name').value = '';

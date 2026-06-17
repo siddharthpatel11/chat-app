@@ -41,9 +41,21 @@ class MediaApiController extends Controller
                 $maxId = max($userId, $otherUser->id);
                 $chatId = "chat_{$minId}_{$maxId}";
 
+                $clearedAt = $this->db->getReference("chats/{$chatId}/settings/{$userId}/cleared_at")->getValue();
+                $deletedAt = $this->db->getReference("chats/{$chatId}/settings/{$userId}/deleted_at")->getValue();
+
                 $messagesRef = $this->db->getReference("chats/{$chatId}/messages")->getValue() ?? [];
                 
                 foreach ($messagesRef as $key => $data) {
+                    if (isset($data['deleted_for'][$userId])) {
+                        continue;
+                    }
+                    if ($clearedAt && isset($data['time']) && $data['time'] < $clearedAt) {
+                        continue;
+                    }
+                    if ($deletedAt && isset($data['time']) && $data['time'] < $deletedAt) {
+                        continue;
+                    }
                     $this->processMessageForMedia($data, $key, $chatId, $userId, $globalMediaCache, $urlRegex);
                 }
             }
@@ -53,9 +65,21 @@ class MediaApiController extends Controller
             foreach ($groupsRef as $groupId => $groupData) {
                 $groupUsers = $groupData['users'] ?? [];
                 if (in_array((int)$userId, $groupUsers)) {
+                    $clearedAt = $this->db->getReference("chats/{$groupId}/settings/{$userId}/cleared_at")->getValue();
+                    $deletedAt = $this->db->getReference("chats/{$groupId}/settings/{$userId}/deleted_at")->getValue();
+
                     $messagesRef = $this->db->getReference("groups/{$groupId}/messages")->getValue() ?? [];
                     
                     foreach ($messagesRef as $key => $data) {
+                        if (isset($data['deleted_for'][$userId])) {
+                            continue;
+                        }
+                        if ($clearedAt && isset($data['time']) && $data['time'] < $clearedAt) {
+                            continue;
+                        }
+                        if ($deletedAt && isset($data['time']) && $data['time'] < $deletedAt) {
+                            continue;
+                        }
                         $this->processMessageForMedia($data, $key, $groupId, $userId, $globalMediaCache, $urlRegex);
                     }
                 }
@@ -80,7 +104,19 @@ class MediaApiController extends Controller
                     }
 
                     if ($userIsInvolved) {
+                        $clearedAt = $this->db->getReference("chats/{$chatId}/settings/{$userId}/cleared_at")->getValue();
+                        $deletedAt = $this->db->getReference("chats/{$chatId}/settings/{$userId}/deleted_at")->getValue();
+
                         foreach ($messagesRef as $key => $data) {
+                            if (isset($data['deleted_for'][$userId])) {
+                                continue;
+                            }
+                            if ($clearedAt && isset($data['time']) && $data['time'] < $clearedAt) {
+                                continue;
+                            }
+                            if ($deletedAt && isset($data['time']) && $data['time'] < $deletedAt) {
+                                continue;
+                            }
                             $this->processMessageForMedia($data, $key, $chatId, $userId, $globalMediaCache, $urlRegex);
                         }
                     }

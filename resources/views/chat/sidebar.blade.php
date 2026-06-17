@@ -1193,34 +1193,72 @@
                 }
             };
 
-            window.clearChatMessages = function(targetId, type) {
-                const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
-                window.clearedChats[elementId] = Math.floor(Date.now() / 1000);
-                localStorage.setItem('cleared_chats', JSON.stringify(window.clearedChats));
-
-                // Clear UI if currently open
-                if (window.checkAndApplyClearedChatUI) window.checkAndApplyClearedChatUI(elementId);
-
-                window.showToast?.('Chat Cleared', `Messages in this chat have been cleared for you.`);
-            };
-
-            window.deleteChatMessages = function(targetId, type) {
-                const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
-                window.clearedChats[elementId] = Math.floor(Date.now() / 1000);
-                localStorage.setItem('cleared_chats', JSON.stringify(window.clearedChats));
-
-                if (!window.deletedChats.includes(elementId)) {
-                    window.deletedChats.push(elementId);
-                    localStorage.setItem('deleted_chats', JSON.stringify(window.deletedChats));
-                }
-
-                window.sortSidebar();
-
-                // Clear UI if currently open
-                if (window.checkAndApplyClearedChatUI) window.checkAndApplyClearedChatUI(elementId);
-
-                window.showToast?.('Chat Deleted', `The chat has been deleted.`);
-            };
+             window.clearChatMessages = function(targetId, type) {
+                 const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                 window.clearedChats[elementId] = Math.floor(Date.now() / 1000);
+                 localStorage.setItem('cleared_chats', JSON.stringify(window.clearedChats));
+ 
+                 // Clear UI if currently open
+                 if (window.checkAndApplyClearedChatUI) window.checkAndApplyClearedChatUI(elementId);
+ 
+                 let chatIdToClear = null;
+                 if (type === 'group') {
+                     chatIdToClear = String(targetId);
+                     if (!chatIdToClear.startsWith('group_')) {
+                         chatIdToClear = 'group_' + chatIdToClear;
+                     }
+                 } else {
+                     const minId = Math.min(window.myUserId, targetId);
+                     const maxId = Math.max(window.myUserId, targetId);
+                     chatIdToClear = `chat_${minId}_${maxId}`;
+                 }
+ 
+                 if (chatIdToClear && window.globalMediaCache) {
+                     window.globalMediaCache = window.globalMediaCache.filter(m => m.chatId !== chatIdToClear);
+                 }
+                 if (window.updateContactInfoMediaSection) {
+                     window.updateContactInfoMediaSection();
+                 }
+ 
+                 window.showToast?.('Chat Cleared', `Messages in this chat have been cleared for you.`);
+             };
+ 
+             window.deleteChatMessages = function(targetId, type) {
+                 const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                 window.clearedChats[elementId] = Math.floor(Date.now() / 1000);
+                 localStorage.setItem('cleared_chats', JSON.stringify(window.clearedChats));
+ 
+                 if (!window.deletedChats.includes(elementId)) {
+                     window.deletedChats.push(elementId);
+                     localStorage.setItem('deleted_chats', JSON.stringify(window.deletedChats));
+                 }
+ 
+                 window.sortSidebar();
+ 
+                 // Clear UI if currently open
+                 if (window.checkAndApplyClearedChatUI) window.checkAndApplyClearedChatUI(elementId);
+ 
+                 let chatIdToClear = null;
+                 if (type === 'group') {
+                     chatIdToClear = String(targetId);
+                     if (!chatIdToClear.startsWith('group_')) {
+                         chatIdToClear = 'group_' + chatIdToClear;
+                     }
+                 } else {
+                     const minId = Math.min(window.myUserId, targetId);
+                     const maxId = Math.max(window.myUserId, targetId);
+                     chatIdToClear = `chat_${minId}_${maxId}`;
+                 }
+ 
+                 if (chatIdToClear && window.globalMediaCache) {
+                     window.globalMediaCache = window.globalMediaCache.filter(m => m.chatId !== chatIdToClear);
+                 }
+                 if (window.updateContactInfoMediaSection) {
+                     window.updateContactInfoMediaSection();
+                 }
+ 
+                 window.showToast?.('Chat Deleted', `The chat has been deleted.`);
+             };
 
             window.toggleFavouriteChat = function(targetId, type) {
                 const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;

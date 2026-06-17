@@ -878,6 +878,49 @@
                         </div>
                     </div>
                 </div>
+            <!-- Group Settings Row -->
+            <div id="group_settings_info_row" class="px-6 mb-5 hidden">
+                <div class="bg-[#182229] rounded-[16px] p-4 border border-[#202c33] space-y-4">
+                    <div class="flex items-center gap-2 mb-2 pb-2 border-b border-[#313d45]">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#00a884]">
+                            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path>
+                        </svg>
+                        <span class="text-[#e9edef] text-[15px] font-semibold">Group settings (Admins only)</span>
+                    </div>
+
+                    <!-- Edit group settings -->
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 pr-4">
+                            <span class="text-[#e9edef] text-[14px] block">Edit group settings</span>
+                            <span class="text-[#8696a0] text-xs">Name, icon, and description.</span>
+                        </div>
+                        <button onclick="window.toggleGroupInfoPerm('editSettings')" id="info_perm_toggle_editSettings" class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
+                            <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5" id="info_perm_circle_editSettings"></div>
+                        </button>
+                    </div>
+
+                    <!-- Send messages -->
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 pr-4">
+                            <span class="text-[#e9edef] text-[14px] block">Send messages</span>
+                            <span class="text-[#8696a0] text-xs">Choose who can send messages to this group.</span>
+                        </div>
+                        <button onclick="window.toggleGroupInfoPerm('sendMessages')" id="info_perm_toggle_sendMessages" class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
+                            <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5" id="info_perm_circle_sendMessages"></div>
+                        </button>
+                    </div>
+
+                    <!-- Add other members -->
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 pr-4">
+                            <span class="text-[#e9edef] text-[14px] block">Add other members</span>
+                            <span class="text-[#8696a0] text-xs">Choose who can add new members to this group.</span>
+                        </div>
+                        <button onclick="window.toggleGroupInfoPerm('addMembers')" id="info_perm_toggle_addMembers" class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
+                            <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5" id="info_perm_circle_addMembers"></div>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
@@ -916,17 +959,17 @@
 
             <!-- Footer Actions -->
             <div class="flex flex-col mb-8 px-6 pb-4">
-                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                <div onclick="window.toggleFavouriteChat(window.activeChatUser.id, 'group'); window.updateGroupInfoFavouriteText();" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
                         stroke-width="2" class="text-[#8696a0]">
                         <path
                             d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
                         </path>
                     </svg>
-                    <span class="text-[#e9edef] text-[16px]">Add to favourites</span>
+                    <span id="group_info_fav_text" class="text-[#e9edef] text-[16px]">Add to favourites</span>
                 </div>
 
-                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                <div onclick="if(window.openAddToListModal) { window.openAddToListModal('group_sidebar_' + window.activeChatUser.id); }" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
                         stroke-width="2" class="text-[#8696a0]">
                         <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
@@ -934,7 +977,7 @@
                     <span class="text-[#e9edef] text-[16px]">Add to list</span>
                 </div>
 
-                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                <div onclick="window.handleGroupInfoClearChat();" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
                         class="text-[#f15c6d]">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z">
@@ -943,7 +986,7 @@
                     <span class="text-[#f15c6d] text-[16px]">Clear chat</span>
                 </div>
 
-                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                <div onclick="window.handleGroupInfoExitGroup();" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
                         class="text-[#f15c6d]">
                         <path
@@ -953,7 +996,7 @@
                     <span class="text-[#f15c6d] text-[16px]">Exit group</span>
                 </div>
 
-                <div class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                <div onclick="window.handleGroupInfoReportGroup();" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
                         stroke-width="2" class="text-[#f15c6d]">
                         <path d="M14.59 10l-4.59-4.59v3.59H2v2h8v3.59L14.59 10zM22 3v18H10V3h12z"></path>
@@ -962,8 +1005,25 @@
                 </div>
             </div>
         </div>
+        </div>
     </div>
 
+</div>
+
+<!-- Group Member Context Dropdown Menu -->
+<div id="group_member_context_dropdown" class="hidden fixed w-48 bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[600] transform scale-95 opacity-0 transition-all duration-150 origin-top-right">
+    <button id="member_menu_message" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
+        Message
+    </button>
+    <button id="member_menu_make_admin" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
+        Make group admin
+    </button>
+    <button id="member_menu_dismiss_admin" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
+        Dismiss as admin
+    </button>
+    <button id="member_menu_remove" class="w-full text-left px-4 py-3 text-red-500 hover:bg-red-500/10 transition-colors text-sm focus:outline-none">
+        Remove
+    </button>
 </div>
 
 <!-- Add Group Member Modal -->
@@ -1895,6 +1955,10 @@
         if (u.id) {
             window.get(window.ref(window.db, 'groups/' + u.id)).then((snapshot) => {
                 const group = snapshot.val();
+                
+                // Set current group data
+                window.currentGroupData = group;
+
                 const listEl = document.getElementById('group_members_list');
                 const countEl = document.getElementById('group_members_count');
                 const createdInfoEl = document.getElementById('group_info_created_at');
@@ -1939,71 +2003,9 @@
                     }
                 }
 
-                if (group && group.users && listEl) {
-                    if (countEl) countEl.textContent = group.users.length + ' members';
-
-                    const addMemberHtml = `
-                        <div class="flex items-center gap-4 py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors" onclick="window.openAddGroupMembersModal()">
-                            <div class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white shrink-0">
-                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                                    <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
-                                </svg>
-                            </div>
-                            <span class="text-[#e9edef] text-[16px]">Add member</span>
-                        </div>
-                    `;
-
-                    let membersHtml = '';
-                    group.users.forEach(userId => {
-                        let memberName = "Member";
-                        let memberAbout = "Available";
-                        let isAdmin = (group.createdBy == userId);
-                        let isAdminBadge = isAdmin ?
-                            `<div class="border border-[#00a884]/40 bg-[#00a884]/10 rounded px-1.5 py-0.5 text-[11px] text-[#00a884]">Group admin</div>` :
-                            '';
-
-                        if (userId == window.myUserId) {
-                            memberName = "You";
-                            membersHtml += `
-                            <div class="flex items-center justify-between py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors">
-                                <div class="flex items-center gap-4">
-                                    <img src="${window.myUserAvatar || `https://ui-avatars.com/api/?name=You&background=2a3942&color=fff`}" class="w-[44px] h-[44px] rounded-full object-cover">
-                                    <div>
-                                        <div class="text-[#e9edef] text-[16px]">You</div>
-                                        <div class="text-[#8696a0] text-[14px] mt-0.5">Available</div>
-                                    </div>
-                                </div>
-                                ${isAdminBadge}
-                            </div>`;
-                        } else if (window.allContacts) {
-                            const matchUser = window.allContacts.find(c => c.id == userId);
-                            if (matchUser) {
-                                memberName = matchUser.name || matchUser.phone;
-                                memberAbout = matchUser.about || "Available";
-                            }
-
-                            let memberAvatar =
-                                `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=2a3942&color=fff`;
-                            if (matchUser) {
-                                memberAvatar = window.getUserAvatar ? window.getUserAvatar(matchUser
-                                    .id) : (matchUser.avatar || memberAvatar);
-                            }
-
-                            membersHtml += `
-                            <div class="flex items-center justify-between py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors">
-                                <div class="flex items-center gap-4">
-                                    <img src="${memberAvatar}" class="w-[44px] h-[44px] rounded-full object-cover">
-                                    <div class="w-[170px]">
-                                        <div class="text-[#e9edef] text-[16px] truncate">${memberName}</div>
-                                        <div class="text-[#8696a0] text-[14px] truncate mt-0.5">${memberAbout}</div>
-                                    </div>
-                                </div>
-                                ${isAdminBadge}
-                            </div>`;
-                        }
-                    });
-
-                    listEl.innerHTML = addMemberHtml + membersHtml;
+                // Render group members using the new helper function
+                if (group && window.renderGroupInfoMembers) {
+                    window.renderGroupInfoMembers(group);
                 }
             });
         }
@@ -2016,6 +2018,9 @@
         if (typeof window.updateGroupInfoMediaList === 'function') {
             window.updateGroupInfoMediaList();
         }
+        if (typeof window.updateGroupInfoFavouriteText === 'function') {
+            window.updateGroupInfoFavouriteText();
+        }
     };
 
     window.closeGroupInfoPanel = function() {
@@ -2023,6 +2028,141 @@
         if (p) {
             p.classList.remove('flex');
             p.classList.add('hidden');
+        }
+    };
+
+    window.updateGroupInfoFavouriteText = function() {
+        const textSpan = document.getElementById('group_info_fav_text');
+        if (!textSpan || !window.activeChatUser) return;
+        const elementId = `group_sidebar_${window.activeChatUser.id}`;
+        const isFav = window.favouriteChats && window.favouriteChats.includes(elementId);
+        textSpan.textContent = isFav ? 'Remove from favourites' : 'Add to favourites';
+    };
+
+    window.handleGroupInfoClearChat = function() {
+        if (!window.activeChatUser) return;
+        const groupId = window.activeChatUser.id;
+        const confirmAction = () => {
+            window.clearChatMessages(groupId, 'group');
+            window.closeGroupInfoPanel();
+        };
+        if (window.openDeleteModal) {
+            window.openDeleteModal('Clear this chat?', confirmAction);
+        } else if (confirm('Clear this chat?')) {
+            confirmAction();
+        }
+    };
+
+    window.handleGroupInfoExitGroup = function() {
+        if (!window.activeChatUser) return;
+        const groupId = window.activeChatUser.id;
+        const groupName = window.activeChatUser.name;
+        const confirmAction = async () => {
+            try {
+                const res = await fetch(`/api/group/${groupId}/leave`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify({
+                        user_id: window.myUserId
+                    })
+                });
+                const data = await res.json();
+                if (data.status) {
+                    if (window.db && window.ref && window.push) {
+                        const myName = document.getElementById('my_profile_name')?.textContent || 'Someone';
+                        window.push(window.ref(window.db, `groups/${groupId}/messages`), {
+                            text: `${myName} has left the group`,
+                            sender_id: window.myUserId,
+                            time: Math.floor(Date.now() / 1000),
+                            type: 'text',
+                            status: 'read'
+                        });
+                    }
+                    window.closeGroupInfoPanel();
+                    document.getElementById('active_group_chat_content')?.classList.add('hidden');
+                    document.getElementById('chat_empty_state')?.classList.remove('hidden');
+                    window.currentChatId = null;
+                    window.activeChatUser = null;
+                    
+                    const sidebarEl = document.getElementById(`group_sidebar_${groupId}`) || document.getElementById(`group_sidebar_${groupId.toString().replace('group_', '')}`);
+                    if (sidebarEl) sidebarEl.remove();
+                    
+                    window.showToast?.('Exit Group', 'You have left the group.');
+                } else {
+                    window.showToast?.('Error', data.message || 'Failed to exit group.');
+                }
+            } catch (e) {
+                console.error(e);
+                window.showToast?.('Error', 'Failed to exit group.');
+            }
+        };
+        if (confirm(`Are you sure you want to exit ${groupName}?`)) {
+            confirmAction();
+        }
+    };
+
+    window.handleGroupInfoReportGroup = function() {
+        if (!window.activeChatUser) return;
+        const groupId = window.activeChatUser.id;
+        const groupName = window.activeChatUser.name;
+        const confirmAction = async () => {
+            try {
+                const res = await fetch('/user/report', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify({
+                        reported_id: groupId,
+                        reason: 'Reported from Group Info'
+                    })
+                });
+                const data = await res.json();
+                if (data.status) {
+                    window.showToast?.('Report sent', `Group ${groupName} reported.`);
+                    // Auto exit group after reporting
+                    await fetch(`/api/group/${groupId}/leave`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        },
+                        body: JSON.stringify({
+                            user_id: window.myUserId
+                        })
+                    });
+                    if (window.db && window.ref && window.push) {
+                        const myName = document.getElementById('my_profile_name')?.textContent || 'Someone';
+                        window.push(window.ref(window.db, `groups/${groupId}/messages`), {
+                            text: `${myName} has left the group`,
+                            sender_id: window.myUserId,
+                            time: Math.floor(Date.now() / 1000),
+                            type: 'text',
+                            status: 'read'
+                        });
+                    }
+                    window.closeGroupInfoPanel();
+                    document.getElementById('active_group_chat_content')?.classList.add('hidden');
+                    document.getElementById('chat_empty_state')?.classList.remove('hidden');
+                    window.currentChatId = null;
+                    window.activeChatUser = null;
+                    
+                    const sidebarEl = document.getElementById(`group_sidebar_${groupId}`) || document.getElementById(`group_sidebar_${groupId.toString().replace('group_', '')}`);
+                    if (sidebarEl) sidebarEl.remove();
+                } else {
+                    window.showToast?.('Error', data.message || 'Failed to report group.');
+                }
+            } catch (e) {
+                console.error(e);
+                window.showToast?.('Error', 'Failed to report group.');
+            }
+        };
+        if (confirm(`Report ${groupName} to WhatsApp? The last 5 messages from this group will be forwarded. If you exit this group, messages will be removed from this device.`)) {
+            confirmAction();
         }
     };
 
@@ -4541,7 +4681,15 @@
         if (typeof window.closeAllSearchPanels === 'function') {
             window.closeAllSearchPanels();
         }
-
+        if (typeof window.closeContactInfo === 'function') {
+            window.closeContactInfo();
+        }
+        if (typeof window.closeGroupInfoPanel === 'function') {
+            window.closeGroupInfoPanel();
+        }
+        if (typeof window.closeBroadcastInfo === 'function') {
+            window.closeBroadcastInfo();
+        }
         // Fetch missing info from DOM
         const sidebarEl = document.getElementById(`group_sidebar_${groupId}`);
         if (sidebarEl) {
@@ -4682,18 +4830,48 @@
                         descEl.classList.remove('text-[#8696a0]');
                     }
                 }
-            });
 
-            if (group && group.permissions) {
-                const canSend = group.permissions.sendMessages;
-                const isAdmin = group.createdBy == window.myUserId;
-                if (!canSend && !isAdmin) {
+                // Render group members using the new helper function
+                if (window.renderGroupInfoMembers) {
+                    window.renderGroupInfoMembers(gData);
+                }
+                const settingsPanel = document.getElementById('group_info_settings_panel');
+                if (settingsPanel && !settingsPanel.classList.contains('hidden') && window.updateGroupInfoSettingsUI) {
+                    window.updateGroupInfoSettingsUI(gData);
+                }
+
+                // Dynamic input control
+                const myUidStr = String(window.myUserId);
+                let uListForCheck = [];
+                if (gData.users) {
+                    uListForCheck = Array.isArray(gData.users) ? gData.users : Object.values(gData.users);
+                }
+                const isStillMember = uListForCheck.includes(myUidStr) || uListForCheck.includes(parseInt(myUidStr));
+
+                if (!isStillMember) {
+                    const msgInput = document.getElementById('group_msg') || document.getElementById('msg');
                     if (msgInput) {
                         msgInput.disabled = true;
-                        msgInput.placeholder = "Only admins can send messages";
+                        msgInput.placeholder = "You are no longer a participant of this group.";
+                    }
+                    window.closeGroupInfoPanel();
+                } else {
+                    const adminsList = gData.admins || [];
+                    const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) || adminsList.includes(String(myUidStr)) || String(gData.createdBy) === String(myUidStr);
+                    const canSend = gData.permissions ? gData.permissions.sendMessages !== false : true;
+
+                    const msgInput = document.getElementById('group_msg') || document.getElementById('msg');
+                    if (msgInput) {
+                        if (!canSend && !isCurrentUserAdmin) {
+                            msgInput.disabled = true;
+                            msgInput.placeholder = "Only admins can send messages";
+                        } else {
+                            msgInput.disabled = false;
+                            msgInput.placeholder = "Type a message";
+                        }
                     }
                 }
-            }
+            });
 
             // Populate users for calling list
             if (group && group.users && window.activeChatUser) {
@@ -5248,6 +5426,12 @@
             const msgEl = document.getElementById('msg_' + key);
             if (msgEl) msgEl.remove();
             delete window.globalMessages[key];
+            if (window.globalMediaCache) {
+                window.globalMediaCache = window.globalMediaCache.filter(m => m.key !== key && !m.key.startsWith(key + '_link_'));
+            }
+            if (window.updateContactInfoMediaSection) {
+                window.updateContactInfoMediaSection();
+            }
         });
 
         window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
@@ -5258,6 +5442,12 @@
                 const msgEl = document.getElementById('msg_' + key);
                 if (msgEl) msgEl.remove();
                 delete window.globalMessages[key];
+                if (window.globalMediaCache) {
+                    window.globalMediaCache = window.globalMediaCache.filter(m => m.key !== key && !m.key.startsWith(key + '_link_'));
+                }
+                if (window.updateContactInfoMediaSection) {
+                    window.updateContactInfoMediaSection();
+                }
                 return;
             }
 
@@ -5598,6 +5788,371 @@
         } catch (err) {
             console.error('Error updating group description:', err);
             alert('Failed to update group description.');
+        }
+    };
+
+    // --- GROUP MEMBER LIST & PERMISSIONS HELPER FUNCTIONS ---
+    window.renderGroupInfoMembers = function(group) {
+        if (!group) return;
+        const listEl = document.getElementById('group_members_list');
+        const countEl = document.getElementById('group_members_count');
+        if (!listEl) return;
+
+        const usersList = Array.isArray(group.users) ? group.users : Object.values(group.users || {});
+        if (countEl) countEl.textContent = usersList.length + ' members';
+
+        // Check if current user is admin
+        const myUidStr = String(window.myUserId);
+        const adminsList = group.admins || [];
+        const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) || adminsList.includes(String(myUidStr)) || (String(group.createdBy) === myUidStr);
+
+        // Check if settings row should be displayed
+        const settingsRow = document.getElementById('group_settings_info_row');
+        if (settingsRow) {
+            if (isCurrentUserAdmin) {
+                settingsRow.classList.remove('hidden');
+            } else {
+                settingsRow.classList.add('hidden');
+            }
+        }
+
+        // Show/Hide Add button in action row based on permissions
+        const canAddMembers = isCurrentUserAdmin || (group.permissions ? group.permissions.addMembers !== false : true);
+        
+        // Toggle the edit buttons for name & description as well
+        const canEditInfo = isCurrentUserAdmin || (group.permissions ? group.permissions.editSettings !== false : true);
+        const nameEditBtn = document.querySelector('#group_info_name_container button');
+        const descEditBtn = document.querySelector('#group_info_description_container button');
+        if (nameEditBtn) {
+            if (canEditInfo) {
+                nameEditBtn.classList.remove('hidden');
+            } else {
+                nameEditBtn.classList.add('hidden');
+            }
+        }
+        if (descEditBtn) {
+            if (canEditInfo) {
+                descEditBtn.classList.remove('hidden');
+            } else {
+                descEditBtn.classList.add('hidden');
+            }
+        }
+
+        // Action Buttons Row Add button
+        const actionAddBtn = document.querySelector('button[onclick="window.openAddGroupMembersModal()"]');
+        if (actionAddBtn) {
+            if (canAddMembers) {
+                actionAddBtn.classList.remove('hidden');
+                actionAddBtn.classList.add('flex-grow');
+            } else {
+                actionAddBtn.classList.add('hidden');
+                actionAddBtn.classList.remove('flex-grow');
+            }
+        }
+
+        let addMemberHtml = '';
+        if (canAddMembers) {
+            addMemberHtml = `
+                <div class="flex items-center gap-4 py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors px-1" onclick="window.openAddGroupMembersModal()">
+                    <div class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white shrink-0">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                        </svg>
+                    </div>
+                    <span class="text-[#e9edef] text-[16px]">Add member</span>
+                </div>
+            `;
+        }
+
+        let membersHtml = '';
+        usersList.forEach(userId => {
+            let memberName = "Member";
+            let memberAbout = "Available";
+            let memberAvatar = "";
+            let phone = "";
+
+            const isThisMemberAdmin = adminsList.includes(userId) || adminsList.includes(parseInt(userId)) || adminsList.includes(String(userId)) || (String(group.createdBy) === String(userId));
+            const isAdminBadge = isThisMemberAdmin ?
+                `<div class="border border-[#00a884]/40 bg-[#00a884]/10 rounded px-1.5 py-0.5 text-[11px] text-[#00a884]">Group admin</div>` :
+                '';
+
+            if (userId == window.myUserId) {
+                memberName = "You";
+                memberAbout = window.myUserAbout || "Available";
+                memberAvatar = window.myUserAvatar || `https://ui-avatars.com/api/?name=You&background=2a3942&color=fff`;
+                phone = window.myUserPhone || "";
+            } else {
+                const matchUser = window.allContacts ? window.allContacts.find(c => String(c.id) === String(userId)) : null;
+                if (matchUser) {
+                    memberName = matchUser.name || matchUser.phone;
+                    memberAbout = matchUser.about || "Available";
+                    memberAvatar = window.getUserAvatar ? window.getUserAvatar(matchUser.id) : (matchUser.avatar || "");
+                    phone = matchUser.phone || "";
+                }
+                if (!memberAvatar) {
+                    memberAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=2a3942&color=fff`;
+                }
+            }
+
+            const clickHandler = (userId == window.myUserId) ? "" : `onclick="window.showGroupMemberMenu(event, '${userId}', '${memberName.replace(/'/g, "\\'")}', '${memberAvatar}', '${phone.replace(/'/g, "\\'")}', '${memberAbout.replace(/'/g, "\\'")}')"`;
+
+            membersHtml += `
+            <div ${clickHandler} class="flex items-center justify-between py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors px-1 rounded-lg">
+                <div class="flex items-center gap-4 min-w-0">
+                    <img src="${memberAvatar}" class="w-[44px] h-[44px] rounded-full object-cover shrink-0">
+                    <div class="min-w-0 pr-2">
+                        <div class="text-[#e9edef] text-[16px] truncate">${memberName}</div>
+                        <div class="text-[#8696a0] text-[14px] truncate mt-0.5">${memberAbout}</div>
+                    </div>
+                </div>
+                ${isAdminBadge}
+            </div>`;
+        });
+
+        listEl.innerHTML = addMemberHtml + membersHtml;
+    };
+
+    window.showGroupMemberMenu = function(event, targetUserId, name, avatar, phone, about) {
+        if (event) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+
+        const dropdown = document.getElementById('group_member_context_dropdown');
+        if (!dropdown) return;
+
+        const x = event.clientX;
+        const y = event.clientY;
+
+        const dropdownWidth = 192;
+        const dropdownHeight = 200;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        let left = x;
+        let top = y;
+
+        if (x + dropdownWidth > windowWidth) {
+            left = windowWidth - dropdownWidth - 10;
+        }
+        if (y + dropdownHeight > windowHeight) {
+            top = windowHeight - dropdownHeight - 10;
+        }
+
+        dropdown.style.left = `${left}px`;
+        dropdown.style.top = `${top}px`;
+
+        dropdown.classList.remove('hidden');
+        setTimeout(() => {
+            dropdown.classList.remove('scale-95', 'opacity-0');
+            dropdown.classList.add('scale-100', 'opacity-100');
+        }, 10);
+
+        dropdown.dataset.targetUserId = targetUserId;
+        dropdown.dataset.targetName = name;
+        dropdown.dataset.targetAvatar = avatar;
+        dropdown.dataset.targetPhone = phone;
+        dropdown.dataset.targetAbout = about;
+
+        const group = window.currentGroupData;
+        if (!group) return;
+
+        const myUidStr = String(window.myUserId);
+        const adminsList = group.admins || [];
+        const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) || adminsList.includes(String(myUidStr)) || (String(group.createdBy) === myUidStr);
+        const isTargetAdmin = adminsList.includes(targetUserId) || adminsList.includes(parseInt(targetUserId)) || adminsList.includes(String(targetUserId)) || (String(group.createdBy) === String(targetUserId));
+
+        const makeAdminBtn = document.getElementById('member_menu_make_admin');
+        const dismissAdminBtn = document.getElementById('member_menu_dismiss_admin');
+        const removeBtn = document.getElementById('member_menu_remove');
+        const messageBtn = document.getElementById('member_menu_message');
+
+        if (messageBtn) {
+            messageBtn.textContent = `Message ${name}`;
+            messageBtn.onclick = function() {
+                window.selectChat(targetUserId, name, phone, avatar, about);
+                window.closeGroupMemberMenu();
+            };
+        }
+
+        if (isCurrentUserAdmin) {
+            if (isTargetAdmin) {
+                if (String(group.createdBy) === String(targetUserId)) {
+                    if (makeAdminBtn) makeAdminBtn.classList.add('hidden');
+                    if (dismissAdminBtn) dismissAdminBtn.classList.add('hidden');
+                } else {
+                    if (makeAdminBtn) makeAdminBtn.classList.add('hidden');
+                    if (dismissAdminBtn) dismissAdminBtn.classList.remove('hidden');
+                }
+            } else {
+                if (makeAdminBtn) makeAdminBtn.classList.remove('hidden');
+                if (dismissAdminBtn) dismissAdminBtn.classList.add('hidden');
+            }
+            if (String(group.createdBy) === String(targetUserId)) {
+                if (removeBtn) removeBtn.classList.add('hidden');
+            } else {
+                if (removeBtn) removeBtn.classList.remove('hidden');
+            }
+        } else {
+            if (makeAdminBtn) makeAdminBtn.classList.add('hidden');
+            if (dismissAdminBtn) dismissAdminBtn.classList.add('hidden');
+            if (removeBtn) removeBtn.classList.add('hidden');
+        }
+
+        if (makeAdminBtn) {
+            makeAdminBtn.onclick = function() {
+                window.toggleMemberAdminStatus(targetUserId, true);
+                window.closeGroupMemberMenu();
+            };
+        }
+        if (dismissAdminBtn) {
+            dismissAdminBtn.onclick = function() {
+                window.toggleMemberAdminStatus(targetUserId, false);
+                window.closeGroupMemberMenu();
+            };
+        }
+        if (removeBtn) {
+            removeBtn.onclick = function() {
+                window.removeMemberFromGroup(targetUserId);
+                window.closeGroupMemberMenu();
+            };
+        }
+    };
+
+    window.closeGroupMemberMenu = function() {
+        const dropdown = document.getElementById('group_member_context_dropdown');
+        if (dropdown) {
+            dropdown.classList.remove('scale-100', 'opacity-100');
+            dropdown.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                dropdown.classList.add('hidden');
+            }, 150);
+        }
+    };
+
+    document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('group_member_context_dropdown');
+        if (dropdown && !dropdown.classList.contains('hidden')) {
+            if (!dropdown.contains(e.target)) {
+                window.closeGroupMemberMenu();
+            }
+        }
+    });
+
+    window.toggleMemberAdminStatus = async function(targetUserId, makeAdmin) {
+        const group = window.currentGroupData;
+        if (!group) return;
+
+        const groupId = group.id;
+        const adminsList = group.admins ? [...group.admins] : [group.createdBy];
+        const targetUserIdStr = String(targetUserId);
+
+        if (makeAdmin) {
+            if (!adminsList.includes(targetUserIdStr) && !adminsList.includes(parseInt(targetUserIdStr))) {
+                adminsList.push(targetUserIdStr);
+            }
+        } else {
+            const idx = adminsList.findIndex(id => String(id) === targetUserIdStr);
+            if (idx > -1) {
+                adminsList.splice(idx, 1);
+            }
+        }
+
+        try {
+            await window.update(window.ref(window.db, `groups/${groupId}`), {
+                admins: adminsList
+            });
+            window.showToast?.(makeAdmin ? "Promoted" : "Demoted", `${makeAdmin ? "Promoted to admin" : "Dismissed as admin"}.`);
+        } catch (err) {
+            console.error("Error toggling admin status:", err);
+            alert("Failed to update member role.");
+        }
+    };
+
+    window.removeMemberFromGroup = async function(targetUserId) {
+        const group = window.currentGroupData;
+        if (!group) return;
+
+        const groupId = group.id;
+        const usersList = group.users ? [...group.users] : [];
+        const adminsList = group.admins ? [...group.admins] : [group.createdBy];
+        const targetUserIdStr = String(targetUserId);
+
+        const userIdx = usersList.findIndex(id => String(id) === targetUserIdStr);
+        if (userIdx > -1) {
+            usersList.splice(userIdx, 1);
+        }
+
+        const adminIdx = adminsList.findIndex(id => String(id) === targetUserIdStr);
+        if (adminIdx > -1) {
+            adminsList.splice(adminIdx, 1);
+        }
+
+        if (confirm(`Are you sure you want to remove this member from the group?`)) {
+            try {
+                await window.update(window.ref(window.db, `groups/${groupId}`), {
+                    users: usersList,
+                    admins: adminsList
+                });
+                window.showToast?.("Removed", "Member removed from the group.");
+            } catch (err) {
+                console.error("Error removing member:", err);
+                alert("Failed to remove member.");
+            }
+        }
+    };
+
+    window.updateGroupInfoSettingsUI = function(group) {
+        const perms = group.permissions || {
+            editSettings: true,
+            sendMessages: true,
+            addMembers: true
+        };
+
+        const keys = ['editSettings', 'sendMessages', 'addMembers'];
+        keys.forEach(key => {
+            const val = perms[key] !== false;
+            const btn = document.getElementById(`info_perm_toggle_${key}`);
+            const circle = document.getElementById(`info_perm_circle_${key}`);
+
+            if (btn && circle) {
+                if (val) {
+                    btn.classList.remove('bg-[#374248]');
+                    btn.classList.add('bg-[#00a884]');
+                    circle.classList.remove('translate-x-0');
+                    circle.classList.add('translate-x-5');
+                } else {
+                    btn.classList.remove('bg-[#00a884]');
+                    btn.classList.add('bg-[#374248]');
+                    circle.classList.remove('translate-x-5');
+                    circle.classList.add('translate-x-0');
+                }
+            }
+        });
+    };
+
+    window.toggleGroupInfoPerm = async function(key) {
+        const group = window.currentGroupData;
+        if (!group) return;
+
+        const groupId = group.id;
+        const perms = group.permissions ? { ...group.permissions } : {
+            editSettings: true,
+            sendMessages: true,
+            addMembers: true
+        };
+
+        const currentVal = perms[key] !== false;
+        perms[key] = !currentVal;
+
+        try {
+            await window.update(window.ref(window.db, `groups/${groupId}`), {
+                permissions: perms
+            });
+            window.showToast?.("Settings Saved", `Updated permission: ${key}`);
+        } catch (err) {
+            console.error("Error toggling group info permission:", err);
+            alert("Failed to update group permission.");
         }
     };
 </script>

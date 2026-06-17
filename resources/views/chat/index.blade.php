@@ -4578,6 +4578,15 @@
             if (typeof window.closeAllSearchPanels === 'function') {
                 window.closeAllSearchPanels();
             }
+            if (typeof window.closeContactInfo === 'function') {
+                window.closeContactInfo();
+            }
+            if (typeof window.closeGroupInfoPanel === 'function') {
+                window.closeGroupInfoPanel();
+            }
+            if (typeof window.closeBroadcastInfo === 'function') {
+                window.closeBroadcastInfo();
+            }
             // Fetch missing info from DOM
             const sidebarEl = document.getElementById(`user_sidebar_${otherUserId}`);
             if (sidebarEl) {
@@ -5157,16 +5166,28 @@
                     const msgEl = document.getElementById('msg_' + key);
                     if (msgEl) msgEl.remove();
                     delete window.globalMessages[key];
+                    if (window.globalMediaCache) {
+                        window.globalMediaCache = window.globalMediaCache.filter(m => m.key !== key && !m.key.startsWith(key + '_link_'));
+                    }
+                    if (window.updateContactInfoMediaSection) {
+                        window.updateContactInfoMediaSection();
+                    }
                 });
-
+ 
                 window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
                     const data = snapshot.val();
                     const key = snapshot.key;
-
+ 
                     if (data && data.deleted_for && data.deleted_for[window.myUserId]) {
                         const msgEl = document.getElementById('msg_' + key);
                         if (msgEl) msgEl.remove();
                         delete window.globalMessages[key];
+                        if (window.globalMediaCache) {
+                            window.globalMediaCache = window.globalMediaCache.filter(m => m.key !== key && !m.key.startsWith(key + '_link_'));
+                        }
+                        if (window.updateContactInfoMediaSection) {
+                            window.updateContactInfoMediaSection();
+                        }
                         return;
                     }
 
@@ -5939,7 +5960,7 @@
                     activeElementId = `user_sidebar_${targetId}`;
                 }
 
-                if (activeElementId === clearedElementId) {
+                if (activeElementId === clearedElementId || (isGroup && clearedElementId.replace('group_sidebar_group_', 'group_sidebar_') === activeElementId)) {
                     // Clear messages container
                     const msgsContainer = document.getElementById(isGroup ? 'group_messages' : 'messages');
                     if (msgsContainer) {
@@ -5958,7 +5979,10 @@
             const isTargetGroup = clearedElementId.startsWith('group_sidebar_');
             const targetId = clearedElementId.replace('user_sidebar_', '').replace('group_sidebar_', '');
             const lastMsgElId = isTargetGroup ? `group_last_msg_${targetId}` : `last_msg_${targetId}`;
-            const lastMsgEl = document.getElementById(lastMsgElId);
+            let lastMsgEl = document.getElementById(lastMsgElId);
+            if (!lastMsgEl && isTargetGroup) {
+                lastMsgEl = document.getElementById(`group_last_msg_${targetId.replace('group_', '')}`);
+            }
             if (lastMsgEl) lastMsgEl.textContent = isTargetGroup ? 'Group chat' : 'Click to chat';
         };
 

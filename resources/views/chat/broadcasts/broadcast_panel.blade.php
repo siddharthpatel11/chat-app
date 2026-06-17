@@ -338,6 +338,14 @@
                 if (typeof targetId === 'string' && targetId.startsWith('broadcast_')) {
                     const listId = targetId.replace('broadcast_', '');
                     const deleteAction = () => {
+                        if (window.db && window.remove && window.ref) {
+                            window.remove(window.ref(window.db, 'broadcasts/' + listId));
+                        }
+                        const elementId = `user_sidebar_broadcast_${listId}`;
+                        if (window.hiddenChats && window.hiddenChats.includes(elementId)) {
+                            window.hiddenChats = window.hiddenChats.filter(x => x !== elementId);
+                            localStorage.setItem('hidden_chats', JSON.stringify(window.hiddenChats));
+                        }
                         window.broadcastLists = window.broadcastLists.filter(l => l.id !== listId);
                         localStorage.setItem('broadcast_lists', JSON.stringify(window.broadcastLists));
                         window.renderBroadcastLists();
@@ -482,6 +490,14 @@
 
     window.deleteBroadcastList = function(id) {
         const deleteAction = () => {
+            if (window.db && window.remove && window.ref) {
+                window.remove(window.ref(window.db, 'broadcasts/' + id));
+            }
+            const elementId = `user_sidebar_broadcast_${id}`;
+            if (window.hiddenChats && window.hiddenChats.includes(elementId)) {
+                window.hiddenChats = window.hiddenChats.filter(x => x !== elementId);
+                localStorage.setItem('hidden_chats', JSON.stringify(window.hiddenChats));
+            }
             window.broadcastLists = window.broadcastLists.filter(l => l.id !== id);
             localStorage.setItem('broadcast_lists', JSON.stringify(window.broadcastLists));
             window.renderBroadcastLists();
@@ -734,11 +750,7 @@
             };
         }
 
-        if (window.selectChat) {
-            const originalSelectChat = window.selectChat;
-            window.selectChat = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
-                if (window.closeBroadcastInfo) window.closeBroadcastInfo();
-                if (typeof otherUserId === 'string' && otherUserId.startsWith('broadcast_')) {
+        window.selectBroadcastChatActual = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
                     // Clean up existing active state
                     document.querySelectorAll('.user-chat-item').forEach(el => el.classList.remove('active'));
 
@@ -933,6 +945,21 @@
 
                     if (window.applyGlobalWallpaper) window.applyGlobalWallpaper();
                     document.getElementById('msg')?.focus();
+        };
+
+        if (window.selectChat) {
+            const originalSelectChat = window.selectChat;
+            window.selectChat = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
+                if (window.closeBroadcastInfo) window.closeBroadcastInfo();
+                if (typeof otherUserId === 'string' && otherUserId.startsWith('broadcast_')) {
+                    const elementId = `user_sidebar_${otherUserId}`;
+                    if (window.hiddenChats && window.hiddenChats.includes(elementId)) {
+                        window.promptHiddenChatClickUnlock(function() {
+                            window.selectBroadcastChatActual(otherUserId, name, phone, avatar, about, searchMsgTime);
+                        });
+                    } else {
+                        window.selectBroadcastChatActual(otherUserId, name, phone, avatar, about, searchMsgTime);
+                    }
                 } else {
                     const callBtn = document.getElementById('call_btn_pill');
                     if (callBtn) {

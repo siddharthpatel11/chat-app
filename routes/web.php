@@ -41,6 +41,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/chat/clear', [ChatController::class, 'clearChat']);
     Route::post('/chat/delete', [ChatController::class, 'deleteChat']);
     Route::post('/user/report', [ChatController::class, 'reportUser']);
+
+    // Hide Chat settings
+    Route::get('/chat/hide-settings', [ChatController::class, 'getHideChatSettings']);
+    Route::post('/chat/hide-settings', [ChatController::class, 'saveHideChatSettings']);
 });
 
 require __DIR__.'/auth.php';
