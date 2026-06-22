@@ -4,6 +4,11 @@
     <!-- Communities Header -->
     <div class="h-16 bg-[#202c33] flex items-center px-4 justify-between shrink-0 border-b border-[#313d45]">
         <div class="flex items-center gap-3">
+            <button onclick="if(typeof window.showChats === 'function') window.showChats()" class="text-[#aebac1] hover:text-[#e9edef] p-1 rounded-full transition-colors focus:outline-none" title="Back to Chats">
+                <svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+                </svg>
+            </button>
             <span class="font-semibold text-xl text-[#e9edef]">Communities</span>
         </div>
         <div class="flex items-center gap-2 text-[#aebac1]">

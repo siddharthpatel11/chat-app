@@ -1413,6 +1413,14 @@
                                     </button>`;
                             }
 
+                            let unreadCount = 0;
+                            let unreadClass = "hidden";
+                            const existingBadge = document.getElementById(`group_unread_badge_${g.id}`);
+                            if (existingBadge && !existingBadge.classList.contains('hidden')) {
+                                unreadCount = parseInt(existingBadge.textContent) || 0;
+                                if (unreadCount > 0) unreadClass = "flex";
+                            }
+
                             groupsContainer.insertAdjacentHTML('beforeend', `
                                 <div class="flex items-center gap-3 px-4 py-3 border-b border-[#202c33]/50 last:border-b-0">
                                     <div class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-white shrink-0 overflow-hidden">
@@ -1423,7 +1431,10 @@
                                             <img src="${g.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.name)}&background=2a3942&color=fff`}" class="w-full h-full object-cover">`}
                                     </div>
                                     <div class="flex flex-col min-w-0 flex-1">
-                                        <span class="text-[#e9edef] text-[15px] font-medium truncate">${g.name}</span>
+                                        <div class="flex items-center">
+                                            <span class="text-[#e9edef] text-[15px] font-medium truncate">${g.name}</span>
+                                            <span id="community_drawer_unread_${g.id}" class="${unreadClass} ml-2 bg-[#00a884] text-[#111b21] text-[12px] font-bold min-w-[20px] h-5 rounded-full items-center justify-center px-1.5 shadow-sm">${unreadCount}</span>
+                                        </div>
                                         <span class="text-[12px] text-[#8696a0] truncate">${desc}</span>
                                     </div>
                                     <div class="flex items-center gap-1.5 ml-auto">
@@ -2094,6 +2105,14 @@
                 clickAction = `window.openGroupJoinPreviewModal('${groupId}', '${communityId}')`;
             }
 
+            let unreadCount = 0;
+            let unreadClass = "hidden";
+            const existingBadge = document.getElementById(`group_unread_badge_${groupId}`);
+            if (existingBadge && !existingBadge.classList.contains('hidden')) {
+                unreadCount = parseInt(existingBadge.textContent) || 0;
+                if (unreadCount > 0) unreadClass = "flex";
+            }
+
             rowEl.innerHTML = `
                 <div class="flex items-center pl-10 pr-4 py-2.5 hover:bg-[#202c33]/30 cursor-pointer border-t border-[#202c33]/10"
                      onclick="${clickAction}">
@@ -2101,7 +2120,10 @@
                     <div class="ml-3 flex-1 min-w-0">
                         <div class="flex justify-between items-center">
                             <h5 class="text-[14px] text-[#e9edef] font-medium truncate">${displayName}</h5>
-                            <span class="text-[11px] text-[#8696a0]" id="comm_group_time_${communityId}_${groupId}"></span>
+                            <div class="flex flex-col items-end gap-1 shrink-0">
+                                <span class="text-[11px] text-[#8696a0]" id="comm_group_time_${communityId}_${groupId}"></span>
+                                <span id="sidebar_comm_unread_${groupId}" class="${unreadClass} bg-[#00a884] text-[#111b21] text-[12px] font-bold min-w-[20px] h-5 rounded-full items-center justify-center px-1.5 shadow-sm">${unreadCount}</span>
+                            </div>
                         </div>
                         <p class="text-[13px] text-[#8696a0] truncate" id="comm_group_msg_${communityId}_${groupId}">${subtitle}</p>
                     </div>

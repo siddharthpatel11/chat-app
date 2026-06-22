@@ -4215,8 +4215,9 @@
             // Update Unread Badge
             const isActive = window.currentChatId === 'group_' + groupId.replace('group_', '');
             const isMe = data.sender_id == window.myUserId;
+            const hasRead = data.read_by && data.read_by[window.myUserId];
 
-            if (!isActive && !isMe) {
+            if (!isActive && !isMe && !hasRead) {
                 const badge = document.getElementById(`group_unread_badge_${groupId}`);
                 if (badge) {
                     let count = parseInt(badge.textContent) || 0;
@@ -4224,6 +4225,20 @@
                     badge.textContent = count;
                     badge.classList.remove('hidden');
                     badge.classList.add('flex');
+
+                    const drawerBadge = document.getElementById(`community_drawer_unread_${groupId}`);
+                    if (drawerBadge) {
+                        drawerBadge.textContent = count;
+                        drawerBadge.classList.remove('hidden');
+                        drawerBadge.classList.add('flex');
+                    }
+
+                    const sidebarBadge = document.getElementById(`sidebar_comm_unread_${groupId}`);
+                    if (sidebarBadge) {
+                        sidebarBadge.textContent = count;
+                        sidebarBadge.classList.remove('hidden');
+                        sidebarBadge.classList.add('flex');
+                    }
                 }
             }
 
@@ -4356,8 +4371,8 @@
                         if (cName) {
                             group.community_name = cName;
                             // Update the h4 in the sidebar item if it's already rendered
-                            const h4 = item.querySelector('h4');
-                            if (h4 && h4.textContent === 'Announcements') {
+                            const h4 = document.getElementById(`group_sidebar_name_${group.id}`);
+                            if (h4) {
                                 h4.textContent = cName;
                             }
                         }
@@ -4390,7 +4405,7 @@
                 ${isAnnounceGroup && group.community_id ? `
                 <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-2 relative">
                     <div class="flex justify-between items-center">
-                        <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${group.community_name || group.name.replace(' - Announcements','').replace(' Announcements','')}</h4>
+                        <h4 id="group_sidebar_name_${group.id}" class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${group.community_name || group.name.replace(' - Announcements','').replace(' Announcements','')}</h4>
                         <span class="text-[12px] text-[#8696a0] whitespace-nowrap" id="group_last_time_${group.id}"></span>
                     </div>
                     <div class="flex justify-between items-center mt-0.5">
@@ -4450,11 +4465,12 @@
                 window.sortSidebar();
             }
         } else {
-            const h4 = item.querySelector('h4');
+            const h4 = document.getElementById(`group_sidebar_name_${group.id}`) || item.querySelector('h4');
             const img = item.querySelector('img');
-            if (h4) h4.textContent = group.name;
+            const displayName = (isAnnounceGroup && group.community_id) ? (group.community_name || group.name.replace(' - Announcements','').replace(' Announcements','')) : group.name;
+            if (h4) h4.textContent = displayName;
             if (img) img.src = group.avatar ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`;
+                `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
         }
 
         // Attach message listener for real-time sidebar updates
@@ -5528,6 +5544,20 @@
             badge.textContent = '0';
             badge.classList.add('hidden');
             badge.classList.remove('flex');
+        }
+
+        const drawerBadge = document.getElementById(`community_drawer_unread_${groupId}`);
+        if (drawerBadge) {
+            drawerBadge.textContent = '0';
+            drawerBadge.classList.add('hidden');
+            drawerBadge.classList.remove('flex');
+        }
+
+        const sidebarBadge = document.getElementById(`sidebar_comm_unread_${groupId}`);
+        if (sidebarBadge) {
+            sidebarBadge.textContent = '0';
+            sidebarBadge.classList.add('hidden');
+            sidebarBadge.classList.remove('flex');
         }
 
         // If this is a community sub-group, recalculate parent community unread badge

@@ -289,6 +289,7 @@ class CommunityController extends Controller
             'last_message_time' => now()->timestamp,
             'disappearingTimer' => 0,
             'community_id' => $communityId,
+            'community_name' => $community['name'],
             'permissions' => [
                 'send_messages' => 'all',
                 'edit_group_info' => 'admins',
@@ -341,10 +342,8 @@ class CommunityController extends Controller
         $communityGroups = $community['groups'] ?? [];
         if (! in_array($groupId, $communityGroups)) {
             $communityGroups[] = $groupId;
-            $communityRef->update([
-                'groups' => array_values($communityGroups),
-                'updated_at' => now()->timestamp,
-            ]);
+            $this->db->getReference("communities/$communityId/groups")->set(array_values($communityGroups));
+            $this->db->getReference("communities/$communityId/updated_at")->set(now()->timestamp);
         }
 
         return response()->json([
