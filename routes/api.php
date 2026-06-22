@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\Profile\PrivacyApiController;
 use App\Http\Controllers\Api\Profile\ProfileApiController;
 use App\Http\Controllers\Api\Profile\VideoVoiceApiController;
 use App\Http\Controllers\Api\StatusApiController;
+use App\Http\Controllers\Api\CommunityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -126,6 +127,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Profile Logout Settings
     Route::post('/profile/logout', [LogoutApiController::class, 'logout']);
+
+    // Communities API
+    Route::post('/community/create', [CommunityController::class, 'createCommunity']);
+    Route::post('/community/{communityId}/add-groups', [CommunityController::class, 'addGroups']);
+    Route::post('/community/{communityId}/create-group', [CommunityController::class, 'createGroupInCommunity']);
+    Route::post('/community/{communityId}/leave', [CommunityController::class, 'leaveCommunity']);
+    Route::post('/community/{communityId}/deactivate', [CommunityController::class, 'deactivateCommunity']);
+    Route::post('/community/{communityId}/add-members', [CommunityController::class, 'addMembers']);
+    Route::post('/community/{communityId}/remove-member', [CommunityController::class, 'removeMember']);
+    Route::post('/community/{communityId}/toggle-admin', [CommunityController::class, 'toggleAdmin']);
+    Route::post('/community/{communityId}/update', [CommunityController::class, 'updateCommunity']);
+    Route::match(['get', 'post'], '/community/{communityId}/info', [CommunityController::class, 'communityInfo']);
+    Route::post('/community/{communityId}/remove-group', [CommunityController::class, 'removeGroup']);
+    Route::post('/community/{communityId}/groups/{groupId}/join', [CommunityController::class, 'joinGroup']);
+    Route::post('/community/{communityId}/groups/{groupId}/join-request', [CommunityController::class, 'sendJoinRequest']);
+    Route::post('/community/{communityId}/requests/{requestId}/handle', [CommunityController::class, 'handleJoinRequest']);
 });
 
 // Meta AI
