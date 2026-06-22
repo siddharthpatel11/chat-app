@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\MetaAiController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,22 @@ Route::middleware('auth')->group(function () {
     // Hide Chat settings
     Route::get('/chat/hide-settings', [ChatController::class, 'getHideChatSettings']);
     Route::post('/chat/hide-settings', [ChatController::class, 'saveHideChatSettings']);
+
+    // Communities (Web Router)
+    Route::post('/community/create', [CommunityController::class, 'createCommunity']);
+    Route::post('/community/{communityId}/add-groups', [CommunityController::class, 'addGroups']);
+    Route::post('/community/{communityId}/create-group', [CommunityController::class, 'createGroupInCommunity']);
+    Route::post('/community/{communityId}/leave', [CommunityController::class, 'leaveCommunity']);
+    Route::post('/community/{communityId}/deactivate', [CommunityController::class, 'deactivateCommunity']);
+    Route::post('/community/{communityId}/add-members', [CommunityController::class, 'addMembers']);
+    Route::post('/community/{communityId}/remove-member', [CommunityController::class, 'removeMember']);
+    Route::post('/community/{communityId}/toggle-admin', [CommunityController::class, 'toggleAdmin']);
+    Route::post('/community/{communityId}/update', [CommunityController::class, 'updateCommunity']);
+    Route::get('/community/{communityId}/info', [CommunityController::class, 'communityInfo']);
+    Route::post('/community/{communityId}/remove-group', [CommunityController::class, 'removeGroup']);
+    Route::post('/community/{communityId}/groups/{groupId}/join', [CommunityController::class, 'joinGroup']);
+    Route::post('/community/{communityId}/groups/{groupId}/join-request', [CommunityController::class, 'sendJoinRequest']);
+    Route::post('/community/{communityId}/requests/{requestId}/handle', [CommunityController::class, 'handleJoinRequest']);
 });
 
 require __DIR__.'/auth.php';

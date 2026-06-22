@@ -508,6 +508,8 @@
             @include('chat.broadcasts.change_name_modal')
             @include('chat.broadcasts.edit_recipients_panel')
             @include('chat.calls_sidebar')
+            @include('chat.communities_sidebar')
+            @include('chat.communities.communities_panel')
             <div id="sidebar_resizer"
                 class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]">
             </div>
@@ -4161,6 +4163,18 @@
                 }
             });
 
+            // Hide communities panel and sidebar
+            const cSidebar = document.getElementById('communities_sidebar_container');
+            if (cSidebar) {
+                cSidebar.classList.add('hidden');
+                cSidebar.classList.remove('sm:flex', 'flex');
+            }
+            const cMain = document.getElementById('communities_main_column');
+            if (cMain) {
+                cMain.classList.add('hidden');
+                cMain.classList.remove('flex');
+            }
+
             // Cleanly close info and edit panels to restore main_chat_column layout
             if (window.closeContactInfo) window.closeContactInfo();
             if (window.closeBroadcastInfo) window.closeBroadcastInfo();
@@ -5386,7 +5400,7 @@
                 });
             };
 
-            window.openDeleteModal = function (title, onConfirmMe, onConfirmEveryone = null) {
+            window.openDeleteModal = function (title, onConfirmMe, onConfirmEveryone = null, confirmBtnLabel = 'Delete for me') {
                 const modal = document.getElementById('delete_modal');
                 const titleEl = document.getElementById('delete_modal_title');
                 const confirmBtn = document.getElementById('delete_confirm_btn');
@@ -5394,6 +5408,7 @@
 
                 if (titleEl) titleEl.textContent = title;
                 if (confirmBtn) {
+                    confirmBtn.textContent = confirmBtnLabel;
                     confirmBtn.onclick = function () {
                         onConfirmMe();
                         window.closeDeleteModal();
@@ -6931,6 +6946,9 @@
         });
 
         window.loadStarredMessages();
+
+        // Communities JS logic has been migrated to communities_panel.blade.php
+
     </script>
 
     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">

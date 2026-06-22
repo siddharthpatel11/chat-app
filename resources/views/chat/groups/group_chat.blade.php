@@ -36,14 +36,15 @@
                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
                         </svg>
                     </button>
-                    <div id="active_group_chat_avatar" onclick="openGroupInfoPanel()"
+                    <div id="active_group_chat_avatar" onclick="window.handleGroupHeaderClick()"
                         class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm overflow-hidden transition-transform hover:scale-105 cursor-pointer shrink-0">
                         <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                     </div>
-                    <div onclick="openGroupInfoPanel()" class="cursor-pointer min-w-0 flex flex-col justify-center">
+                    <div onclick="window.handleGroupHeaderClick()"  
+                        class="cursor-pointer min-w-0 flex flex-col justify-center">
                         <h2 id="active_group_chat_title"
                             class="text-[15.5px] font-semibold text-[#e9edef] leading-tight truncate">Select a group
                             chat
@@ -202,6 +203,22 @@
                         </svg>
                     </button>
 
+                    <!-- Community Icon -->
+                    <button id="group_community_btn" onclick="window.currentGroupData && window.currentGroupData.community_id && window.openCommunityGroupsDrawer(window.currentGroupData.community_id)"
+                        class="hidden p-2 text-[#8696a0] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                        title="Community Groups">
+                        <div class="relative w-7 h-7 bg-[#3a2c26] rounded-xl flex items-center justify-center">
+                            <svg class="w-4 h-4 text-[#eaa180]" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 12.75c1.63 0 3.07.39 4.24.9 1.08.48 1.76 1.56 1.76 2.73V18H6v-1.62c0-1.17.68-2.25 1.76-2.73 1.17-.51 2.61-.9 4.24-.9zM12 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zM18.8 11.23c-1.28 0-2.42-.45-3.32-1.2a4.4 4.4 0 0 0 .52-2.03c0-.75-.19-1.46-.52-2.03.9-.75 2.04-1.2 3.32-1.2 2.08 0 3.8 1.71 3.8 3.8s-1.72 3.8-3.8 3.8zM5.2 11.23C3.12 11.23 1.4 9.52 1.4 7.44s1.72-3.8 3.8-3.8c1.28 0 2.42.45 3.32 1.2-.33.57-.52 1.28-.52 2.03 0 .75.19 1.46.52 2.03-.9.75-2.04 1.2-3.32 1.2z"/>
+                            </svg>
+                            <div class="absolute -bottom-1 -right-1 w-[18px] h-[18px] bg-[#f0f2f5] rounded-full flex items-center justify-center border-2 border-[#202c33]">
+                                <svg class="w-2.5 h-2.5 text-[#111b21] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </button>
+
                     <!-- Menu Icon -->
                     <button id="group_header_more_btn" onclick="toggleGroupHeaderMoreMenu(event)"
                         class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
@@ -257,7 +274,8 @@
                 <div class="flex flex-col min-w-0 flex-1">
                     <span id="group_pinned_count" class="text-[#00a884] text-[13px] font-semibold">1 pinned
                         message</span>
-                    <span id="group_pinned_text" class="text-[#8696a0] text-sm truncate block w-full">Message text goes
+                    <span id="group_pinned_text" class="text-[#8696a0] text-sm truncate block w-full">Message text
+                        goes
                         here...</span>
                 </div>
             </div>
@@ -878,150 +896,174 @@
                         </div>
                     </div>
                 </div>
-            <!-- Group Settings Row -->
-            <div id="group_settings_info_row" class="px-6 mb-5 hidden">
-                <div class="bg-[#182229] rounded-[16px] p-4 border border-[#202c33] space-y-4">
-                    <div class="flex items-center gap-2 mb-2 pb-2 border-b border-[#313d45]">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#00a884]">
-                            <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"></path>
-                        </svg>
-                        <span class="text-[#e9edef] text-[15px] font-semibold">Group settings (Admins only)</span>
-                    </div>
-
-                    <!-- Edit group settings -->
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1 pr-4">
-                            <span class="text-[#e9edef] text-[14px] block">Edit group settings</span>
-                            <span class="text-[#8696a0] text-xs">Name, icon, and description.</span>
-                        </div>
-                        <button onclick="window.toggleGroupInfoPerm('editSettings')" id="info_perm_toggle_editSettings" class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
-                            <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5" id="info_perm_circle_editSettings"></div>
-                        </button>
-                    </div>
-
-                    <!-- Send messages -->
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1 pr-4">
-                            <span class="text-[#e9edef] text-[14px] block">Send messages</span>
-                            <span class="text-[#8696a0] text-xs">Choose who can send messages to this group.</span>
-                        </div>
-                        <button onclick="window.toggleGroupInfoPerm('sendMessages')" id="info_perm_toggle_sendMessages" class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
-                            <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5" id="info_perm_circle_sendMessages"></div>
-                        </button>
-                    </div>
-
-                    <!-- Add other members -->
-                    <div class="flex items-start justify-between">
-                        <div class="flex-1 pr-4">
-                            <span class="text-[#e9edef] text-[14px] block">Add other members</span>
-                            <span class="text-[#8696a0] text-xs">Choose who can add new members to this group.</span>
-                        </div>
-                        <button onclick="window.toggleGroupInfoPerm('addMembers')" id="info_perm_toggle_addMembers" class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
-                            <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5" id="info_perm_circle_addMembers"></div>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
-
-            <!-- Members Section -->
-            <div class="px-6 mb-2">
-                <div class="flex justify-between items-center mb-4">
-                    <span id="group_members_count" class="text-[#8696a0] text-[15px]">... members</span>
-                    <button class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                            <path
-                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
-                            </path>
-                        </svg>
-                    </button>
-                </div>
-
-                <div id="group_members_list" class="flex flex-col">
-                    <!-- Add Member Item -->
-                    <div class="flex items-center gap-4 py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors"
-                        onclick="window.openAddGroupMembersModal()">
-                        <div
-                            class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white shrink-0">
-                            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <!-- Group Settings Row -->
+                <div id="group_settings_info_row" class="px-6 mb-5 hidden">
+                    <div class="bg-[#182229] rounded-[16px] p-4 border border-[#202c33] space-y-4">
+                        <div class="flex items-center gap-2 mb-2 pb-2 border-b border-[#313d45]">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"
+                                class="text-[#00a884]">
                                 <path
-                                    d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
+                                    d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z">
                                 </path>
                             </svg>
+                            <span class="text-[#e9edef] text-[15px] font-semibold">Group settings (Admins only)</span>
                         </div>
-                        <span class="text-[#e9edef] text-[16px]">Add member</span>
+
+                        <!-- Edit group settings -->
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 pr-4">
+                                <span class="text-[#e9edef] text-[14px] block">Edit group settings</span>
+                                <span class="text-[#8696a0] text-xs">Name, icon, and description.</span>
+                            </div>
+                            <button onclick="window.toggleGroupInfoPerm('editSettings')"
+                                id="info_perm_toggle_editSettings"
+                                class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
+                                <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5"
+                                    id="info_perm_circle_editSettings"></div>
+                            </button>
+                        </div>
+
+                        <!-- Send messages -->
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 pr-4">
+                                <span class="text-[#e9edef] text-[14px] block">Send messages</span>
+                                <span class="text-[#8696a0] text-xs">Choose who can send messages to this group.</span>
+                            </div>
+                            <button onclick="window.toggleGroupInfoPerm('sendMessages')"
+                                id="info_perm_toggle_sendMessages"
+                                class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
+                                <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5"
+                                    id="info_perm_circle_sendMessages"></div>
+                            </button>
+                        </div>
+
+                        <!-- Add other members -->
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1 pr-4">
+                                <span class="text-[#e9edef] text-[14px] block">Add other members</span>
+                                <span class="text-[#8696a0] text-xs">Choose who can add new members to this
+                                    group.</span>
+                            </div>
+                            <button onclick="window.toggleGroupInfoPerm('addMembers')"
+                                id="info_perm_toggle_addMembers"
+                                class="w-11 h-6 flex items-center rounded-full p-0.5 transition-colors duration-200 bg-[#00a884] shrink-0">
+                                <div class="bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 translate-x-5"
+                                    id="info_perm_circle_addMembers"></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
+
+                <!-- Members Section -->
+                <div class="px-6 mb-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <span id="group_members_count" class="text-[#8696a0] text-[15px]">... members</span>
+                        <button class="text-[#aebac1] hover:text-[#e9edef] transition-colors focus:outline-none">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                <path
+                                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z">
+                                </path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div id="group_members_list" class="flex flex-col">
+                        <!-- Add Member Item -->
+                        <div class="flex items-center gap-4 py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors"
+                            onclick="window.openAddGroupMembersModal()">
+                            <div
+                                class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white shrink-0">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                    <path
+                                        d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="text-[#e9edef] text-[16px]">Add member</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
+
+                <!-- Footer Actions -->
+                <div class="flex flex-col mb-8 px-6 pb-4">
+                    <div onclick="window.toggleFavouriteChat(window.activeChatUser.id, 'group'); window.updateGroupInfoFavouriteText();"
+                        class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                            stroke-width="2" class="text-[#8696a0]">
+                            <path
+                                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                            </path>
+                        </svg>
+                        <span id="group_info_fav_text" class="text-[#e9edef] text-[16px]">Add to favourites</span>
+                    </div>
+
+                    <div onclick="if(window.openAddToListModal) { window.openAddToListModal('group_sidebar_' + window.activeChatUser.id); }"
+                        class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                            stroke-width="2" class="text-[#8696a0]">
+                            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
+                        </svg>
+                        <span class="text-[#e9edef] text-[16px]">Add to list</span>
+                    </div>
+
+                    <div onclick="window.handleGroupInfoClearChat();"
+                        class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#f15c6d]">
+                            <path
+                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z">
+                            </path>
+                        </svg>
+                        <span class="text-[#f15c6d] text-[16px]">Clear chat</span>
+                    </div>
+
+                    <div onclick="window.handleGroupInfoExitGroup();"
+                        class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                            class="text-[#f15c6d]">
+                            <path
+                                d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z">
+                            </path>
+                        </svg>
+                        <span class="text-[#f15c6d] text-[16px]">Exit group</span>
+                    </div>
+
+                    <div onclick="window.handleGroupInfoReportGroup();"
+                        class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                            stroke-width="2" class="text-[#f15c6d]">
+                            <path d="M14.59 10l-4.59-4.59v3.59H2v2h8v3.59L14.59 10zM22 3v18H10V3h12z"></path>
+                        </svg>
+                        <span class="text-[#f15c6d] text-[16px]">Report group</span>
                     </div>
                 </div>
             </div>
-
-            <div class="h-[1px] bg-[#313d45] mx-6 mb-4"></div>
-
-            <!-- Footer Actions -->
-            <div class="flex flex-col mb-8 px-6 pb-4">
-                <div onclick="window.toggleFavouriteChat(window.activeChatUser.id, 'group'); window.updateGroupInfoFavouriteText();" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                        stroke-width="2" class="text-[#8696a0]">
-                        <path
-                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                        </path>
-                    </svg>
-                    <span id="group_info_fav_text" class="text-[#e9edef] text-[16px]">Add to favourites</span>
-                </div>
-
-                <div onclick="if(window.openAddToListModal) { window.openAddToListModal('group_sidebar_' + window.activeChatUser.id); }" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                        stroke-width="2" class="text-[#8696a0]">
-                        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"></path>
-                    </svg>
-                    <span class="text-[#e9edef] text-[16px]">Add to list</span>
-                </div>
-
-                <div onclick="window.handleGroupInfoClearChat();" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                        class="text-[#f15c6d]">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z">
-                        </path>
-                    </svg>
-                    <span class="text-[#f15c6d] text-[16px]">Clear chat</span>
-                </div>
-
-                <div onclick="window.handleGroupInfoExitGroup();" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                        class="text-[#f15c6d]">
-                        <path
-                            d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z">
-                        </path>
-                    </svg>
-                    <span class="text-[#f15c6d] text-[16px]">Exit group</span>
-                </div>
-
-                <div onclick="window.handleGroupInfoReportGroup();" class="py-4 hover:bg-[#202c33]/30 cursor-pointer transition-colors flex items-center gap-5">
-                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
-                        stroke-width="2" class="text-[#f15c6d]">
-                        <path d="M14.59 10l-4.59-4.59v3.59H2v2h8v3.59L14.59 10zM22 3v18H10V3h12z"></path>
-                    </svg>
-                    <span class="text-[#f15c6d] text-[16px]">Report group</span>
-                </div>
-            </div>
-        </div>
         </div>
     </div>
 
 </div>
 
 <!-- Group Member Context Dropdown Menu -->
-<div id="group_member_context_dropdown" class="hidden fixed w-48 bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[600] transform scale-95 opacity-0 transition-all duration-150 origin-top-right">
-    <button id="member_menu_message" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
+<div id="group_member_context_dropdown"
+    class="hidden fixed w-48 bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[600] transform scale-95 opacity-0 transition-all duration-150 origin-top-right">
+    <button id="member_menu_message"
+        class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
         Message
     </button>
-    <button id="member_menu_make_admin" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
+    <button id="member_menu_make_admin"
+        class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
         Make group admin
     </button>
-    <button id="member_menu_dismiss_admin" class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
+    <button id="member_menu_dismiss_admin"
+        class="w-full text-left px-4 py-3 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm focus:outline-none">
         Dismiss as admin
     </button>
-    <button id="member_menu_remove" class="w-full text-left px-4 py-3 text-red-500 hover:bg-red-500/10 transition-colors text-sm focus:outline-none">
+    <button id="member_menu_remove"
+        class="w-full text-left px-4 py-3 text-red-500 hover:bg-red-500/10 transition-colors text-sm focus:outline-none">
         Remove
     </button>
 </div>
@@ -1955,7 +1997,7 @@
         if (u.id) {
             window.get(window.ref(window.db, 'groups/' + u.id)).then((snapshot) => {
                 const group = snapshot.val();
-                
+
                 // Set current group data
                 window.currentGroupData = group;
 
@@ -2063,7 +2105,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || ''
                     },
                     body: JSON.stringify({
                         user_id: window.myUserId
@@ -2086,10 +2129,11 @@
                     document.getElementById('chat_empty_state')?.classList.remove('hidden');
                     window.currentChatId = null;
                     window.activeChatUser = null;
-                    
-                    const sidebarEl = document.getElementById(`group_sidebar_${groupId}`) || document.getElementById(`group_sidebar_${groupId.toString().replace('group_', '')}`);
+
+                    const sidebarEl = document.getElementById(`group_sidebar_${groupId}`) || document
+                        .getElementById(`group_sidebar_${groupId.toString().replace('group_', '')}`);
                     if (sidebarEl) sidebarEl.remove();
-                    
+
                     window.showToast?.('Exit Group', 'You have left the group.');
                 } else {
                     window.showToast?.('Error', data.message || 'Failed to exit group.');
@@ -2114,7 +2158,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || ''
                     },
                     body: JSON.stringify({
                         reported_id: groupId,
@@ -2129,7 +2174,8 @@
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute('content') || ''
                         },
                         body: JSON.stringify({
                             user_id: window.myUserId
@@ -2150,8 +2196,9 @@
                     document.getElementById('chat_empty_state')?.classList.remove('hidden');
                     window.currentChatId = null;
                     window.activeChatUser = null;
-                    
-                    const sidebarEl = document.getElementById(`group_sidebar_${groupId}`) || document.getElementById(`group_sidebar_${groupId.toString().replace('group_', '')}`);
+
+                    const sidebarEl = document.getElementById(`group_sidebar_${groupId}`) || document
+                        .getElementById(`group_sidebar_${groupId.toString().replace('group_', '')}`);
                     if (sidebarEl) sidebarEl.remove();
                 } else {
                     window.showToast?.('Error', data.message || 'Failed to report group.');
@@ -2161,7 +2208,9 @@
                 window.showToast?.('Error', 'Failed to report group.');
             }
         };
-        if (confirm(`Report ${groupName} to WhatsApp? The last 5 messages from this group will be forwarded. If you exit this group, messages will be removed from this device.`)) {
+        if (confirm(
+                `Report ${groupName} to WhatsApp? The last 5 messages from this group will be forwarded. If you exit this group, messages will be removed from this device.`
+                )) {
             confirmAction();
         }
     };
@@ -2904,19 +2953,22 @@
         <button id="group_edit_dropdown_btn" onclick="window.startGroupEdit()"
             class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Edit</span>
             <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z">
+                </path>
             </svg>
         </button>
         <button onclick="window.forwardGroupMessage()"
             class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span>Forward</span>
             <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3">
                 </path>
             </svg></button>
         <button id="group_pin_dropdown_btn" onclick="window.toggleGroupPinMessage(event)"
             class="w-full text-left px-4 py-2.5 text-[#e9edef] hover:bg-[#182229] flex items-center justify-between transition-colors text-[15px]"><span
-                id="group_pin_dropdown_btn_text">Pin</span> <svg class="w-4 h-4 text-[#8696a0]" viewBox="0 0 24 24"
-                fill="currentColor">
+                id="group_pin_dropdown_btn_text">Pin</span> <svg class="w-4 h-4 text-[#8696a0]"
+                viewBox="0 0 24 24" fill="currentColor">
                 <path
                     d="M16 9V4l1 0c.55 0 1-.45 1-1s-.45-1-1-1H7c-.55 0-1 .45-1 1s.45 1 1 1l1 0v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z">
                 </path>
@@ -2947,131 +2999,10 @@
 <!-- Group Header More Options Dropdown -->
 <div id="group_header_more_dropdown"
     class="hidden absolute top-14 right-4 w-[260px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
-    <button onclick="window.openAddGroupMembersModal(); toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
-            <path
-                d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
-            </path>
-        </svg>
-        <span class="text-[15px]">Add member</span>
-    </button>
-    <button onclick="window.openGroupInfoPanel(); toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-        </svg>
-        <span class="text-[15px]">Group info</span>
-    </button>
-    <button onclick="window.toggleGroupSearchDrawer(); toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-        <span class="text-[15px]">Search</span>
-    </button>
-    <button onclick="toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <polyline points="9 11 12 14 22 4"></polyline>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-        </svg>
-        <span class="text-[15px]">Select messages</span>
-    </button>
-    <div class="w-full flex items-center justify-between px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors cursor-pointer group"
-        onclick="toggleGroupHeaderMoreMenu()">
-        <div class="flex items-center gap-4">
-            <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                stroke-width="2">
-                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                <path d="M18.63 13A17.89 17.89 0 0 1 18 8"></path>
-                <path d="M6.26 6.26A5.86 5.86 0 0 0 6 8a7 7 0 0 0 7 7v0"></path>
-                <path d="M18 8a6 6 0 0 0-9.33-5"></path>
-                <line x1="1" y1="1" x2="23" y2="23"></line>
-            </svg>
-            <span class="text-[15px]">Mute notifications</span>
-        </div>
-        <svg class="w-4 h-4 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>
-        </svg>
-    </div>
-    <button onclick="toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        <span class="text-[15px]">Disappearing messages</span>
-    </button>
-    <button onclick="toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
-        <span class="text-[15px]">Lock chat</span>
-    </button>
-    <button onclick="toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <path
-                d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-            </path>
-        </svg>
-        <span class="text-[15px]">Add to favourites</span>
-    </button>
-    <button onclick="toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-        </svg>
-        <span class="text-[15px]">Add to list</span>
-    </button>
-    <button onclick="window.closeChat(); toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="15" y1="9" x2="9" y2="15"></line>
-            <line x1="9" y1="9" x2="15" y2="15"></line>
-        </svg>
-        <span class="text-[15px]">Close chat</span>
-    </button>
-    <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
-    <button onclick="toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="8" y1="12" x2="16" y2="12"></line>
-        </svg>
-        <span class="text-[15px]">Clear chat</span>
-    </button>
-    <button onclick="toggleGroupHeaderMoreMenu()"
-        class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors">
-        <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-            stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-        </svg>
-        <span class="text-[15px]">Exit group</span>
-    </button>
+    <div id="group_header_main_menu"></div>
+    <div id="group_header_submenu"
+        class="hidden absolute top-0 right-full mr-2 w-[220px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[101]"></div>
+</div>
 </div>
 
 <script>
@@ -3186,6 +3117,240 @@
         window._activeGroupSenderId = senderId;
     };
 
+    window.renderGroupHeaderMoreMenu = function() {
+        const isAnnouncement = window.currentGroupData && window.currentGroupData.is_announcement === true;
+        const mainMenu = document.getElementById('group_header_main_menu');
+        const submenu = document.getElementById('group_header_submenu');
+        const dropdown = document.getElementById('group_header_more_dropdown');
+        if (!mainMenu || !submenu || !dropdown) return;
+
+        if (isAnnouncement) {
+            // Main Menu Content for Announcements
+            mainMenu.innerHTML = `
+                <button onclick="window.openAddGroupMembersModal(); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                    </svg>
+                    <span class="text-[15px]">Add members</span>
+                </button>
+                <button onclick="window.openGroupInfoPanel(); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="text-[15px]">Announcements info</span>
+                </button>
+                <button onclick="window.showToast?.('Media', 'Opening media, docs, and links...'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                    <span class="text-[15px]">Announcements media</span>
+                </button>
+                <button onclick="window.toggleGroupSearchDrawer(); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span class="text-[15px]">Search</span>
+                </button>
+                <button onclick="window.showToast?.('Mute', 'Notifications muted'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    <span class="text-[15px]">Mute notifications</span>
+                </button>
+                <button onclick="window.showToast?.('Disappearing Messages', 'Settings updated'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="text-[15px]">Disappearing messages</span>
+                </button>
+                <button onclick="window.showToast?.('Theme', 'Opening theme selector...'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
+                        <line x1="9" y1="22" x2="15" y2="22"></line>
+                    </svg>
+                    <span class="text-[15px]">Chat theme</span>
+                </button>
+                <div id="group_header_more_trigger" class="w-full flex items-center justify-between px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors cursor-pointer group">
+                    <div class="flex items-center gap-4">
+                        <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"></path>
+                        </svg>
+                        <span class="text-[15px]">More</span>
+                    </div>
+                    <svg class="w-4 h-4 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </div>
+            `;
+
+            // Submenu Content for Announcements
+            submenu.innerHTML = `
+                <button onclick="window.showToast?.('Clear', 'Chat cleared'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <span class="text-[15px]">Clear chat</span>
+                </button>
+                <button onclick="window.showToast?.('Export', 'Exporting chat...'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <span class="text-[15px]">Export chat</span>
+                </button>
+                <button onclick="window.showToast?.('Shortcut', 'Shortcut added'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <span class="text-[15px]">Add shortcut</span>
+                </button>
+                <button onclick="window.showToast?.('List', 'Added to list'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <span class="text-[15px]">Add to list</span>
+                </button>
+                <button onclick="window.showToast?.('Report', 'Report sent'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <span class="text-[15px]">Report</span>
+                </button>
+                <button onclick="window.showToast?.('Exit', 'Exited community'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-red-500 hover:bg-[#182229] transition-colors text-left focus:outline-none font-medium">
+                    <span class="text-[15px]">Exit community</span>
+                </button>
+            `;
+
+            // Mouse behaviors to show/hide submenu on hover
+            const trigger = document.getElementById('group_header_more_trigger');
+            if (trigger) {
+                trigger.addEventListener('mouseenter', () => {
+                    submenu.classList.remove('hidden');
+                });
+                trigger.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    submenu.classList.toggle('hidden');
+                });
+            }
+
+            dropdown.addEventListener('mouseleave', () => {
+                submenu.classList.add('hidden');
+            });
+        } else {
+            // Main Menu Content for Standard Groups (original menu layout)
+            mainMenu.innerHTML = `
+                <button onclick="window.openAddGroupMembersModal(); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                    </svg>
+                    <span class="text-[15px]">Add member</span>
+                </button>
+                <button onclick="window.openGroupInfoPanel(); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="16" x2="12" y2="12"></line>
+                        <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                    </svg>
+                    <span class="text-[15px]">Group info</span>
+                </button>
+                <button onclick="window.toggleGroupSearchDrawer(); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <span class="text-[15px]">Search</span>
+                </button>
+                <button onclick="toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <polyline points="9 11 12 14 22 4"></polyline>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                    <span class="text-[15px]">Select messages</span>
+                </button>
+                <button onclick="toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path d="M18 8a6 6 0 0 0-9.33-5"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                    <span class="text-[15px]">Mute notifications</span>
+                </button>
+                <button onclick="toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span class="text-[15px]">Disappearing messages</span>
+                </button>
+                <button onclick="toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span class="text-[15px]">Lock chat</span>
+                </button>
+                <button onclick="toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span class="text-[15px]">Add to favourites</span>
+                </button>
+                <button onclick="toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <line x1="8" y1="6" x2="21" y2="6"></line>
+                        <line x1="8" y1="12" x2="21" y2="12"></line>
+                        <line x1="8" y1="18" x2="21" y2="18"></line>
+                        <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                        <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                        <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                    </svg>
+                    <span class="text-[15px]">Add to list</span>
+                </button>
+                <button onclick="window.closeChat(); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    <span class="text-[15px]">Close chat</span>
+                </button>
+                <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
+                <button onclick="toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span class="text-[15px]">Clear chat</span>
+                </button>
+                <button onclick="toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-red-500 hover:bg-[#182229] transition-colors text-left focus:outline-none font-medium">
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span class="text-[15px]">Exit group</span>
+                </button>
+            `;
+            submenu.innerHTML = '';
+        }
+    };
+
     window.toggleGroupHeaderMoreMenu = function(event) {
         if (event) event.stopPropagation();
         const dropdown = document.getElementById('group_header_more_dropdown');
@@ -3193,6 +3358,7 @@
 
         const isHidden = dropdown.classList.contains('hidden');
         if (isHidden) {
+            window.renderGroupHeaderMoreMenu();
             dropdown.classList.remove('hidden');
             setTimeout(() => {
                 dropdown.classList.remove('opacity-0', 'scale-95');
@@ -3201,7 +3367,11 @@
         } else {
             dropdown.classList.remove('opacity-100', 'scale-100');
             dropdown.classList.add('opacity-0', 'scale-95');
-            setTimeout(() => dropdown.classList.add('hidden'), 200);
+            setTimeout(() => {
+                dropdown.classList.add('hidden');
+                const submenu = document.getElementById('group_header_submenu');
+                if (submenu) submenu.classList.add('hidden');
+            }, 200);
         }
     };
 
@@ -3813,7 +3983,7 @@
         document.getElementById('group_editing_to_block').classList.remove('hidden');
         document.getElementById('group_editing_to_block').classList.add('flex');
         document.getElementById('group_editing_to_text').textContent = text;
-        
+
         const input = document.getElementById('group_msg');
         if (input) {
             input.value = text;
@@ -3854,7 +4024,7 @@
             console.log("emitMessage intercepted. chatId:", window.currentChatId);
             if (window.currentChatId && typeof window.currentChatId === 'string' && window.currentChatId
                 .startsWith('group_')) {
-                
+
                 if (window.groupEditingMessageKey) {
                     let firebaseChatId = window.currentChatId;
                     if (firebaseChatId.startsWith('group_group_')) {
@@ -4056,11 +4226,99 @@
                     badge.classList.add('flex');
                 }
             }
+
+            // If this is a community sub-group, update the parent Community row details and recalculate unread badge
+            if (groupItem) {
+                const communityId = groupItem.getAttribute('data-community-id');
+                const isAnnouncement = groupItem.getAttribute('data-is-announcement') === 'true';
+                const groupName = groupItem.getAttribute('data-name') || "";
+
+                if (communityId && !isAnnouncement) {
+                    const parentItem = document.querySelector(`[data-community-id="${communityId}"][data-is-announcement="true"]`);
+                    if (parentItem) {
+                        const parentGroupId = parentItem.getAttribute('data-groupid');
+                        if (parentGroupId) {
+                            // Update parent last message
+                            const parentLastMsgEl = document.getElementById(`group_last_msg_${parentGroupId}`);
+                            if (parentLastMsgEl) {
+                                let previewText = data.text || "";
+                                if (data.type === 'image') previewText = "📷 Image";
+                                else if (data.type === 'video') previewText = "🎥 Video";
+                                else if (data.type === 'audio') previewText = "🎵 Audio";
+                                else if (data.type === 'document') previewText = "📄 Document";
+                                else if (data.type === 'location') previewText = "📍 Location";
+                                else if (data.type === 'live_location') previewText = "📍 Live Location";
+
+                                const prefix = (data.sender_id == window.myUserId) ? "✓ " : "";
+                                parentLastMsgEl.innerHTML = `${prefix}<span class="text-[#e9edef] font-medium">${groupName}</span> ▸ ${previewText}`;
+                            }
+
+                            // Update parent last message time
+                            const parentLastTimeEl = document.getElementById(`group_last_time_${parentGroupId}`);
+                            if (parentLastTimeEl) {
+                                const msgDate = new Date(data.time * 1000);
+                                parentLastTimeEl.textContent = msgDate.toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                });
+                            }
+
+                            // Update parent timestamp
+                            parentItem.setAttribute('data-timestamp', data.time);
+                            if (window.sortSidebar) window.sortSidebar();
+
+                            // Recalculate parent unread badge
+                            if (typeof window.recalculateCommunityUnreadBadge === 'function') {
+                                window.recalculateCommunityUnreadBadge(communityId);
+                            }
+                        }
+                    }
+                }
+            }
         });
+    };
+
+    window.recalculateCommunityUnreadBadge = function(communityId) {
+        if (!communityId) return;
+        const parentItem = document.querySelector(`[data-community-id="${communityId}"][data-is-announcement="true"]`);
+        if (!parentItem) return;
+        const parentGroupId = parentItem.getAttribute('data-groupid');
+        if (!parentGroupId) return;
+
+        let totalUnread = 0;
+        // Sum up unread counts of all groups belonging to this community
+        const commGroups = document.querySelectorAll(`[data-community-id="${communityId}"]`);
+        commGroups.forEach(item => {
+            const isAnnounce = item.getAttribute('data-is-announcement') === 'true';
+            const gId = item.getAttribute('data-groupid');
+            // If it's a sub-group, get its unread badge count
+            if (!isAnnounce && gId) {
+                const badge = document.getElementById(`group_unread_badge_${gId}`);
+                if (badge && !badge.classList.contains('hidden')) {
+                    totalUnread += parseInt(badge.textContent) || 0;
+                }
+            }
+        });
+
+        // Also add the announcement group's own unread count if any (wait, the parent item is the announcement group)
+        // Since we are setting the badge on the parent item directly, it represents the community level unread count.
+        const parentBadge = document.getElementById(`group_unread_badge_${parentGroupId}`);
+        if (parentBadge) {
+            if (totalUnread > 0) {
+                parentBadge.textContent = totalUnread;
+                parentBadge.classList.remove('hidden');
+                parentBadge.classList.add('flex');
+            } else {
+                parentBadge.textContent = '0';
+                parentBadge.classList.add('hidden');
+                parentBadge.classList.remove('flex');
+            }
+        }
     };
 
     window.renderGroupSidebarItem = function(group) {
         let item = document.getElementById(`group_sidebar_${group.id}`);
+        const isAnnounceGroup = group.is_announcement === true || group.is_announcement === 'true' || group.is_announcement == 1;
         if (!item) {
             item = document.createElement('div');
             item.id = `group_sidebar_${group.id}`;
@@ -4072,14 +4330,82 @@
             item.setAttribute('data-avatar', group.avatar ||
                 `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`
             );
-            item.onclick = function() {
-                window.selectGroupChat(group.id, group.name, group.avatar);
-            };
 
-            item.innerHTML = `
+            // Set community data attributes for all community groups
+            if (group.community_id) {
+                item.setAttribute('data-community-id', group.community_id);
+            }
+            if (isAnnounceGroup) {
+                item.setAttribute('data-is-announcement', 'true');
+            }
+
+            // For announcement groups (community announcements), open the community sidebar list
+            if (isAnnounceGroup && group.community_id) {
+                item.onclick = function() {
+                    if (typeof window.openCommunityFromChats === 'function') {
+                        window.openCommunityFromChats(group.community_id);
+                    } else {
+                        window.selectGroupChat(group.id, group.name, group.avatar);
+                    }
+                };
+
+                // If community_name is not in group data, fetch it from Firebase
+                if (!group.community_name && window.db && window.get && window.ref) {
+                    window.get(window.ref(window.db, `communities/${group.community_id}/name`)).then((snap) => {
+                        const cName = snap.val();
+                        if (cName) {
+                            group.community_name = cName;
+                            // Update the h4 in the sidebar item if it's already rendered
+                            const h4 = item.querySelector('h4');
+                            if (h4 && h4.textContent === 'Announcements') {
+                                h4.textContent = cName;
+                            }
+                        }
+                    }).catch(() => {});
+                }
+            } else {
+                item.onclick = function() {
+                    window.selectGroupChat(group.id, group.name, group.avatar);
+                };
+            }
+
+            const avatarHtml = isAnnounceGroup ? `
+                <div class="relative w-12 h-12 shrink-0 flex items-center justify-center">
+                    <!-- Stacked background cards -->
+                    <div class="absolute w-[36px] h-[36px] rounded-lg bg-[#3a464c] left-0.5 top-1 border border-[#111b21] transform -rotate-[10deg] z-[1]"></div>
+                    <div class="absolute w-[36px] h-[36px] rounded-lg bg-[#2d383e] left-1.5 top-1.5 border border-[#111b21] transform -rotate-[5deg] z-[2]"></div>
+                    <!-- Main top card -->
+                    <div class="relative w-9 h-9 rounded-xl bg-[#3d302b] flex items-center justify-center border border-[#111b21] shadow-md z-[3] overflow-hidden">
+                        <img src="${group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=3d302b&color=ff8e6e`}" class="w-full h-full object-cover">
+                    </div>
+                </div>
+            ` : `
                 <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
                     <img src="${group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`}" class="w-full h-full object-cover">
                 </div>
+            `;
+
+            item.innerHTML = `
+                ${avatarHtml}
+                ${isAnnounceGroup && group.community_id ? `
+                <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-2 relative">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${group.community_name || group.name.replace(' - Announcements','').replace(' Announcements','')}</h4>
+                        <span class="text-[12px] text-[#8696a0] whitespace-nowrap" id="group_last_time_${group.id}"></span>
+                    </div>
+                    <div class="flex justify-between items-center mt-0.5">
+                        <div class="flex items-center gap-1 min-w-0 flex-1">
+                            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor" class="text-[#8696a0] shrink-0"><path d="M8 5v14l11-7z"/></svg>
+                            <p class="text-[14px] text-[#8696a0] truncate leading-snug" id="group_last_msg_${group.id}">Add members to start chatting</p>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0 ml-2">
+                            <!-- Unread Badge -->
+                            <span id="group_unread_badge_${group.id}" class="hidden bg-[#00a884] text-[#111b21] text-[12px] font-bold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1.5 shadow-sm">0</span>
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" class="text-[#8696a0] shrink-0"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
+                        </div>
+                    </div>
+                </div>
+                ` : `
                 <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                     <div class="flex justify-between items-center">
                         <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">${group.name}</h4>
@@ -4108,6 +4434,7 @@
                         </svg>
                     </button>
                 </div>
+                `}
             `;
             const container = document.getElementById('user_list_container');
             if (container) {
@@ -4678,6 +5005,25 @@
     };
 
     window.selectGroupChatOriginal = function(groupId, name, avatar, searchMsgTime = null) {
+        const commSidebar = document.getElementById('communities_sidebar_container');
+        const isCommSidebarActive = commSidebar && !commSidebar.classList.contains('hidden');
+
+        if (isCommSidebarActive) {
+            const commMain = document.getElementById('communities_main_column');
+            if (commMain) {
+                commMain.classList.add('hidden');
+                commMain.classList.remove('flex');
+            }
+            const chatContainer = document.getElementById('chat_view_container');
+            if (chatContainer) {
+                chatContainer.classList.remove('hidden');
+                chatContainer.classList.add('flex');
+            }
+        } else {
+            if (typeof window.showChats === 'function') {
+                window.showChats();
+            }
+        }
         if (typeof window.closeAllSearchPanels === 'function') {
             window.closeAllSearchPanels();
         }
@@ -4715,12 +5061,92 @@
         window.get(window.ref(window.db, 'groups/' + groupId)).then((snapshot) => {
             const group = snapshot.val();
 
+            // Clear any old welcome card first
+            const oldCard = document.getElementById('community_welcome_card');
+            if (oldCard) oldCard.remove();
+
+            if (group && (group.is_announcement === true || group.is_general === true)) {
+                const adminsList = group.admins || [];
+                const isCurrentUserAdmin = adminsList.includes(window.myUserId) || adminsList.includes(
+                        parseInt(window.myUserId)) || adminsList.includes(String(window.myUserId)) ||
+                    String(group.createdBy) === String(window.myUserId);
+
+                const addMembersBtnHtml = isCurrentUserAdmin ? `
+                    <button onclick="window.openAddGroupMembersModal()" class="mt-4 flex items-center justify-center gap-2 border border-[#00a884] hover:bg-[#00a884]/10 text-[#00a884] font-semibold px-6 py-2 rounded-full transition-all duration-200 focus:outline-none cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        Add members
+                    </button>
+                ` : '';
+
+                let cardIconHtml = '';
+                let cardTitle = '';
+                let cardSubtitle = '';
+
+                if (group.is_announcement === true) {
+                    cardIconHtml = `
+                        <div class="w-16 h-16 rounded-2xl bg-[#3d302b] flex items-center justify-center text-[#ff8e6e] mb-4 shadow-inner">
+                            <svg class="w-9 h-9" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </div>
+                    `;
+                    cardTitle = 'Welcome to your community!';
+                    cardSubtitle =
+                        'Use this chat to send important admin announcements to all your members at once.';
+                } else {
+                    cardIconHtml = `
+                        <div class="w-16 h-16 rounded-full bg-[#3d4b53] flex items-center justify-center text-[#e9edef] mb-4 shadow-inner">
+                            <svg class="w-9 h-9" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm0-3h12v2H6V6zm0 6h7v2H6v-2z"/>
+                            </svg>
+                        </div>
+                    `;
+                    cardTitle = `Welcome to the group: ${group.name}`;
+                    cardSubtitle = 'All community members can use this chat to talk with each other';
+                }
+
+                const welcomeCardHtml = `
+                    <div id="community_welcome_card" class="flex flex-col items-center justify-center p-6 mx-auto my-6 max-w-sm bg-[#1f2c34] rounded-2xl border border-white/5 text-center shadow-lg">
+                        ${cardIconHtml}
+                        <h3 class="text-[#e9edef] text-[18px] font-bold mb-2">${cardTitle}</h3>
+                        <p class="text-[#8696a0] text-sm leading-relaxed max-w-[280px]">${cardSubtitle}</p>
+                        ${addMembersBtnHtml}
+                    </div>
+                `;
+                const gMsgs = document.getElementById('group_messages');
+                if (gMsgs) gMsgs.insertAdjacentHTML('afterbegin', welcomeCardHtml);
+            }
+
             // Listen for group metadata (pinned msgs, member count, etc)
             const groupRef = window.ref(window.db, 'groups/' + groupId);
             window.onValue(groupRef, (snap) => {
                 const gData = snap.val();
                 if (!gData) return;
                 window.currentGroupData = gData;
+
+                // Hide call button for announcement groups
+                const callBtn = document.getElementById('group_call_btn_pill');
+                if (callBtn) {
+                    if (gData.is_announcement === true) {
+                        callBtn.classList.add('hidden');
+                        callBtn.classList.remove('sm:flex');
+                    } else {
+                        callBtn.classList.remove('hidden');
+                        callBtn.classList.add('sm:flex');
+                    }
+                }
+
+                // Show community button if part of a community
+                const commBtn = document.getElementById('group_community_btn');
+                if (commBtn) {
+                    if (gData.community_id) {
+                        commBtn.classList.remove('hidden');
+                    } else {
+                        commBtn.classList.add('hidden');
+                    }
+                }
 
                 // Dynamic Name, Member Count & Users List
                 if (gData.name) {
@@ -4783,6 +5209,35 @@
                 const infoPill = document.getElementById('group_info_member_count_pill');
                 if (infoPill) infoPill.textContent = memberCount + ' members';
 
+                if (gData.is_announcement === true && gData.community_id) {
+                    if (subtitle) subtitle.textContent = 'Announcements';
+                    if (infoCount) infoCount.textContent = 'Announcements';
+                    if (infoPill) infoPill.textContent = 'Announcements';
+                    
+                    window.get(window.ref(window.db, 'communities/' + gData.community_id)).then((cSnap) => {
+                        const cData = cSnap.val();
+                        if (cData && cData.name) {
+                            const titleEl = document.getElementById('active_group_chat_title');
+                            if (titleEl) titleEl.textContent = cData.name;
+                            
+                            const infoNameEl = document.getElementById('group_info_name');
+                            if (infoNameEl) infoNameEl.textContent = cData.name;
+                            
+                            window.activeChatName = cData.name;
+                            if (window.activeChatUser) window.activeChatUser.name = cData.name;
+                            
+                            if (cData.avatar) {
+                                const avatarEl = document.getElementById('active_group_chat_avatar');
+                                if (avatarEl) avatarEl.innerHTML = `<img src="${cData.avatar}" class="w-full h-full object-cover">`;
+                                const infoAvatarEl = document.getElementById('group_info_avatar');
+                                if (infoAvatarEl) infoAvatarEl.src = cData.avatar;
+                                window.activeChatAvatar = cData.avatar;
+                                if (window.activeChatUser) window.activeChatUser.avatar = cData.avatar;
+                            }
+                        }
+                    });
+                }
+
                 const pinBar = document.getElementById('group_pinned_bar');
                 const pinText = document.getElementById('group_pinned_text');
                 const pinCount = document.getElementById('group_pinned_count');
@@ -4836,7 +5291,8 @@
                     window.renderGroupInfoMembers(gData);
                 }
                 const settingsPanel = document.getElementById('group_info_settings_panel');
-                if (settingsPanel && !settingsPanel.classList.contains('hidden') && window.updateGroupInfoSettingsUI) {
+                if (settingsPanel && !settingsPanel.classList.contains('hidden') && window
+                    .updateGroupInfoSettingsUI) {
                     window.updateGroupInfoSettingsUI(gData);
                 }
 
@@ -4844,12 +5300,15 @@
                 const myUidStr = String(window.myUserId);
                 let uListForCheck = [];
                 if (gData.users) {
-                    uListForCheck = Array.isArray(gData.users) ? gData.users : Object.values(gData.users);
+                    uListForCheck = Array.isArray(gData.users) ? gData.users : Object.values(gData
+                        .users);
                 }
-                const isStillMember = uListForCheck.includes(myUidStr) || uListForCheck.includes(parseInt(myUidStr));
+                const isStillMember = uListForCheck.includes(myUidStr) || uListForCheck.includes(
+                    parseInt(myUidStr));
 
                 if (!isStillMember) {
-                    const msgInput = document.getElementById('group_msg') || document.getElementById('msg');
+                    const msgInput = document.getElementById('group_msg') || document
+                        .getElementById('msg');
                     if (msgInput) {
                         msgInput.disabled = true;
                         msgInput.placeholder = "You are no longer a participant of this group.";
@@ -4857,17 +5316,39 @@
                     window.closeGroupInfoPanel();
                 } else {
                     const adminsList = gData.admins || [];
-                    const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) || adminsList.includes(String(myUidStr)) || String(gData.createdBy) === String(myUidStr);
-                    const canSend = gData.permissions ? gData.permissions.sendMessages !== false : true;
+                    const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(
+                        parseInt(myUidStr)) || adminsList.includes(String(myUidStr)) || String(
+                        gData.createdBy) === String(myUidStr);
+                    const canSend = gData.permissions ? gData.permissions.sendMessages !== false :
+                        true;
 
-                    const msgInput = document.getElementById('group_msg') || document.getElementById('msg');
+                    const msgInput = document.getElementById('group_msg') || document
+                        .getElementById('msg');
+                    const emojiBtn = document.getElementById('group_emoji_toggle_btn');
+                    const attachBtn = document.getElementById('group_attach_toggle_btn');
+                    const actionBtn = document.getElementById('group_action_btn');
+                    const insideMicBtn = document.getElementById('group_inside_mic_btn');
+
                     if (msgInput) {
                         if (!canSend && !isCurrentUserAdmin) {
                             msgInput.disabled = true;
-                            msgInput.placeholder = "Only admins can send messages";
+                            if (gData.is_announcement === true) {
+                                msgInput.placeholder =
+                                    "You can reply to announcements, but only community admins can send them.";
+                            } else {
+                                msgInput.placeholder = "Only admins can send messages";
+                            }
+                            if (emojiBtn) emojiBtn.classList.add('hidden');
+                            if (attachBtn) attachBtn.classList.add('hidden');
+                            if (actionBtn) actionBtn.classList.add('hidden');
+                            if (insideMicBtn) insideMicBtn.classList.add('hidden');
                         } else {
                             msgInput.disabled = false;
                             msgInput.placeholder = "Type a message";
+                            if (emojiBtn) emojiBtn.classList.remove('hidden');
+                            if (attachBtn) attachBtn.classList.remove('hidden');
+                            if (actionBtn) actionBtn.classList.remove('hidden');
+                            if (insideMicBtn) insideMicBtn.classList.remove('hidden');
                         }
                     }
                 }
@@ -4951,7 +5432,12 @@
         }
 
         if (window.innerWidth < 640) {
-            document.getElementById('user_sidebar_container').classList.add('hidden');
+            const sidebarToHide = isCommSidebarActive ? 'communities_sidebar_container' : 'user_sidebar_container';
+            const sEl = document.getElementById(sidebarToHide);
+            if (sEl) {
+                sEl.classList.add('hidden');
+                sEl.classList.remove('flex', 'w-full');
+            }
             document.getElementById('main_chat_column').classList.remove('hidden');
             document.getElementById('main_chat_column').classList.add('flex');
         }
@@ -5044,6 +5530,17 @@
             badge.classList.remove('flex');
         }
 
+        // If this is a community sub-group, recalculate parent community unread badge
+        const groupEl = document.getElementById(`group_sidebar_${groupId}`);
+        if (groupEl) {
+            const communityId = groupEl.getAttribute('data-community-id');
+            if (communityId) {
+                if (typeof window.recalculateCommunityUnreadBadge === 'function') {
+                    window.recalculateCommunityUnreadBadge(communityId);
+                }
+            }
+        }
+
         const gMsgs = document.getElementById('group_messages');
         if (gMsgs) gMsgs.innerHTML = '';
         window.globalMessages = {};
@@ -5086,6 +5583,146 @@
             const isSearchMatch = window.activeSearchMsgTime && data.time && data.time == window
                 .activeSearchMsgTime;
             const searchHighlightClass = isSearchMatch ? 'search-msg-highlight' : '';
+
+            // Intercept special community welcome/added cards and system messages
+            if (data.type === 'group_link_announcement') {
+                const dateHeader = window.getDateHeader(data.time);
+                if (dateHeader !== lastDateString) {
+                    lastDateString = dateHeader;
+                    const headerHtml = `
+                        <div class="flex justify-center my-3 sticky top-0 z-[5]">
+                            <div class="bg-[#182229]/90 backdrop-blur-sm text-[#8696a0] text-[11px] px-3 py-1 rounded-lg shadow-sm font-medium uppercase tracking-wider border border-[#202c33]">
+                                ${dateHeader}
+                            </div>
+                        </div>`;
+                    const gMsgs = document.getElementById('group_messages');
+                    if (gMsgs) gMsgs.insertAdjacentHTML('beforeend', headerHtml);
+                }
+
+                const msgHtml = `
+                    <div id="msg_${key}" class="flex justify-center my-3 relative select-none w-full">
+                        <div class="bg-[#182229]/90 backdrop-blur-sm text-[#8696a0] text-[12.5px] px-3.5 py-1.5 rounded-lg shadow-sm font-normal text-center max-w-[85%] border border-[#202c33]">
+                            ${data.text}
+                        </div>
+                    </div>`;
+
+                const gMsgs = document.getElementById('group_messages');
+                if (gMsgs) {
+                    gMsgs.insertAdjacentHTML('beforeend', msgHtml);
+                    gMsgs.scrollTop = gMsgs.scrollHeight;
+                }
+                return;
+            }
+
+            if (data.type === 'community_added' || data.type === 'welcome_announcement') {
+                const dateHeader = window.getDateHeader(data.time);
+                if (dateHeader !== lastDateString) {
+                    lastDateString = dateHeader;
+                    const headerHtml = `
+                        <div class="flex justify-center my-3 sticky top-0 z-[5]">
+                            <div class="bg-[#182229]/90 backdrop-blur-sm text-[#8696a0] text-[11px] px-3 py-1 rounded-lg shadow-sm font-medium uppercase tracking-wider border border-[#202c33]">
+                                ${dateHeader}
+                            </div>
+                        </div>`;
+                    const gMsgs = document.getElementById('group_messages');
+                    if (gMsgs) gMsgs.insertAdjacentHTML('beforeend', headerHtml);
+                }
+
+                let cardHtml = '';
+                if (data.type === 'community_added') {
+                    const groupAvatar = window.activeGroupChatAvatar || '';
+                    const isMe = data.sender_id == window.myUserId;
+                    const senderName = isMe ? 'You' : (data.sender_name || 'Admin');
+
+                    const groupAvatarHtml = groupAvatar
+                        ? `<img src="${groupAvatar}" class="w-full h-full object-cover">`
+                        : `<div class="w-full h-full bg-[#3d3025] flex items-center justify-center text-gray-400">
+                             <svg class="w-8 h-8 text-[#a98a6c]" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                           </div>`;
+
+                    const communityAvatarHtml = `<div class="w-full h-full bg-[#2b2520] flex items-center justify-center text-red-300">
+                        <svg viewBox="0 0 24 24" width="32" height="32" class="text-[#a96c6c]" fill="currentColor">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                    </div>`;
+
+                    cardHtml = `
+                        <div id="msg_${key}" class="flex justify-center my-4 relative select-none w-full px-4">
+                            <div class="bg-[#1f2c34] text-[#e9edef] rounded-2xl p-6 shadow-xl w-full max-w-[360px] border border-white/5 flex flex-col items-center">
+                                <!-- Icons Row -->
+                                <div class="flex items-center justify-center gap-5 mb-5">
+                                    <div class="w-14 h-14 rounded-full bg-[#2a2421] flex items-center justify-center border border-white/5 overflow-hidden shrink-0">
+                                        ${groupAvatarHtml}
+                                    </div>
+                                    <span class="text-xl text-[#8696a0]">→</span>
+                                    <div class="w-14 h-14 rounded-2xl bg-[#241e21] flex items-center justify-center border border-white/5 overflow-hidden shrink-0">
+                                        ${communityAvatarHtml}
+                                    </div>
+                                </div>
+                                <!-- Title -->
+                                <h4 class="text-[17px] text-[#e9edef] font-semibold text-center mb-4 leading-snug">
+                                    ${senderName} added this group to the community: ${data.community_name || 'Community'}
+                                </h4>
+                                <!-- Bullets -->
+                                <ul class="text-[13.5px] text-[#8696a0] space-y-2 mb-6 w-full px-2 list-inside list-disc">
+                                    <li>Members in this group are now community members</li>
+                                    <li>Anyone in the community can join this group</li>
+                                </ul>
+                                <!-- Buttons -->
+                                <div class="flex flex-col gap-2.5 w-full">
+                                    <button onclick="window.handleManageCommunityClick('${data.community_id}')"
+                                        class="w-full py-2.5 rounded-full border border-[#313d45] hover:bg-[#202c33] text-[#00a884] font-semibold text-sm transition-colors text-center">
+                                        Manage community
+                                    </button>
+                                    <button onclick="window.handleAddDescriptionClick('${data.community_id}')"
+                                        class="w-full py-2.5 rounded-full border border-[#313d45] hover:bg-[#202c33] text-[#00a884] font-semibold text-sm transition-colors text-center">
+                                        Add description...
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                } else if (data.type === 'welcome_announcement') {
+                    const isMe = data.sender_id == window.myUserId;
+                    const senderName = isMe ? 'You' : (data.sender_name || 'Admin');
+
+                    const communitySquareIcon = `<svg viewBox="0 0 24 24" width="36" height="36" class="text-[#a98a6c]" fill="currentColor">
+                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                    </svg>`;
+
+                    cardHtml = `
+                        <div id="msg_${key}" class="flex justify-center my-4 relative select-none w-full px-4">
+                            <div class="bg-[#1f2c34] text-[#e9edef] rounded-2xl p-6 shadow-xl w-full max-w-[360px] border border-white/5 flex flex-col items-center">
+                                <!-- Square Community Icon -->
+                                <div class="w-16 h-16 rounded-2xl bg-[#2a2421] flex items-center justify-center border border-white/5 mb-4 shrink-0">
+                                    ${communitySquareIcon}
+                                </div>
+                                <!-- Title -->
+                                <h3 class="text-[18px] text-[#e9edef] font-semibold text-center mb-3 leading-snug">
+                                    Welcome to the community!
+                                </h3>
+                                <!-- Bullets -->
+                                <ul class="text-[13.5px] text-[#8696a0] space-y-2 mb-6 w-full px-2 list-inside list-disc">
+                                    <li>${senderName} added you</li>
+                                    <li>Admins will send everyone important community announcements here</li>
+                                </ul>
+                                <!-- Buttons -->
+                                <div class="w-full">
+                                    <button onclick="window.handleManageCommunityClick('${data.community_id}')"
+                                        class="w-full py-2.5 rounded-full border border-[#313d45] hover:bg-[#202c33] text-[#00a884] font-semibold text-sm transition-colors text-center">
+                                        See community info
+                                    </button>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+
+                const gMsgs = document.getElementById('group_messages');
+                if (gMsgs) {
+                    gMsgs.insertAdjacentHTML('beforeend', cardHtml);
+                    gMsgs.scrollTop = gMsgs.scrollHeight;
+                }
+                return;
+            }
 
             // Auto-read new messages
             if (data.sender_id != window.myUserId && (!data.read_by || !data.read_by[window.myUserId])) {
@@ -5351,7 +5988,14 @@
                             </button>
                         </div>
 
-                        ${!isMe ? `<div class="text-[#25d366] text-[12.5px] font-semibold mb-0.5 leading-tight pr-6">${senderDisplayName}</div>` : ''}
+                        ${(!isMe || (window.currentGroupData && window.currentGroupData.is_announcement)) ? (() => {
+                            const adminsList = window.currentGroupData?.admins || [];
+                            const isSenderAdmin = adminsList.includes(data.sender_id) || adminsList.includes(parseInt(data.sender_id)) || adminsList.includes(String(data.sender_id)) || String(window.currentGroupData?.createdBy) === String(data.sender_id);
+                            const badgeHtml = (window.currentGroupData?.is_announcement && isSenderAdmin)
+                                ? `<span class="bg-[#00a884]/20 text-[#00a884] text-[9.5px] font-bold px-1.5 py-0.5 rounded ml-2 border border-[#00a884]/30">Community admin</span>`
+                                : '';
+                            return `<div class="text-[#25d366] text-[12.5px] font-semibold mb-0.5 leading-tight pr-6 flex items-center flex-wrap gap-1">${senderDisplayName}${badgeHtml}</div>`;
+                        })() : ''}
 
                         ${replyPreviewHtml}
                         ${mediaContent}
@@ -5427,7 +6071,8 @@
             if (msgEl) msgEl.remove();
             delete window.globalMessages[key];
             if (window.globalMediaCache) {
-                window.globalMediaCache = window.globalMediaCache.filter(m => m.key !== key && !m.key.startsWith(key + '_link_'));
+                window.globalMediaCache = window.globalMediaCache.filter(m => m.key !== key && !m.key
+                    .startsWith(key + '_link_'));
             }
             if (window.updateContactInfoMediaSection) {
                 window.updateContactInfoMediaSection();
@@ -5443,7 +6088,8 @@
                 if (msgEl) msgEl.remove();
                 delete window.globalMessages[key];
                 if (window.globalMediaCache) {
-                    window.globalMediaCache = window.globalMediaCache.filter(m => m.key !== key && !m.key.startsWith(key + '_link_'));
+                    window.globalMediaCache = window.globalMediaCache.filter(m => m.key !== key && !m.key
+                        .startsWith(key + '_link_'));
                 }
                 if (window.updateContactInfoMediaSection) {
                     window.updateContactInfoMediaSection();
@@ -5475,16 +6121,21 @@
                     if (callLink) {
                         newHtmlText = window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
                     } else {
-                        newHtmlText = (window.wrapEmojis ? window.wrapEmojis(data.text) : data.text) + '<span class="inline-block w-[99px] h-[1px]"></span>';
+                        newHtmlText = (window.wrapEmojis ? window.wrapEmojis(data.text) : data.text) +
+                            '<span class="inline-block w-[99px] h-[1px]"></span>';
                     }
                     textDiv.innerHTML = newHtmlText;
                 }
 
                 // Add Edited indicator if not present
                 if (data.is_edited) {
-                    const timeSpan = bubbleEl.querySelector('span.text-\\[11px\\]') || bubbleEl.querySelector('span:not(.edited-label):not(#star_icon_' + key + '):not(#pin_icon_' + key + '):not(#status_icon_' + key + ')');
+                    const timeSpan = bubbleEl.querySelector('span.text-\\[11px\\]') || bubbleEl
+                        .querySelector('span:not(.edited-label):not(#star_icon_' + key +
+                            '):not(#pin_icon_' + key + '):not(#status_icon_' + key + ')');
                     if (timeSpan && !bubbleEl.querySelector('.edited-label')) {
-                        timeSpan.insertAdjacentHTML('beforebegin', '<span class="edited-label text-[10px] text-[#8696a0] select-none italic mr-0.5">Edited</span>');
+                        timeSpan.insertAdjacentHTML('beforebegin',
+                            '<span class="edited-label text-[10px] text-[#8696a0] select-none italic mr-0.5">Edited</span>'
+                            );
                     }
                 }
             }
@@ -5804,7 +6455,8 @@
         // Check if current user is admin
         const myUidStr = String(window.myUserId);
         const adminsList = group.admins || [];
-        const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) || adminsList.includes(String(myUidStr)) || (String(group.createdBy) === myUidStr);
+        const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) ||
+            adminsList.includes(String(myUidStr)) || (String(group.createdBy) === myUidStr);
 
         // Check if settings row should be displayed
         const settingsRow = document.getElementById('group_settings_info_row');
@@ -5817,10 +6469,12 @@
         }
 
         // Show/Hide Add button in action row based on permissions
-        const canAddMembers = isCurrentUserAdmin || (group.permissions ? group.permissions.addMembers !== false : true);
-        
+        const canAddMembers = isCurrentUserAdmin || (group.permissions ? group.permissions.addMembers !== false :
+            true);
+
         // Toggle the edit buttons for name & description as well
-        const canEditInfo = isCurrentUserAdmin || (group.permissions ? group.permissions.editSettings !== false : true);
+        const canEditInfo = isCurrentUserAdmin || (group.permissions ? group.permissions.editSettings !== false :
+            true);
         const nameEditBtn = document.querySelector('#group_info_name_container button');
         const descEditBtn = document.querySelector('#group_info_description_container button');
         if (nameEditBtn) {
@@ -5871,7 +6525,9 @@
             let memberAvatar = "";
             let phone = "";
 
-            const isThisMemberAdmin = adminsList.includes(userId) || adminsList.includes(parseInt(userId)) || adminsList.includes(String(userId)) || (String(group.createdBy) === String(userId));
+            const isThisMemberAdmin = adminsList.includes(userId) || adminsList.includes(parseInt(
+                userId)) || adminsList.includes(String(userId)) || (String(group.createdBy) === String(
+                    userId));
             const isAdminBadge = isThisMemberAdmin ?
                 `<div class="border border-[#00a884]/40 bg-[#00a884]/10 rounded px-1.5 py-0.5 text-[11px] text-[#00a884]">Group admin</div>` :
                 '';
@@ -5879,22 +6535,27 @@
             if (userId == window.myUserId) {
                 memberName = "You";
                 memberAbout = window.myUserAbout || "Available";
-                memberAvatar = window.myUserAvatar || `https://ui-avatars.com/api/?name=You&background=2a3942&color=fff`;
+                memberAvatar = window.myUserAvatar ||
+                    `https://ui-avatars.com/api/?name=You&background=2a3942&color=fff`;
                 phone = window.myUserPhone || "";
             } else {
-                const matchUser = window.allContacts ? window.allContacts.find(c => String(c.id) === String(userId)) : null;
+                const matchUser = window.allContacts ? window.allContacts.find(c => String(c.id) === String(
+                    userId)) : null;
                 if (matchUser) {
                     memberName = matchUser.name || matchUser.phone;
                     memberAbout = matchUser.about || "Available";
-                    memberAvatar = window.getUserAvatar ? window.getUserAvatar(matchUser.id) : (matchUser.avatar || "");
+                    memberAvatar = window.getUserAvatar ? window.getUserAvatar(matchUser.id) : (matchUser
+                        .avatar || "");
                     phone = matchUser.phone || "";
                 }
                 if (!memberAvatar) {
-                    memberAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=2a3942&color=fff`;
+                    memberAvatar =
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(memberName)}&background=2a3942&color=fff`;
                 }
             }
 
-            const clickHandler = (userId == window.myUserId) ? "" : `onclick="window.showGroupMemberMenu(event, '${userId}', '${memberName.replace(/'/g, "\\'")}', '${memberAvatar}', '${phone.replace(/'/g, "\\'")}', '${memberAbout.replace(/'/g, "\\'")}')"`;
+            const clickHandler = (userId == window.myUserId) ? "" :
+                `onclick="window.showGroupMemberMenu(event, '${userId}', '${memberName.replace(/'/g, "\\'")}', '${memberAvatar}', '${phone.replace(/'/g, "\\'")}', '${memberAbout.replace(/'/g, "\\'")}')"`;
 
             membersHtml += `
             <div ${clickHandler} class="flex items-center justify-between py-3 hover:bg-[#202c33]/30 cursor-pointer transition-colors px-1 rounded-lg">
@@ -5959,8 +6620,10 @@
 
         const myUidStr = String(window.myUserId);
         const adminsList = group.admins || [];
-        const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) || adminsList.includes(String(myUidStr)) || (String(group.createdBy) === myUidStr);
-        const isTargetAdmin = adminsList.includes(targetUserId) || adminsList.includes(parseInt(targetUserId)) || adminsList.includes(String(targetUserId)) || (String(group.createdBy) === String(targetUserId));
+        const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) ||
+            adminsList.includes(String(myUidStr)) || (String(group.createdBy) === myUidStr);
+        const isTargetAdmin = adminsList.includes(targetUserId) || adminsList.includes(parseInt(targetUserId)) ||
+            adminsList.includes(String(targetUserId)) || (String(group.createdBy) === String(targetUserId));
 
         const makeAdminBtn = document.getElementById('member_menu_make_admin');
         const dismissAdminBtn = document.getElementById('member_menu_dismiss_admin');
@@ -6062,7 +6725,8 @@
             await window.update(window.ref(window.db, `groups/${groupId}`), {
                 admins: adminsList
             });
-            window.showToast?.(makeAdmin ? "Promoted" : "Demoted", `${makeAdmin ? "Promoted to admin" : "Dismissed as admin"}.`);
+            window.showToast?.(makeAdmin ? "Promoted" : "Demoted",
+                `${makeAdmin ? "Promoted to admin" : "Dismissed as admin"}.`);
         } catch (err) {
             console.error("Error toggling admin status:", err);
             alert("Failed to update member role.");
@@ -6136,7 +6800,9 @@
         if (!group) return;
 
         const groupId = group.id;
-        const perms = group.permissions ? { ...group.permissions } : {
+        const perms = group.permissions ? {
+            ...group.permissions
+        } : {
             editSettings: true,
             sendMessages: true,
             addMembers: true
@@ -6155,4 +6821,18 @@
             alert("Failed to update group permission.");
         }
     };
+
+    window.handleGroupHeaderClick = function() {
+        if (window.currentGroupData && window.currentGroupData.community_id && window.currentGroupData.is_announcement === true) {
+            // Switch to Communities tab & load details
+            if (typeof window.showCommunities === 'function') {
+                window.showCommunities();
+                window.showCommunityDetails(window.currentGroupData.community_id);
+            }
+        } else {
+            window.openGroupInfoPanel();
+        }
+    };
+
 </script>
+@include('chat.communities.community_drawer')

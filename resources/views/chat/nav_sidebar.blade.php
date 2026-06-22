@@ -58,15 +58,16 @@
         </button>
 
         <!-- Communities -->
-        <button class="nav-item group" title="Communities">
+        <button id="nav_communities" class="nav-item group" title="Communities" onclick="window.showCommunities()">
             <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                    class="text-[#8696a0] group-hover:text-[#e9edef]">
+                    class="text-[#8696a0] group-[.active]:text-[#e9edef]">
                     <path
                         d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z">
                     </path>
                 </svg>
             </div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#00a884] rounded-r-full hidden group-[.active]:block"></div>
         </button>
 
         <!-- Archived -->

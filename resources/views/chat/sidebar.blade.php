@@ -244,7 +244,7 @@
                     <path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path>
                 </svg>
             </button>
-            
+
             <!-- Dropdown -->
             <div id="select_chats_menu_dropdown"
                 class="hidden absolute right-0 top-10 w-56 bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-50 transform origin-top-right transition-all">
@@ -755,17 +755,17 @@
             window.renderCustomListFilters = function() {
                 const container = document.getElementById('custom_lists_container');
                 if (!container) return;
-                
+
                 container.innerHTML = '';
-                
+
                 Object.keys(window.customLists || {}).forEach(listName => {
                     const isActive = window.activeSidebarFilter === `list_${listName}`;
-                    const className = isActive ? 
-                        'px-3 py-1.5 rounded-full bg-[#2a3942] text-[#00a884] text-[14px] whitespace-nowrap transition-colors flex items-center gap-2' : 
+                    const className = isActive ?
+                        'px-3 py-1.5 rounded-full bg-[#2a3942] text-[#00a884] text-[14px] whitespace-nowrap transition-colors flex items-center gap-2' :
                         'px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors block';
-                    
+
                     const deleteIcon = isActive ? `<span onclick="event.stopPropagation(); window.deleteCustomListInline('${listName.replace(/'/g, "\\'")}')" class="hover:text-[#f15c6d] text-[#00a884] ml-1" title="Delete list"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg></span>` : '';
-                    
+
                     const btnHtml = `<button onclick="window.setSidebarFilter('list_${listName.replace(/'/g, "\\'")}')" id="filter_btn_list_${listName}" class="${className}">${listName}${deleteIcon}</button>`;
                     container.insertAdjacentHTML('beforeend', btnHtml);
                 });
@@ -865,17 +865,18 @@
                     if (filter !== 'archived' && filter !== 'locked' && window.archivedChats.includes(item.id)) {
                         matchesFilter = false;
                     }
-                    
+
                     // Hide locked chats from all other views
                     if (filter !== 'locked' && window.lockedChats.includes(item.id)) {
                         matchesFilter = false;
                     }
-                    
+
                     // Hide hidden chats from all views
                     if (window.hiddenChats && window.hiddenChats.includes(item.id)) {
                         matchesFilter = false;
                     }
 
+                    // Hide deleted chats unless new message exists (timestamp > cleared timestamp)
                     // Hide deleted chats unless new message exists (timestamp > cleared timestamp)
                     if (window.deletedChats.includes(item.id)) {
                         const itemTime = parseFloat(item.getAttribute('data-timestamp') || '0');
@@ -883,6 +884,13 @@
                         if (itemTime <= clearedTime) {
                             matchesFilter = false;
                         }
+                    }
+
+                    // Hide community sub-groups from the main chat list (only show announcement/root community row)
+                    const commId = item.getAttribute('data-community-id');
+                    const isAnnounce = item.getAttribute('data-is-announcement') === 'true';
+                    if (commId && !isAnnounce) {
+                        matchesFilter = false;
                     }
 
                     if (matchesFilter) {
@@ -912,7 +920,7 @@
                 });
 
                 items.forEach(item => container.appendChild(item));
-                
+
                 // Show/hide Locked Chats button
                 const lockedBtn = document.getElementById('locked_chats_btn');
                 if (lockedBtn) {
@@ -1197,10 +1205,10 @@
                  const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                  window.clearedChats[elementId] = Math.floor(Date.now() / 1000);
                  localStorage.setItem('cleared_chats', JSON.stringify(window.clearedChats));
- 
+
                  // Clear UI if currently open
                  if (window.checkAndApplyClearedChatUI) window.checkAndApplyClearedChatUI(elementId);
- 
+
                  let chatIdToClear = null;
                  if (type === 'group') {
                      chatIdToClear = String(targetId);
@@ -1212,32 +1220,32 @@
                      const maxId = Math.max(window.myUserId, targetId);
                      chatIdToClear = `chat_${minId}_${maxId}`;
                  }
- 
+
                  if (chatIdToClear && window.globalMediaCache) {
                      window.globalMediaCache = window.globalMediaCache.filter(m => m.chatId !== chatIdToClear);
                  }
                  if (window.updateContactInfoMediaSection) {
                      window.updateContactInfoMediaSection();
                  }
- 
+
                  window.showToast?.('Chat Cleared', `Messages in this chat have been cleared for you.`);
              };
- 
+
              window.deleteChatMessages = function(targetId, type) {
                  const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                  window.clearedChats[elementId] = Math.floor(Date.now() / 1000);
                  localStorage.setItem('cleared_chats', JSON.stringify(window.clearedChats));
- 
+
                  if (!window.deletedChats.includes(elementId)) {
                      window.deletedChats.push(elementId);
                      localStorage.setItem('deleted_chats', JSON.stringify(window.deletedChats));
                  }
- 
+
                  window.sortSidebar();
- 
+
                  // Clear UI if currently open
                  if (window.checkAndApplyClearedChatUI) window.checkAndApplyClearedChatUI(elementId);
- 
+
                  let chatIdToClear = null;
                  if (type === 'group') {
                      chatIdToClear = String(targetId);
@@ -1249,14 +1257,14 @@
                      const maxId = Math.max(window.myUserId, targetId);
                      chatIdToClear = `chat_${minId}_${maxId}`;
                  }
- 
+
                  if (chatIdToClear && window.globalMediaCache) {
                      window.globalMediaCache = window.globalMediaCache.filter(m => m.chatId !== chatIdToClear);
                  }
                  if (window.updateContactInfoMediaSection) {
                      window.updateContactInfoMediaSection();
                  }
- 
+
                  window.showToast?.('Chat Deleted', `The chat has been deleted.`);
              };
 
@@ -1325,10 +1333,10 @@
                 if (!localStorage.getItem('app_lock_hash')) {
                     // Prompt user to set up App Lock first
                     window.handleAppLockClick();
-                    return; // They can lock it manually after setting it up, or we could save intent. 
+                    return; // They can lock it manually after setting it up, or we could save intent.
                             // For simplicity, just prompt them and let them try again.
                 }
-                
+
                 const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                 const index = window.lockedChats.indexOf(elementId);
                 let isLocked = false;
@@ -1391,26 +1399,26 @@
                 document.getElementById('sidebar_filters_container')?.classList.remove('flex');
                 document.getElementById('user_list_container')?.classList.add('hidden');
                 document.getElementById('search_results_container')?.classList.add('hidden');
-                
+
                 // Hide search box container
                 document.getElementById('sidebar_search_box')?.parentElement?.classList.add('hidden');
-                
+
                 // Show global starred
                 document.getElementById('global_starred_sidebar_header')?.classList.remove('hidden');
                 document.getElementById('global_starred_sidebar_header')?.classList.add('flex');
                 document.getElementById('global_starred_messages_container')?.classList.remove('hidden');
                 document.getElementById('global_starred_messages_container')?.classList.add('flex');
-                
+
                 const list = document.getElementById('global_starred_messages_list');
                 const noResults = document.getElementById('global_starred_no_results');
-                
+
                 if(!list || !noResults) return;
-                
+
                 list.innerHTML = '';
                 noResults.classList.add('hidden');
-                
+
                 if (!window.get || !window.ref || !window.db || !window.myUserId) return;
-                
+
                 window.get(window.ref(window.db, `starred_messages/${window.myUserId}`)).then(snapshot => {
                     const data = snapshot.val();
                     if (!data || Object.keys(data).length === 0) {
@@ -1419,23 +1427,23 @@
                     } else {
                         noResults.classList.add('hidden');
                         noResults.classList.remove('flex');
-                        
+
                         const msgs = Object.entries(data).sort((a, b) => (b[1].time || 0) - (a[1].time || 0));
                         msgs.forEach(([key, msg]) => {
                             const dateObj = msg.time ? new Date(msg.time * 1000) : new Date();
                             const date = dateObj.toLocaleDateString([], { day:'2-digit', month:'2-digit', year:'numeric' });
                             const time = dateObj.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
                             const isMe = msg.sender_id == window.myUserId;
-                            
+
                             let content = msg.text || '';
                             if (msg.type === 'image') content = '📷 Photo';
                             else if (msg.type === 'video') content = '🎥 Video';
                             else if (msg.type === 'audio') content = '🎤 Voice message';
                             else if (msg.type === 'document') content = `📄 ${msg.file_name || 'Document'}`;
-                            
+
                             let contextLabel = 'You > You';
                             let chatName = 'Contact';
-                            
+
                             if (msg.chat_id) {
                                 if (msg.chat_id.startsWith('group_')) {
                                     const targetId = msg.chat_id.replace('group_', '');
@@ -1456,7 +1464,7 @@
                                     }
                                 }
                             }
-                            
+
                             list.insertAdjacentHTML('beforeend', `
                                 <div class="bg-[#202c33] rounded-lg p-3 cursor-pointer hover:bg-[#2a3942] transition-colors shadow-sm border-l-4 border-transparent hover:border-[#00a884]"
                                     onclick="window.goToStarredMessage('${msg.chat_id}', '${key}')">
@@ -1486,10 +1494,10 @@
                 document.getElementById('global_starred_sidebar_header')?.classList.remove('flex');
                 document.getElementById('global_starred_messages_container')?.classList.add('hidden');
                 document.getElementById('global_starred_messages_container')?.classList.remove('flex');
-                
+
                 // Restore normal state based on current filter
                 window.setSidebarFilter(window.activeSidebarFilter || 'all');
-                
+
                 document.getElementById('sidebar_search_box')?.parentElement?.classList.remove('hidden');
                 document.getElementById('user_list_container')?.classList.remove('hidden');
             };
@@ -1510,7 +1518,7 @@
                     const userEl = document.getElementById(`user_sidebar_${targetId}`);
                     if(userEl) userEl.click();
                 }
-                
+
                 setTimeout(() => {
                     if(type === 'group' && window.scrollToGroupMessage) {
                         window.scrollToGroupMessage(msgId);
@@ -1523,7 +1531,7 @@
             // Select Chats Logic
             window.isSelectChatsMode = false;
             window.selectedSidebarChats = new Set();
-            
+
             document.addEventListener('click', (e) => {
                 const menuDropdown = document.getElementById('select_chats_menu_dropdown');
                 const menuBtn = document.getElementById('select_chats_menu_btn');
@@ -1537,7 +1545,7 @@
             window.openSelectChatsMode = function() {
                 window.isSelectChatsMode = true;
                 window.selectedSidebarChats = new Set();
-                
+
                 // Hide normal elements
                 document.getElementById('normal_sidebar_header')?.classList.add('hidden');
                 document.getElementById('normal_sidebar_header')?.classList.remove('flex');
@@ -1546,13 +1554,13 @@
                 document.getElementById('global_starred_sidebar_header')?.classList.add('hidden');
                 document.getElementById('global_starred_sidebar_header')?.classList.remove('flex');
                 document.getElementById('main_menu_dropdown')?.classList.add('hidden');
-                
+
                 // Show select chats header
                 document.getElementById('select_chats_sidebar_header')?.classList.remove('hidden');
                 document.getElementById('select_chats_sidebar_header')?.classList.add('flex');
-                
+
                 document.getElementById('select_chats_count').textContent = '0 selected';
-                
+
                 // Add checkboxes to all items
                 document.querySelectorAll('.user-chat-item').forEach(item => {
                     if (!item.querySelector('.sidebar-chat-checkbox-container')) {
@@ -1569,7 +1577,7 @@
                     if(container) {
                         container.classList.remove('hidden');
                     }
-                    
+
                     // reset visual states
                     item.classList.remove('bg-[#2a3942]');
                     const box = item.querySelector('.sidebar-chat-checkbox-box');
@@ -1585,13 +1593,13 @@
             window.closeSelectChatsMode = function() {
                 window.isSelectChatsMode = false;
                 window.selectedSidebarChats.clear();
-                
+
                 document.getElementById('select_chats_sidebar_header')?.classList.add('hidden');
                 document.getElementById('select_chats_sidebar_header')?.classList.remove('flex');
-                
+
                 // Restore normal state based on current filter
                 window.setSidebarFilter(window.activeSidebarFilter || 'all');
-                
+
                 document.querySelectorAll('.user-chat-item').forEach(item => {
                     const container = item.querySelector('.sidebar-chat-checkbox-container');
                     if(container) container.classList.add('hidden');
@@ -1602,11 +1610,11 @@
             window.toggleSidebarChatSelection = function(itemEl) {
                 const id = itemEl.id;
                 if (!id) return;
-                
+
                 const isSelected = window.selectedSidebarChats.has(id);
                 const box = itemEl.querySelector('.sidebar-chat-checkbox-box');
                 const tick = itemEl.querySelector('.sidebar-chat-checkbox-tick');
-                
+
                 if (isSelected) {
                     window.selectedSidebarChats.delete(id);
                     itemEl.classList.remove('bg-[#2a3942]');
@@ -1624,7 +1632,7 @@
                     }
                     if(tick) tick.classList.remove('hidden');
                 }
-                
+
                 document.getElementById('select_chats_count').textContent = window.selectedSidebarChats.size + (window.selectedSidebarChats.size === 1 ? ' selected' : ' selected');
             };
 
@@ -1641,7 +1649,7 @@
 
             window.handleSelectChatsAction = function(action) {
                 if (window.selectedSidebarChats.size === 0) return;
-                
+
                 document.getElementById('select_chats_menu_dropdown')?.classList.add('hidden');
 
                 if (action === 'clear') {
@@ -1670,7 +1678,7 @@
                 window.selectedSidebarChats.forEach(id => {
                     const isGroup = id.startsWith('group_sidebar_');
                     const targetId = id.replace('user_sidebar_', '').replace('group_sidebar_', '');
-                    
+
                     if (action === 'archive') {
                         if (!window.archivedChats.includes(id)) {
                             window.archivedChats.push(id);
@@ -1684,12 +1692,12 @@
                             badge.textContent = '0';
                             badge.classList.add('hidden');
                         }
-                        
+
                         if (!isGroup && window.myUserId && window.db && window.ref && window.get && window.update) {
                             const minId = Math.min(window.myUserId, parseInt(targetId));
                             const maxId = Math.max(window.myUserId, parseInt(targetId));
                             const chatId = `chat_${minId}_${maxId}`;
-                            
+
                             window.get(window.ref(window.db, `chats/${chatId}/messages`)).then(snap => {
                                 if(snap.exists()) {
                                     const updates = {};
