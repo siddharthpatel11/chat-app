@@ -917,12 +917,14 @@
                                 }
                             }
                             const hasText = !!textToRender;
+                            let htmlText = window.wrapEmojis ? window.wrapEmojis(textToRender) : textToRender;
+                            if (window.linkifyText) htmlText = window.linkifyText(htmlText);
 
                             const msgHtml = `
                                 <div class="relative group/msg w-full flex justify-end mt-1 mb-2 px-2 transition-colors cursor-pointer select-none gap-2 items-start" id="msg_broadcast_msg_${index}">
                                     <div class="max-w-[85%] sm:max-w-[70%] relative px-2.5 py-1.5 shadow-sm rounded-lg bg-[#005c4b] rounded-tr-none transform transition-transform group-active/msg:scale-[0.98] text-white text-left min-w-[80px]">
                                         ${mediaContent}
-                                        ${hasText ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">${escapeHtml(textToRender)}<span class="inline-block w-[99px] h-[1px]"></span></div>` : `<div class="h-[10px]"></div>`}
+                                        ${hasText ? `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>` : `<div class="h-[10px]"></div>`}
                                         <div class="flex items-center justify-end gap-1 absolute bottom-1 right-2 bg-transparent select-none">
                                             <span class="text-[11px] text-[#8696a0] select-none leading-none">${timeStr}</span>
                                             <span class="shrink-0 flex items-center justify-center leading-none">

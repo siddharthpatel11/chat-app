@@ -6036,7 +6036,8 @@
                                 return window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
                             }
                             const htmlText = window.wrapEmojis ? window.wrapEmojis(msgText) : msgText;
-                            return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
+                            const finalHtmlText = window.linkifyText ? window.linkifyText(htmlText) : htmlText;
+                            return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">${finalHtmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
                         })() : ''}
 
                         <div class="flex items-center justify-end gap-1 absolute bottom-0.5 right-2 bg-transparent">

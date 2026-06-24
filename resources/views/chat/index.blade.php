@@ -361,7 +361,7 @@
                     <div onclick="window.toggleForwardTargetSelection('status', 'My status', '')"
                         class="flex items-center justify-between p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item forward-target-item"
                         data-name="my status">
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
                             <div
                                 class="w-12 h-12 rounded-full bg-[#00a884]/10 flex items-center justify-center shrink-0">
                                 <svg class="w-7 h-7 text-[#00a884]" fill="none" stroke="currentColor"
@@ -370,9 +370,9 @@
                                     <path d="M12 6v6l4 2"></path>
                                 </svg>
                             </div>
-                            <div>
-                                <div class="text-[#e9edef] font-medium">My status</div>
-                                <div class="text-[#8696a0] text-sm mt-0.5">Share to my status</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-[#e9edef] font-medium truncate">My status</div>
+                                <div class="text-[#8696a0] text-sm mt-0.5 truncate">Share to my status</div>
                             </div>
                         </div>
                         <div class="shrink-0 mr-1">
@@ -510,10 +510,16 @@
             @include('chat.calls_sidebar')
             @include('chat.communities_sidebar')
             @include('chat.communities.communities_panel')
+            @include('chat.channels.channels_sidebar')
+            @include('chat.channels.find_channels_sidebar')
+            @include('chat.channels.create_channel')
+
+            @include('chat.channels.share_channel_modals')
             <div id="sidebar_resizer"
                 class="hidden sm:block w-[4px] hover:bg-[#00a884]/30 cursor-col-resize shrink-0 z-[60] transition-colors active:bg-[#00a884]">
             </div>
             @include('chat.calls_main_column')
+            @include('chat.channels.channels_main_column')
             @include('chat.calls.add_favourite_modal')
             @include('chat.media_gallery')
 
@@ -1559,6 +1565,26 @@
             // Matches Regional Indicators (flags) or emojis with optional skin tones and ZWJ joins
             const emojiRegex = /(\p{Regional_Indicator}{2}|(\p{Emoji_Presentation}|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?)(\u200D(\p{Emoji_Presentation}|\p{Emoji_Modifier_Base}\p{Emoji_Modifier}?))*)/gu;
             return text.replace(emojiRegex, '<span class="emoji-text">$1</span>');
+        };
+
+        window.linkifyText = function(text) {
+            if (!text) return text;
+            const urlRegex = /(https?:\/\/[^\s<]+)/g;
+            return text.replace(urlRegex, function(url) {
+                // Intercept WhatsApp channel links and our app's channel links
+                if (url.includes('whatsapp.com/channel/') || url.includes('/channel/')) {
+                    let channelId = '';
+                    if (url.includes('whatsapp.com/channel/')) {
+                        channelId = url.split('whatsapp.com/channel/')[1].split('/')[0].split('?')[0];
+                    } else if (url.includes('/channel/')) {
+                        channelId = url.split('/channel/')[1].split('/')[0].split('?')[0];
+                    }
+                    if (channelId) {
+                        return `<a href="javascript:void(0)" class="text-[#00a884] hover:underline hover:text-[#008f72] transition-colors" onclick="window.showChannels(); setTimeout(() => { window.openChannel('${channelId}'); }, 300);">${url}</a>`;
+                    }
+                }
+                return `<a href="${url}" target="_blank" class="text-[#00a884] hover:underline hover:text-[#008f72] transition-colors">${url}</a>`;
+            });
         };
 
         function toggleEmojiPicker() {
@@ -3263,7 +3289,9 @@
         window.csrf = csrf;
 
         // Expose to window for global access
+        window.firebaseApp = app;
         window.db = db;
+        window.storage = storage;
         window.ref = ref;
         window.get = get;
         window.update = update;
@@ -4175,6 +4203,20 @@
                 cMain.classList.remove('flex');
             }
 
+            // Hide channels panel and sidebar
+            const chSidebar = document.getElementById('channels_sidebar_container');
+            if (chSidebar) {
+                chSidebar.classList.add('hidden');
+                chSidebar.classList.remove('sm:flex', 'flex');
+            }
+            const chMain = document.getElementById('channels_main_column');
+            if (chMain) {
+                chMain.classList.add('hidden');
+                chMain.classList.remove('flex');
+            }
+            if(window.closeChannelInfo) window.closeChannelInfo();
+            if(window.closeCreateChannelModal) window.closeCreateChannelModal();
+
             // Cleanly close info and edit panels to restore main_chat_column layout
             if (window.closeContactInfo) window.closeContactInfo();
             if (window.closeBroadcastInfo) window.closeBroadcastInfo();
@@ -4353,7 +4395,9 @@
                     'add_group_members_panel',
                     'create_group_panel',
                     'new_contact_panel',
-                    'status_sidebar'
+                    'status_sidebar',
+                    'channels_sidebar_container',
+                    'find_channels_sidebar'
                 ];
                 sidebarIds.forEach(id => {
                     const el = document.getElementById(id);
@@ -4946,6 +4990,25 @@
                         mediaContent +=
                             `<div class="text-xs text-gray-500 mb-1 italic px-1">${statusText}</div>`;
                     }
+                } else if (data.type === 'channel_invite') {
+                    mediaContent = `
+                        <div class="mb-1 w-[280px] max-w-[100%]">
+                            <div class="flex items-center gap-3 mb-2 pt-1 px-1">
+                                <div class="w-10 h-10 rounded-full bg-[#111b21] flex items-center justify-center shrink-0 overflow-hidden">
+                                    <img src="${data.channel_avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(data.channel_name)+'&background=2a3942&color=fff'}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-[15px] font-medium truncate text-[#e9edef]">${data.channel_name}</div>
+                                    <div class="text-[12.5px] text-[#8696a0] truncate">WhatsApp channel admin invite</div>
+                                </div>
+                            </div>
+                            <div class="text-[14.5px] leading-5 text-[#e9edef] px-1 pb-2">
+                                Accept this invitation to be an admin for my WhatsApp channel, ${data.channel_name}
+                            </div>
+                            <div class="border-t border-white/10 mt-1 cursor-pointer" onclick="window.showAdminInviteModal('${data.channel_id}', this.dataset.name, this.dataset.avatar)" data-name="${(data.channel_name||'').replace(/&/g, '&amp;').replace(/\"/g, '&quot;')}" data-avatar="${data.channel_avatar || ''}">
+                                <div class="py-2 text-center text-[#00a884] hover:text-[#00c298] font-medium text-[15px] transition-colors">View Invite</div>
+                            </div>
+                        </div>`;
                 } else if (data.type === 'scheduled_call') {
                     const startStr = new Date(data.start_time * 1000).toLocaleString([], {
                         weekday: 'short',
@@ -5131,7 +5194,8 @@
                                     return window.renderCallLinkHTML(callLink.url, callLink.type, isMe);
                                 }
                                 const textToRender = isSearchMatch ? window.highlightSearchText(data.text) : data.text;
-                                const htmlText = window.wrapEmojis ? window.wrapEmojis(textToRender) : textToRender;
+                                let htmlText = window.wrapEmojis ? window.wrapEmojis(textToRender) : textToRender;
+                                if (window.linkifyText) htmlText = window.linkifyText(htmlText);
                                 return `<div class="text-[14.2px] text-[#e9edef] leading-relaxed break-words pb-[2px]" style="white-space: pre-wrap; word-break: break-word;">${htmlText}<span class="inline-block w-[99px] h-[1px]"></span></div>`;
                             })() : ''}
 
@@ -5512,9 +5576,9 @@
                 html += `
                     <div onclick="window.toggleForwardTargetSelection('${userId}', '${name.replace(/'/g, "\\'")}', 'user')"
                         class="flex items-center justify-between p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item forward-target-item" data-name="${name.toLowerCase()}">
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
                             <img src="${avatar}" class="w-12 h-12 rounded-full object-cover border border-white/5 shrink-0">
-                            <div class="min-w-0">
+                            <div class="min-w-0 flex-1">
                                 <div class="text-[#e9edef] font-medium truncate">${name}</div>
                                 <div class="text-[#8696a0] text-sm truncate mt-0.5">${about}</div>
                             </div>
@@ -5541,9 +5605,9 @@
                 html += `
                     <div onclick="window.toggleForwardTargetSelection('${groupId}', '${name.replace(/'/g, "\\'")}', 'group')"
                         class="flex items-center justify-between p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item forward-target-item" data-name="${name.toLowerCase()}">
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 flex-1 min-w-0">
                             <img src="${avatar}" class="w-12 h-12 rounded-full object-cover border border-white/5 shrink-0">
-                            <div class="min-w-0">
+                            <div class="min-w-0 flex-1">
                                 <div class="text-[#e9edef] font-medium truncate">${name}</div>
                                 <div class="text-[#8696a0] text-sm truncate mt-0.5">${about}</div>
                             </div>
@@ -5565,7 +5629,11 @@
         window.closeForwardModal = function() {
             const modal = document.getElementById('forward_modal');
             modal.classList.remove('show');
-            setTimeout(() => modal.classList.add('hidden'), 300);
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                window.isForwardingChannel = false;
+                window.forwardChannelText = '';
+            }, 300);
         };
 
         window.filterForwardContacts = function() {
@@ -5630,11 +5698,19 @@
                 return;
             }
 
-            if (window.selectedMessages.size === 0 || window._selectedForwardTargets.size === 0) return;
+            if (window._selectedForwardTargets.size === 0) return;
+            if (!window.isForwardingChannel && (!window.selectedMessages || window.selectedMessages.size === 0)) return;
 
             const messagesToForward = [];
-            window.selectedMessages.forEach(key => {
-                let msg = window.globalMessages ? window.globalMessages[key] : null;
+            
+            if (window.isForwardingChannel) {
+                messagesToForward.push({
+                    type: 'text',
+                    text: window.forwardChannelText || 'Check out this channel'
+                });
+            } else {
+                window.selectedMessages.forEach(key => {
+                    let msg = window.globalMessages ? window.globalMessages[key] : null;
 
                 if (!msg && window.globalMediaCache) {
                     const cacheItem = window.globalMediaCache.find(m => m.key === key);
@@ -5650,10 +5726,11 @@
                     }
                 }
 
-                if (msg) {
-                    messagesToForward.push(msg);
-                }
-            });
+                    if (msg) {
+                        messagesToForward.push(msg);
+                    }
+                });
+            }
 
             window.closeForwardModal();
             window.cancelSelection();
@@ -7480,6 +7557,83 @@
         </div>
     </div>
 
+    <!-- Admin Invite Modal -->
+    <div id="admin_invite_modal" class="hidden fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity">
+        <div id="admin_invite_modal_content" class="w-full max-w-[400px] bg-white rounded-t-3xl sm:rounded-3xl flex flex-col shadow-2xl transform translate-y-full transition-transform duration-300">
+            <!-- Grab Handle -->
+            <div class="w-full flex justify-center pt-3 pb-2 sm:hidden">
+                <div class="w-10 h-1 rounded-full bg-gray-300"></div>
+            </div>
+            
+            <!-- Close Button (Desktop) -->
+            <div class="absolute top-4 right-4 hidden sm:block">
+                <button onclick="window.closeAdminInviteModal()" class="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Content -->
+            <div class="px-6 pt-4 pb-8 flex flex-col items-center font-sans">
+                <!-- Channel Avatar -->
+                <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mb-5 border border-gray-100 shadow-sm">
+                    <img id="admin_invite_modal_avatar" src="" class="w-full h-full object-cover">
+                </div>
+
+                <!-- Channel Name -->
+                <h2 id="admin_invite_modal_name" class="text-[24px] font-semibold text-gray-900 mb-1 text-center leading-tight"></h2>
+                <p class="text-[15px] text-gray-600 mb-8 font-medium">Channel admin invite</p>
+
+                <!-- Features List -->
+                <div class="w-full flex flex-col gap-6 mb-8">
+                    <div class="flex items-start gap-4">
+                        <div class="mt-0.5 text-[#008069] shrink-0">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-[16px] text-gray-900 font-normal">Admins can send updates</h4>
+                            <p class="text-[14px] text-gray-500 leading-snug mt-0.5">Admins can also change the channel's profile and settings.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <div class="mt-0.5 text-[#008069] shrink-0">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-[16px] text-gray-900 font-normal">You're visible to other admins</h4>
+                            <p class="text-[14px] text-gray-500 leading-snug mt-0.5">Admins for this channel can see your phone number, profile picture and name, but followers can't.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start gap-4">
+                        <div class="mt-0.5 text-[#008069] shrink-0">
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-[16px] text-gray-900 font-normal">You're responsible for this channel</h4>
+                            <p class="text-[14px] text-gray-500 leading-snug mt-0.5">This channel needs to follow our guidelines and is reviewed against them.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expiry -->
+                <p class="text-[13px] text-gray-500 mb-6">Expires in 7 days</p>
+
+                <!-- Actions -->
+                <div class="w-full flex flex-col gap-3">
+                    <button onclick="window.acceptAdminInviteAndOpen()" class="w-full bg-[#008069] text-white py-3 rounded-full font-medium text-[15px] hover:bg-[#00695c] transition-colors focus:outline-none shadow-sm">
+                        Accept invite
+                    </button>
+                    <button onclick="window.viewChannelFromInvite()" class="w-full bg-white text-[#008069] py-3 rounded-full font-medium text-[15px] hover:bg-gray-50 transition-colors focus:outline-none">
+                        View channel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Share Selector Modal (select user or group to send link/scheduled call to) -->
     <div id="share_selector_modal"
         class="hidden fixed inset-0 z-[250] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -7512,4 +7666,29 @@
             </div>
         </div>
     </div>
+    @include('chat.channels.channels_scripts')
+    
+    <script>
+        window.addEventListener('load', function() {
+            const path = window.location.pathname;
+            if (path.startsWith('/channel/')) {
+                const parts = path.split('/');
+                const channelId = parts[2];
+                if (channelId) {
+                    if (typeof window.showChannels === 'function') {
+                        window.showChannels();
+                    }
+                    let attempts = 0;
+                    const check = setInterval(() => {
+                        if (typeof window.openChannel === 'function' && window.db) {
+                            clearInterval(check);
+                            window.openChannel(channelId);
+                        }
+                        attempts++;
+                        if (attempts > 50) clearInterval(check); // timeout after 5s
+                    }, 100);
+                }
+            }
+        });
+    </script>
 </x-app-layout>

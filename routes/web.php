@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\WebChannelController;
 use App\Http\Controllers\MetaAiController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -62,6 +63,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/community/{communityId}/groups/{groupId}/join', [CommunityController::class, 'joinGroup']);
     Route::post('/community/{communityId}/groups/{groupId}/join-request', [CommunityController::class, 'sendJoinRequest']);
     Route::post('/community/{communityId}/requests/{requestId}/handle', [CommunityController::class, 'handleJoinRequest']);
+
+    // Channels (Web Router)
+    Route::get('/channel/{channelId}', [ChatController::class, 'index']);
+    Route::post('/channel/create', [WebChannelController::class, 'createChannel']);
+    Route::post('/channel/upload-avatar', [WebChannelController::class, 'uploadAvatar']);
+    Route::post('/channel/upload-message-media', [WebChannelController::class, 'uploadMessageMedia']);
+    Route::get('/users/details', [WebChannelController::class, 'getUsersDetails']);
+    Route::post('/channel/{channelId}/follow', [WebChannelController::class, 'followChannel']);
+    Route::post('/channel/{channelId}/unfollow', [WebChannelController::class, 'unfollowChannel']);
+    Route::post('/channel/{channelId}/update', [WebChannelController::class, 'updateChannel']);
 });
 
 require __DIR__.'/auth.php';

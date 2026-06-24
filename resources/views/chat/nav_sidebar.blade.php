@@ -46,15 +46,16 @@
         </button>
 
         <!-- Channels -->
-        <button class="nav-item group" title="Channels">
+        <button id="nav_channels" class="nav-item group" title="Channels" onclick="window.showChannels()">
             <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
-                    class="text-[#8696a0] group-hover:text-[#e9edef]">
+                    class="text-[#8696a0] group-[.active]:text-[#e9edef]">
                     <path
                         d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 14.5h-2v-2h2v2zm0-4h-2v-6h2v6z">
                     </path>
                 </svg>
             </div>
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[#00a884] rounded-r-full hidden group-[.active]:block"></div>
         </button>
 
         <!-- Communities -->
