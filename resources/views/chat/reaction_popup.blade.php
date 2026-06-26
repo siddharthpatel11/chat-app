@@ -132,7 +132,7 @@
         }
     };
 
-    window.sendReaction = async function(emoji, msgId, isGroup, event) {
+    window.sendReaction = async function(emoji, msgId, isGroup, event, isChannel = false) {
         event.stopPropagation();
 
         if (!msgId || !window.myUserId) {
@@ -141,7 +141,9 @@
         }
 
         let path = '';
-        if (isGroup) {
+        if (isChannel && window.currentChannel) {
+            path = `channels/${window.currentChannel.id}/messages/${msgId}/reactions/${window.myUserId}`;
+        } else if (isGroup) {
             path = `groups/${window.currentChatId}/messages/${msgId}/reactions/${window.myUserId}`;
         } else {
             path = `chats/${window.currentChatId}/messages/${msgId}/reactions/${window.myUserId}`;
@@ -178,11 +180,12 @@
         }
     };
 
-    window.openFullReactionPicker = function(msgId, isGroup, event) {
+    window.openFullReactionPicker = function(msgId, isGroup, event, isChannel = false) {
         event.stopPropagation();
 
         window.currentReactionMsgId = msgId;
         window.currentReactionIsGroup = isGroup;
+        window.currentReactionIsChannel = isChannel;
 
         // Close the quick reaction menu
         const menu = document.getElementById('menu_' + msgId);
@@ -232,7 +235,7 @@
             picker.addEventListener('emoji-click', event => {
                 if (window.currentReactionMsgId) {
                     window.sendReaction(event.detail.unicode, window.currentReactionMsgId, window
-                        .currentReactionIsGroup, event);
+                        .currentReactionIsGroup, event, window.currentReactionIsChannel);
                     window.closeFullReactionPicker();
                 }
             });
@@ -279,6 +282,7 @@
 
         let html = '';
         const isGroup = window.currentChatId && window.currentChatId.startsWith('group_');
+        const isChannel = window.currentChannel ? true : false;
 
         for (const [uid, emoji] of Object.entries(msg.reactions)) {
             let name = 'Unknown';
@@ -288,7 +292,7 @@
                 // Determine own avatar. Try window.myAvatar if available
                 avatar = window.myAvatar || `https://ui-avatars.com/api/?name=You&background=2a3942&color=fff`;
                 html += `
-                    <div class="flex items-center gap-3 p-3 hover:bg-[#2a3942]/60 rounded-lg transition-colors cursor-pointer" onclick="window.sendReaction('${emoji}', '${msgId}', ${isGroup}, event); window.closeReactionListModal();">
+                    <div class="flex items-center gap-3 p-3 hover:bg-[#2a3942]/60 rounded-lg transition-colors cursor-pointer" onclick="window.sendReaction('${emoji}', '${msgId}', ${isGroup}, event, ${isChannel}); window.closeReactionListModal();">
                         <img src="${avatar}" class="w-10 h-10 rounded-full object-cover shrink-0">
                         <div class="flex-1">
                             <div class="text-[#e9edef] text-[15px]">You</div>

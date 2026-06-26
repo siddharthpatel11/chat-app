@@ -68,7 +68,9 @@
         let visibleCount = 0;
         
         items.forEach(item => {
-            const name = item.querySelector('h3').innerText.toLowerCase();
+            const h3 = item.querySelector('h3');
+            if (!h3) return;
+            const name = h3.innerText.toLowerCase();
             if (name.includes(val)) {
                 item.style.display = 'flex';
                 visibleCount++;

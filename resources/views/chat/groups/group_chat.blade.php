@@ -5436,6 +5436,10 @@
         document.getElementById('active_chat_content')?.classList.remove('flex');
         document.getElementById('meta_ai_content')?.classList.add('hidden');
         document.getElementById('meta_ai_content')?.classList.remove('flex');
+        
+        // Hide channels column
+        document.getElementById('channels_main_column')?.classList.add('hidden');
+        document.getElementById('channels_main_column')?.classList.remove('flex');
 
         const gContent = document.getElementById('active_group_chat_content');
         if (gContent) {

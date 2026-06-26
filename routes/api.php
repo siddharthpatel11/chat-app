@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\Profile\ProfileApiController;
 use App\Http\Controllers\Api\Profile\VideoVoiceApiController;
 use App\Http\Controllers\Api\StatusApiController;
 use App\Http\Controllers\Api\CommunityController;
+use App\Http\Controllers\Api\ChannelApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -80,6 +81,33 @@ Route::post('/broadcast/{broadcastId}/remove-recipient', [BroadcastApiController
 Route::post('/broadcast/{broadcastId}/delete', [BroadcastApiController::class, 'delete']);
 Route::get('/broadcast/{broadcastId}/messages', [BroadcastApiController::class, 'getMessages']);
 Route::post('/broadcast/{broadcastId}/send-message', [BroadcastApiController::class, 'sendMessage']);
+
+// Channel Features
+Route::post('/channel/upload-avatar', [ChannelApiController::class, 'uploadAvatar']);
+Route::post('/channel/upload-message-media', [ChannelApiController::class, 'uploadMessageMedia']);
+Route::post('/channel/create', [ChannelApiController::class, 'createChannel']);
+Route::post('/channel/{channelId}/follow', [ChannelApiController::class, 'followChannel']);
+Route::post('/channel/{channelId}/unfollow', [ChannelApiController::class, 'unfollowChannel']);
+Route::post('/channel/{channelId}/update', [ChannelApiController::class, 'updateChannel']);
+Route::post('/channel/{channelId}/delete', [ChannelApiController::class, 'deleteChannel']);
+
+// Channel Admin & Owner Features
+Route::post('/channel/{channelId}/invite-admins', [ChannelApiController::class, 'inviteAdmins']);
+Route::post('/channel/{channelId}/accept-admin-invite', [ChannelApiController::class, 'acceptAdminInvite']);
+Route::post('/channel/{channelId}/dismiss-admin', [ChannelApiController::class, 'dismissAdmin']);
+Route::post('/channel/{channelId}/dismiss-self-admin', [ChannelApiController::class, 'dismissSelfAdmin']);
+Route::post('/channel/{channelId}/remove-follower', [ChannelApiController::class, 'removeFollower']);
+
+// Channel Messages
+Route::get('/channel/{channelId}/messages', [ChannelApiController::class, 'getMessages']);
+Route::post('/channel/{channelId}/send-message', [ChannelApiController::class, 'sendMessage']);
+Route::get('/channel/{channelId}/search', [ChannelApiController::class, 'searchMessages']);
+
+// Channel Additional Settings
+Route::post('/channel/{channelId}/mute', [ChannelApiController::class, 'toggleMute']);
+Route::post('/channel/{channelId}/report', [ChannelApiController::class, 'reportChannel']);
+
+Route::get('/channel/users', [ChannelApiController::class, 'getUsersDetails']);
 
 // Status Features
 Route::post('/status/create', [StatusApiController::class, 'createStatus']);
@@ -154,3 +182,6 @@ Route::get('/media/all', [MediaApiController::class, 'getGlobalMedia']);
 // Global Media Actions
 Route::post('/media/delete', [MediaApiController::class, 'deleteMedia']);
 Route::post('/media/forward', [MediaApiController::class, 'forwardMedia']);
+Route::post('/channel/{channelId}/react-message', [ChannelApiController::class, 'reactMessage']);
+Route::post('/channel/{channelId}/delete-message', [ChannelApiController::class, 'deleteMessage']);
+Route::post('/channel/{channelId}/delete-messages', [ChannelApiController::class, 'deleteMessages']);

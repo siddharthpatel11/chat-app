@@ -1028,6 +1028,8 @@ class ChatApiController extends Controller
                     $msgData = null;
                     if (str_starts_with($chatId, 'group_')) {
                         $msgData = $this->db->getReference("groups/{$chatId}/messages/{$msgId}")->getValue();
+                    } elseif (str_starts_with($chatId, 'channel_')) {
+                        $msgData = $this->db->getReference("channels/{$chatId}/messages/{$msgId}")->getValue();
                     } else {
                         $msgData = $this->db->getReference("chats/{$chatId}/messages/{$msgId}")->getValue();
                     }

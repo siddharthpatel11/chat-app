@@ -1,5 +1,5 @@
 <!-- Channel Info Sidebar -->
-<div id="channel_info_sidebar" class="hidden w-[400px] h-full bg-[#111b21] border-l border-[#313d45] flex-col shrink-0 z-40 select-none">
+<div id="channel_info_sidebar" class="hidden w-[30%] min-w-[400px] max-w-full h-full bg-[#111b21] border-l border-[#313d45] flex-col shrink-0 z-40 select-none flex-1 sm:flex-none">
     <!-- Header -->
     <div class="h-[60px] bg-[#111b21] px-4 flex items-center gap-6 shrink-0">
         <!-- Close button 'X' -->
@@ -549,7 +549,7 @@
 
         document.getElementById('info_channel_avatar').src = ch.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=2a3942&color=fff';
 
-        const followersCount = (ch.followers_count || 1);
+        const followersCount = ch.followers ? Object.keys(ch.followers).length : 0;
         document.getElementById('info_channel_followers').innerText = "Channel · " + followersCount + " follower" + (followersCount !== 1 ? 's' : '');
         document.getElementById('info_follower_count_header').innerText = followersCount + " follower" + (followersCount !== 1 ? 's' : '');
 

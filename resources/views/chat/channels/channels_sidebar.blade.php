@@ -1,5 +1,5 @@
 <!-- Channels Sidebar -->
-<div id="channels_sidebar_container" class="hidden h-full flex flex-col bg-[#111b21] w-full sm:w-[30%] sm:min-w-[300px] border-r border-[#313d45] z-50 shrink-0 relative">
+<div id="channels_sidebar_container" class="hidden h-full flex flex-col bg-[#111b21] w-[30%] min-w-[300px] border-r border-[#313d45] z-50 shrink-0 relative flex-1 sm:flex-none">
     <!-- Header -->
     <div class="px-4 py-3 bg-[#111b21] shrink-0 h-[60px] flex items-center justify-between z-20">
         <h1 class="text-[#e9edef] text-[22px] font-medium">Channels</h1>

@@ -24,6 +24,11 @@
         <!-- Channel Header -->
         <div class="h-[60px] px-4 py-2 bg-[#202c33] border-b border-[#313d45] flex items-center justify-between shrink-0 z-20 cursor-pointer" onclick="window.toggleChannelInfo()">
             <div class="flex items-center gap-4 flex-1 min-w-0">
+                <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1" onclick="event.stopPropagation(); window.backToChannelSidebar()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+                    </svg>
+                </button>
                 <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 border border-transparent shadow-sm bg-[#2a3942]">
                     <img id="current_channel_avatar" src="" class="w-full h-full object-cover">
                 </div>
@@ -56,10 +61,57 @@
                         </svg>
                     </button>
                     <!-- Dropdown Menu -->
-                    <div id="channel_dropdown_menu" class="hidden absolute right-0 top-12 bg-[#233138] rounded-md shadow-2xl py-2 w-48 z-[100] border border-[#313d45]">
-                        <button onclick="window.toggleChannelInfo()" class="w-full text-left px-4 py-2 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm">Channel info</button>
-                        <button id="channel_menu_unfollow" onclick="window.toggleFollowChannel()" class="hidden w-full text-left px-4 py-2 text-[#e9edef] hover:bg-[#182229] transition-colors text-sm">Unfollow</button>
-                        <button id="channel_menu_delete" onclick="window.deleteChannel()" class="hidden w-full text-left px-4 py-2 text-[#ea005e] hover:bg-[#182229] transition-colors text-sm">Delete channel</button>
+                    <div id="channel_dropdown_menu" class="hidden absolute right-0 top-12 bg-[#233138] rounded-md shadow-xl py-2 w-[220px] z-[100]">
+                        <button onclick="window.toggleChannelInfo()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[14.5px]">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#aebac1] shrink-0">
+                                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                            </svg>
+                            <span>Channel info</span>
+                        </button>
+                        
+                        <button onclick="window.toggleChannelSettings()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[14.5px]">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#aebac1] shrink-0">
+                                <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22l-1.92 3.32c-.12.21-.07.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                            </svg>
+                            <span>Channel settings</span>
+                        </button>
+                        
+                        <button onclick="window.toggleChannelSelectionMode()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[14.5px]">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#aebac1] shrink-0">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-8.29 13.29a.996.996 0 01-1.41 0L5.71 12.7a.996.996 0 111.41-1.41L10 14.17l6.88-6.88a.996.996 0 111.41 1.41l-7.58 7.59z"/>
+                            </svg>
+                            <span>Select updates</span>
+                        </button>
+                        
+                        <button onclick="window.closeActiveChannel()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[14.5px]">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#aebac1] shrink-0">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                            </svg>
+                            <span>Close channel</span>
+                        </button>
+
+                        <button id="channel_menu_unfollow" onclick="window.toggleFollowChannel()" class="hidden w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[14.5px]">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#aebac1] shrink-0">
+                                <path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                            <span>Unfollow</span>
+                        </button>
+                        
+                        <button id="channel_menu_delete" onclick="window.deleteChannel()" class="hidden w-full flex items-center gap-4 px-5 py-2.5 text-[#ea005e] hover:bg-[#182229] transition-colors text-[14.5px]">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="shrink-0">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                            <span>Delete channel</span>
+                        </button>
+
+                        <div class="border-t border-[#313d45] my-2"></div>
+
+                        <button onclick="window.reportChannel()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-[14.5px]">
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-[#aebac1] shrink-0">
+                                <path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/>
+                            </svg>
+                            <span>Report</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -202,6 +254,31 @@
                 This channel has added privacy for your profile and phone number. <a href="#" class="text-[#027eb5] dark:text-[#53bdeb] font-medium hover:underline">Learn more</a>
             </p>
         </div>
+        <!-- Bottom Selection Bar -->
+        <div id="channel_selection_bottom_bar" class="hidden absolute bottom-0 left-0 w-full h-[60px] bg-[#202c33] border-t border-[#313d45] flex items-center justify-between px-4 z-30 transition-transform transform translate-y-full">
+            <div class="flex items-center gap-4">
+                <button onclick="window.cancelChannelSelection()" class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <span id="channel_selection_count" class="font-medium text-[#e9edef] text-[16px]">0 selected</span>
+            </div>
+            <div class="flex items-center gap-4 text-[#8696a0]">
+                <!-- Forward -->
+                <button onclick="window.forwardSelectedChannelUpdates()" class="hover:text-[#e9edef] p-2 focus:outline-none transition-colors" title="Forward">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+                <!-- Copy -->
+                <button onclick="window.copySelectedChannelUpdates()" class="hover:text-[#e9edef] p-2 focus:outline-none transition-colors" title="Copy">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                </button>
+                <!-- Delete -->
+                <button onclick="window.deleteSelectedChannelUpdates()" id="channel_selection_delete_btn" class="hover:text-[#e9edef] p-2 focus:outline-none transition-colors" title="Delete">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>
+        </div>
         </div>
     
         <!-- Channel Search Drawer (Hidden by default) -->
@@ -231,6 +308,42 @@
         <!-- Search Results List -->
         <div id="channel_search_results" class="flex-1 overflow-y-auto p-3 space-y-2 select-none">
             <div class="text-[#8696a0] text-center text-sm py-4">Type to search messages in channel</div>
+        </div>
+    </div>
+
+    <!-- Channel Settings Drawer -->
+    <div id="channel_settings_drawer" class="hidden absolute top-0 right-0 w-full md:w-[400px] h-full bg-[#111b21] border-l border-[#313d45] flex-col shrink-0 z-50 transition-transform transform translate-x-full duration-300">
+        <!-- Header -->
+        <div class="h-[60px] bg-[#202c33] px-4 flex items-center gap-4 border-b border-[#313d45] shrink-0">
+            <button onclick="window.closeChannelSettings()" class="text-[#8696a0] hover:text-[#e9edef]">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+            </button>
+            <span class="text-[#e9edef] text-[16px] font-medium">Channel settings</span>
+        </div>
+        <!-- Body -->
+        <div class="flex-1 overflow-y-auto p-6 bg-[#111b21]">
+            <h3 class="text-[#8696a0] text-[14px] font-medium mb-4">Which reactions can followers send</h3>
+            <label class="flex items-center gap-4 mb-6 cursor-pointer">
+                <input type="radio" name="channel_reactions_setting" value="any" onchange="window.saveChannelReactionsSetting('any')" class="hidden peer" id="channel_reaction_any">
+                <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] flex items-center justify-center shrink-0">
+                    <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                </div>
+                <span class="text-[#e9edef] text-[15px]">Any emoji</span>
+            </label>
+            <label class="flex items-center gap-4 mb-6 cursor-pointer">
+                <input type="radio" name="channel_reactions_setting" value="default" onchange="window.saveChannelReactionsSetting('default')" class="hidden peer" id="channel_reaction_default">
+                <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] flex items-center justify-center shrink-0">
+                    <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                </div>
+                <span class="text-[#e9edef] text-[15px]">Default only (👍❤️😂😮😢🙏)</span>
+            </label>
+            <label class="flex items-center gap-4 cursor-pointer">
+                <input type="radio" name="channel_reactions_setting" value="none" onchange="window.saveChannelReactionsSetting('none')" class="hidden peer" id="channel_reaction_none">
+                <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] flex items-center justify-center shrink-0">
+                    <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                </div>
+                <span class="text-[#e9edef] text-[15px]">None</span>
+            </label>
         </div>
     </div>
     

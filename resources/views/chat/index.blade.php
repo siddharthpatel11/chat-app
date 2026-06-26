@@ -4245,6 +4245,16 @@
             document.getElementById('calls_main_column')?.classList.add('hidden');
             document.getElementById('calls_main_column')?.classList.remove('flex');
 
+            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
+            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
+
+            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
+            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
+
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.remove('hidden');
             sidebar.classList.add('sm:flex', 'flex'); // Ensure both base and responsive flex are added
@@ -4281,6 +4291,16 @@
             document.getElementById('calls_main_column')?.classList.add('hidden');
             document.getElementById('calls_main_column')?.classList.remove('flex');
 
+            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
+            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
+
+            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
+            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
+
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.remove('hidden');
             sidebar.classList.add('sm:flex', 'flex');
@@ -4311,12 +4331,27 @@
             document.getElementById('chat_view_container').classList.add('hidden');
             document.getElementById('chat_view_container').classList.remove('flex');
 
+            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
+            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
+
             document.getElementById('sidebar_resizer').classList.add('hidden');
 
             document.getElementById('calls_sidebar_container')?.classList.add('hidden');
             document.getElementById('calls_sidebar_container')?.classList.remove('flex');
             document.getElementById('calls_main_column')?.classList.add('hidden');
             document.getElementById('calls_main_column')?.classList.remove('flex');
+
+            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
+            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
+
+            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
+            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
 
             document.getElementById('status_view_container').classList.remove('hidden');
             document.getElementById('status_view_container').classList.add('flex');
@@ -4341,6 +4376,11 @@
 
             document.getElementById('chat_view_container').classList.add('hidden');
             document.getElementById('chat_view_container').classList.remove('flex');
+
+            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
+            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
 
             document.getElementById('status_view_container').classList.add('hidden');
             document.getElementById('status_view_container').classList.remove('flex');
@@ -4665,9 +4705,9 @@
                 }
             }
 
-            // If we are in Status mode, switch back to Chats
-            const statusView = document.getElementById('status_view_container');
-            if (statusView && !statusView.classList.contains('hidden')) {
+            // If we are not in Chats view, switch back to Chats
+            const chatViewContainer = document.getElementById('chat_view_container');
+            if (chatViewContainer && chatViewContainer.classList.contains('hidden')) {
                 window.showChats();
             }
 
@@ -4680,6 +4720,10 @@
 
             // Show content, hide empty state
             document.getElementById('chat_empty_state')?.classList.add('hidden');
+            
+            // Hide channels and others
+            document.getElementById('channels_main_column')?.classList.add('hidden');
+            document.getElementById('channels_main_column')?.classList.remove('flex');
 
             // Highlight selected item in sidebar
             document.querySelectorAll('.user-chat-item').forEach(el => {
@@ -5472,11 +5516,16 @@
 
                 if (titleEl) titleEl.textContent = title;
                 if (confirmBtn) {
-                    confirmBtn.textContent = confirmBtnLabel;
-                    confirmBtn.onclick = function () {
-                        onConfirmMe();
-                        window.closeDeleteModal();
-                    };
+                    if (onConfirmMe === null) {
+                        confirmBtn.classList.add('hidden');
+                    } else {
+                        confirmBtn.classList.remove('hidden');
+                        confirmBtn.textContent = confirmBtnLabel;
+                        confirmBtn.onclick = function () {
+                            if(typeof onConfirmMe === 'function') onConfirmMe();
+                            window.closeDeleteModal();
+                        };
+                    }
                 }
 
                 if (everyoneBtn) {
