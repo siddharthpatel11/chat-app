@@ -1009,6 +1009,9 @@
     window.communityListeners = {};
 
     window.showCommunities = function() {
+        if (typeof window.closeAllSettings === 'function') {
+            window.closeAllSettings();
+        }
         window.closeAllSidebarPanels();
 
         // Update Navigation UI active states

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Cache;
 
 class NotificationsApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
+
     /**
      * Get Notifications Settings
      */
@@ -17,7 +19,7 @@ class NotificationsApiController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $userId = $request->user_id;
+        $userId = auth()->id();
         $settings = Cache::get("settings_notifications_{$userId}", [
             'user_id' => (int) $userId,
             'conversation_tones' => true,
@@ -27,11 +29,9 @@ class NotificationsApiController extends Controller
             'ringtone' => 'default',
         ]);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Notification settings retrieved successfully.',
-            'data' => $settings
-        ]);
+            'data' => $settings], 'Success', 200);
     }
 
     /**
@@ -66,10 +66,8 @@ class NotificationsApiController extends Controller
 
         Cache::put("settings_notifications_{$userId}", $settings);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Notification settings updated successfully.',
-            'data' => $settings
-        ]);
+            'data' => $settings], 'Success', 200);
     }
 }

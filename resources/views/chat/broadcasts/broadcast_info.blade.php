@@ -117,6 +117,11 @@
         const list = window.activeBroadcastList;
         if (!list) return;
 
+        // Close disappearing messages if open
+        if (typeof window.closeDisappearingMessagesSidebar === 'function') {
+            window.closeDisappearingMessagesSidebar();
+        }
+
         // Close search sidebar if open
         const searchSidebar = document.getElementById('search_sidebar');
         if (searchSidebar) {

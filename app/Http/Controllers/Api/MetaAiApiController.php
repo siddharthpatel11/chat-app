@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 
 class MetaAiApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
+
     public function ask(Request $request)
     {
         $request->validate([
@@ -19,7 +21,7 @@ class MetaAiApiController extends Controller
         $apiKey = env('GROQ_API_KEY');
 
         if (empty($apiKey)) {
-            return response()->json(['error' => 'API key is missing.'], 500);
+            return $this->errorResponse('API key is missing.', 500);
         }
 
         $userMessage = $request->input('message');
@@ -112,22 +114,22 @@ class MetaAiApiController extends Controller
                     if ($finalResponse->successful()) {
                         $finalData = $finalResponse->json();
                         $reply = $finalData['choices'][0]['message']['content'] ?? 'I could not generate a response.';
-                        return response()->json(['reply' => $reply]);
+                        return $this->successResponse(['reply' => $reply]);
                     } else {
                         Log::error('OpenAI API Final Call Error: '.$finalResponse->body());
-                        return response()->json(['error' => 'Failed to connect to AI.'], 500);
+                        return $this->errorResponse('Failed to connect to AI.', 500);
                     }
                 }
 
                 $reply = $data['choices'][0]['message']['content'] ?? 'I could not generate a response.';
-                return response()->json(['reply' => $reply]);
+                return $this->successResponse(['reply' => $reply]);
             } else {
                 Log::error('OpenAI API Error: '.$response->body());
-                return response()->json(['error' => 'Failed to connect to AI.'], 500);
+                return $this->errorResponse('Failed to connect to AI.', 500);
             }
         } catch (\Exception $e) {
             Log::error('OpenAI Exception: '.$e->getMessage());
-            return response()->json(['error' => 'An error occurred while processing your request.'], 500);
+            return $this->errorResponse('An error occurred while processing your request.', 500);
         }
     }
 

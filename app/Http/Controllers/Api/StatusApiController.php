@@ -13,12 +13,9 @@ class StatusApiController extends Controller
 
     public function __construct()
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $this->db = $factory->createDatabase();
-        $this->messaging = $factory->createMessaging();
+        $firebaseService = app(\App\Services\FirebaseService::class);
+        $this->db = $firebaseService->database();
+        $this->messaging = $firebaseService->messaging();
     }
 
     // 1. Create Status

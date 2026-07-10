@@ -806,6 +806,9 @@
                                             <div class="px-4 py-2 text-[#e9edef] hover:bg-[#182229] cursor-pointer text-[14.5px]" onclick="event.stopPropagation(); window.inviteFollowerAsAdmin('${u.id}', this.dataset.name)" data-name="${(u.name||'').replace(/&/g, '&amp;').replace(/\"/g, '&quot;')}">Invite as admin</div>
                                         ` : ''}
                                         <div class="px-4 py-2 text-[#e9edef] hover:bg-[#182229] cursor-pointer text-[14.5px]" onclick="event.stopPropagation(); window.showSecurityCodeModal(this.dataset.name)" data-name="${(u.name||'').replace(/&/g, '&amp;').replace(/\"/g, '&quot;')}">Verify security code</div>
+                                        ${(amIOwner && !isThisUserOwner) ? `
+                                            <div class="px-4 py-2 text-[#ea005e] hover:bg-[#182229] cursor-pointer text-[14.5px]" onclick="event.stopPropagation(); window.removeFollower('${u.id}', this.dataset.name)" data-name="${(u.name||'').replace(/&/g, '&amp;').replace(/\"/g, '&quot;')}">Remove from channel</div>
+                                        ` : ''}
                                     </div>
                                     ` : ''}
                                 </div>
@@ -1507,6 +1510,34 @@
         setTimeout(() => {
             modal.classList.add('hidden');
         }, 200);
+    };
+
+    window.removeFollower = function(userId, userName) {
+        window.closeAllRevokeMenus();
+        window.showCustomConfirmModal(`Are you sure you want to remove ${userName} from this channel?`, function() {
+            const chId = window.currentChannel.id;
+            
+            fetch(`/api/channel/${chId}/remove-follower`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                },
+                body: JSON.stringify({
+                    follower_user_id: userId,
+                    user_id: window.myUserId
+                })
+            }).then(res => res.json()).then(data => {
+                if(data.status) {
+                    if (window.showToast) window.showToast('Follower Removed', `${userName} has been removed from the channel.`);
+                } else {
+                    if (window.showToast) window.showToast('Error', data.message || 'Failed to remove follower.');
+                }
+            }).catch(err => {
+                console.error('Error removing follower:', err);
+                if (window.showToast) window.showToast('Error', 'An error occurred.');
+            });
+        });
     };
 
     window.dismissAdmin = function(userId, userName) {

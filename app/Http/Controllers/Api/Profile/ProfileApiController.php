@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 
 class ProfileApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
+
     public function updateProfile(Request $request)
     {
         $request->validate([
@@ -18,7 +20,7 @@ class ProfileApiController extends Controller
         $user = User::find($userId);
 
         if (! $user) {
-            return response()->json(['status' => false, 'message' => 'User not found'], 404);
+            return $this->errorResponse('User not found', 404);
         }
 
         $data = [];
@@ -47,7 +49,7 @@ class ProfileApiController extends Controller
         }
 
         if (empty($data)) {
-            return response()->json(['status' => false, 'message' => 'No data provided'], 400);
+            return $this->errorResponse('No data provided', 400);
         }
 
         $user->update($data);
@@ -69,7 +71,7 @@ class ProfileApiController extends Controller
         $user = User::find($userId);
 
         if (! $user) {
-            return response()->json(['status' => false, 'message' => 'User not found'], 404);
+            return $this->errorResponse('User not found', 404);
         }
 
         return response()->json([

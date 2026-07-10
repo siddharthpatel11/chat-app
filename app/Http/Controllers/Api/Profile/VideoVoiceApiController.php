@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Cache;
 
 class VideoVoiceApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
+
     /**
      * Get Video & Voice Settings
      */
@@ -17,7 +19,7 @@ class VideoVoiceApiController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $userId = $request->user_id;
+        $userId = auth()->id();
         $settings = Cache::get("settings_video_voice_{$userId}", [
             'user_id' => (int) $userId,
             'camera' => 'default',
@@ -26,11 +28,9 @@ class VideoVoiceApiController extends Controller
             'incoming_call_ring' => true,
         ]);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Video & voice settings retrieved successfully.',
-            'data' => $settings
-        ]);
+            'data' => $settings], 'Success', 200);
     }
 
     /**
@@ -63,10 +63,8 @@ class VideoVoiceApiController extends Controller
 
         Cache::put("settings_video_voice_{$userId}", $settings);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Video & voice settings updated successfully.',
-            'data' => $settings
-        ]);
+            'data' => $settings], 'Success', 200);
     }
 }

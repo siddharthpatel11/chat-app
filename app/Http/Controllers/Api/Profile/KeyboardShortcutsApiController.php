@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Cache;
 
 class KeyboardShortcutsApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
+
     /**
      * Get Keyboard Shortcuts Settings
      */
@@ -17,7 +19,7 @@ class KeyboardShortcutsApiController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $userId = $request->user_id;
+        $userId = auth()->id();
         $settings = Cache::get("settings_keyboard_shortcuts_{$userId}", [
             'user_id' => (int) $userId,
             'enabled' => true,
@@ -25,11 +27,9 @@ class KeyboardShortcutsApiController extends Controller
             'archive_chat_shortcut' => 'Ctrl+Alt+A',
         ]);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Keyboard shortcuts settings retrieved successfully.',
-            'data' => $settings
-        ]);
+            'data' => $settings], 'Success', 200);
     }
 
     /**
@@ -60,10 +60,8 @@ class KeyboardShortcutsApiController extends Controller
 
         Cache::put("settings_keyboard_shortcuts_{$userId}", $settings);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Keyboard shortcuts settings updated successfully.',
-            'data' => $settings
-        ]);
+            'data' => $settings], 'Success', 200);
     }
 }

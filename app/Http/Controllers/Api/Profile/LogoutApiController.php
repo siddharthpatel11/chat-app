@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class LogoutApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
+
     /**
      * Log out user
      */
@@ -18,7 +20,7 @@ class LogoutApiController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $user = User::find($request->user_id);
+        $user = auth()->user();
         
         // Clear FCM token on logout
         $user->update(['fcm_token' => null]);
@@ -33,9 +35,7 @@ class LogoutApiController extends Controller
             $request->session()->regenerateToken();
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User logged out successfully.'
-        ]);
+        return $this->successResponse(['success' => true,
+            'message' => 'User logged out successfully.'], 'Success', 200);
     }
 }

@@ -170,12 +170,85 @@
 
         <!-- Input Area (Only visible to Admins) -->
         <div id="channel_input_area" class="hidden px-4 py-3 bg-[#202c33] border-t border-[#313d45] shrink-0 z-20 flex items-end gap-2 relative">
-            <div class="relative shrink-0">
+            <div class="relative shrink-0 flex items-center gap-1">
+                <!-- Emoji Toggle Button -->
+                <button type="button" id="channel_emoji_toggle_btn" onclick="toggleChannelEmojiPicker()" class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full transition-colors focus:outline-none">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                        <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z"></path>
+                    </svg>
+                </button>
+                
                 <button type="button" id="channel_attach_toggle_btn" onclick="toggleChannelAttachMenu()" class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full transition-colors focus:outline-none">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                         <path d="M1.816 15.556v.002c0 1.502.584 2.912 1.646 3.972s2.472 1.647 3.974 1.647a5.58 5.58 0 0 0 3.972-1.645l9.547-9.548c.769-.768 1.147-1.767 1.058-2.817-.079-.968-.548-1.927-1.319-2.698-1.594-1.592-4.068-1.711-5.517-.262l-7.916 7.915c-.881.881-.792 2.25.214 3.261.959.958 2.423 1.053 3.263.215l5.511-5.512c.28-.28.267-.722.053-.936l-.244-.244c-.191-.191-.567-.349-.957.04l-5.506 5.506c-.18.18-.635.127-.976-.214-.098-.097-.576-.613-.213-.973l7.915-7.917c.818-.817 2.267-.699 3.23.262.5.501.802 1.1.849 1.685.051.573-.156 1.111-.589 1.543l-9.547 9.549a3.97 3.97 0 0 1-2.829 1.171 3.975 3.975 0 0 1-2.83-1.173 3.973 3.973 0 0 1-1.172-2.828c0-1.071.415-2.076 1.172-2.83l7.209-7.211c.157-.157.264-.579.028-.814L11.5 4.36a.57.57 0 0 0-.834.018l-7.205 7.207a5.577 5.577 0 0 0-1.645 3.971z"></path>
                     </svg>
                 </button>
+
+                <!-- Emoji Picker Panel (Toggled with button) -->
+                <div id="channel_emoji_picker_container"
+                    class="hidden absolute bottom-full mb-3 left-0 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px] sm:w-[350px]">
+                    
+                    <div class="w-full relative" style="height: 320px;">
+                        <!-- The actual picker -->
+                        <div id="channel_panel_emoji" class="w-full h-full">
+                        <emoji-picker id="channel_emoji_picker" class="w-full"
+                            style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
+                    </div>
+
+                    <!-- GIF Panel -->
+                        <div id="channel_panel_gif" class="w-full h-full hidden bg-white dark:bg-[#202c33] p-2 flex flex-col">
+                        <div class="mb-2 shrink-0">
+                            <input type="text" id="channel_gif_search_input" placeholder="Search GIFs..." class="w-full bg-gray-100 dark:bg-[#2a3942] text-gray-800 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00a884] border-none text-sm placeholder-gray-500" onkeyup="if(event.key === 'Enter') searchChannelGifs(this.value)">
+                        </div>
+                        <div id="channel_gif_results" class="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-2 gap-1 p-1 content-start">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Sticker Panel -->
+                        <div id="channel_panel_sticker" class="w-full h-full hidden bg-white dark:bg-[#202c33] p-2 flex flex-col">
+                        <div class="mb-2 shrink-0">
+                            <input type="text" id="channel_sticker_search_input" placeholder="Search Stickers..." class="w-full bg-gray-100 dark:bg-[#2a3942] text-gray-800 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00a884] border-none text-sm placeholder-gray-500" onkeyup="if(event.key === 'Enter') searchChannelStickers(this.value)">
+                        </div>
+                        <div id="channel_sticker_results" class="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-4 gap-2 p-1 content-start">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    </div> <!-- Close w-full relative h-[320px] -->
+
+                    <!-- Bottom Tabs Bar -->
+                    <div
+                        class="h-[50px] bg-gray-100 dark:bg-[#2a3942] border-t border-gray-200 dark:border-gray-700 flex items-center justify-center shrink-0">
+                        <!-- Emoji Tab (Active) -->
+                        <button onclick="switchChannelPickerTab('emoji')" id="channel_tab_btn_emoji"
+                            class="flex-1 flex justify-center py-2 h-full items-center relative transition-colors bg-gray-200 dark:bg-[#384b57]">
+                            <svg viewBox="0 0 24 24" width="24" height="24"
+                                class="text-gray-600 dark:text-gray-300" fill="currentColor">
+                                <path
+                                    d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
+                                </path>
+                            </svg>
+                            <div id="channel_tab_indicator_emoji" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
+                        </button>
+                        <!-- GIF Tab -->
+                        <button onclick="switchChannelPickerTab('gif')" id="channel_tab_btn_gif"
+                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors relative">
+                            <span class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
+                            <div id="channel_tab_indicator_gif" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884] hidden"></div>
+                        </button>
+                        <!-- Sticker Tab -->
+                        <button onclick="switchChannelPickerTab('sticker')" id="channel_tab_btn_sticker"
+                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors relative">
+                            <svg viewBox="0 0 24 24" width="24" height="24"
+                                class="text-gray-500 dark:text-gray-400" fill="currentColor">
+                                <path
+                                    d="M14.5 3h-5C6.46 3 4 5.46 4 8.5v7C4 18.54 6.46 21 9.5 21h4l6-6v-6.5C19.5 5.46 17.04 3 14.5 3zm-2.5 16h-2.5C7.57 19 6 17.43 6 15.5v-7C6 6.57 7.57 5 9.5 5h5C16.43 5 18 6.57 18 8.5v5.09l-4.5 4.5V19h-1.5zM17 14h-2.5c-.83 0-1.5.67-1.5 1.5V18l4-4z">
+                                </path>
+                            </svg>
+                            <div id="channel_tab_indicator_sticker" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884] hidden"></div>
+                        </button>
+                    </div>
+                </div>
 
                 <!-- Attachment Menu -->
                 <div id="channel_attach_menu" class="hidden absolute bottom-full mb-3 left-0 bg-[#1f2c34] p-4 rounded-3xl w-[320px] shadow-2xl z-50 transition-all origin-bottom-left">

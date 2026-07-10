@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Api\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Kreait\Firebase\Factory;
 
 class PrivacyApiController extends Controller
 {
+    use ApiResponse;
+
     protected $db;
 
     public function __construct()
@@ -31,7 +34,7 @@ class PrivacyApiController extends Controller
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $userId = $request->user_id;
+        $userId = auth()->id();
         $settings = Cache::get("settings_privacy_{$userId}", [
             'user_id' => (int) $userId,
             'last_seen' => 'everyone', // everyone, contacts, nobody
@@ -42,11 +45,9 @@ class PrivacyApiController extends Controller
             'disappearing_messages_timer' => 'off', // off, 24h, 7d, 90d
         ]);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Privacy settings retrieved successfully.',
-            'data' => $settings,
-        ]);
+            'data' => $settings, ], 'Success', 200);
     }
 
     /**
@@ -87,34 +88,44 @@ class PrivacyApiController extends Controller
             $privacyData = [];
             if (isset($settings['profile_photo'])) {
                 $val = 'My contacts';
-                if ($settings['profile_photo'] === 'everyone') $val = 'Everyone';
-                elseif ($settings['profile_photo'] === 'nobody') $val = 'Nobody';
-                elseif ($settings['profile_photo'] === 'contacts') $val = 'My contacts';
+                if ($settings['profile_photo'] === 'everyone') {
+                    $val = 'Everyone';
+                } elseif ($settings['profile_photo'] === 'nobody') {
+                    $val = 'Nobody';
+                } elseif ($settings['profile_photo'] === 'contacts') {
+                    $val = 'My contacts';
+                }
                 $privacyData['profile_photo'] = $val;
             }
             if (isset($settings['about'])) {
                 $val = 'Everyone';
-                if ($settings['about'] === 'everyone') $val = 'Everyone';
-                elseif ($settings['about'] === 'nobody') $val = 'Nobody';
-                elseif ($settings['about'] === 'contacts') $val = 'My contacts';
+                if ($settings['about'] === 'everyone') {
+                    $val = 'Everyone';
+                } elseif ($settings['about'] === 'nobody') {
+                    $val = 'Nobody';
+                } elseif ($settings['about'] === 'contacts') {
+                    $val = 'My contacts';
+                }
                 $privacyData['about'] = $val;
             }
             if (isset($settings['last_seen'])) {
                 $val = 'Everyone';
-                if ($settings['last_seen'] === 'everyone') $val = 'Everyone';
-                elseif ($settings['last_seen'] === 'nobody') $val = 'Nobody';
-                elseif ($settings['last_seen'] === 'contacts') $val = 'My contacts';
+                if ($settings['last_seen'] === 'everyone') {
+                    $val = 'Everyone';
+                } elseif ($settings['last_seen'] === 'nobody') {
+                    $val = 'Nobody';
+                } elseif ($settings['last_seen'] === 'contacts') {
+                    $val = 'My contacts';
+                }
                 $privacyData['last_seen'] = $val;
             }
-            if (!empty($privacyData)) {
+            if (! empty($privacyData)) {
                 $this->db->getReference("users/{$userId}/privacy")->update($privacyData);
             }
         }
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Privacy settings updated successfully.',
-            'data' => $settings,
-        ]);
+            'data' => $settings, ], 'Success', 200);
     }
 }

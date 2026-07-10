@@ -1421,4 +1421,214 @@
             }
         });
     };
+
+    window.toggleChannelEmojiPicker = function() {
+        const container = document.getElementById('channel_emoji_picker_container');
+        if (container) container.classList.toggle('hidden');
+    };
+
+    window.insertEmojiIntoChannelInput = function(emoji) {
+        const input = document.getElementById('channel_message_input');
+        if (input) {
+            input.value += emoji;
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+            input.focus();
+        }
+        document.getElementById('channel_emoji_picker_container')?.classList.add('hidden');
+    };
+
+    const channelEmojiPicker = document.getElementById('channel_emoji_picker');
+    if (channelEmojiPicker) {
+        channelEmojiPicker.addEventListener('emoji-click', event => {
+            window.insertEmojiIntoChannelInput(event.detail.unicode);
+        });
+    }
+
+    document.addEventListener('click', function(event) {
+        const picker = document.getElementById('channel_emoji_picker_container');
+        const btn = document.getElementById('channel_emoji_toggle_btn');
+        if (picker && btn && !picker.classList.contains('hidden')) {
+            const path = event.composedPath();
+            if (!path.includes(picker) && !path.includes(btn)) {
+                picker.classList.add('hidden');
+            }
+        }
+    });
+
+    window.switchChannelPickerTab = function(tab) {
+        document.getElementById('channel_panel_emoji').classList.add('hidden');
+        document.getElementById('channel_panel_gif').classList.add('hidden');
+        document.getElementById('channel_panel_sticker').classList.add('hidden');
+        
+        document.getElementById('channel_tab_btn_emoji').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+        document.getElementById('channel_tab_btn_gif').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+        document.getElementById('channel_tab_btn_sticker').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+        
+        document.getElementById('channel_tab_indicator_emoji').classList.add('hidden');
+        document.getElementById('channel_tab_indicator_gif').classList.add('hidden');
+        document.getElementById('channel_tab_indicator_sticker').classList.add('hidden');
+
+        document.getElementById(`channel_panel_${tab}`).classList.remove('hidden');
+        document.getElementById(`channel_tab_btn_${tab}`).classList.add('bg-gray-200', 'dark:bg-[#384b57]');
+        document.getElementById(`channel_tab_indicator_${tab}`).classList.remove('hidden');
+
+        if (tab === 'gif' && document.getElementById('channel_gif_results').children.length === 0) {
+            window.loadChannelTrendingGifs();
+        } else if (tab === 'sticker' && document.getElementById('channel_sticker_results').children.length === 0) {
+            window.loadChannelStickers();
+        }
+    };
+
+    window.GIPHY_API_KEY = '{{ env("GIPHY_API_KEY", "") }}';
+
+    window.loadChannelTrendingGifs = async function() {
+        const gifResults = document.getElementById('channel_gif_results');
+        if (!window.GIPHY_API_KEY) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+            return;
+        }
+        gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">Loading GIFs...</div>';
+        try {
+            const res = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${window.GIPHY_API_KEY}&limit=20`);
+            const data = await res.json();
+            window.renderChannelGifs(data.data);
+        } catch (e) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">Failed to load GIFs</div>';
+        }
+    };
+
+    window.searchChannelGifs = async function(query) {
+        if (!query.trim()) return window.loadChannelTrendingGifs();
+        const gifResults = document.getElementById('channel_gif_results');
+        if (!window.GIPHY_API_KEY) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+            return;
+        }
+        gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">Searching...</div>';
+        try {
+            const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${window.GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=20`);
+            const data = await res.json();
+            window.renderChannelGifs(data.data);
+        } catch (e) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">Search failed</div>';
+        }
+    };
+
+    window.renderChannelGifs = function(gifs) {
+        const gifResults = document.getElementById('channel_gif_results');
+        gifResults.innerHTML = '';
+        if (!gifs || gifs.length === 0) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">No GIFs found</div>';
+            return;
+        }
+        gifs.forEach(gif => {
+            const previewUrl = gif.images.fixed_height_small.url;
+            const sendUrl = gif.images.original.url;
+            const img = document.createElement('img');
+            img.src = previewUrl;
+            img.className = 'w-full h-[100px] object-cover rounded cursor-pointer hover:opacity-80 transition-opacity bg-gray-100 dark:bg-[#2a3942]';
+            img.onclick = () => window.sendChannelMediaFromUrl(sendUrl, 'image/gif', 'animation.gif');
+            gifResults.appendChild(img);
+        });
+    };
+
+    window.loadChannelStickers = async function() {
+        const stickerResults = document.getElementById('channel_sticker_results');
+        if (!window.GIPHY_API_KEY) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+            return;
+        }
+        stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">Loading Stickers...</div>';
+        try {
+            const res = await fetch(`https://api.giphy.com/v1/stickers/trending?api_key=${window.GIPHY_API_KEY}&limit=20`);
+            const data = await res.json();
+            window.renderChannelStickers(data.data);
+        } catch (e) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">Failed to load Stickers</div>';
+        }
+    };
+
+    window.searchChannelStickers = async function(query) {
+        if (!query.trim()) return window.loadChannelStickers();
+        const stickerResults = document.getElementById('channel_sticker_results');
+        if (!window.GIPHY_API_KEY) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+            return;
+        }
+        stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">Searching...</div>';
+        try {
+            const res = await fetch(`https://api.giphy.com/v1/stickers/search?api_key=${window.GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=20`);
+            const data = await res.json();
+            window.renderChannelStickers(data.data);
+        } catch (e) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">Search failed</div>';
+        }
+    };
+
+    window.renderChannelStickers = function(stickers) {
+        const stickerResults = document.getElementById('channel_sticker_results');
+        stickerResults.innerHTML = '';
+        if (!stickers || stickers.length === 0) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">No stickers found</div>';
+            return;
+        }
+        stickers.forEach(sticker => {
+            const previewUrl = sticker.images.fixed_height_small.url;
+            const sendUrl = sticker.images.original.url;
+            const img = document.createElement('img');
+            img.src = previewUrl;
+            img.className = 'w-full h-[72px] object-contain cursor-pointer hover:scale-110 transition-transform p-1';
+            img.onclick = () => window.sendChannelMediaFromUrl(sendUrl, 'image/gif', 'sticker.gif');
+            stickerResults.appendChild(img);
+        });
+    };
+
+    window.sendChannelMediaFromUrl = async function(url, type, filename) {
+        document.getElementById('channel_emoji_picker_container').classList.add('hidden');
+        if (!window.currentChannel) return;
+        const chId = window.currentChannel.id;
+
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const file = new File([blob], filename, { type: type });
+            
+            const time = Math.floor(Date.now() / 1000);
+            const msgData = {
+                sender_id: window.myUserId,
+                time: time,
+                type: 'image',
+                text: '',
+                fileName: file.name,
+                fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+            };
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const uploadRes = await fetch('/channel/upload-message-media', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrf
+                },
+                body: formData
+            });
+            const json = await uploadRes.json();
+            
+            if (json.status) {
+                msgData.fileUrl = json.url;
+                import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js').then(module => {
+                    const { ref, push, update } = module;
+                    push(ref(db, `channels/${chId}/messages`), msgData);
+                    update(ref(db, `channels/${chId}`), {
+                        last_message: '📸 Photo'
+                    });
+                });
+            }
+        } catch (err) {
+            console.error('Error sending media:', err);
+            alert('Failed to send media. Network error.');
+        }
+    };
 </script>

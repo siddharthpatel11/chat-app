@@ -1,4 +1,4 @@
-<div id="meta_ai_content" class="hidden flex-col flex-1 h-full overflow-hidden select-none bg-[#0b141a] relative">
+<div id="meta_ai_content" class="hidden absolute inset-0 z-50 flex-col w-full h-full overflow-hidden select-none bg-[#0b141a]">
     <!-- Header -->
     <div id="meta_ai_normal_header" class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] flex items-center justify-between shrink-0 shadow-sm z-20 relative">
         <div class="flex items-center gap-3">
@@ -54,8 +54,8 @@
                     <button onclick="toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#8696a0] hover:bg-[#182229] transition-colors cursor-not-allowed"><span class="text-[15px]">Schedule call</span></button>
                     <button onclick="toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#8696a0] hover:bg-[#182229] transition-colors cursor-not-allowed"><span class="text-[15px]">New group call</span></button>
                     <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
-                    <button onclick="if(confirm('Clear this chat?')) { window.clearMetaAiChat(); }; toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Clear chat</span></button>
-                    <button onclick="if(confirm('Delete this chat?')) { window.clearMetaAiChat(); window.backToSidebar(); }; toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Delete chat</span></button>
+                    <button onclick="if(window.openDeleteModal) { window.openDeleteModal('Clear this chat?', () => { window.clearMetaAiChat(); toggleMetaAiHeaderMenu(); }); } else { if(confirm('Clear this chat?')) { window.clearMetaAiChat(); toggleMetaAiHeaderMenu(); } }" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Clear chat</span></button>
+                    <button onclick="if(window.openDeleteModal) { window.openDeleteModal('Delete this chat?', () => { window.clearMetaAiChat(); window.backToSidebar(); toggleMetaAiHeaderMenu(); }); } else { if(confirm('Delete this chat?')) { window.clearMetaAiChat(); window.backToSidebar(); toggleMetaAiHeaderMenu(); } }" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Delete chat</span></button>
                 </div>
             </div>
         </div>
@@ -170,7 +170,7 @@
             <div class="h-[10px] bg-[#0c1317]"></div>
 
             <div class="flex flex-col py-2 mb-8 mt-2">
-                <button onclick="if(confirm('Clear this chat?')) { window.clearMetaAiChat(); document.getElementById('meta_ai_info_panel').classList.add('translate-x-full'); document.getElementById('meta_ai_info_panel').classList.remove('translate-x-0'); }"
+                <button onclick="if(window.openDeleteModal) { window.openDeleteModal('Clear this chat?', () => { window.clearMetaAiChat(); document.getElementById('meta_ai_info_panel').classList.add('translate-x-full'); document.getElementById('meta_ai_info_panel').classList.remove('translate-x-0'); }); } else { if(confirm('Clear this chat?')) { window.clearMetaAiChat(); document.getElementById('meta_ai_info_panel').classList.add('translate-x-full'); document.getElementById('meta_ai_info_panel').classList.remove('translate-x-0'); } }"
                     class="flex items-center px-4 py-4 gap-6 text-[#ea5656] hover:bg-[#202c33]/30 transition-colors w-full text-left focus:outline-none">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                         <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"></path>
@@ -229,12 +229,24 @@
 
         // Hide other main contents
         document.getElementById('welcome_screen')?.classList.add('hidden');
+        document.getElementById('welcome_screen')?.classList.remove('flex');
         document.getElementById('chat_empty_state')?.classList.add('hidden');
+        document.getElementById('chat_empty_state')?.classList.remove('flex');
         document.getElementById('active_chat_content')?.classList.add('hidden');
         document.getElementById('active_chat_content')?.classList.remove('flex');
         document.getElementById('active_group_chat_content')?.classList.add('hidden');
         document.getElementById('active_group_chat_content')?.classList.remove('flex');
         document.getElementById('archived_chat_content')?.classList.add('hidden');
+        
+        // Hide all other tab main columns to ensure full width
+        document.getElementById('channels_main_column')?.classList.add('hidden');
+        document.getElementById('channels_main_column')?.classList.remove('flex');
+        document.getElementById('calls_main_column')?.classList.add('hidden');
+        document.getElementById('calls_main_column')?.classList.remove('flex');
+        document.getElementById('communities_main_column')?.classList.add('hidden');
+        document.getElementById('communities_main_column')?.classList.remove('flex');
+        document.getElementById('status_view_container')?.classList.add('hidden');
+        document.getElementById('status_view_container')?.classList.remove('flex');
         
         // Show Meta AI Content
         const metaAiContent = document.getElementById('meta_ai_content');

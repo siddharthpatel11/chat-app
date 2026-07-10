@@ -407,9 +407,9 @@
                 data-avatar="{{ $userAvatar }}" data-phone="{{ $user->phone ?? '' }}"
                 data-about="{{ $user->about ?? 'Available' }}" data-userid="{{ $user->id }}"
                 data-timestamp="0">
-                <div
-                    class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
-                    <img src="{{ $userAvatar }}" class="w-full h-full object-cover">
+                <div id="avatar_wrapper_user_{{ $user->id }}"
+                    class="relative w-12 h-12 rounded-full bg-[#2a3942] flex items-center justify-center shrink-0">
+                    <img src="{{ $userAvatar }}" class="w-full h-full object-cover rounded-full">
                 </div>
                 <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
                     <div class="flex justify-between items-center">
@@ -1384,8 +1384,18 @@
                     window.showToast?.('Mute Notifications',
                         `Notifications muted for ${durationStr === '8h' ? '8 hours' : durationStr === '1w' ? '1 week' : 'always'}.`
                         );
+                    if (type === 'group' && window.currentGroupId == targetId) {
+                        document.getElementById('group_header_mute_icon')?.classList.remove('hidden');
+                    } else if (type === 'user' && window.activeChatUser && window.activeChatUser.id == targetId) {
+                        document.getElementById('private_header_mute_icon')?.classList.remove('hidden');
+                    }
                 } else {
                     window.showToast?.('Unmute Notifications', `Notifications have been unmuted.`);
+                    if (type === 'group' && window.currentGroupId == targetId) {
+                        document.getElementById('group_header_mute_icon')?.classList.add('hidden');
+                    } else if (type === 'user' && window.activeChatUser && window.activeChatUser.id == targetId) {
+                        document.getElementById('private_header_mute_icon')?.classList.add('hidden');
+                    }
                 }
             };
 

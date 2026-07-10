@@ -227,12 +227,12 @@
         import { getDatabase, ref, set, update, onValue, push, onChildAdded, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCTUuLg0mheURhlG1Z0p0DgMRwoAcR-F0w",
-            authDomain: "chat-app-a370c.firebaseapp.com",
-            databaseURL: "https://chat-app-a370c-default-rtdb.firebaseio.com",
-            projectId: "chat-app-a370c",
-            messagingSenderId: "1089034732064",
-            appId: "1:1016598612026:web:6cc4d1dd4466eec8934d03"
+            apiKey: "{{ env('FIREBASE_API_KEY') }}",
+            authDomain: "{{ env('FIREBASE_AUTH_DOMAIN') }}",
+            databaseURL: "{{ env('FIREBASE_DATABASE_URL') }}",
+            projectId: "{{ env('FIREBASE_PROJECT_ID') }}",
+            messagingSenderId: "{{ env('FIREBASE_MESSAGING_SENDER_ID') }}",
+            appId: "{{ env('FIREBASE_APP_ID') }}"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -253,7 +253,13 @@
 
         async function init() {
             try {
+            try {
                 localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch (err) {
+                console.error("Microphone access error:", err);
+                alert("Microphone access was denied or failed. Please check browser permissions and ensure you are using HTTPS.");
+                return;
+            }
                 if (ROLE === 'caller') {
                     startGroupVoiceCall();
                     try { document.getElementById('ringtone').play(); } catch(e) {}
@@ -416,6 +422,7 @@
                     document.body.appendChild(audio);
                 }
                 audio.srcObject = e.streams[0];
+                setTimeout(() => { audio.play().catch(err => console.log('Autoplay blocked', err)); }, 500);
             };
 
             const pairKey = MY_USER_ID < remoteId ? `${MY_USER_ID}_${remoteId}` : `${remoteId}_${MY_USER_ID}`;

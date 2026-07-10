@@ -122,12 +122,12 @@
         import { getDatabase, ref, set, update, onValue, push, onChildAdded, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCTUuLg0mheURhlG1Z0p0DgMRwoAcR-F0w",
-            authDomain: "chat-app-a370c.firebaseapp.com",
-            databaseURL: "https://chat-app-a370c-default-rtdb.firebaseio.com",
-            projectId: "chat-app-a370c",
-            messagingSenderId: "1089034732064",
-            appId: "1:1016598612026:web:6cc4d1dd4466eec8934d03"
+            apiKey: "{{ env('FIREBASE_API_KEY') }}",
+            authDomain: "{{ env('FIREBASE_AUTH_DOMAIN') }}",
+            databaseURL: "{{ env('FIREBASE_DATABASE_URL') }}",
+            projectId: "{{ env('FIREBASE_PROJECT_ID') }}",
+            messagingSenderId: "{{ env('FIREBASE_MESSAGING_SENDER_ID') }}",
+            appId: "{{ env('FIREBASE_APP_ID') }}"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -198,7 +198,23 @@
                 localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
 
                 pc.ontrack = (e) => {
-                    document.getElementById('remote_video').srcObject = e.streams[0];
+                    let rv = document.getElementById('remote_video');
+                    if (e.streams && e.streams[0]) {
+                        if (rv.srcObject !== e.streams[0]) rv.srcObject = e.streams[0];
+                    } else {
+                        let stream = rv.srcObject || new MediaStream();
+                        if (stream.getTracks().indexOf(e.track) === -1) {
+                            stream.addTrack(e.track);
+                        }
+                        rv.srcObject = stream;
+                    }
+                    rv.muted = false;
+                    setTimeout(() => { 
+                        rv.play().catch(err => {
+                            console.log('Autoplay blocked', err);
+                            document.body.addEventListener('click', () => { rv.play(); }, { once: true });
+                        }); 
+                    }, 500);
                 };
 
                 pc.oniceconnectionstatechange = () => {
@@ -211,6 +227,7 @@
                 else await calleeFlow();
             } catch (err) {
                 console.error('Init error:', err);
+                alert("Camera or Microphone access was denied or failed. Please check browser permissions and ensure you are using HTTPS if on mobile.");
                 document.getElementById('vc_status').textContent = 'Camera/Mic access denied';
                 document.getElementById('vc_dots').classList.add('hidden');
             }
@@ -220,7 +237,7 @@
             callId = 'call_' + MY_USER_ID + '_' + CALLEE_ID + '_' + Date.now();
             pc.onicecandidate = (e) => { if (e.candidate) push(ref(db, `calls/${callId}/caller_candidates`), e.candidate.toJSON()); };
 
-            const offer = await pc.createOffer();
+            const offer = await pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
             await pc.setLocalDescription(offer);
 
             await set(ref(db, `calls/${callId}`), {
@@ -351,7 +368,24 @@
             document.getElementById('self_fallback').classList.toggle('hidden', !isCamOff);
         };
 
-        window.toggleVSpk = function() { document.getElementById('vspk_btn').classList.toggle('active'); };
+        window.toggleVSpk = async function() { 
+            const btn = document.getElementById('vspk_btn');
+            const isActive = btn.classList.toggle('active'); 
+            const rv = document.getElementById('remote_video');
+            if (rv) {
+                rv.play().catch(()=>{});
+                if (typeof rv.setSinkId === 'function') {
+                    try {
+                        const devices = await navigator.mediaDevices.enumerateDevices();
+                        const audioOutputs = devices.filter(d => d.kind === 'audiooutput');
+                        if (audioOutputs.length > 1) {
+                            const newSinkId = isActive ? audioOutputs[1].deviceId : audioOutputs[0].deviceId;
+                            await rv.setSinkId(newSinkId);
+                        }
+                    } catch(e) {}
+                }
+            }
+        };
 
         // PiP drag
         const pip = document.getElementById('self_pip');
@@ -379,7 +413,22 @@
                     vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5';
                     document.querySelector('.remote-video-wrap').appendChild(vid);
                 }
-                vid.srcObject = e.streams[0];
+                if (e.streams && e.streams[0]) {
+                    if (vid.srcObject !== e.streams[0]) vid.srcObject = e.streams[0];
+                } else {
+                    let stream = vid.srcObject || new MediaStream();
+                    if (stream.getTracks().indexOf(e.track) === -1) {
+                        stream.addTrack(e.track);
+                    }
+                    vid.srcObject = stream;
+                }
+                vid.muted = false;
+                setTimeout(() => { 
+                    vid.play().catch(err => {
+                        console.log('Autoplay blocked', err);
+                        document.body.addEventListener('click', () => { vid.play(); }, { once: true });
+                    }); 
+                }, 500);
             };
             npc.oniceconnectionstatechange = () => {
                 if (npc.iceConnectionState === 'connected' && !wasConnected) onConnected();
@@ -389,7 +438,7 @@
             const iAmInit = MY_USER_ID < remoteId;
             npc.onicecandidate = (e) => { if (e.candidate) push(ref(db, `group_calls/${groupId}/signaling/${pairKey}/${MY_USER_ID}_candidates`), e.candidate.toJSON()); };
             if (iAmInit) {
-                const o = await npc.createOffer(); await npc.setLocalDescription(o);
+                const o = await npc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true }); await npc.setLocalDescription(o);
                 await set(ref(db, `group_calls/${groupId}/signaling/${pairKey}/offer`), { type: o.type, sdp: o.sdp });
                 onValue(ref(db, `group_calls/${groupId}/signaling/${pairKey}/answer`), async (s) => {
                     if (s.val() && npc.signalingState === 'have-local-offer') await npc.setRemoteDescription(new RTCSessionDescription(s.val()));
@@ -461,12 +510,27 @@
             opc.ontrack = (e) => {
                 let vid = document.getElementById('rv_' + userId);
                 if (!vid) { vid = document.createElement('video'); vid.id = 'rv_' + userId; vid.autoplay = true; vid.playsinline = true; vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:5'; document.querySelector('.remote-video-wrap').appendChild(vid); }
-                vid.srcObject = e.streams[0];
+                if (e.streams && e.streams[0]) {
+                    if (vid.srcObject !== e.streams[0]) vid.srcObject = e.streams[0];
+                } else {
+                    let stream = vid.srcObject || new MediaStream();
+                    if (stream.getTracks().indexOf(e.track) === -1) {
+                        stream.addTrack(e.track);
+                    }
+                    vid.srcObject = stream;
+                }
+                vid.muted = false;
+                setTimeout(() => { 
+                    vid.play().catch(err => {
+                        console.log('Autoplay blocked', err);
+                        document.body.addEventListener('click', () => { vid.play(); }, { once: true });
+                    }); 
+                }, 500);
             };
             opc.oniceconnectionstatechange = () => { if (opc.iceConnectionState === 'connected') update(ref(db, `group_calls/${groupId}/participants/${userId}`), { status: 'connected' }); };
             extraPeers[userId] = opc;
             opc.onicecandidate = (e) => { if (e.candidate) push(ref(db, `calls/${inviteId}/caller_candidates`), e.candidate.toJSON()); };
-            const offer = await opc.createOffer(); await opc.setLocalDescription(offer);
+            const offer = await opc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true }); await opc.setLocalDescription(offer);
             await set(ref(db, `calls/${inviteId}`), {
                 caller_id: MY_USER_ID, callee_id: userId, caller_name: MY_NAME, caller_avatar: MY_AVATAR,
                 callee_name: name, callee_avatar: avatar, type: 'video', status: 'calling',

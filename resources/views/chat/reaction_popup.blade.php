@@ -167,6 +167,12 @@
         if (menu) {
             menu.classList.remove('flex');
             menu.classList.add('hidden');
+            
+            // Reset z-index that was added by toggleMsgMenu
+            const parentMsg = document.getElementById('msg_' + msgId);
+            const bubbleEl = document.getElementById('bubble_' + msgId);
+            if (parentMsg) parentMsg.style.zIndex = '';
+            if (bubbleEl) bubbleEl.style.zIndex = '';
         }
 
         if (typeof window.hideGroupMessageOptions === 'function') {
@@ -192,6 +198,12 @@
         if (menu) {
             menu.classList.remove('flex');
             menu.classList.add('hidden');
+            
+            // Reset z-index that was added by toggleMsgMenu
+            const parentMsg = document.getElementById('msg_' + msgId);
+            const bubbleEl = document.getElementById('bubble_' + msgId);
+            if (parentMsg) parentMsg.style.zIndex = '';
+            if (bubbleEl) bubbleEl.style.zIndex = '';
         }
         if (typeof window.hideGroupMessageOptions === 'function') {
             window.hideGroupMessageOptions();

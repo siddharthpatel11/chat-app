@@ -80,7 +80,7 @@
             <div class="text-[#8696a0] text-[14px] font-medium mb-3 mt-6">Disappearing messages</div>
 
             <!-- Default message timer -->
-            <div class="relative flex items-center justify-between py-4 border-b border-[#202c33] cursor-pointer hover:bg-[#202c33] -mx-6 px-6 transition-colors group">
+            <div class="flex items-center justify-between py-4 border-b border-[#202c33] cursor-pointer hover:bg-[#202c33] -mx-6 px-6 transition-colors group" onclick="window.openDefaultTimerSidebar()">
                 <div class="flex-1 pr-4">
                     <div class="text-[#e9edef] text-[16px] mb-1">Default message timer</div>
                     <div class="text-[#8696a0] text-[14px]" id="privacy_message_timer_label">Off</div>
@@ -88,12 +88,6 @@
                 <div class="text-[#8696a0]">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                 </div>
-                <select id="privacy_message_timer" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer text-[16px]">
-                    <option value="Off">Off</option>
-                    <option value="24 hours">24 hours</option>
-                    <option value="7 days">7 days</option>
-                    <option value="90 days">90 days</option>
-                </select>
             </div>
 
             <!-- Groups -->
@@ -211,7 +205,6 @@
             'privacy_profile_photo': 'My contacts',
             'privacy_about': 'Nobody',
             'privacy_status': '1 contact included',
-            'privacy_message_timer': 'Off',
             'privacy_groups': 'Everyone'
         };
         

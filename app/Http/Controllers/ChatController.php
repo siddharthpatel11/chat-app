@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use Kreait\Firebase\Factory;
+use App\Services\FirebaseService;
 use Illuminate\Http\Request;
 use App\Events\MessageSent;
 use Illuminate\Support\Facades\Schema;
 
 class ChatController extends Controller
 {
+    protected $db;
+    protected $messaging;
+
+    public function __construct(FirebaseService $firebaseService)
+    {
+        $this->db = $firebaseService->database();
+        $this->messaging = $firebaseService->messaging();
+    }
+
     public function index()
     {
         $users = \App\Models\User::where('id', '!=', auth()->id())->get();
@@ -33,15 +42,15 @@ class ChatController extends Controller
 
     public function send(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $db = $factory->createDatabase();
-        $messaging = $factory->createMessaging();
+        $db = $this->db;
+        $messaging = $this->messaging;
 
         $chatId = $request->chat_id;
-        $senderId = auth()->id() ?? 1;
+        $senderId = auth()->id();
+        
+        if (!$senderId) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
+        }
 
         $type = 'text';
         $fileUrl = null;
@@ -120,8 +129,18 @@ class ChatController extends Controller
             $firebaseChatId = $chatId;
         }
 
+        $disappearingMessageService = app(\App\Services\DisappearingMessageService::class);
+        $isExpiring = $disappearingMessageService->attachExpirationData($chatId, $senderId, $data);
+
         // Push to Realtime Database
-        $db->getReference("$node/$firebaseChatId/messages")->push($data);
+        $msgRef = $db->getReference("$node/$firebaseChatId/messages")->push($data);
+
+        if ($isExpiring) {
+            $disappearingMessageService->logExpiringMessage($chatId, $msgRef->getKey(), $data['expires_at']);
+        }
+
+        // Dispatch WebSocket Event
+        broadcast(new MessageSent($chatId, $data))->toOthers();
 
         // Handle Notifications
         $senderName = auth()->user()->name ?? auth()->user()->phone ?? 'Someone';
@@ -150,7 +169,7 @@ class ChatController extends Controller
                 $userIds = is_array($group['users']) ? $group['users'] : array_values($group['users']);
                 $receivers = \App\Models\User::whereIn('id', $userIds)
                     ->where('id', '!=', $senderId)
-                    ->whereNotNull('fcm_token')
+                    ->whereNotNull('fcm_token', 'and')
                     ->get();
 
                 $groupName = $group['name'] ?? 'Group';
@@ -186,7 +205,7 @@ class ChatController extends Controller
 
             if ($otherUserId) {
                 $receivers = \App\Models\User::where('id', $otherUserId)
-                    ->whereNotNull('fcm_token')
+                    ->whereNotNull('fcm_token', 'and')
                     ->get();
 
                 foreach ($receivers as $user) {
@@ -199,7 +218,11 @@ class ChatController extends Controller
                             'sender_id' => (string)$senderId,
                             'click_action' => 'FLUTTER_NOTIFICATION_CLICK'
                         ]);
-                    try { $messaging->send($message); } catch (\Exception $e) {}
+                    try { 
+                        $messaging->send($message); 
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('FCM Send Error: ' . $e->getMessage());
+                    }
                 }
             }
         }
@@ -296,11 +319,7 @@ class ChatController extends Controller
 
     public function updateLiveLocation(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $db = $factory->createDatabase();
+        $db = $this->db;
 
         $db->getReference("live_locations/user_" . auth()->id())->set([
             'lat' => $request->lat,
@@ -369,12 +388,8 @@ class ChatController extends Controller
 
     public function sendGroupNotification(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $db = $factory->createDatabase();
-        $messaging = $factory->createMessaging();
+        $db = $this->db;
+        $messaging = $this->messaging;
 
         $groupId = $request->group_id;
         $senderId = auth()->id();
@@ -392,7 +407,7 @@ class ChatController extends Controller
         // Fetch users who have FCM tokens
         $receivers = \App\Models\User::whereIn('id', $userIds)
             ->where('id', '!=', $senderId)
-            ->whereNotNull('fcm_token')
+            ->whereNotNull('fcm_token', 'and')
             ->get();
 
         $senderName = auth()->user()->name ?? auth()->user()->phone ?? 'Someone';
@@ -437,11 +452,7 @@ class ChatController extends Controller
     // ⚙️ Update Chat Settings (Mute, Lock, Fav, Disappearing)
     public function updateChatSettings(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $db = $factory->createDatabase();
+        $db = $this->db;
 
         $request->validate([
             'chat_id' => 'required',
@@ -449,7 +460,8 @@ class ChatController extends Controller
             'setting_value' => 'required'
         ]);
 
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
+        if (!$userId) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
 
         $db->getReference("chats/{$request->chat_id}/settings/{$userId}/{$request->setting_key}")
             ->set($request->setting_value);
@@ -457,21 +469,44 @@ class ChatController extends Controller
         return response()->json(['status' => true, 'message' => 'Settings updated successfully']);
     }
 
+    // Set Default Message Timer
+    public function setDefaultMessageTimer(Request $request, \App\Services\DisappearingMessageService $disappearingMessageService)
+    {
+        $request->validate([
+            'duration' => 'required|integer'
+        ]);
+
+        $userId = auth()->id();
+        $disappearingMessageService->setDefaultTimer($userId, $request->duration);
+
+        return response()->json(['status' => true, 'message' => 'Default message timer updated']);
+    }
+
+    // Set Disappearing Message Timer for a specific chat
+    public function setDisappearingMessageTimer(Request $request, \App\Services\DisappearingMessageService $disappearingMessageService)
+    {
+        $request->validate([
+            'chat_id' => 'required',
+            'duration' => 'required|integer'
+        ]);
+
+        $disappearingMessageService->setChatTimer((string)$request->chat_id, $request->duration);
+
+        return response()->json(['status' => true, 'message' => 'Disappearing message timer updated for this chat']);
+    }
+
     // 🚫 Block/Unblock User
     public function toggleBlockUser(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $db = $factory->createDatabase();
+        $db = $this->db;
 
         $request->validate([
             'blocked_user_id' => 'required',
             'action' => 'required|in:block,unblock'
         ]);
 
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
+        if (!$userId) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
 
         if ($request->action === 'block') {
             $db->getReference("users/{$userId}/blocked/{$request->blocked_user_id}")->set(true);
@@ -487,14 +522,11 @@ class ChatController extends Controller
     // 🧹 Clear Chat
     public function clearChat(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $db = $factory->createDatabase();
+        $db = $this->db;
 
         $request->validate(['chat_id' => 'required']);
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
+        if (!$userId) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
 
         $db->getReference("chats/{$request->chat_id}/settings/{$userId}/cleared_at")
             ->set(now()->timestamp);
@@ -505,14 +537,11 @@ class ChatController extends Controller
     // 🗑️ Delete Chat
     public function deleteChat(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $db = $factory->createDatabase();
+        $db = $this->db;
 
         $request->validate(['chat_id' => 'required']);
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
+        if (!$userId) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
 
         $db->getReference("chats/{$request->chat_id}/settings/{$userId}/deleted_at")
             ->set(now()->timestamp);
@@ -528,13 +557,10 @@ class ChatController extends Controller
             'reason' => 'required|string'
         ]);
 
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
+        $db = $this->db;
 
-        $db = $factory->createDatabase();
-
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
+        if (!$userId) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
         $reportId = 'report_' . time() . '_' . uniqid();
 
         $db->getReference("reports/{$reportId}")->set([
@@ -551,12 +577,10 @@ class ChatController extends Controller
     // 🔒 Get Hide Chat Settings (Password hash and Hidden Chats)
     public function getHideChatSettings(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-        $db = $factory->createDatabase();
+        $db = $this->db;
 
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
+        if (!$userId) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
         
         $settings = $db->getReference("users/{$userId}/hide_chat_settings")->getValue() ?: [
             'hidden_chats' => [],
@@ -564,13 +588,11 @@ class ChatController extends Controller
             'password_hash' => null
         ];
 
-        // Ensure both password and password_hash are populated
-        if (!isset($settings['password'])) {
-            $settings['password'] = $settings['password_hash'] ?? null;
+        // Ensure backward compatibility
+        if (isset($settings['password']) && !isset($settings['password_hash'])) {
+            $settings['password_hash'] = \Illuminate\Support\Facades\Hash::make($settings['password']);
         }
-        if (!isset($settings['password_hash'])) {
-            $settings['password_hash'] = $settings['password'] ?? null;
-        }
+        unset($settings['password']);
 
         return response()->json([
             'status' => true,
@@ -581,10 +603,7 @@ class ChatController extends Controller
     // 🔒 Save Hide Chat Settings
     public function saveHideChatSettings(Request $request)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-        $db = $factory->createDatabase();
+        $db = $this->db;
 
         $request->validate([
             'password' => 'nullable|string',
@@ -592,13 +611,14 @@ class ChatController extends Controller
             'hidden_chats' => 'nullable|array'
         ]);
 
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
+        if (!$userId) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
         
         $pwd = $request->input('password') ?? $request->input('password_hash');
+        $hashedPwd = $pwd ? \Illuminate\Support\Facades\Hash::make($pwd) : null;
 
         $settings = [
-            'password' => $pwd,
-            'password_hash' => $pwd,
+            'password_hash' => $hashedPwd,
             'hidden_chats' => $request->input('hidden_chats', [])
         ];
 

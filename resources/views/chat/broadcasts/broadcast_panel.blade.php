@@ -1286,7 +1286,7 @@
                                     class="text-[15px]" id="private_header_block_text">Block</span></button>
                             <div class="h-[1px] bg-[#313d45] my-1 mx-4"></div>
                             <button
-                                onclick="if(confirm('Clear this chat?')) { window.clearChatMessages(window.activeChatUser.id, 'user'); }; togglePrivateHeaderMoreMenu()"
+                                onclick="if(window.openDeleteModal) { window.openDeleteModal('Clear this chat?', () => { window.clearChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); }); } else { if(confirm('Clear this chat?')) { window.clearChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); } }"
                                 class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
                                     class="text-[15px]">Clear chat</span></button>
                             <button

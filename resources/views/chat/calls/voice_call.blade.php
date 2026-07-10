@@ -229,7 +229,8 @@
                         alt="User avatar">
                 </div>
             </div>
-            <h1 id="call_user_name" class="text-white text-[28px] font-semibold tracking-tight mb-2">{{ $name }}</h1>
+            <h1 id="call_user_name" class="text-white text-[28px] font-semibold tracking-tight mb-2">{{ $name }}
+            </h1>
             <div id="call_status" class="flex items-center gap-1.5">
                 <span id="call_status_text"
                     class="text-[#8696a0] text-[15px] font-normal">{{ $role === 'caller' ? 'Calling' : 'Connecting' }}</span>
@@ -322,13 +323,12 @@
                     class="w-full bg-[#202c33] border-none rounded-lg px-4 py-2 text-sm text-[#d1d7db] placeholder-[#8696a0] focus:ring-1 focus:ring-[#00a884] outline-none">
             </div>
             <div class="flex-1 overflow-y-auto" id="cp_list">
-                @foreach($users as $u)
+                @foreach ($users as $u)
                     <div class="cp-item flex items-center gap-3 px-5 py-3 hover:bg-[#202c33] cursor-pointer transition-colors"
                         data-name="{{ strtolower($u->name) }}"
                         onclick="selectContact({{ $u->id }}, '{{ addslashes($u->name) }}', '{!! $u->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=2a3942&color=fff' !!}')">
                         <div class="w-10 h-10 rounded-full overflow-hidden bg-[#2a3942] shrink-0"><img
-                                src="{!! $u->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=2a3942&color=fff' !!}"
-                                class="w-full h-full object-cover"></div>
+                                src="{!! $u->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=2a3942&color=fff' !!}" class="w-full h-full object-cover"></div>
                         <div class="flex-1 min-w-0">
                             <div class="text-[#e9edef] text-[15px] truncate">{{ $u->name }}</div>
                             <div class="text-[#8696a0] text-xs truncate">{{ $u->phone ?? '' }}</div>
@@ -340,17 +340,30 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, update, onValue, push, onChildAdded, remove, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import {
+            initializeApp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {
+            getDatabase,
+            ref,
+            set,
+            update,
+            onValue,
+            push,
+            onChildAdded,
+            remove,
+            get
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCTUuLg0mheURhlG1Z0p0DgMRwoAcR-F0w",
-            authDomain: "chat-app-a370c.firebaseapp.com",
-            databaseURL: "https://chat-app-a370c-default-rtdb.firebaseio.com",
-            projectId: "chat-app-a370c",
-            messagingSenderId: "1089034732064",
-            appId: "1:1016598612026:web:6cc4d1dd4466eec8934d03"
+            apiKey: "{{ env('FIREBASE_API_KEY') }}",
+            authDomain: "{{ env('FIREBASE_AUTH_DOMAIN') }}",
+            databaseURL: "{{ env('FIREBASE_DATABASE_URL') }}",
+            projectId: "{{ env('FIREBASE_PROJECT_ID') }}",
+            messagingSenderId: "{{ env('FIREBASE_MESSAGING_SENDER_ID') }}",
+            appId: "{{ env('FIREBASE_APP_ID') }}"
         };
+
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -368,12 +381,21 @@
         const CALL_TYPE = "voice";
 
         const iceServers = {
-            iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' },
-                { urls: 'stun:stun4.l.google.com:19302' }
+            iceServers: [{
+                    urls: 'stun:stun.l.google.com:19302'
+                },
+                {
+                    urls: 'stun:stun1.l.google.com:19302'
+                },
+                {
+                    urls: 'stun:stun2.l.google.com:19302'
+                },
+                {
+                    urls: 'stun:stun3.l.google.com:19302'
+                },
+                {
+                    urls: 'stun:stun4.l.google.com:19302'
+                }
             ]
         };
 
@@ -404,11 +426,16 @@
             const now = Math.floor(Date.now() / 1000);
             try {
                 await push(ref(db, `chats/${getChatId()}/messages`), {
-                    sender_id: MY_USER_ID, type: 'call', call_type: CALL_TYPE,
-                    call_status: callStatus, call_duration: duration || 0,
-                    text: '', time: now, status: 'sent'
+                    sender_id: MY_USER_ID,
+                    type: 'call',
+                    call_type: CALL_TYPE,
+                    call_status: callStatus,
+                    call_duration: duration || 0,
+                    text: '',
+                    time: now,
+                    status: 'sent'
                 });
-                
+
                 const logData = {
                     type: CALL_TYPE,
                     status: callStatus,
@@ -420,14 +447,26 @@
                     other_user_avatar: OTHER_AVATAR
                 };
                 await push(ref(db, `users/${MY_USER_ID}/call_logs`), logData);
-            } catch (e) { console.error('Call log error:', e); }
+            } catch (e) {
+                console.error('Call log error:', e);
+            }
         }
 
         // === INIT ===
         async function init() {
             try {
                 // Get microphone
-                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                try {
+                    localStream = await navigator.mediaDevices.getUserMedia({
+                        audio: true
+                    });
+                } catch (err) {
+                    console.error("Microphone access denied or error:", err);
+                    alert(
+                        "Microphone access is required for this call. Please check your browser permissions. If you are on mobile, make sure you are using HTTPS.");
+                    document.getElementById('call_status_text').textContent = 'Microphone access denied';
+                    return;
+                }
 
                 // Create peer connection
                 peerConnection = new RTCPeerConnection(iceServers);
@@ -440,7 +479,26 @@
                 // When remote audio arrives, play it
                 peerConnection.ontrack = (event) => {
                     const remoteAudio = document.getElementById('remote_audio');
-                    remoteAudio.srcObject = event.streams[0];
+                    if (event.streams && event.streams[0]) {
+                        if (remoteAudio.srcObject !== event.streams[0]) remoteAudio.srcObject = event.streams[0];
+                    } else {
+                        let stream = remoteAudio.srcObject || new MediaStream();
+                        if (stream.getTracks().indexOf(event.track) === -1) {
+                            stream.addTrack(event.track);
+                        }
+                        remoteAudio.srcObject = stream;
+                    }
+                    remoteAudio.muted = false;
+                    setTimeout(() => {
+                        remoteAudio.play().catch(err => {
+                            console.log('Autoplay blocked', err);
+                            document.body.addEventListener('click', () => {
+                                remoteAudio.play();
+                            }, {
+                                once: true
+                            });
+                        });
+                    }, 500);
                 };
 
                 // ICE connection state change
@@ -480,7 +538,10 @@
             };
 
             // Create offer
-            const offer = await peerConnection.createOffer();
+            const offer = await peerConnection.createOffer({
+                offerToReceiveAudio: true,
+                offerToReceiveVideo: false
+            });
             await peerConnection.setLocalDescription(offer);
 
             // Write call to Firebase
@@ -493,12 +554,17 @@
                 callee_avatar: OTHER_AVATAR,
                 type: CALL_TYPE,
                 status: 'calling',
-                offer: { type: offer.type, sdp: offer.sdp },
+                offer: {
+                    type: offer.type,
+                    sdp: offer.sdp
+                },
                 created_at: Date.now()
             });
 
             document.getElementById('call_status_text').textContent = 'Ringing';
-            try { document.getElementById('ringtone_audio').play().catch(() => { }); } catch (e) { }
+            try {
+                document.getElementById('ringtone_audio').play().catch(() => {});
+            } catch (e) {}
 
             // Listen for answer
             onValue(ref(db, `calls/${callId}/answer`), async (snapshot) => {
@@ -514,7 +580,9 @@
                 if (candidate) {
                     try {
                         await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-                    } catch (e) { console.warn('ICE add error:', e); }
+                    } catch (e) {
+                        console.warn('ICE add error:', e);
+                    }
                 }
             });
 
@@ -526,11 +594,14 @@
                         callEnded = true;
                         // Caller sends call log when callee ends
                         if (status === 'ended' && wasConnected) await sendCallLog('completed', callSeconds);
-                        document.getElementById('call_status_text').textContent = status === 'rejected' ? 'Call declined' : 'Call ended';
+                        document.getElementById('call_status_text').textContent = status === 'rejected' ?
+                            'Call declined' : 'Call ended';
                         document.getElementById('ringing_dots').classList.add('hidden');
                         document.getElementById('call_timer').classList.add('hidden');
                         cleanup();
-                        setTimeout(() => { window.location.href = '/chat'; }, 1500);
+                        setTimeout(() => {
+                            window.location.href = '/chat';
+                        }, 1500);
                     }
                 }
             });
@@ -555,12 +626,16 @@
             if (!callData || !callData.offer) {
                 document.getElementById('call_status_text').textContent = 'Call not found';
                 document.getElementById('ringing_dots').classList.add('hidden');
-                setTimeout(() => { window.location.href = '/chat'; }, 2000);
+                setTimeout(() => {
+                    window.location.href = '/chat';
+                }, 2000);
                 return;
             }
 
             // Update status
-            await update(ref(db, `calls/${callId}`), { status: 'connected' });
+            await update(ref(db, `calls/${callId}`), {
+                status: 'connected'
+            });
 
             // ICE candidates → Firebase
             peerConnection.onicecandidate = (event) => {
@@ -578,7 +653,10 @@
 
             // Write answer to Firebase
             await update(ref(db, `calls/${callId}`), {
-                answer: { type: answer.type, sdp: answer.sdp }
+                answer: {
+                    type: answer.type,
+                    sdp: answer.sdp
+                }
             });
 
             // Listen for caller's ICE candidates
@@ -587,7 +665,9 @@
                 if (candidate) {
                     try {
                         await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
-                    } catch (e) { console.warn('ICE add error:', e); }
+                    } catch (e) {
+                        console.warn('ICE add error:', e);
+                    }
                 }
             });
 
@@ -601,7 +681,9 @@
                         document.getElementById('ringing_dots').classList.add('hidden');
                         document.getElementById('call_timer').classList.add('hidden');
                         cleanup();
-                        setTimeout(() => { window.location.href = '/chat'; }, 1500);
+                        setTimeout(() => {
+                            window.location.href = '/chat';
+                        }, 1500);
                     }
                 }
             });
@@ -610,7 +692,9 @@
         // === CONNECTED ===
         function onCallConnected() {
             wasConnected = true;
-            try { document.getElementById('ringtone_audio').pause(); } catch (e) { }
+            try {
+                document.getElementById('ringtone_audio').pause();
+            } catch (e) {}
             document.getElementById('call_status_text').textContent = '';
             document.getElementById('ringing_dots').classList.add('hidden');
             document.getElementById('call_timer').classList.remove('hidden');
@@ -630,18 +714,32 @@
         // === CLEANUP ===
         function cleanup() {
             clearInterval(callTimer);
-            try { document.getElementById('ringtone_audio').pause(); } catch (e) { }
-            if (localStream) { localStream.getTracks().forEach(track => track.stop()); }
-            if (peerConnection) { peerConnection.close(); }
-            Object.values(extraPeers).forEach(pc => { try { pc.close(); } catch (e) { } });
+            try {
+                document.getElementById('ringtone_audio').pause();
+            } catch (e) {}
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (peerConnection) {
+                peerConnection.close();
+            }
+            Object.values(extraPeers).forEach(pc => {
+                try {
+                    pc.close();
+                } catch (e) {}
+            });
             extraPeers = {};
             if (groupId) {
-                try { update(ref(db, `group_calls/${groupId}/participants/${MY_USER_ID}`), { status: 'left' }); } catch (e) { }
+                try {
+                    update(ref(db, `group_calls/${groupId}/participants/${MY_USER_ID}`), {
+                        status: 'left'
+                    });
+                } catch (e) {}
             }
         }
 
         // === END CALL ===
-        window.endCall = async function () {
+        window.endCall = async function() {
             if (callEnded) return;
             callEnded = true;
 
@@ -659,17 +757,25 @@
 
             if (callId) {
                 try {
-                    await update(ref(db, `calls/${callId}`), { status: 'ended' });
-                    setTimeout(async () => { try { await remove(ref(db, `calls/${callId}`)); } catch (e) { } }, 3000);
-                } catch (e) { }
+                    await update(ref(db, `calls/${callId}`), {
+                        status: 'ended'
+                    });
+                    setTimeout(async () => {
+                        try {
+                            await remove(ref(db, `calls/${callId}`));
+                        } catch (e) {}
+                    }, 3000);
+                } catch (e) {}
             }
 
             cleanup();
-            setTimeout(() => { window.location.href = '/chat'; }, 1000);
+            setTimeout(() => {
+                window.location.href = '/chat';
+            }, 1000);
         };
 
         // === CONTROLS ===
-        window.toggleMute = function () {
+        window.toggleMute = function() {
             isMuted = !isMuted;
             if (localStream) {
                 localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
@@ -679,16 +785,33 @@
             document.getElementById('mute_btn').classList.toggle('active', isMuted);
         };
 
-        window.toggleSpeaker = function () {
+        window.toggleSpeaker = async function() {
             isSpeaker = !isSpeaker;
             document.getElementById('speaker_btn').classList.toggle('active', isSpeaker);
+
+            const remoteAudio = document.getElementById('remote_audio');
+            if (remoteAudio) {
+                remoteAudio.play().catch(() => {});
+                if (typeof remoteAudio.setSinkId === 'function') {
+                    try {
+                        const devices = await navigator.mediaDevices.enumerateDevices();
+                        const audioOutputs = devices.filter(d => d.kind === 'audiooutput');
+                        if (audioOutputs.length > 1) {
+                            const newSinkId = isSpeaker ? audioOutputs[1].deviceId : audioOutputs[0].deviceId;
+                            await remoteAudio.setSinkId(newSinkId);
+                        }
+                    } catch (e) {}
+                }
+            }
         };
 
         // Handle tab close / navigate away
         window.addEventListener('beforeunload', () => {
             if (!callEnded && callId) {
                 // Use sendBeacon pattern - update status
-                navigator.sendBeacon('/api/end-call', JSON.stringify({ call_id: callId }));
+                navigator.sendBeacon('/api/end-call', JSON.stringify({
+                    call_id: callId
+                }));
                 cleanup();
             }
         });
@@ -700,8 +823,32 @@
             localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
             pc.ontrack = (e) => {
                 let audio = document.getElementById('audio_' + remoteId);
-                if (!audio) { audio = document.createElement('audio'); audio.id = 'audio_' + remoteId; audio.autoplay = true; document.body.appendChild(audio); }
-                audio.srcObject = e.streams[0];
+                if (!audio) {
+                    audio = document.createElement('audio');
+                    audio.id = 'audio_' + remoteId;
+                    audio.autoplay = true;
+                    document.body.appendChild(audio);
+                }
+                if (e.streams && e.streams[0]) {
+                    if (audio.srcObject !== e.streams[0]) audio.srcObject = e.streams[0];
+                } else {
+                    let stream = audio.srcObject || new MediaStream();
+                    if (stream.getTracks().indexOf(e.track) === -1) {
+                        stream.addTrack(e.track);
+                    }
+                    audio.srcObject = stream;
+                }
+                audio.muted = false;
+                setTimeout(() => {
+                    audio.play().catch(err => {
+                        console.log('Autoplay blocked', err);
+                        document.body.addEventListener('click', () => {
+                            audio.play();
+                        }, {
+                            once: true
+                        });
+                    });
+                }, 500);
             };
             pc.oniceconnectionstatechange = () => {
                 if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
@@ -713,15 +860,24 @@
             const iAmInitiator = MY_USER_ID < remoteId;
 
             pc.onicecandidate = (e) => {
-                if (e.candidate) push(ref(db, `group_calls/${groupId}/signaling/${pairKey}/${MY_USER_ID}_candidates`), e.candidate.toJSON());
+                if (e.candidate) push(ref(db,
+                        `group_calls/${groupId}/signaling/${pairKey}/${MY_USER_ID}_candidates`), e.candidate
+                    .toJSON());
             };
 
             if (iAmInitiator) {
-                const offer = await pc.createOffer();
+                const offer = await pc.createOffer({
+                    offerToReceiveAudio: true,
+                    offerToReceiveVideo: false
+                });
                 await pc.setLocalDescription(offer);
-                await set(ref(db, `group_calls/${groupId}/signaling/${pairKey}/offer`), { type: offer.type, sdp: offer.sdp });
+                await set(ref(db, `group_calls/${groupId}/signaling/${pairKey}/offer`), {
+                    type: offer.type,
+                    sdp: offer.sdp
+                });
                 onValue(ref(db, `group_calls/${groupId}/signaling/${pairKey}/answer`), async (s) => {
-                    if (s.val() && pc.signalingState === 'have-local-offer') await pc.setRemoteDescription(new RTCSessionDescription(s.val()));
+                    if (s.val() && pc.signalingState === 'have-local-offer') await pc.setRemoteDescription(
+                        new RTCSessionDescription(s.val()));
                 });
             } else {
                 onValue(ref(db, `group_calls/${groupId}/signaling/${pairKey}/offer`), async (s) => {
@@ -729,11 +885,16 @@
                     await pc.setRemoteDescription(new RTCSessionDescription(s.val()));
                     const answer = await pc.createAnswer();
                     await pc.setLocalDescription(answer);
-                    await set(ref(db, `group_calls/${groupId}/signaling/${pairKey}/answer`), { type: answer.type, sdp: answer.sdp });
+                    await set(ref(db, `group_calls/${groupId}/signaling/${pairKey}/answer`), {
+                        type: answer.type,
+                        sdp: answer.sdp
+                    });
                 });
             }
             onChildAdded(ref(db, `group_calls/${groupId}/signaling/${pairKey}/${remoteId}_candidates`), async (s) => {
-                try { await pc.addIceCandidate(new RTCIceCandidate(s.val())); } catch (e) { }
+                try {
+                    await pc.addIceCandidate(new RTCIceCandidate(s.val()));
+                } catch (e) {}
             });
         }
 
@@ -749,11 +910,13 @@
             Object.entries(participantsData).forEach(([uid, p]) => {
                 // Use String comparison to avoid type issues
                 if (String(uid) === String(MY_USER_ID)) return;
-                
-                const statusText = p.status === 'connected' ? 'Connected' : (p.status === 'calling' ? 'Ringing...' : p.status);
+
+                const statusText = p.status === 'connected' ? 'Connected' : (p.status === 'calling' ? 'Ringing...' :
+                    p.status);
                 const statusClass = p.status === 'calling' ? 'calling' : '';
-                const avatarUrl = p.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=2a3942&color=fff&size=96`;
-                
+                const avatarUrl = p.avatar ||
+                    `https://ui-avatars.com/api/?name=${encodeURIComponent(p.name)}&background=2a3942&color=fff&size=96`;
+
                 const bubble = document.createElement('div');
                 bubble.className = 'participant-bubble';
                 bubble.id = 'pb_' + uid;
@@ -769,7 +932,7 @@
         function setupParticipantListener() {
             if (participantListenerSet || !groupId) return;
             participantListenerSet = true;
-            
+
             // Listen for new participants to create peer connections
             onChildAdded(ref(db, `group_calls/${groupId}/participants`), (snap) => {
                 const uid = parseInt(snap.key);
@@ -794,51 +957,92 @@
         // === Create/join group call ===
         async function ensureGroupCall() {
             if (!groupId) groupId = 'gc_' + callId;
-            const me = { name: MY_NAME, avatar: MY_AVATAR, status: 'connected' };
+            const me = {
+                name: MY_NAME,
+                avatar: MY_AVATAR,
+                status: 'connected'
+            };
             await set(ref(db, `group_calls/${groupId}/participants/${MY_USER_ID}`), me);
             if (otherUserId) {
-                await set(ref(db, `group_calls/${groupId}/participants/${otherUserId}`), { name: OTHER_NAME, avatar: OTHER_AVATAR, status: 'connected' });
+                await set(ref(db, `group_calls/${groupId}/participants/${otherUserId}`), {
+                    name: OTHER_NAME,
+                    avatar: OTHER_AVATAR,
+                    status: 'connected'
+                });
             }
             await set(ref(db, `group_calls/${groupId}/type`), CALL_TYPE);
             setupParticipantListener();
         }
 
         // === Add participant ===
-        window.selectContact = async function (userId, name, avatar) {
+        window.selectContact = async function(userId, name, avatar) {
             closeContactPicker();
             await ensureGroupCall();
-            await set(ref(db, `group_calls/${groupId}/participants/${userId}`), { name, avatar, status: 'calling' });
+            await set(ref(db, `group_calls/${groupId}/participants/${userId}`), {
+                name,
+                avatar,
+                status: 'calling'
+            });
             // Create call invitation
             const inviteId = `gc_${groupId}_${userId}`;
             const offer_pc = new RTCPeerConnection(iceServers);
             localStream.getTracks().forEach(t => offer_pc.addTrack(t, localStream));
             offer_pc.ontrack = (e) => {
                 let audio = document.getElementById('audio_' + userId);
-                if (!audio) { audio = document.createElement('audio'); audio.id = 'audio_' + userId; audio.autoplay = true; document.body.appendChild(audio); }
+                if (!audio) {
+                    audio = document.createElement('audio');
+                    audio.id = 'audio_' + userId;
+                    audio.autoplay = true;
+                    document.body.appendChild(audio);
+                }
                 audio.srcObject = e.streams[0];
+                setTimeout(() => {
+                    audio.play().catch(err => console.log('Autoplay blocked', err));
+                }, 500);
             };
             offer_pc.oniceconnectionstatechange = () => {
                 if (offer_pc.iceConnectionState === 'connected') {
-                    update(ref(db, `group_calls/${groupId}/participants/${userId}`), { status: 'connected' });
+                    update(ref(db, `group_calls/${groupId}/participants/${userId}`), {
+                        status: 'connected'
+                    });
                 }
             };
             extraPeers[userId] = offer_pc;
-            offer_pc.onicecandidate = (e) => { if (e.candidate) push(ref(db, `calls/${inviteId}/caller_candidates`), e.candidate.toJSON()); };
+            offer_pc.onicecandidate = (e) => {
+                if (e.candidate) push(ref(db, `calls/${inviteId}/caller_candidates`), e.candidate.toJSON());
+            };
             const offer = await offer_pc.createOffer();
             await offer_pc.setLocalDescription(offer);
             await set(ref(db, `calls/${inviteId}`), {
-                caller_id: MY_USER_ID, callee_id: userId, caller_name: MY_NAME, caller_avatar: MY_AVATAR,
-                callee_name: name, callee_avatar: avatar, type: CALL_TYPE, status: 'calling',
-                group_call_id: groupId, offer: { type: offer.type, sdp: offer.sdp }, created_at: Date.now()
+                caller_id: MY_USER_ID,
+                callee_id: userId,
+                caller_name: MY_NAME,
+                caller_avatar: MY_AVATAR,
+                callee_name: name,
+                callee_avatar: avatar,
+                type: CALL_TYPE,
+                status: 'calling',
+                group_call_id: groupId,
+                offer: {
+                    type: offer.type,
+                    sdp: offer.sdp
+                },
+                created_at: Date.now()
             });
             onValue(ref(db, `calls/${inviteId}/answer`), async (s) => {
-                if (s.val() && offer_pc.signalingState === 'have-local-offer') await offer_pc.setRemoteDescription(new RTCSessionDescription(s.val()));
+                if (s.val() && offer_pc.signalingState === 'have-local-offer') await offer_pc
+                    .setRemoteDescription(new RTCSessionDescription(s.val()));
             });
             onChildAdded(ref(db, `calls/${inviteId}/callee_candidates`), async (s) => {
-                try { await offer_pc.addIceCandidate(new RTCIceCandidate(s.val())); } catch (e) { }
+                try {
+                    await offer_pc.addIceCandidate(new RTCIceCandidate(s.val()));
+                } catch (e) {}
             });
             onValue(ref(db, `calls/${inviteId}/status`), (s) => {
-                if (s.val() === 'rejected') { delete extraPeers[userId]; offer_pc.close(); }
+                if (s.val() === 'rejected') {
+                    delete extraPeers[userId];
+                    offer_pc.close();
+                }
             });
             setupParticipantListener();
         };
@@ -846,17 +1050,25 @@
         // === If joining a group call as new participant ===
         // Join group call on connect if it exists
         const origOnConnected = onCallConnected;
-        onCallConnected = function () { 
-            origOnConnected(); 
-            ensureGroupCall(); 
+        onCallConnected = function() {
+            origOnConnected();
+            ensureGroupCall();
         };
 
         // Contact picker UI functions
-        window.openContactPicker = function () { document.getElementById('contact_picker').classList.remove('hidden'); };
-        window.closeContactPicker = function () { document.getElementById('contact_picker').classList.add('hidden'); document.getElementById('cp_search').value = ''; filterContacts(); };
-        window.filterContacts = function () {
+        window.openContactPicker = function() {
+            document.getElementById('contact_picker').classList.remove('hidden');
+        };
+        window.closeContactPicker = function() {
+            document.getElementById('contact_picker').classList.add('hidden');
+            document.getElementById('cp_search').value = '';
+            filterContacts();
+        };
+        window.filterContacts = function() {
             const q = document.getElementById('cp_search').value.toLowerCase();
-            document.querySelectorAll('.cp-item').forEach(el => { el.style.display = el.dataset.name.includes(q) ? '' : 'none'; });
+            document.querySelectorAll('.cp-item').forEach(el => {
+                el.style.display = el.dataset.name.includes(q) ? '' : 'none';
+            });
         };
 
         // Start!

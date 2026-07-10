@@ -440,18 +440,46 @@
 
         <script>
             window.applyGlobalWallpaper = function() {
-                const color = localStorage.getItem('whatsapp_wallpaper_color') || '#0b141a';
-                const doodles = localStorage.getItem('whatsapp_wallpaper_doodles') !== 'false';
+                const currentUserId = window.myUserId || 'default';
+                const color = localStorage.getItem(`whatsapp_wallpaper_color_${currentUserId}`) || '#0b141a';
+                const doodles = localStorage.getItem(`whatsapp_wallpaper_doodles_${currentUserId}`) !== 'false';
+                const globalImg = localStorage.getItem(`whatsapp_wallpaper_global_image_${currentUserId}`);
 
                 const bgElements = document.querySelectorAll('.chat-bg');
                 bgElements.forEach(el => {
-                    el.style.backgroundColor = color;
-                    if (doodles) {
-                        el.style.backgroundImage = "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')";
-                        el.style.backgroundBlendMode = "overlay";
-                        // Some colors are very dark, overlay blend mode with opacity looks best
-                    } else {
-                        el.style.backgroundImage = 'none';
+                    // Check if it's #messages or #group_messages and if they have custom wallpaper
+                    let hasCustom = false;
+                    if (el.id === 'messages' && window.activeChatUser && window.activeChatUser.id) {
+                        if (localStorage.getItem(`custom_wallpaper_${currentUserId}_user_${window.activeChatUser.id}`)) hasCustom = true;
+                    }
+                    if (el.id === 'group_messages' && window.currentGroupId) {
+                        if (localStorage.getItem(`custom_wallpaper_${currentUserId}_group_${window.currentGroupId}`)) hasCustom = true;
+                    }
+
+                    if (!hasCustom) {
+                        if (globalImg) {
+                            el.style.backgroundColor = 'transparent';
+                            el.style.backgroundImage = `url('${globalImg}')`;
+                            el.style.backgroundSize = 'cover';
+                            el.style.backgroundPosition = 'center';
+                            el.style.backgroundRepeat = 'no-repeat';
+                            el.style.backgroundBlendMode = 'normal';
+                        } else {
+                            el.style.backgroundColor = color;
+                            if (doodles) {
+                                el.style.backgroundImage = "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')";
+                                el.style.backgroundBlendMode = "overlay";
+                                el.style.backgroundSize = '';
+                                el.style.backgroundPosition = '';
+                                el.style.backgroundRepeat = '';
+                            } else {
+                                el.style.backgroundImage = 'none';
+                                el.style.backgroundSize = '';
+                                el.style.backgroundPosition = '';
+                                el.style.backgroundRepeat = '';
+                                el.style.backgroundBlendMode = '';
+                            }
+                        }
                     }
                 });
             };
@@ -472,6 +500,7 @@
             @include('chat.settings.edit_profile')
             @include('chat.settings.general')
             @include('chat.settings.privacy')
+            @include('chat.settings.disappearing_messages.default_timer')
             @include('chat.settings.privacy_panels.privacy_last_seen')
             @include('chat.settings.privacy_panels.privacy_profile_photo')
             @include('chat.settings.privacy_panels.privacy_about')
@@ -802,7 +831,7 @@
                                         </svg>
                                     </button>
                                     <div id="active_chat_avatar" onclick="openContactInfo()"
-                                        class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm overflow-hidden transition-transform hover:scale-105 cursor-pointer">
+                                        class="relative w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm transition-transform hover:scale-105 cursor-pointer">
                                         <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -981,9 +1010,12 @@
                                                 class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
                                                     class="text-[15px]" id="private_header_mute_text">Mute
                                                     notifications</span></button>
-                                            <button onclick="togglePrivateHeaderMoreMenu()"
+                                            <button onclick="window.openDisappearingMessagesSidebar(); togglePrivateHeaderMoreMenu()"
                                                 class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
                                                     class="text-[15px]">Disappearing messages</span></button>
+                                            <button onclick="window.openWallpaperModal(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu()"
+                                                class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
+                                                    class="text-[15px]">Chat wallpaper</span></button>
                                             <button
                                                 onclick="window.toggleLockChat(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu()"
                                                 class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
@@ -1011,7 +1043,7 @@
                                                         id="private_header_block_text">Block</span></span>
                                             </button>
                                             <button
-                                                onclick="if(confirm('Clear this chat?')) { window.clearChatMessages(window.activeChatUser.id, 'user'); }; togglePrivateHeaderMoreMenu()"
+                                                onclick="if(window.openDeleteModal) { window.openDeleteModal('Clear this chat?', () => { window.clearChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); }); } else { if(confirm('Clear this chat?')) { window.clearChatMessages(window.activeChatUser.id, 'user'); togglePrivateHeaderMoreMenu(); } }"
                                                 class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
                                                     class="text-[15px]">Clear chat</span></button>
                                             <button
@@ -1145,39 +1177,63 @@
                                 <!-- Emoji Picker Panel -->
                                 <div id="emoji_picker_container"
                                     class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px] sm:w-[350px]">
-                                    <!-- The actual picker (Uses system dark/light mode automatically) -->
-                                    <emoji-picker id="emoji_picker" class="w-full"
-                                        style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
+
+                                    <!-- Panels container -->
+                                    <div class="w-full relative" style="height: 320px;">
+                                        <!-- Emoji Panel (Uses system dark/light mode automatically) -->
+                                        <div id="panel_emoji" class="w-full h-full">
+                                            <emoji-picker id="emoji_picker" class="w-full"
+                                                style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
+                                        </div>
+
+                                        <!-- GIF Panel -->
+                                        <div id="panel_gif" class="w-full h-full hidden bg-white dark:bg-[#202c33] p-2 flex flex-col">
+                                            <div class="mb-2 shrink-0">
+                                                <input type="text" id="gif_search_input" placeholder="Search GIFs..." class="w-full bg-gray-100 dark:bg-[#2a3942] text-gray-800 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00a884] border-none text-sm placeholder-gray-500" onkeyup="if(event.key === 'Enter') searchGifs(this.value)">
+                                            </div>
+                                            <div id="gif_results" class="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-2 gap-1 p-1 content-start">
+                                                <!-- Populated by JS -->
+                                            </div>
+                                        </div>
+
+                                        <!-- Sticker Panel -->
+                                        <div id="panel_sticker" class="w-full h-full hidden bg-white dark:bg-[#202c33] p-2 flex flex-col">
+                                            <div class="mb-2 shrink-0">
+                                                <input type="text" id="sticker_search_input" placeholder="Search Stickers..." class="w-full bg-gray-100 dark:bg-[#2a3942] text-gray-800 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00a884] border-none text-sm placeholder-gray-500" onkeyup="if(event.key === 'Enter') searchStickers(this.value)">
+                                            </div>
+                                            <div id="sticker_results" class="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-4 gap-2 p-1 content-start">
+                                                <!-- Populated by JS -->
+                                            </div>
+                                        </div>
+                                    </div>
 
                                     <!-- Bottom Tabs Bar (WhatsApp Style) -->
                                     <div
                                         class="h-[50px] bg-gray-100 dark:bg-[#2a3942] border-t border-gray-200 dark:border-gray-700 flex items-center justify-center shrink-0">
-                                        <!-- Emoji Tab (Active) -->
-                                        <button
+                                        <!-- Emoji Tab -->
+                                        <button onclick="switchPickerTab('emoji')" id="tab_btn_emoji"
                                             class="flex-1 flex justify-center py-2 h-full items-center relative transition-colors bg-gray-200 dark:bg-[#384b57]">
                                             <svg viewBox="0 0 24 24" width="24" height="24"
                                                 class="text-gray-600 dark:text-gray-300" fill="currentColor">
-                                                <path
-                                                    d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
-                                                </path>
+                                                <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z"></path>
                                             </svg>
-                                            <div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
+                                            <div id="tab_indicator_emoji" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
                                         </button>
                                         <!-- GIF Tab -->
-                                        <button
-                                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                                        <button onclick="switchPickerTab('gif')" id="tab_btn_gif"
+                                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors relative">
                                             <span
                                                 class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
+                                            <div id="tab_indicator_gif" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884] hidden"></div>
                                         </button>
                                         <!-- Sticker Tab -->
-                                        <button
-                                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                                        <button onclick="switchPickerTab('sticker')" id="tab_btn_sticker"
+                                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors relative">
                                             <svg viewBox="0 0 24 24" width="24" height="24"
                                                 class="text-gray-500 dark:text-gray-400" fill="currentColor">
-                                                <path
-                                                    d="M14.5 3h-5C6.46 3 4 5.46 4 8.5v7C4 18.54 6.46 21 9.5 21h4l6-6v-6.5C19.5 5.46 17.04 3 14.5 3zm-2.5 16h-2.5C7.57 19 6 17.43 6 15.5v-7C6 6.57 7.57 5 9.5 5h5C16.43 5 18 6.57 18 8.5v5.09l-4.5 4.5V19h-1.5zM17 14h-2.5c-.83 0-1.5.67-1.5 1.5V18l4-4z">
-                                                </path>
+                                                <path d="M14.5 3h-5C6.46 3 4 5.46 4 8.5v7C4 18.54 6.46 21 9.5 21h4l6-6v-6.5C19.5 5.46 17.04 3 14.5 3zm-2.5 16h-2.5C7.57 19 6 17.43 6 15.5v-7C6 6.57 7.57 5 9.5 5h5C16.43 5 18 6.57 18 8.5v5.09l-4.5 4.5V19h-1.5zM17 14h-2.5c-.83 0-1.5.67-1.5 1.5V18l4-4z"></path>
                                             </svg>
+                                            <div id="tab_indicator_sticker" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884] hidden"></div>
                                         </button>
                                     </div>
                                 </div>
@@ -1597,6 +1653,163 @@
             if (favText && window.activeChatUser && window.favouriteChats) {
                 const isFav = window.favouriteChats.includes(`user_sidebar_${window.activeChatUser.id}`);
                 favText.textContent = isFav ? 'Remove from favourites' : 'Add to favourites';
+            }
+        };
+
+        window.switchPickerTab = function(tab) {
+            // Hide all panels
+            document.getElementById('panel_emoji').classList.add('hidden');
+            document.getElementById('panel_gif').classList.add('hidden');
+            document.getElementById('panel_sticker').classList.add('hidden');
+
+            // Reset tab styles
+            document.getElementById('tab_btn_emoji').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+            document.getElementById('tab_btn_gif').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+            document.getElementById('tab_btn_sticker').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+
+            document.getElementById('tab_indicator_emoji').classList.add('hidden');
+            document.getElementById('tab_indicator_gif').classList.add('hidden');
+            document.getElementById('tab_indicator_sticker').classList.add('hidden');
+
+            // Show selected panel
+            document.getElementById(`panel_${tab}`).classList.remove('hidden');
+            document.getElementById(`tab_btn_${tab}`).classList.add('bg-gray-200', 'dark:bg-[#384b57]');
+            document.getElementById(`tab_indicator_${tab}`).classList.remove('hidden');
+
+            if (tab === 'gif' && document.getElementById('gif_results').children.length === 0) {
+                window.loadTrendingGifs();
+            } else if (tab === 'sticker' && document.getElementById('sticker_results').children.length === 0) {
+                window.loadStickers();
+            }
+        };
+
+        window.GIPHY_API_KEY = '{{ env("GIPHY_API_KEY", "") }}';
+
+        window.loadTrendingGifs = async function() {
+            const gifResults = document.getElementById('gif_results');
+            if (!window.GIPHY_API_KEY) {
+                gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+                return;
+            }
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">Loading GIFs...</div>';
+            try {
+                const res = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${window.GIPHY_API_KEY}&limit=20`);
+                const data = await res.json();
+                window.renderGifs(data.data);
+            } catch (e) {
+                gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">Failed to load GIFs</div>';
+            }
+        };
+
+        window.searchGifs = async function(query) {
+            if (!query.trim()) return window.loadTrendingGifs();
+            const gifResults = document.getElementById('gif_results');
+            if (!window.GIPHY_API_KEY) {
+                gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+                return;
+            }
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">Searching...</div>';
+            try {
+                const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${window.GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=20`);
+                const data = await res.json();
+                window.renderGifs(data.data);
+            } catch (e) {
+                gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">Search failed</div>';
+            }
+        };
+
+        window.renderGifs = function(gifs) {
+            const gifResults = document.getElementById('gif_results');
+            gifResults.innerHTML = '';
+            if (!gifs || gifs.length === 0) {
+                gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">No GIFs found</div>';
+                return;
+            }
+            gifs.forEach(gif => {
+                const previewUrl = gif.images.fixed_height_small.url;
+                const sendUrl = gif.images.original.url;
+                const img = document.createElement('img');
+                img.src = previewUrl;
+                img.className = 'w-full h-[100px] object-cover rounded cursor-pointer hover:opacity-80 transition-opacity bg-gray-100 dark:bg-[#2a3942]';
+                img.onclick = () => window.sendMediaFromUrl(sendUrl, 'image/gif', 'animation.gif');
+                gifResults.appendChild(img);
+            });
+        };
+
+        window.loadStickers = async function() {
+            const stickerResults = document.getElementById('sticker_results');
+            if (!window.GIPHY_API_KEY) {
+                stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+                return;
+            }
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">Loading Stickers...</div>';
+            try {
+                const res = await fetch(`https://api.giphy.com/v1/stickers/trending?api_key=${window.GIPHY_API_KEY}&limit=20`);
+                const data = await res.json();
+                window.renderStickers(data.data);
+            } catch (e) {
+                stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">Failed to load Stickers. Network Error.</div>';
+                console.error(e);
+            }
+        };
+
+        window.searchStickers = async function(query) {
+            if (!query.trim()) return window.loadStickers();
+            const stickerResults = document.getElementById('sticker_results');
+            if (!window.GIPHY_API_KEY) {
+                stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+                return;
+            }
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">Searching...</div>';
+            try {
+                const res = await fetch(`https://api.giphy.com/v1/stickers/search?api_key=${window.GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=20`);
+                const data = await res.json();
+                window.renderStickers(data.data);
+            } catch (e) {
+                stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">Search failed. Network Error.</div>';
+                console.error(e);
+            }
+        };
+
+        window.renderStickers = function(stickers) {
+            const stickerResults = document.getElementById('sticker_results');
+            stickerResults.innerHTML = '';
+
+            if (!stickers || stickers.length === 0) {
+                stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">No stickers found</div>';
+                return;
+            }
+
+            stickers.forEach(sticker => {
+                const previewUrl = sticker.images.fixed_height_small.url;
+                const sendUrl = sticker.images.original.url;
+                const img = document.createElement('img');
+                img.src = previewUrl;
+                img.className = 'w-full h-[72px] object-contain cursor-pointer hover:scale-110 transition-transform p-1';
+                img.onclick = () => window.sendMediaFromUrl(sendUrl, 'image/gif', 'sticker.gif');
+                stickerResults.appendChild(img);
+            });
+        };
+
+        window.sendMediaFromUrl = async function(url, type, filename) {
+            // Show loading or close picker immediately
+            document.getElementById('emoji_picker_container').classList.add('hidden');
+
+            try {
+                // Fetch blob
+                const response = await fetch(url);
+                const blob = await response.blob(); 
+                const file = new File([blob], filename, { type: type });
+
+                // Pass to emitMessage
+                if (window.emitMessage) {
+                    window.emitMessage('', file);
+                } else {
+                    console.error('emitMessage function not found');
+                }
+            } catch (err) {
+                console.error('Error sending media:', err);
+                alert('Failed to send media. Network error.');
             }
         };
 
@@ -2459,7 +2672,7 @@
                         is_edited: true,
                         edited_at: Math.floor(Date.now() / 1000)
                     });
-                    
+
                     if (!isGroup) {
                         window.update(window.ref(window.db, `chats/${window.currentChatId}`), {
                             'last_message': msgText,
@@ -2670,7 +2883,7 @@
 
             document.getElementById('editing_to_block').classList.remove('hidden');
             document.getElementById('editing_to_text').textContent = text;
-            
+
             const textarea = document.getElementById('msg');
             textarea.value = text;
             textarea.focus();
@@ -3270,14 +3483,13 @@
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyCTUuLg0mheURhlG1Z0p0DgMRwoAcR-F0w",
-            authDomain: "chat-app-a370c.firebaseapp.com",
-            databaseURL: "https://chat-app-a370c-default-rtdb.firebaseio.com",
-            projectId: "chat-app-a370c",
-            storageBucket: "chat-app-a370c.appspot.com",
-            // IMPORTANT: Get these from Firebase Console -> Project Settings
-            messagingSenderId: "1089034732064",
-            appId: "1:1016598612026:web:6cc4d1dd4466eec8934d03"
+            apiKey: "{{ env('FIREBASE_API_KEY') }}",
+            authDomain: "{{ env('FIREBASE_AUTH_DOMAIN') }}",
+            databaseURL: "{{ env('FIREBASE_DATABASE_URL') }}",
+            projectId: "{{ env('FIREBASE_PROJECT_ID') }}",
+            storageBucket: "{{ env('FIREBASE_PROJECT_ID') }}.appspot.com",
+            messagingSenderId: "{{ env('FIREBASE_MESSAGING_SENDER_ID') }}",
+            appId: "{{ env('FIREBASE_APP_ID') }}"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -3324,6 +3536,74 @@
         window.isSelectionMode = false;
 
         window.usersPrivacyData = {};
+        window.chatDisappearingTimers = {};
+
+        window.updateDisappearingBadge = function(chatId, isDisappearing) {
+            try {
+                if (!chatId) return;
+
+                let sidebarWrapperId = '';
+                let headerWrapperId = '';
+
+                if (chatId.startsWith('group_')) {
+                    const cleanGroupId = chatId.replace('group_', '');
+                    sidebarWrapperId = `avatar_wrapper_group_${cleanGroupId}`;
+                    headerWrapperId = `active_group_chat_avatar`;
+                } else if (chatId.startsWith('chat_')) {
+                    const parts = chatId.replace('chat_', '').split('_');
+                    const otherUserId = parts.find(id => String(id) !== String(window.myUserId));
+                    if (!otherUserId) return;
+                    sidebarWrapperId = `avatar_wrapper_user_${otherUserId}`;
+                    headerWrapperId = `active_chat_avatar`;
+                } else {
+                    return;
+                }
+
+                const sidebarWrapper = document.getElementById(sidebarWrapperId);
+                if (sidebarWrapper) {
+                    const existing = sidebarWrapper.querySelector('.disappearing-badge');
+                    if (existing) existing.remove();
+
+                    if (isDisappearing) {
+                        const img = sidebarWrapper.querySelector('img');
+                        if (img) img.classList.add('rounded-full');
+
+                        const badge = document.createElement('div');
+                        badge.className = "disappearing-badge absolute -bottom-0.5 -right-0.5 w-[18px] h-[18px] bg-[#111b21] rounded-full flex items-center justify-center border border-[#111b21] z-10 shadow-md";
+                        badge.innerHTML = `
+                            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#8696a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="stroke-dasharray: 4 2;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                        `;
+                        sidebarWrapper.appendChild(badge);
+                    }
+                }
+
+                const headerWrapper = document.getElementById(headerWrapperId);
+                if (headerWrapper) {
+                    const existing = headerWrapper.querySelector('.disappearing-badge');
+                    if (existing) existing.remove();
+
+                    if (isDisappearing) {
+                        const img = headerWrapper.querySelector('img');
+                        if (img) img.classList.add('rounded-full');
+
+                        const badge = document.createElement('div');
+                        badge.className = "disappearing-badge absolute -bottom-1 -right-1 w-[16px] h-[16px] bg-[#202c33] rounded-full flex items-center justify-center border border-[#202c33] z-10 shadow-md";
+                        badge.innerHTML = `
+                            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#8696a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="stroke-dasharray: 4 2;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                        `;
+                        headerWrapper.appendChild(badge);
+                    }
+                }
+            } catch (err) {
+                console.error("Error in updateDisappearingBadge:", err);
+            }
+        };
 
         window.isAvatarVisible = function(otherUserId) {
             if (String(otherUserId) === String(window.myUserId)) {
@@ -3676,8 +3956,23 @@
                     window.applyAllAvatarsPrivacy();
                 }
             });
-
-
+            //////api to web wallpaper
+            // Global Wallpaper Listener for current user
+            const wallpaperRef = window.ref(window.db, `users/${window.myUserId}/settings/wallpaper`);
+            window.onValue(wallpaperRef, (snapshot) => {
+                const wallpaperData = snapshot.val();
+                if (wallpaperData) {
+                    if (wallpaperData.color) localStorage.setItem(`whatsapp_wallpaper_color_${window.myUserId}`, wallpaperData.color);
+                    if (wallpaperData.doodles !== undefined) localStorage.setItem(`whatsapp_wallpaper_doodles_${window.myUserId}`, wallpaperData.doodles);
+                    if (wallpaperData.global_image) {
+                        localStorage.setItem(`whatsapp_wallpaper_global_image_${window.myUserId}`, wallpaperData.global_image);
+                    } else if (wallpaperData.global_image === null) {
+                        localStorage.removeItem(`whatsapp_wallpaper_global_image_${window.myUserId}`);
+                    }
+                    if (window.applyGlobalWallpaper) window.applyGlobalWallpaper();
+                }
+            });
+            //////////
             // Global Delivered Listener (for all users in sidebar)
             const allUserIds = [
                 @foreach ($users ?? [] as $u)
@@ -3838,16 +4133,37 @@
                                 badge.classList.add('flex');
                             }
                         }
+                        // Show star icon if this message is already starred
+                        if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
+                            const sIcon = document.getElementById('star_icon_' + key);
+                            if (sIcon) sIcon.classList.remove('hidden');
+                            const btnText = document.getElementById('star_btn_text_' + key);
+                            if (btnText) btnText.textContent = 'Unstar';
+                        }
                     }
                 });
 
-                // Show star icon if this message is already starred
-                if (window.starredMsgKeys && window.starredMsgKeys.has(key)) {
-                    const sIcon = document.getElementById('star_icon_' + key);
-                    if (sIcon) sIcon.classList.remove('hidden');
-                    const btnText = document.getElementById('star_btn_text_' + key);
-                    if (btnText) btnText.textContent = 'Unstar';
-                }
+                // Listen for disappearing messages status for this chat
+                const timerRef = ref(db, `chats/${chatId}/disappearingTimer`);
+                onValue(timerRef, (snap) => {
+                    const duration = snap.val() || 0;
+                    window.chatDisappearingTimers = window.chatDisappearingTimers || {};
+                    window.chatDisappearingTimers[chatId] = duration;
+
+                    const isDisappearing = (duration > 0);
+                    window.updateDisappearingBadge(chatId, isDisappearing);
+
+                    if (window.currentChatId === chatId) {
+                        let val = 'Off';
+                        if (duration === 120) val = '2 minutes';
+                        else if (duration === 86400) val = '24 hours';
+                        else if (duration === 604800) val = '7 days';
+                        else if (duration === 7776000) val = '90 days';
+
+                        const label = document.getElementById('contact_disappearing_timer_label');
+                        if (label) label.innerText = val;
+                    }
+                });
             });
         }
 
@@ -4221,6 +4537,7 @@
             if (window.closeContactInfo) window.closeContactInfo();
             if (window.closeBroadcastInfo) window.closeBroadcastInfo();
             if (window.closeEditRecipients) window.closeEditRecipients();
+            if (window.closeDisappearingMessagesSidebar) window.closeDisappearingMessagesSidebar();
         };
 
         window.showChats = function() {
@@ -4640,6 +4957,13 @@
             window.activeChatUser = null;
             document.getElementById('chat_empty_state')?.classList.remove('hidden');
 
+            if (typeof window.closeContactInfo === 'function') {
+                window.closeContactInfo();
+            }
+            if (typeof window.closeDisappearingMessagesSidebar === 'function') {
+                window.closeDisappearingMessagesSidebar();
+            }
+
             if (typeof window.closeAllSearchPanels === 'function') {
                 window.closeAllSearchPanels();
             }
@@ -4720,7 +5044,7 @@
 
             // Show content, hide empty state
             document.getElementById('chat_empty_state')?.classList.add('hidden');
-            
+
             // Hide channels and others
             document.getElementById('channels_main_column')?.classList.add('hidden');
             document.getElementById('channels_main_column')?.classList.remove('flex');
@@ -4789,6 +5113,10 @@
                 avatar: activeAvatar,
                 about: safeAbout
             };
+            window.currentGroupId = null;
+
+            // Apply custom wallpaper
+            window.applyCustomWallpaper(otherUserId, 'user');
 
             if (window.updateContactInfoMediaSection) {
                 window.updateContactInfoMediaSection();
@@ -4797,7 +5125,7 @@
             document.getElementById('active_chat_title').textContent = activeName;
             document.getElementById('active_chat_subtitle').classList.add('hidden');
             document.getElementById('active_chat_avatar').innerHTML =
-                `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
+                `<img src="${activeAvatar}" class="w-full h-full object-cover rounded-full">`;
 
             // Update Call Dropdown
             document.getElementById('call_dropdown_name').textContent = activeName;
@@ -4811,6 +5139,19 @@
                 badge.classList.add('hidden');
                 badge.classList.remove('flex');
             }
+
+            // Apply disappearing messages badge if active
+            const currentDuration = window.chatDisappearingTimers?.[window.currentChatId] || 0;
+            window.updateDisappearingBadge(window.currentChatId, currentDuration > 0);
+
+            // Also update contact info label
+            let timerText = 'Off';
+            if (currentDuration === 120) timerText = '2 minutes';
+            else if (currentDuration === 86400) timerText = '24 hours';
+            else if (currentDuration === 604800) timerText = '7 days';
+            else if (currentDuration === 7776000) timerText = '90 days';
+            const label = document.getElementById('contact_disappearing_timer_label');
+            if (label) label.innerText = timerText;
 
             // Listen to other user's status
             const otherUserStatusRef = window.ref(window.db, `status/${otherUserId}`);
@@ -4871,9 +5212,20 @@
                 window._pinnedMsgsList = [];
                 window._currentPinIndex = 0;
 
+                const isGroup = window.currentChatId.startsWith('group_');
+                const targetId = isGroup ? window.currentChatId.replace('group_', '') : window.currentChatId
+                    .replace('chat_', '').split('_').find(id => id != window.myUserId);
+                const elementId = isGroup ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
+                const clearedTime = window.clearedChats?.[elementId] || 0;
+
                 if (pinnedData && typeof pinnedData === 'object') {
                     // Build sorted list (newest first)
                     for (const [key, val] of Object.entries(pinnedData)) {
+                        // Hide if chat was cleared after the message was pinned
+                        if (val.time && val.time <= clearedTime) {
+                            continue;
+                        }
+
                         window.pinnedMsgKeys.add(key);
                         window._pinnedMsgsList.push({
                             key,
@@ -4885,9 +5237,13 @@
 
                     if (pinBar && pinText && pinCount) {
                         const count = window._pinnedMsgsList.length;
-                        pinCount.textContent = count === 1 ? '1 pinned message' : `${count} pinned messages`;
-                        pinText.textContent = window._pinnedMsgsList[0].text;
-                        pinBar.classList.remove('hidden');
+                        if (count > 0) {
+                            pinCount.textContent = count === 1 ? '1 pinned message' : `${count} pinned messages`;
+                            pinText.textContent = window._pinnedMsgsList[0].text;
+                            pinBar.classList.remove('hidden');
+                        } else {
+                            pinBar.classList.add('hidden');
+                        }
                     }
                 } else {
                     if (pinBar) pinBar.classList.add('hidden');
@@ -4903,6 +5259,27 @@
 
             window.unsubscribeAdded = window.onChildAdded(messagesRef, (snapshot) => {
                 const data = snapshot.val();
+                const key = snapshot.key;
+
+                // Check if message is expired (disappearing messages)
+                if (data.is_disappearing && data.expires_at) {
+                    const currentTime = Date.now() / 1000;
+                    const remainingSeconds = data.expires_at - currentTime;
+                    if (remainingSeconds <= 0) {
+                        return; // Already expired
+                    } else {
+                        // Set timeout to delete message element from DOM when it expires
+                        // Max 32-bit int for setTimeout is 2147483647 ms (~24.8 days). 
+                        // If remaining time is greater, we don't set a timeout as the user will likely reload before then.
+                        const delayMs = remainingSeconds * 1000;
+                        if (delayMs <= 2147483647) {
+                            setTimeout(() => {
+                                const msgEl = document.getElementById('msg_' + key);
+                                if (msgEl) msgEl.remove();
+                            }, delayMs);
+                        }
+                    }
+                }
 
                 // Check if message is older than clear timestamp
                 const isGroup = window.currentChatId.startsWith('group_');
@@ -4923,8 +5300,39 @@
                 if (!isGroup && window.blockedUsers?.includes(elementId) && data.sender_id != window.myUserId) {
                     return;
                 }
+ 
+                // Render system messages (like disappearing timer updates)
+                if (data.type === 'system') {
+                    const dateHeader = window.getDateHeader(data.time);
+                    if (dateHeader !== lastDateString) {
+                        lastDateString = dateHeader;
+                        const headerHtml = `
+                            <div class="flex justify-center my-3 sticky top-0 z-[5]">
+                                <div class="bg-[#182229]/90 backdrop-blur-sm text-[#8696a0] text-[11px] px-3 py-1 rounded-lg shadow-sm font-medium uppercase tracking-wider border border-[#202c33]">
+                                    ${dateHeader}
+                                </div>
+                            </div>`;
+                        document.getElementById('messages').insertAdjacentHTML('beforeend', headerHtml);
+                    }
 
-                const key = snapshot.key;
+                    const msgHtml = `
+                        <div id="msg_${key}" class="flex justify-center my-3 relative select-none w-full">
+                            <div class="bg-[#182229]/90 backdrop-blur-sm text-[#8696a0] text-[12px] px-3.5 py-1.5 rounded-lg shadow-sm font-normal text-center max-w-[85%] border border-[#202c33] flex items-center justify-center gap-2">
+                                <svg class="w-3.5 h-3.5 text-[#8696a0] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                </svg>
+                                <span>${data.text}</span>
+                            </div>
+                        </div>`;
+                    document.getElementById('messages').insertAdjacentHTML('beforeend', msgHtml);
+
+                    const container = document.getElementById('messages_container') || document.getElementById('messages');
+                    if (container) {
+                        container.scrollTop = container.scrollHeight;
+                    }
+                    return;
+                }
+
                 window.globalMessages[key] = data; // store for reply/forward
 
                 // Date Header Logic
@@ -5295,11 +5703,11 @@
                         window.updateContactInfoMediaSection();
                     }
                 });
- 
+
                 window.unsubscribeChanged = window.onChildChanged(messagesRef, (snapshot) => {
                     const data = snapshot.val();
                     const key = snapshot.key;
- 
+
                     if (data && data.deleted_for && data.deleted_for[window.myUserId]) {
                         const msgEl = document.getElementById('msg_' + key);
                         if (msgEl) msgEl.remove();
@@ -5751,7 +6159,7 @@
             if (!window.isForwardingChannel && (!window.selectedMessages || window.selectedMessages.size === 0)) return;
 
             const messagesToForward = [];
-            
+
             if (window.isForwardingChannel) {
                 messagesToForward.push({
                     type: 'text',
@@ -5902,12 +6310,24 @@
 
         // === INCOMING CALL LISTENER ===
         const myCallsRef = ref(db, 'calls');
-        onChildAdded(myCallsRef, (snapshot) => {
+        onChildAdded(myCallsRef, async (snapshot) => {
             const callData = snapshot.val();
             const callKey = snapshot.key;
             if (!callData) return;
-            // Only show if I am the callee and call is in 'calling' state
-            if (callData.callee_id == window.myUserId && callData.status === 'calling') {
+
+            // ✅ FIX 1: Ignore calls older than 30 seconds (handles page refresh showing stale calls)
+            const callAge = Date.now() - (callData.created_at || 0);
+            if (callAge > 30000) return; // Older than 30 seconds → skip
+
+            // ✅ FIX 2: Re-read from Firebase to get the LATEST status (not cached snapshot)
+            let freshStatus = callData.status;
+            try {
+                const freshSnap = await get(ref(db, `calls/${callKey}/status`));
+                freshStatus = freshSnap.val();
+            } catch(e) {}
+
+            // Only show if I am the callee and call is STILL in 'calling' state RIGHT NOW
+            if (callData.callee_id == window.myUserId && freshStatus === 'calling') {
                 window.showIncomingCall(callKey, callData.caller_name, callData.caller_avatar || '', callData.type,
                     callData.group_call_id || null);
                 window._incomingCallerId = callData.caller_id;
@@ -6112,6 +6532,19 @@
                         window.cancelGroupReply();
                     } else if (typeof window.cancelReply === 'function') {
                         window.cancelReply();
+                    }
+
+                    // Hide pinned messages bars
+                    if (isGroup) {
+                        const pinBar = document.getElementById('group_pinned_bar');
+                        if (pinBar) pinBar.classList.add('hidden');
+                        window._groupPinnedMsgsList = [];
+                        if (window._groupPinnedMsgKeys) window._groupPinnedMsgKeys.clear();
+                    } else {
+                        const pinBar = document.getElementById('private_pinned_bar');
+                        if (pinBar) pinBar.classList.add('hidden');
+                        window._pinnedMsgsList = [];
+                        if (window.pinnedMsgKeys) window.pinnedMsgKeys.clear();
                     }
                 }
             }
@@ -7613,7 +8046,7 @@
             <div class="w-full flex justify-center pt-3 pb-2 sm:hidden">
                 <div class="w-10 h-1 rounded-full bg-gray-300"></div>
             </div>
-            
+
             <!-- Close Button (Desktop) -->
             <div class="absolute top-4 right-4 hidden sm:block">
                 <button onclick="window.closeAdminInviteModal()" class="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none">
@@ -7715,8 +8148,10 @@
             </div>
         </div>
     </div>
+    @include('chat.modals.chat_wallpaper_modal')
+    @include('chat.settings.disappearing_messages.index')
     @include('chat.channels.channels_scripts')
-    
+
     <script>
         window.addEventListener('load', function() {
             const path = window.location.pathname;

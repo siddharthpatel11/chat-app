@@ -6,6 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Contact;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Requests\Api\ForwardMessageRequest;
+use App\Http\Requests\Api\DeleteMessagesRequest;
+use App\Http\Requests\Api\SaveTokenRequest;
+use App\Http\Requests\Api\CreateChatRequest;
+use App\Http\Requests\Api\SendMessageRequest;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Kreait\Firebase\Factory;
@@ -14,21 +19,19 @@ use Kreait\Firebase\Messaging\Notification;
 
 class ChatApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
     protected $db;
 
     protected $messaging;
 
     public function __construct()
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $this->db = $factory->createDatabase();
-        $this->messaging = $factory->createMessaging();
+        $firebaseService = app(\App\Services\FirebaseService::class);
+        $this->db = $firebaseService->database();
+        $this->messaging = $firebaseService->messaging();
     }
 
-    public function send(Request $request)
+    public function send(SendMessageRequest $request)
     {
         $chatId = $request->chat_id;
         $senderId = $request->sender_id ?? 1;
@@ -56,6 +59,10 @@ class ChatApiController extends Controller
             $fileName = $file->getClientOriginalName();
             $path = $file->store('uploads', 'public');
             $fileUrl = url('storage/'.$path);
+        } elseif ($request->has('file_url')) {
+            $fileUrl = $request->file_url;
+            $fileName = $request->file_name;
+            $type = $request->type ?? 'image';
         }
 
         // 📍 Location support
@@ -111,8 +118,16 @@ class ChatApiController extends Controller
             $data['group_call_id'] = $request->group_call_id;
         }
 
+        // Attach disappearing messages data
+        $disappearingMessageService = app(\App\Services\DisappearingMessageService::class);
+        $isExpiring = $disappearingMessageService->attachExpirationData($chatId, $senderId, $data);
+
         // Push to Realtime Database
-        $this->db->getReference("chats/$chatId/messages")->push($data);
+        $msgRef = $this->db->getReference("chats/$chatId/messages")->push($data);
+
+        if ($isExpiring) {
+            $disappearingMessageService->logExpiringMessage($chatId, $msgRef->getKey(), $data['expires_at']);
+        }
 
         // Update chat metadata with last message info
         $this->db->getReference("chats/$chatId")->update([
@@ -149,7 +164,7 @@ class ChatApiController extends Controller
         // Send FCM Notification to all other users in system with a token
         // In a real app, you'd filter by users in this specific chat
         $receivers = User::where('id', '!=', $senderId)
-            ->whereNotNull('fcm_token')
+            ->whereNotNull('fcm_token', 'and')
             ->get();
 
         foreach ($receivers as $user) {
@@ -172,7 +187,7 @@ class ChatApiController extends Controller
     }
 
     // Save FCM Token via API
-    public function saveToken(Request $request)
+    public function saveToken(SaveTokenRequest $request)
     {
         $request->validate([
             'user_id' => 'required',
@@ -206,6 +221,10 @@ class ChatApiController extends Controller
                 }
                 // Filter by deleted_for
                 if (isset($msg['deleted_for']) && is_array($msg['deleted_for']) && isset($msg['deleted_for'][$userId])) {
+                    continue;
+                }
+                // Filter by expires_at (disappearing messages)
+                if (isset($msg['is_disappearing']) && $msg['is_disappearing'] && isset($msg['expires_at']) && microtime(true) > $msg['expires_at']) {
                     continue;
                 }
                 $filteredMessages[$msgId] = $msg;
@@ -269,7 +288,7 @@ class ChatApiController extends Controller
     }
 
     // Create chat
-    public function createChat(Request $request)
+    public function createChat(CreateChatRequest $request)
     {
         $users = $request->users;
 
@@ -403,7 +422,7 @@ class ChatApiController extends Controller
             });
         }
 
-        $users = $query->get();
+        $users = $query->take(100)->get();
 
         return response()->json([
             'status' => true,
@@ -430,6 +449,7 @@ class ChatApiController extends Controller
                 $q->where('name', 'LIKE', "%{$query}%")
                     ->orWhere('phone', 'LIKE', "%{$query}%");
             })
+            ->take(100)
             ->get();
 
         // 2. Search Messages in Firebase
@@ -861,7 +881,7 @@ class ChatApiController extends Controller
         return response()->json(['status' => true, 'message' => 'Report submitted successfully']);
     }
 
-    public function deleteMessages(Request $request)
+    public function deleteMessages(DeleteMessagesRequest $request)
     {
         $userId = auth()->id() ?? $request->user_id;
         $messages = $request->input('messages', []);
@@ -1008,7 +1028,7 @@ class ChatApiController extends Controller
         }
     }
 
-    public function forwardMessages(Request $request)
+    public function forwardMessages(ForwardMessageRequest $request)
     {
         $userId = auth()->id() ?? $request->user_id;
         $messages = $request->input('messages', []);
@@ -1121,6 +1141,68 @@ class ChatApiController extends Controller
             'status' => true,
             'message' => 'Hide Chat settings updated successfully'
         ]);
+    }
+
+    public function trendingGifs(Request $request)
+    {
+        $limit = $request->query('limit', 20);
+        $key = env('TENOR_API_KEY', 'LIVDSRZULELA');
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::get("https://g.tenor.com/v1/trending?key={$key}&limit={$limit}");
+            return response()->json(['status' => true, 'data' => $response->json()['results'] ?? []]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Failed to fetch GIFs'], 500);
+        }
+    }
+
+    public function searchGifs(Request $request)
+    {
+        $query = $request->query('q', '');
+        if (empty(trim($query))) {
+            return $this->trendingGifs($request);
+        }
+
+        $limit = $request->query('limit', 20);
+        $key = env('TENOR_API_KEY', 'LIVDSRZULELA');
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::get("https://g.tenor.com/v1/search?q=" . urlencode($query) . "&key={$key}&limit={$limit}");
+            return response()->json(['status' => true, 'data' => $response->json()['results'] ?? []]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Failed to search GIFs'], 500);
+        }
+    }
+
+    public function trendingStickers(Request $request)
+    {
+        $limit = $request->query('limit', 20);
+        $key = env('TENOR_API_KEY', 'LIVDSRZULELA');
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::get("https://g.tenor.com/v1/search?q=sticker&key={$key}&limit={$limit}");
+            return response()->json(['status' => true, 'data' => $response->json()['results'] ?? []]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Failed to fetch stickers'], 500);
+        }
+    }
+
+    public function searchStickers(Request $request)
+    {
+        $query = $request->query('q', '');
+        if (empty(trim($query))) {
+            return $this->trendingStickers($request);
+        }
+
+        $limit = $request->query('limit', 20);
+        $key = env('TENOR_API_KEY', 'LIVDSRZULELA');
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::get("https://g.tenor.com/v1/search?q=" . urlencode($query . ' sticker') . "&key={$key}&limit={$limit}");
+            return response()->json(['status' => true, 'data' => $response->json()['results'] ?? []]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => 'Failed to search stickers'], 500);
+        }
     }
 }
 

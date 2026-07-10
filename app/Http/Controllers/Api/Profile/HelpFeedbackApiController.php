@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Cache;
 
 class HelpFeedbackApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
+
     /**
      * Get Help Links
      */
@@ -25,11 +27,9 @@ class HelpFeedbackApiController extends Controller
             'app_version' => '1.0.0-stable',
         ];
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Help information retrieved successfully.',
-            'data' => $helpInfo
-        ]);
+            'data' => $helpInfo], 'Success', 200);
     }
 
     /**
@@ -58,13 +58,11 @@ class HelpFeedbackApiController extends Controller
         $feedbackHistory[] = $newFeedback;
         Cache::put("user_feedback_{$userId}", $feedbackHistory);
 
-        return response()->json([
-            'success' => true,
+        return $this->successResponse(['success' => true,
             'message' => 'Feedback submitted successfully.',
             'data' => [
                 'user_id' => (int) $userId,
                 'feedback' => $newFeedback
-            ]
-        ]);
+            ]], 'Success', 200);
     }
 }

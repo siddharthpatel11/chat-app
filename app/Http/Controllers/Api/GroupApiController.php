@@ -12,11 +12,8 @@ class GroupApiController extends Controller
 
     public function __construct()
     {
-        $factory = (new Factory)
-            ->withServiceAccount(storage_path('app/firebase.json'))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $this->db = $factory->createDatabase();
+        $firebaseService = app(\App\Services\FirebaseService::class);
+        $this->db = $firebaseService->database();
     }
 
     // 1. Create Group
@@ -322,8 +319,16 @@ class GroupApiController extends Controller
             'status' => 'sent',
         ];
 
+        // Attach disappearing messages data
+        $disappearingMessageService = app(\App\Services\DisappearingMessageService::class);
+        $isExpiring = $disappearingMessageService->attachExpirationData($groupId, $senderId, $data);
+
         // Push to Realtime Database
-        $this->db->getReference("groups/$groupId/messages")->push($data);
+        $msgRef = $this->db->getReference("groups/$groupId/messages")->push($data);
+
+        if ($isExpiring) {
+            $disappearingMessageService->logExpiringMessage($groupId, $msgRef->getKey(), $data['expires_at']);
+        }
 
         // Update chat metadata with last message info
         $this->db->getReference("groups/$groupId")->update([
@@ -346,12 +351,11 @@ class GroupApiController extends Controller
 
         if (!empty($receiversList)) {
             $receivers = \App\Models\User::whereIn('id', $receiversList)
-                ->whereNotNull('fcm_token')
+                ->whereNotNull('fcm_token', 'and')
                 ->get();
 
-            $messaging = (new Factory)
-                ->withServiceAccount(storage_path('app/firebase.json'))
-                ->createMessaging();
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $messaging = $firebaseService->messaging();
 
             $groupName = $groupData['name'] ?? 'Group';
 
@@ -415,10 +419,9 @@ class GroupApiController extends Controller
         });
 
         if (!empty($receiversList)) {
-            $receivers = \App\Models\User::whereIn('id', $receiversList)->whereNotNull('fcm_token')->get();
-            $messaging = (new Factory)
-                ->withServiceAccount(storage_path('app/firebase.json'))
-                ->createMessaging();
+            $receivers = \App\Models\User::whereIn('id', $receiversList)->whereNotNull('fcm_token', 'and')->get();
+            $firebaseService = app(\App\Services\FirebaseService::class);
+            $messaging = $firebaseService->messaging();
 
             $groupName = $groupData['name'] ?? 'Group';
 
@@ -484,6 +487,10 @@ class GroupApiController extends Controller
                 }
                 // Filter by deleted_for
                 if (isset($msg['deleted_for']) && is_array($msg['deleted_for']) && isset($msg['deleted_for'][$userId])) {
+                    continue;
+                }
+                // Filter by expires_at (disappearing messages)
+                if (isset($msg['is_disappearing']) && $msg['is_disappearing'] && isset($msg['expires_at']) && microtime(true) > $msg['expires_at']) {
                     continue;
                 }
                 $filteredMessages[$msgId] = $msg;

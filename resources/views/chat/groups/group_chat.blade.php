@@ -37,7 +37,7 @@
                         </svg>
                     </button>
                     <div id="active_group_chat_avatar" onclick="window.handleGroupHeaderClick()"
-                        class="w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm overflow-hidden transition-transform hover:scale-105 cursor-pointer shrink-0">
+                        class="relative w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm transition-transform hover:scale-105 cursor-pointer shrink-0">
                         <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -45,10 +45,17 @@
                     </div>
                     <div onclick="window.handleGroupHeaderClick()"  
                         class="cursor-pointer min-w-0 flex flex-col justify-center">
-                        <h2 id="active_group_chat_title"
-                            class="text-[15.5px] font-semibold text-[#e9edef] leading-tight truncate">Select a group
-                            chat
-                        </h2>
+                        <div class="flex items-center">
+                            <h2 id="active_group_chat_title"
+                                class="text-[15.5px] font-semibold text-[#e9edef] leading-tight truncate">Select a group chat
+                            </h2>
+                            <div id="group_header_mute_icon" class="hidden ml-1.5 text-[#8696a0]">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M18 8a6 6 0 0 0-9.33-5"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"></line>
+                                </svg>
+                            </div>
+                        </div>
                         <p id="active_group_chat_subtitle" class="text-xs text-[#8696a0] font-medium mt-0.5 truncate">
                             Group
                             chat</p>
@@ -439,15 +446,40 @@
                 <!-- Emoji Picker Panel (Toggled with button) -->
                 <div id="group_emoji_picker_container"
                     class="hidden absolute bottom-full mb-3 left-0 sm:left-4 z-50 shadow-2xl origin-bottom-left rounded-[16px] overflow-hidden flex flex-col bg-white dark:bg-[#202c33] border border-gray-200 dark:border-gray-700 w-[320px] sm:w-[350px]">
-                    <!-- The actual picker (Uses system dark/light mode automatically) -->
-                    <emoji-picker id="group_emoji_picker" class="w-full"
-                        style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
+                    
+                    <div class="w-full relative" style="height: 320px;">
+                        <!-- The actual picker (Uses system dark/light mode automatically) -->
+                        <div id="group_panel_emoji" class="w-full h-full">
+                        <emoji-picker id="group_emoji_picker" class="w-full"
+                            style="--num-columns: 8; --emoji-size: 1.5rem; --indicator-color: #00a884; height: 320px; border: none;"></emoji-picker>
+                    </div>
+
+                    <!-- GIF Panel -->
+                        <div id="group_panel_gif" class="w-full h-full hidden bg-white dark:bg-[#202c33] p-2 flex flex-col">
+                        <div class="mb-2 shrink-0">
+                            <input type="text" id="group_gif_search_input" placeholder="Search GIFs..." class="w-full bg-gray-100 dark:bg-[#2a3942] text-gray-800 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00a884] border-none text-sm placeholder-gray-500" onkeyup="if(event.key === 'Enter') searchGroupGifs(this.value)">
+                        </div>
+                        <div id="group_gif_results" class="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-2 gap-1 p-1 content-start">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Sticker Panel -->
+                        <div id="group_panel_sticker" class="w-full h-full hidden bg-white dark:bg-[#202c33] p-2 flex flex-col">
+                        <div class="mb-2 shrink-0">
+                            <input type="text" id="group_sticker_search_input" placeholder="Search Stickers..." class="w-full bg-gray-100 dark:bg-[#2a3942] text-gray-800 dark:text-white rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00a884] border-none text-sm placeholder-gray-500" onkeyup="if(event.key === 'Enter') searchGroupStickers(this.value)">
+                        </div>
+                        <div id="group_sticker_results" class="flex-1 overflow-y-auto custom-scrollbar grid grid-cols-4 gap-2 p-1 content-start">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    </div> <!-- Close w-full relative h-[320px] -->
 
                     <!-- Bottom Tabs Bar (WhatsApp Style) -->
                     <div
                         class="h-[50px] bg-gray-100 dark:bg-[#2a3942] border-t border-gray-200 dark:border-gray-700 flex items-center justify-center shrink-0">
                         <!-- Emoji Tab (Active) -->
-                        <button
+                        <button onclick="switchGroupPickerTab('emoji')" id="group_tab_btn_emoji"
                             class="flex-1 flex justify-center py-2 h-full items-center relative transition-colors bg-gray-200 dark:bg-[#384b57]">
                             <svg viewBox="0 0 24 24" width="24" height="24"
                                 class="text-gray-600 dark:text-gray-300" fill="currentColor">
@@ -455,22 +487,24 @@
                                     d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
                                 </path>
                             </svg>
-                            <div class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
+                            <div id="group_tab_indicator_emoji" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884]"></div>
                         </button>
                         <!-- GIF Tab -->
-                        <button
-                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                        <button onclick="switchGroupPickerTab('gif')" id="group_tab_btn_gif"
+                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors relative">
                             <span class="font-bold text-gray-500 dark:text-gray-400 text-[15px]">GIF</span>
+                            <div id="group_tab_indicator_gif" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884] hidden"></div>
                         </button>
                         <!-- Sticker Tab -->
-                        <button
-                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors">
+                        <button onclick="switchGroupPickerTab('sticker')" id="group_tab_btn_sticker"
+                            class="flex-1 flex justify-center py-2 h-full items-center hover:bg-gray-200 dark:hover:bg-[#384b57] transition-colors relative">
                             <svg viewBox="0 0 24 24" width="24" height="24"
                                 class="text-gray-500 dark:text-gray-400" fill="currentColor">
                                 <path
                                     d="M14.5 3h-5C6.46 3 4 5.46 4 8.5v7C4 18.54 6.46 21 9.5 21h4l6-6v-6.5C19.5 5.46 17.04 3 14.5 3zm-2.5 16h-2.5C7.57 19 6 17.43 6 15.5v-7C6 6.57 7.57 5 9.5 5h5C16.43 5 18 6.57 18 8.5v5.09l-4.5 4.5V19h-1.5zM17 14h-2.5c-.83 0-1.5.67-1.5 1.5V18l4-4z">
                                 </path>
                             </svg>
+                            <div id="group_tab_indicator_sticker" class="absolute bottom-0 left-0 w-full h-[3px] bg-[#00a884] hidden"></div>
                         </button>
                     </div>
                 </div>
@@ -878,6 +912,16 @@
                             <div class="text-[#e9edef] text-[16px] mb-0.5">Encryption</div>
                             <div class="text-[#8696a0] text-[14px] leading-snug">Messages are end-to-end encrypted.
                                 Click to learn more.</div>
+                        </div>
+                    </div>
+                    <div class="h-[1px] bg-[#202c33] ml-[54px]"></div>
+                    <div class="p-4 py-4 hover:bg-[#202c33] cursor-pointer transition-colors flex items-start gap-4" onclick="window.openDisappearingMessagesSidebar()">
+                        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8696a0] shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <div class="w-full flex justify-between items-center">
+                            <div>
+                                <div class="text-[#e9edef] text-[16px] mb-0.5">Disappearing messages</div>
+                                <div class="text-[#8696a0] text-[14px]" id="group_disappearing_timer_label">Off</div>
+                            </div>
                         </div>
                     </div>
                     <div class="h-[1px] bg-[#202c33] ml-[54px]"></div>
@@ -1414,6 +1458,161 @@
             }
         });
     }
+
+    window.switchGroupPickerTab = function(tab) {
+        document.getElementById('group_panel_emoji').classList.add('hidden');
+        document.getElementById('group_panel_gif').classList.add('hidden');
+        document.getElementById('group_panel_sticker').classList.add('hidden');
+        
+        document.getElementById('group_tab_btn_emoji').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+        document.getElementById('group_tab_btn_gif').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+        document.getElementById('group_tab_btn_sticker').classList.remove('bg-gray-200', 'dark:bg-[#384b57]');
+        
+        document.getElementById('group_tab_indicator_emoji').classList.add('hidden');
+        document.getElementById('group_tab_indicator_gif').classList.add('hidden');
+        document.getElementById('group_tab_indicator_sticker').classList.add('hidden');
+
+        document.getElementById(`group_panel_${tab}`).classList.remove('hidden');
+        document.getElementById(`group_tab_btn_${tab}`).classList.add('bg-gray-200', 'dark:bg-[#384b57]');
+        document.getElementById(`group_tab_indicator_${tab}`).classList.remove('hidden');
+
+        if (tab === 'gif' && document.getElementById('group_gif_results').children.length === 0) {
+            window.loadGroupTrendingGifs();
+        } else if (tab === 'sticker' && document.getElementById('group_sticker_results').children.length === 0) {
+            window.loadGroupStickers();
+        }
+    };
+
+    window.GIPHY_API_KEY = '{{ env("GIPHY_API_KEY", "") }}';
+
+    window.loadGroupTrendingGifs = async function() {
+        const gifResults = document.getElementById('group_gif_results');
+        if (!window.GIPHY_API_KEY) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+            return;
+        }
+        gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">Loading GIFs...</div>';
+        try {
+            const res = await fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${window.GIPHY_API_KEY}&limit=20`);
+            const data = await res.json();
+            window.renderGroupGifs(data.data);
+        } catch (e) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">Failed to load GIFs</div>';
+        }
+    };
+
+    window.searchGroupGifs = async function(query) {
+        if (!query.trim()) return window.loadGroupTrendingGifs();
+        const gifResults = document.getElementById('group_gif_results');
+        if (!window.GIPHY_API_KEY) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+            return;
+        }
+        gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">Searching...</div>';
+        try {
+            const res = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${window.GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=20`);
+            const data = await res.json();
+            window.renderGroupGifs(data.data);
+        } catch (e) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-red-500 text-sm py-4">Search failed</div>';
+        }
+    };
+
+    window.renderGroupGifs = function(gifs) {
+        const gifResults = document.getElementById('group_gif_results');
+        gifResults.innerHTML = '';
+        if (!gifs || gifs.length === 0) {
+            gifResults.innerHTML = '<div class="col-span-2 text-center text-gray-500 text-sm py-4">No GIFs found</div>';
+            return;
+        }
+        gifs.forEach(gif => {
+            const previewUrl = gif.images.fixed_height_small.url;
+            const sendUrl = gif.images.original.url;
+            const img = document.createElement('img');
+            img.src = previewUrl;
+            img.className = 'w-full h-[100px] object-cover rounded cursor-pointer hover:opacity-80 transition-opacity bg-gray-100 dark:bg-[#2a3942]';
+            img.onclick = () => window.sendGroupMediaFromUrl(sendUrl, 'image/gif', 'animation.gif');
+            gifResults.appendChild(img);
+        });
+    };
+
+    window.loadGroupStickers = async function() {
+        const stickerResults = document.getElementById('group_sticker_results');
+        if (!window.GIPHY_API_KEY) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+            return;
+        }
+        stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">Loading Stickers...</div>';
+        try {
+            const res = await fetch(`https://api.giphy.com/v1/stickers/trending?api_key=${window.GIPHY_API_KEY}&limit=20`);
+            const data = await res.json();
+            window.renderGroupStickers(data.data);
+        } catch (e) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">Failed to load Stickers</div>';
+        }
+    };
+
+    window.searchGroupStickers = async function(query) {
+        if (!query.trim()) return window.loadGroupStickers();
+        const stickerResults = document.getElementById('group_sticker_results');
+        if (!window.GIPHY_API_KEY) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">GIPHY API Key missing.<br>Please add GIPHY_API_KEY to your .env file.</div>';
+            return;
+        }
+        stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">Searching...</div>';
+        try {
+            const res = await fetch(`https://api.giphy.com/v1/stickers/search?api_key=${window.GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=20`);
+            const data = await res.json();
+            window.renderGroupStickers(data.data);
+        } catch (e) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-red-500 text-sm py-4">Search failed</div>';
+        }
+    };
+
+    window.renderGroupStickers = function(stickers) {
+        const stickerResults = document.getElementById('group_sticker_results');
+        stickerResults.innerHTML = '';
+        if (!stickers || stickers.length === 0) {
+            stickerResults.innerHTML = '<div class="col-span-4 text-center text-gray-500 text-sm py-4">No stickers found</div>';
+            return;
+        }
+        stickers.forEach(sticker => {
+            const previewUrl = sticker.images.fixed_height_small.url;
+            const sendUrl = sticker.images.original.url;
+            const img = document.createElement('img');
+            img.src = previewUrl;
+            img.className = 'w-full h-[72px] object-contain cursor-pointer hover:scale-110 transition-transform p-1';
+            img.onclick = () => window.sendGroupMediaFromUrl(sendUrl, 'image/gif', 'sticker.gif');
+            stickerResults.appendChild(img);
+        });
+    };
+
+    window.sendGroupMediaFromUrl = async function(url, type, filename) {
+        document.getElementById('group_emoji_picker_container').classList.add('hidden');
+        if (!window.currentChatId) return;
+
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const file = new File([blob], filename, { type: type });
+            
+            const formData = new FormData();
+            formData.append('chat_id', window.currentChatId);
+            formData.append('message', '');
+            formData.append('file', file);
+            
+            await fetch('/send', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: formData
+            });
+        } catch (err) {
+            console.error('Error sending media:', err);
+            alert('Failed to send media. Network error.');
+        }
+    };
 
     window.selectGroupFile = function(accepts) {
         let fileInput = document.getElementById('group_file_input');
@@ -1957,6 +2156,11 @@
         const u = window.activeChatUser;
         if (!u) return;
 
+        // Close disappearing messages if open
+        if (typeof window.closeDisappearingMessagesSidebar === 'function') {
+            window.closeDisappearingMessagesSidebar();
+        }
+
         // Close search sidebar if open
         const searchSidebar = document.getElementById('search_sidebar');
         if (searchSidebar) {
@@ -2070,6 +2274,9 @@
         if (p) {
             p.classList.remove('flex');
             p.classList.add('hidden');
+        }
+        if (typeof window.closeDisappearingMessagesSidebar === 'function') {
+            window.closeDisappearingMessagesSidebar();
         }
     };
 
@@ -3160,13 +3367,13 @@
                     </svg>
                     <span class="text-[15px]">Search</span>
                 </button>
-                <button onclick="window.showToast?.('Mute', 'Notifications muted'); toggleGroupHeaderMoreMenu()"
+                <button onclick="window.toggleMuteChat(window.currentGroupId, 'group', window.mutedChats['group_sidebar_' + window.currentGroupId] ? null : 'always'); toggleGroupHeaderMoreMenu()"
                     class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
                     <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                     </svg>
-                    <span class="text-[15px]">Mute notifications</span>
+                    <span id="group_header_mute_text_announcement" class="text-[15px]">Mute notifications</span>
                 </button>
                 <button onclick="window.showToast?.('Disappearing Messages', 'Settings updated'); toggleGroupHeaderMoreMenu()"
                     class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
@@ -3176,14 +3383,14 @@
                     </svg>
                     <span class="text-[15px]">Disappearing messages</span>
                 </button>
-                <button onclick="window.showToast?.('Theme', 'Opening theme selector...'); toggleGroupHeaderMoreMenu()"
+                <button onclick="window.openWallpaperModal(window.currentGroupId, 'group'); toggleGroupHeaderMoreMenu()"
                     class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
                     <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
                         <line x1="9" y1="22" x2="15" y2="22"></line>
                     </svg>
-                    <span class="text-[15px]">Chat theme</span>
+                    <span class="text-[15px]">Chat wallpaper</span>
                 </button>
                 <div id="group_header_more_trigger" class="w-full flex items-center justify-between px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors cursor-pointer group">
                     <div class="flex items-center gap-4">
@@ -3276,21 +3483,30 @@
                     </svg>
                     <span class="text-[15px]">Select messages</span>
                 </button>
-                <button onclick="toggleGroupHeaderMoreMenu()"
+                <button onclick="window.toggleMuteChat(window.currentGroupId, 'group', window.mutedChats['group_sidebar_' + window.currentGroupId] ? null : 'always'); toggleGroupHeaderMoreMenu()"
                     class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
                     <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path d="M18 8a6 6 0 0 0-9.33-5"></path>
                         <line x1="1" y1="1" x2="23" y2="23"></line>
                     </svg>
-                    <span class="text-[15px]">Mute notifications</span>
+                    <span id="group_header_mute_text" class="text-[15px]">Mute notifications</span>
                 </button>
-                <button onclick="toggleGroupHeaderMoreMenu()"
+                <button onclick="window.openDisappearingMessagesSidebar(); toggleGroupHeaderMoreMenu()"
                     class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
                     <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <circle cx="12" cy="12" r="10"></circle>
                         <polyline points="12 6 12 12 16 14"></polyline>
                     </svg>
                     <span class="text-[15px]">Disappearing messages</span>
+                </button>
+                <button onclick="window.openWallpaperModal(window.currentGroupId, 'group'); toggleGroupHeaderMoreMenu()"
+                    class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
+                    <svg class="w-5 h-5 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path>
+                        <line x1="9" y1="22" x2="15" y2="22"></line>
+                    </svg>
+                    <span class="text-[15px]">Chat wallpaper</span>
                 </button>
                 <button onclick="toggleGroupHeaderMoreMenu()"
                     class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors text-left focus:outline-none">
@@ -3359,6 +3575,16 @@
         const isHidden = dropdown.classList.contains('hidden');
         if (isHidden) {
             window.renderGroupHeaderMoreMenu();
+            
+            const elementId = 'group_sidebar_' + window.currentGroupId;
+            const isMuted = window.mutedChats && !!window.mutedChats[elementId];
+            
+            const muteText = document.getElementById('group_header_mute_text');
+            if (muteText) muteText.textContent = isMuted ? 'Unmute notifications' : 'Mute notifications';
+            
+            const muteTextAnn = document.getElementById('group_header_mute_text_announcement');
+            if (muteTextAnn) muteTextAnn.textContent = isMuted ? 'Unmute notifications' : 'Mute notifications';
+
             dropdown.classList.remove('hidden');
             setTimeout(() => {
                 dropdown.classList.remove('opacity-0', 'scale-95');
@@ -4395,8 +4621,8 @@
                     </div>
                 </div>
             ` : `
-                <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0">
-                    <img src="${group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`}" class="w-full h-full object-cover">
+                <div id="avatar_wrapper_group_${group.id}" class="relative w-12 h-12 rounded-full bg-[#2a3942] flex items-center justify-center shrink-0">
+                    <img src="${group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`}" class="w-full h-full object-cover rounded-full">
                 </div>
             `;
 
@@ -4479,6 +4705,13 @@
         // Cache group messages for global search
         if (typeof window.cacheGroupMessages === 'function') {
             window.cacheGroupMessages(group.id);
+        }
+
+        // Apply disappearing messages badge if active
+        if (window.updateDisappearingBadge) {
+            setTimeout(() => {
+                window.updateDisappearingBadge(`group_${group.id}`, group.disappearingTimer > 0);
+            }, 50);
         }
     };
 
@@ -5052,6 +5285,25 @@
         if (typeof window.closeBroadcastInfo === 'function') {
             window.closeBroadcastInfo();
         }
+
+        // Set global current group id
+        window.currentGroupId = groupId;
+        window.activeChatUser = null;
+
+        // Apply custom wallpaper
+        window.applyCustomWallpaper(groupId, 'group');
+
+        // Check if group is muted and show/hide mute icon
+        const isMuted = window.mutedChats && window.mutedChats[`group_sidebar_${groupId}`];
+        const muteIcon = document.getElementById('group_header_mute_icon');
+        if (muteIcon) {
+            if (isMuted) {
+                muteIcon.classList.remove('hidden');
+            } else {
+                muteIcon.classList.add('hidden');
+            }
+        }
+
         // Fetch missing info from DOM
         const sidebarEl = document.getElementById(`group_sidebar_${groupId}`);
         if (sidebarEl) {
@@ -5142,6 +5394,23 @@
                 if (!gData) return;
                 window.currentGroupData = gData;
 
+                // Update disappearing messages label
+                const groupTimerLabel = document.getElementById('group_disappearing_timer_label');
+                const isDisappearing = (gData.disappearingTimer && gData.disappearingTimer > 0);
+                if (groupTimerLabel) {
+                    let timerText = 'Off';
+                    if (gData.disappearingTimer === 120) timerText = '2 minutes';
+                    else if (gData.disappearingTimer === 86400) timerText = '24 hours';
+                    else if (gData.disappearingTimer === 604800) timerText = '7 days';
+                    else if (gData.disappearingTimer === 7776000) timerText = '90 days';
+                    groupTimerLabel.innerText = timerText;
+                }
+                
+                // Update badge in sidebar and header!
+                if (window.updateDisappearingBadge) {
+                    window.updateDisappearingBadge(`group_${groupId}`, isDisappearing);
+                }
+
                 // Hide call button for announcement groups
                 const callBtn = document.getElementById('group_call_btn_pill');
                 if (callBtn) {
@@ -5180,7 +5449,7 @@
                     if (window.activeChatUser) window.activeChatUser.avatar = gData.avatar;
                     const avatarEl = document.getElementById('active_group_chat_avatar');
                     if (avatarEl) avatarEl.innerHTML =
-                        `<img src="${gData.avatar}" class="w-full h-full object-cover">`;
+                        `<img src="${gData.avatar}" class="w-full h-full object-cover rounded-full">`;
                     const infoAvatarEl = document.getElementById('group_info_avatar');
                     if (infoAvatarEl) infoAvatarEl.src = gData.avatar;
                 } else if (gData.name) {
@@ -5190,7 +5459,7 @@
                     if (window.activeChatUser) window.activeChatUser.avatar = fallbackAvatar;
                     const avatarEl = document.getElementById('active_group_chat_avatar');
                     if (avatarEl) avatarEl.innerHTML =
-                        `<img src="${fallbackAvatar}" class="w-full h-full object-cover">`;
+                        `<img src="${fallbackAvatar}" class="w-full h-full object-cover rounded-full">`;
                     const infoAvatarEl = document.getElementById('group_info_avatar');
                     if (infoAvatarEl) infoAvatarEl.src = fallbackAvatar;
                 }
@@ -5244,7 +5513,7 @@
                             
                             if (cData.avatar) {
                                 const avatarEl = document.getElementById('active_group_chat_avatar');
-                                if (avatarEl) avatarEl.innerHTML = `<img src="${cData.avatar}" class="w-full h-full object-cover">`;
+                                if (avatarEl) avatarEl.innerHTML = `<img src="${cData.avatar}" class="w-full h-full object-cover rounded-full">`;
                                 const infoAvatarEl = document.getElementById('group_info_avatar');
                                 if (infoAvatarEl) infoAvatarEl.src = cData.avatar;
                                 window.activeChatAvatar = cData.avatar;
@@ -5263,8 +5532,16 @@
                 window._groupPinnedMsgsList = [];
                 window._currentGroupPinIndex = 0;
 
+                const elementId = `group_sidebar_${window.currentGroupId}`;
+                const clearedTime = window.clearedChats?.[elementId] || 0;
+
                 if (gData.pinned_msgs && typeof gData.pinned_msgs === 'object') {
                     for (const [key, val] of Object.entries(gData.pinned_msgs)) {
+                        // Hide if chat was cleared after the message was pinned
+                        if (val.time && val.time <= clearedTime) {
+                            continue;
+                        }
+
                         window._groupPinnedMsgKeys.add(key);
                         window._groupPinnedMsgsList.push({
                             key,
@@ -5276,10 +5553,13 @@
 
                     if (pinBar && pinText && pinCount) {
                         const count = window._groupPinnedMsgsList.length;
-                        pinCount.textContent = count === 1 ? '1 pinned message' :
-                            `${count} pinned messages`;
-                        pinText.textContent = window._groupPinnedMsgsList[0].text;
-                        pinBar.classList.remove('hidden');
+                        if (count > 0) {
+                            pinCount.textContent = count === 1 ? '1 pinned message' : `${count} pinned messages`;
+                            pinText.textContent = window._groupPinnedMsgsList[0].text;
+                            pinBar.classList.remove('hidden');
+                        } else {
+                            pinBar.classList.add('hidden');
+                        }
                     }
                 } else if (pinBar) {
                     pinBar.classList.add('hidden');
@@ -5525,7 +5805,7 @@
         }
         if (document.getElementById('active_group_chat_avatar')) {
             document.getElementById('active_group_chat_avatar').innerHTML =
-                `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
+                `<img src="${activeAvatar}" class="w-full h-full object-cover rounded-full">`;
         }
 
         document.getElementById('active_chat_title').textContent = activeName;
@@ -5537,7 +5817,7 @@
         }
 
         document.getElementById('active_chat_avatar').innerHTML =
-            `<img src="${activeAvatar}" class="w-full h-full object-cover">`;
+            `<img src="${activeAvatar}" class="w-full h-full object-cover rounded-full">`;
 
         document.getElementById('call_dropdown_name').textContent = activeName;
         document.getElementById('call_dropdown_avatar').innerHTML =
@@ -5604,13 +5884,33 @@
 
         window.unsubscribeAdded = window.onChildAdded(messagesRef, (snapshot) => {
             const data = snapshot.val();
+            const key = snapshot.key;
+
+            // Check if message is expired (disappearing messages)
+            if (data.is_disappearing && data.expires_at) {
+                const currentTime = Date.now() / 1000;
+                const remainingSeconds = data.expires_at - currentTime;
+                if (remainingSeconds <= 0) {
+                    return; // Already expired
+                } else {
+                    // Set timeout to delete message element from DOM when it expires
+                    // Max 32-bit int for setTimeout is 2147483647 ms (~24.8 days). 
+                    // If remaining time is greater, we don't set a timeout as the user will likely reload before then.
+                    const delayMs = remainingSeconds * 1000;
+                    if (delayMs <= 2147483647) {
+                        setTimeout(() => {
+                            const msgEl = document.getElementById('msg_' + key);
+                            if (msgEl) msgEl.remove();
+                        }, delayMs);
+                    }
+                }
+            }
 
             const elementId = `group_sidebar_${groupId}`;
             const clearedTime = window.clearedChats?.[elementId] || 0;
             if (data.time && data.time <= clearedTime) return;
             if (data.deleted_for && data.deleted_for[window.myUserId]) return;
 
-            const key = snapshot.key;
             window.globalMessages[key] = data;
 
             // Check if this is the specific searched message (by timestamp)
@@ -5619,6 +5919,38 @@
             const searchHighlightClass = isSearchMatch ? 'search-msg-highlight' : '';
 
             // Intercept special community welcome/added cards and system messages
+            if (data.type === 'system') {
+                const dateHeader = window.getDateHeader(data.time);
+                if (dateHeader !== lastDateString) {
+                    lastDateString = dateHeader;
+                    const headerHtml = `
+                        <div class="flex justify-center my-3 sticky top-0 z-[5]">
+                            <div class="bg-[#182229]/90 backdrop-blur-sm text-[#8696a0] text-[11px] px-3 py-1 rounded-lg shadow-sm font-medium uppercase tracking-wider border border-[#202c33]">
+                                ${dateHeader}
+                            </div>
+                        </div>`;
+                    const gMsgs = document.getElementById('group_messages');
+                    if (gMsgs) gMsgs.insertAdjacentHTML('beforeend', headerHtml);
+                }
+
+                const msgHtml = `
+                    <div id="msg_${key}" class="flex justify-center my-3 relative select-none w-full">
+                        <div class="bg-[#182229]/90 backdrop-blur-sm text-[#8696a0] text-[12px] px-3.5 py-1.5 rounded-lg shadow-sm font-normal text-center max-w-[85%] border border-[#202c33] flex items-center justify-center gap-2">
+                            <svg class="w-3.5 h-3.5 text-[#8696a0] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                            </svg>
+                            <span>${data.text}</span>
+                        </div>
+                    </div>`;
+
+                const gMsgs = document.getElementById('group_messages');
+                if (gMsgs) {
+                    gMsgs.insertAdjacentHTML('beforeend', msgHtml);
+                    gMsgs.scrollTop = gMsgs.scrollHeight;
+                }
+                return;
+            }
+
             if (data.type === 'group_link_announcement') {
                 const dateHeader = window.getDateHeader(data.time);
                 if (dateHeader !== lastDateString) {

@@ -126,6 +126,13 @@
                 </svg>
                 <span class="text-[#e9edef] text-[16px] flex-1">Notification settings</span>
             </button>
+            <button onclick="window.openDisappearingMessagesSidebar()" class="flex items-center px-4 py-4 gap-4 hover:bg-[#202c33]/30 transition-colors text-left w-full">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8696a0]"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                <div class="flex-1">
+                    <div class="text-[#e9edef] text-[16px] mb-1">Disappearing messages</div>
+                    <div class="text-[#8696a0] text-[14px]" id="contact_disappearing_timer_label">Off</div>
+                </div>
+            </button>
         </div>
 
         <div class="h-[10px] bg-[#0c1317]"></div>
@@ -174,6 +181,11 @@
             return;
         }
 
+        // Close disappearing messages if open
+        if (typeof window.closeDisappearingMessagesSidebar === 'function') {
+            window.closeDisappearingMessagesSidebar();
+        }
+
         // Close search sidebar if open
         const searchSidebar = document.getElementById('search_sidebar');
         if (searchSidebar) {
@@ -215,6 +227,10 @@
         // Remove width adjustment on desktop
         if (window.innerWidth >= 640) {
             mainChat.classList.remove('sm:mr-[400px]');
+        }
+
+        if (typeof window.closeDisappearingMessagesSidebar === 'function') {
+            window.closeDisappearingMessagesSidebar();
         }
     };
 
@@ -384,4 +400,32 @@
             window.openGlobalMediaModal(window.currentChatId, name);
         }
     };
+
+    window.updateChatDisappearingTimer = function(val) {
+        if(!window.currentChatId) return;
+        
+        let duration = 0;
+        if (val === '2 minutes') duration = 120;
+        else if (val === '24 hours') duration = 86400;
+        else if (val === '7 days') duration = 604800;
+        else if (val === '90 days') duration = 7776000;
+        
+        document.getElementById('contact_disappearing_timer_label').innerText = val;
+        
+        fetch('/chat/settings/disappearing-message-timer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                chat_id: window.currentChatId,
+                duration: duration
+            })
+        }).then(res => {
+            if(!res.ok) throw new Error('API Error');
+            if(window.showToast) window.showToast('Updated', 'Disappearing messages timer updated.');
+        }).catch(err => console.error('Failed to update timer', err));
+    }
 </script>

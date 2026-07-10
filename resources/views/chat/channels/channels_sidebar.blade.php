@@ -76,6 +76,9 @@
 
 <script>
     window.showChannels = function() {
+        if (typeof window.closeAllSettings === 'function') {
+            window.closeAllSettings();
+        }
         // Hide all sidebars
         if(typeof window.closeAllSidebarPanels === 'function') {
             window.closeAllSidebarPanels();

@@ -8,6 +8,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect('/chat');
+    }
     return view('welcome');
 });
 
@@ -73,6 +76,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/channel/{channelId}/follow', [WebChannelController::class, 'followChannel']);
     Route::post('/channel/{channelId}/unfollow', [WebChannelController::class, 'unfollowChannel']);
     Route::post('/channel/{channelId}/update', [WebChannelController::class, 'updateChannel']);
+    // Disappearing messages timers
+    Route::post('/chat/settings/disappearing-message-timer', [ChatController::class, 'setDisappearingMessageTimer']);
+    Route::post('/chat/settings/default-message-timer', [ChatController::class, 'setDefaultMessageTimer']);
 });
 
 require __DIR__.'/auth.php';

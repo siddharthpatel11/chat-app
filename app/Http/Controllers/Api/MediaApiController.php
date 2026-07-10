@@ -4,42 +4,39 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Kreait\Firebase\Factory;
+use App\Services\FirebaseService;
 use App\Models\User;
 
 class MediaApiController extends Controller
 {
+    use \App\Traits\ApiResponse;
+
     protected $db;
 
-    public function __construct()
+    public function __construct(FirebaseService $firebaseService)
     {
-        $factory = (new Factory)
-            ->withServiceAccount(base_path(env('FIREBASE_CREDENTIALS')))
-            ->withDatabaseUri(env('FIREBASE_DATABASE_URL'));
-
-        $this->db = $factory->createDatabase();
+        $this->db = $firebaseService->database();
     }
 
     public function getGlobalMedia(Request $request)
     {
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
 
         if (!$userId) {
-            return response()->json(['status' => false, 'message' => 'User ID is required'], 400);
+            return $this->errorResponse('User ID is required', 400);
         }
 
         try {
             $globalMediaCache = [];
             $urlRegex = '/(https?:\/\/[^\s]+)/i';
 
-            // 1. Fetch personal chats
-            $allUsers = User::all();
-            foreach ($allUsers as $otherUser) {
-                if ($otherUser->id == $userId) continue;
-
-                $minId = min($userId, $otherUser->id);
-                $maxId = max($userId, $otherUser->id);
-                $chatId = "chat_{$minId}_{$maxId}";
+            // 1. Fetch personal chats using user_chats index
+            $userChatIndex = $this->db->getReference("user_chats/{$userId}")->getValue() ?: [];
+            
+            foreach ($userChatIndex as $chatId => $v) {
+                if ($chatId === '_migrated' || str_starts_with($chatId, 'group_')) {
+                    continue;
+                }
 
                 $clearedAt = $this->db->getReference("chats/{$chatId}/settings/{$userId}/cleared_at")->getValue();
                 $deletedAt = $this->db->getReference("chats/{$chatId}/settings/{$userId}/deleted_at")->getValue();
@@ -155,21 +152,15 @@ class MediaApiController extends Controller
                 }
             }
 
-            return response()->json([
-                'status' => true,
-                'data' => [
+            return $this->successResponse(['data' => [
                     'media' => $media,
                     'docs' => $docs,
                     'links' => $links,
                     'all' => $globalMediaCache
-                ]
-            ]);
+                ]], 'Success', 200);
 
         } catch (\Exception $e) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Error fetching media: ' . $e->getMessage()
-            ], 500);
+            return $this->errorResponse('Error fetching media: ' . $e->getMessage(), 500);
         }
     }
 
@@ -225,11 +216,11 @@ class MediaApiController extends Controller
     }
     public function deleteMedia(Request $request)
     {
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
         $messages = $request->input('messages', []); // Expecting array of ['chat_id' => '', 'message_id' => '']
 
         if (empty($messages) || !is_array($messages)) {
-            return response()->json(['status' => false, 'message' => 'No media items provided'], 400);
+            return $this->errorResponse('No media items provided', 400);
         }
 
         try {
@@ -245,20 +236,20 @@ class MediaApiController extends Controller
                     }
                 }
             }
-            return response()->json(['status' => true, 'message' => 'Media deleted successfully']);
+            return $this->successResponse([], 'Media deleted successfully', 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => false, 'message' => 'Error deleting media: ' . $e->getMessage()], 500);
+            return $this->errorResponse('Error deleting media: ' . $e->getMessage(), 500);
         }
     }
 
     public function forwardMedia(Request $request)
     {
-        $userId = auth()->id() ?? $request->user_id;
+        $userId = auth()->id();
         $messages = $request->input('messages', []);
         $targetChatIds = $request->input('target_chat_ids', []);
 
         if (empty($messages) || empty($targetChatIds)) {
-            return response()->json(['status' => false, 'message' => 'Media items and target chats are required'], 400);
+            return $this->errorResponse('Media items and target chats are required', 400);
         }
 
         try {
@@ -294,9 +285,9 @@ class MediaApiController extends Controller
                 }
             }
 
-            return response()->json(['status' => true, 'message' => 'Media forwarded successfully']);
+            return $this->successResponse([], 'Media forwarded successfully', 200);
         } catch (\Exception $e) {
-            return response()->json(['status' => false, 'message' => 'Error forwarding media: ' . $e->getMessage()], 500);
+            return $this->errorResponse('Error forwarding media: ' . $e->getMessage(), 500);
         }
     }
 }

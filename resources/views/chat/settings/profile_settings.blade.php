@@ -187,7 +187,8 @@
             'chats_auto_download_panel',
             'notifications_taskbar_panel',
             'notifications_banner_panel',
-            'notifications_subpanel'
+            'notifications_subpanel',
+            'default_timer_sidebar'
         ];
         settingsPanels.forEach(id => {
             const el = document.getElementById(id);
@@ -275,7 +276,10 @@
                 'new_chat_panel',
                 'add_group_members_panel',
                 'create_group_panel',
-                'new_contact_panel'
+                'new_contact_panel',
+                'communities_sidebar_container',
+                'channels_sidebar_container',
+                'find_channels_sidebar'
             ];
             leftSidebarIds.forEach(id => {
                 const el = document.getElementById(id);
@@ -288,6 +292,17 @@
             if (callsMain) {
                 callsMain.classList.add('hidden');
                 callsMain.classList.remove('flex');
+            }
+
+            const commMain = document.getElementById('communities_main_column');
+            if (commMain) {
+                commMain.classList.add('hidden');
+                commMain.classList.remove('flex');
+            }
+            const chanMain = document.getElementById('channels_main_column');
+            if (chanMain) {
+                chanMain.classList.add('hidden');
+                chanMain.classList.remove('flex');
             }
 
             // Close right panels

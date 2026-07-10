@@ -13,6 +13,16 @@
     <!-- Scrollable Content -->
     <div class="flex-1 overflow-y-auto custom-scrollbar bg-[#111b21] py-4 px-6 flex flex-col h-full relative z-10">
 
+        <div class="mb-4">
+            <button onclick="document.getElementById('global_wallpaper_upload').click()" class="bg-[#00a884] hover:bg-[#008f6f] text-[#111b21] px-4 py-2 rounded-md w-full font-medium transition-colors text-[14px]">
+                Upload Custom Image
+            </button>
+            <input type="file" id="global_wallpaper_upload" accept="image/*" class="hidden" onchange="handleGlobalWallpaperUpload(event)">
+            <button id="remove_global_wallpaper_btn" onclick="removeGlobalWallpaper()" class="hidden mt-2 bg-transparent border border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-4 py-2 rounded-md w-full font-medium transition-colors text-sm">
+                Remove Custom Image
+            </button>
+        </div>
+
         <div class="flex items-center justify-between py-2 mb-4 group cursor-pointer" onclick="toggleDoodles()">
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="wallpaper_doodles_toggle" class="sr-only peer" checked onchange="updateWallpaperDoodles(this.checked)">
@@ -105,11 +115,19 @@
                 });
             }
 
-            // Init state
-            const savedColor = localStorage.getItem('whatsapp_wallpaper_color') || '#0b141a';
-            const savedDoodles = localStorage.getItem('whatsapp_wallpaper_doodles') !== 'false';
+            const currentUserId = window.myUserId || 'default';
+            const savedColor = localStorage.getItem(`whatsapp_wallpaper_color_${currentUserId}`) || '#0b141a';
+            const savedDoodles = localStorage.getItem(`whatsapp_wallpaper_doodles_${currentUserId}`) !== 'false';
+            const globalImg = localStorage.getItem(`whatsapp_wallpaper_global_image_${currentUserId}`);
 
             document.getElementById('wallpaper_doodles_toggle').checked = savedDoodles;
+            
+            if (globalImg) {
+                document.getElementById('remove_global_wallpaper_btn').classList.remove('hidden');
+            } else {
+                document.getElementById('remove_global_wallpaper_btn').classList.add('hidden');
+            }
+            
             window.updateWallpaperPreview(savedColor, savedDoodles);
 
             // Highlight selected
@@ -136,7 +154,15 @@
     }
 
     window.updateWallpaperDoodles = function(isChecked) {
-        localStorage.setItem('whatsapp_wallpaper_doodles', isChecked);
+        const currentUserId = window.myUserId || 'default';
+        localStorage.setItem(`whatsapp_wallpaper_doodles_${currentUserId}`, isChecked);
+        
+        if (window.db && window.update && window.ref) {
+            window.update(window.ref(window.db, `users/${currentUserId}/settings/wallpaper`), {
+                doodles: isChecked
+            }).catch(err => console.error("Error saving global wallpaper doodles to Firebase:", err));
+        }
+
         const doodles = document.getElementById('wallpaper_preview_doodles');
         if (doodles) {
             doodles.style.opacity = isChecked ? '0.05' : '0';
@@ -145,7 +171,14 @@
     }
 
     window.selectWallpaper = function(color, element) {
-        localStorage.setItem('whatsapp_wallpaper_color', color);
+        const currentUserId = window.myUserId || 'default';
+        localStorage.setItem(`whatsapp_wallpaper_color_${currentUserId}`, color);
+
+        if (window.db && window.update && window.ref) {
+            window.update(window.ref(window.db, `users/${currentUserId}/settings/wallpaper`), {
+                color: color
+            }).catch(err => console.error("Error saving global wallpaper color to Firebase:", err));
+        }
 
         // Update borders
         const grid = document.getElementById('wallpaper_colors_grid');
@@ -160,9 +193,105 @@
     }
 
     window.updateWallpaperPreview = function(color, showDoodles) {
+        const currentUserId = window.myUserId || 'default';
+        const globalImg = localStorage.getItem(`whatsapp_wallpaper_global_image_${currentUserId}`);
+        
+        if (color === undefined) color = localStorage.getItem(`whatsapp_wallpaper_color_${currentUserId}`) || '#0b141a';
+        if (showDoodles === undefined) showDoodles = localStorage.getItem(`whatsapp_wallpaper_doodles_${currentUserId}`) !== 'false';
+
         const bg = document.getElementById('wallpaper_preview_bg');
         const doodles = document.getElementById('wallpaper_preview_doodles');
-        if(bg) bg.style.backgroundColor = color;
-        if(doodles) doodles.style.opacity = showDoodles ? '0.05' : '0';
+        
+        if (globalImg) {
+            bg.style.backgroundColor = 'transparent';
+            bg.style.backgroundImage = `url('${globalImg}')`;
+            bg.style.backgroundSize = 'cover';
+            bg.style.backgroundPosition = 'center';
+            bg.style.backgroundRepeat = 'no-repeat';
+            if (doodles) doodles.style.opacity = '0';
+        } else {
+            bg.style.backgroundImage = 'none';
+            bg.style.backgroundColor = color;
+            if (doodles) doodles.style.opacity = showDoodles ? '0.05' : '0';
+        }
     }
+
+    window.handleGlobalWallpaperUpload = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        event.target.value = '';
+
+        if (file.size > 2 * 1024 * 1024) {
+            window.showToast?.('Error', 'Image must be less than 2MB', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 1000;
+                const MAX_HEIGHT = 1000;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                
+                const currentUserId = window.myUserId || 'default';
+                try {
+                    localStorage.setItem(`whatsapp_wallpaper_global_image_${currentUserId}`, dataUrl);
+                    
+                    if (window.db && window.update && window.ref) {
+                        window.update(window.ref(window.db, `users/${currentUserId}/settings/wallpaper`), {
+                            global_image: dataUrl
+                        }).catch(err => console.error("Error saving global wallpaper image to Firebase:", err));
+                    }
+
+                    window.updateWallpaperPreview();
+                    if (window.applyGlobalWallpaper) window.applyGlobalWallpaper();
+                    document.getElementById('remove_global_wallpaper_btn').classList.remove('hidden');
+                    window.showToast?.('Success', 'Global custom wallpaper set');
+                } catch (err) {
+                    console.error(err);
+                    window.showToast?.('Error', 'Image too large.', 'error');
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    window.removeGlobalWallpaper = function() {
+        const currentUserId = window.myUserId || 'default';
+        localStorage.removeItem(`whatsapp_wallpaper_global_image_${currentUserId}`);
+        
+        if (window.db && window.update && window.ref) {
+            window.update(window.ref(window.db, `users/${currentUserId}/settings/wallpaper`), {
+                global_image: null
+            }).catch(err => console.error("Error removing global wallpaper image from Firebase:", err));
+        }
+
+        window.updateWallpaperPreview();
+        if (window.applyGlobalWallpaper) window.applyGlobalWallpaper();
+        document.getElementById('remove_global_wallpaper_btn').classList.add('hidden');
+        window.showToast?.('Success', 'Global custom wallpaper removed');
+    };
 </script>
