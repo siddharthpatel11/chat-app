@@ -301,22 +301,35 @@
                     </svg>
                 </button>
             </div>
-            <input type="text" id="sidebar_search" oninput="window.filterSidebar()"
+            
+            <!-- Selected Filter Chip (Injected via JS) -->
+            <div id="search_selected_filter_chip" class="hidden items-center gap-1.5 bg-[#0a332c] rounded-full px-2 py-1 shrink-0 ml-2"></div>
+
+            <input type="text" id="sidebar_search" oninput="window.handleSidebarSearchInput ? window.handleSidebarSearchInput() : window.filterSidebar()"
                 onfocus="onSidebarSearchFocus()" onblur="onSidebarSearchBlur()"
-                placeholder="Search or start new chat"
+                placeholder="Ask Meta AI or Search" autocomplete="off"
                 class="bg-transparent border-none focus:ring-0 w-full text-[13px] ml-4 text-[#d1d7db] placeholder-[#8696a0] outline-none">
-            <!-- Clear button -->
-            <button id="sidebar_search_clear" onclick="clearSidebarSearch()"
-                class="hidden text-[#8696a0] hover:text-[#e9edef] transition-colors shrink-0 p-0.5">
-                <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
-                    </path>
-                </svg>
-            </button>
+            
+            <div class="flex items-center gap-1 shrink-0">
+                <!-- List View Icon (Hidden initially) -->
+                <button id="sidebar_search_list_view" onclick="window.toggleGlobalSearchLayout()" class="hidden text-[#8696a0] hover:text-[#e9edef] transition-colors p-1">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" id="sidebar_search_list_view_icon">
+                        <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"></path>
+                    </svg>
+                </button>
+                <!-- Clear button -->
+                <button id="sidebar_search_clear" onclick="clearSidebarSearch()"
+                    class="hidden text-[#8696a0] hover:text-[#e9edef] transition-colors p-0.5">
+                    <svg class="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
         </div>
 
-        <!-- Filters -->
-        <div class="flex items-center gap-2 px-1 overflow-x-auto custom-scrollbar pb-1">
+        <!-- Chat Filters -->
+        <div id="chat_filters_container" class="flex items-center gap-2 px-1 overflow-x-auto custom-scrollbar pb-1 transition-all duration-200">
             <button onclick="window.setSidebarFilter('all')" id="filter_btn_all"
                 class="px-3 py-1.5 rounded-full bg-[#2a3942] text-[#00a884] text-[14px] whitespace-nowrap transition-colors">All</button>
             <button onclick="window.setSidebarFilter('unread')" id="filter_btn_unread"
@@ -326,6 +339,34 @@
             <button onclick="window.setSidebarFilter('groups')" id="filter_btn_groups"
                 class="px-3 py-1.5 rounded-full bg-[#202c33] text-[#8696a0] hover:bg-[#2a3942] text-[14px] whitespace-nowrap transition-colors">Groups</button>
             <div id="custom_lists_container" class="flex items-center gap-2"></div>
+        </div>
+
+        <!-- Global Search Filters (Hidden initially) -->
+        <div id="global_search_filters_container" class="hidden items-center gap-2 px-1 overflow-x-auto custom-scrollbar pb-1 transition-all duration-200">
+            <button onmousedown="event.preventDefault(); window.setGlobalSearchFilter(this, 'unread')" class="global-search-filter flex items-center gap-1.5 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M18.8 6c.9 0 1.7.8 1.7 1.7v10.6c0 .9-.8 1.7-1.7 1.7H5.2c-.9 0-1.7-.8-1.7-1.7V7.7C3.5 6.8 4.3 6 5.2 6h13.6zm0 1.2H5.2c-.3 0-.5.2-.5.5v1.2l7.3 4.6 7.3-4.6V7.7c0-.3-.2-.5-.5-.5zm-13.6 11h13.6c.3 0 .5-.2.5-.5V9.4l-7.3 4.6-7.3-4.6v8.3c0 .3.2.5.5.5z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[13px] font-medium">Unread</span>
+            </button>
+            <button onmousedown="event.preventDefault(); window.setGlobalSearchFilter(this, 'photos')" class="global-search-filter flex items-center gap-1.5 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M21.1 5.3h-1.5l-1-1.3C18 3.3 17.3 3 16.5 3h-9C6.7 3 6 3.3 5.4 4L4.4 5.3H2.9C1.3 5.3 0 6.6 0 8.2v10.6C0 20.4 1.3 21.7 2.9 21.7h18.2c1.6 0 2.9-1.3 2.9-2.9V8.2c0-1.6-1.3-2.9-2.9-2.9zM12 18.5c-3.1 0-5.7-2.5-5.7-5.7s2.5-5.7 5.7-5.7 5.7 2.5 5.7 5.7-2.5 5.7-5.7 5.7zm0-9.8c-2.3 0-4.1 1.8-4.1 4.1s1.8 4.1 4.1 4.1 4.1-1.8 4.1-4.1-1.8-4.1-4.1-4.1z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[13px] font-medium">Photos</span>
+            </button>
+            <button onmousedown="event.preventDefault(); window.setGlobalSearchFilter(this, 'videos')" class="global-search-filter flex items-center gap-1.5 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M17.3 5.6H2.7C1.2 5.6 0 6.8 0 8.3v7.4C0 17.2 1.2 18.4 2.7 18.4h14.6c1.5 0 2.7-1.2 2.7-2.7V8.3c0-1.5-1.2-2.7-2.7-2.7zm.8 9.2L22 17.2c.4.3 1-.1 1-.5V7.3c0-.4-.6-.8-1-.5l-3.9 2.4v5.6z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[13px] font-medium">Videos</span>
+            </button>
+            <button onmousedown="event.preventDefault(); window.setGlobalSearchFilter(this, 'links')" class="global-search-filter flex items-center gap-1.5 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M8.8 14.8c-.8.8-2 .8-2.8 0l-2.8-2.8c-.8-.8-.8-2 0-2.8l2.8-2.8c.8-.8 2-.8 2.8 0 .3.3.5.7.7 1.2l1.6-.9c-.3-.9-.9-1.6-1.6-2.3-1.6-1.6-4.1-1.6-5.7 0L1 7.2C-.6 8.8-.6 11.3 1 12.9l2.8 2.8c1.6 1.6 4.1 1.6 5.7 0 .5-.5 1-1.2 1.3-2l-1.5-1c-.2.7-.4 1.4-1.3 2.1zm5.4-8.7c-.5.5-1 1.2-1.3 2l1.5 1c.2-.7.4-1.4 1.3-2.1.8-.8 2-.8 2.8 0l2.8 2.8c.8.8.8 2 0 2.8l-2.8 2.8c-.8.8-2 .8-2.8 0-.3-.3-.5-.7-.7-1.2l-1.6.9c.3.9.9 1.6 1.6 2.3 1.6 1.6 4.1 1.6 5.7 0l2.8-2.8c1.6-1.6 1.6-4.1 0-5.7l-2.8-2.8c-1.6-1.6-4.1-1.6-5.7 0z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[13px] font-medium">Links</span>
+            </button>
         </div>
     </div>
 
@@ -453,6 +494,61 @@
                 </div>
             </div>
         @endforeach
+    </div>
+
+    <!-- Global Search Results Container (Hidden initially) -->
+    <div class="hidden flex-col flex-1 overflow-y-auto custom-scrollbar bg-[#111b21]" id="global_search_results_container">
+        
+        <div class="px-5 py-3 text-[#8696a0] text-[13px] font-medium tracking-wide">
+            RECENT
+        </div>
+        
+        <!-- Grid layout for photos -->
+        <div class="grid grid-cols-3 gap-[2px]">
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1575936123452-b67c3203c357?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <div class="px-5 py-3 text-[#8696a0] text-[13px] font-medium tracking-wide mt-1">
+            LAST WEEK
+        </div>
+
+        <div class="grid grid-cols-3 gap-[2px]">
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1542273917363-3b1817f69a5d?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1470071131384-001b85755536?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity">
+                <img src="https://images.unsplash.com/photo-1426604966848-d7adac402bff?q=80&w=200&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+        </div>
     </div>
 
     <!-- Search Results View (hidden by default) -->
@@ -1739,5 +1835,1010 @@
                 window.closeSelectChatsMode();
             };
         });
-    </script>
+        window.handleChatContextMenu = function(e, chatId, chatType) {
+            e.preventDefault();
+            const rect = e.currentTarget.getBoundingClientRect();
+            window.showContextMenu(chatId, chatType, e.clientX, e.clientY);
+        };
+
+        window.handleSidebarSearchInput = function() {
+            const isGlobalSearch = !document.getElementById('global_search_results_container')?.classList.contains('hidden');
+            
+            if (isGlobalSearch) {
+                const clearBtn = document.getElementById('sidebar_search_clear');
+                if (document.getElementById('sidebar_search').value.trim() !== '') {
+                    clearBtn?.classList.remove('hidden');
+                    clearBtn?.classList.add('block');
+                } else {
+                    clearBtn?.classList.add('hidden');
+                    clearBtn?.classList.remove('block');
+                }
+                if (window.currentGlobalSearchFilter === 'videos' && window.renderGlobalSearchVideos) {
+                    window.renderGlobalSearchVideos();
+                } else if (window.renderGlobalSearchPhotos) {
+                    window.renderGlobalSearchPhotos();
+                }
+                return;
+            }
+            if (typeof window.filterSidebar === 'function') {
+                window.filterSidebar();
+            }
+        };
+
+        window.setGlobalSearchFilter = function(activeBtn, filter) {
+            // Handle filter selection styling
+            document.querySelectorAll('.global-search-filter').forEach(btn => {
+                btn.classList.remove('bg-[#0a332c]');
+                btn.classList.add('bg-[#202c33]');
+                btn.querySelector('svg').classList.remove('text-[#00a884]');
+                btn.querySelector('span').classList.remove('text-[#00a884]');
+                
+                btn.querySelector('svg').classList.add('text-[#aebac1]');
+                btn.querySelector('span').classList.add('text-[#aebac1]');
+            });
+            
+            activeBtn.classList.remove('bg-[#202c33]');
+            activeBtn.classList.add('bg-[#0a332c]');
+            
+            activeBtn.querySelector('svg').classList.remove('text-[#aebac1]');
+            activeBtn.querySelector('svg').classList.add('text-[#00a884]');
+            activeBtn.querySelector('span').classList.remove('text-[#aebac1]');
+            activeBtn.querySelector('span').classList.add('text-[#00a884]');
+            
+            // Extract SVG and Text from the clicked button
+            const iconHTML = activeBtn.querySelector('svg').outerHTML;
+            const textHTML = activeBtn.querySelector('span').innerText;
+            
+            // Show the inner chip in search input
+            const chipContainer = document.getElementById('search_selected_filter_chip');
+            chipContainer.innerHTML = iconHTML + '<span class="text-[13px] font-medium">' + textHTML + '</span>';
+            chipContainer.classList.remove('hidden');
+            chipContainer.classList.add('flex');
+            
+            // Update search placeholder and icon
+            const searchInput = document.getElementById('sidebar_search');
+            searchInput.placeholder = 'Search...';
+            searchInput.classList.remove('ml-4');
+            searchInput.classList.add('ml-2');
+            
+            // Show list view icon
+            document.getElementById('sidebar_search_list_view')?.classList.remove('hidden');
+            document.getElementById('sidebar_search_list_view')?.classList.add('block');
+            
+            // Show clear button immediately (since we have a filter active)
+            document.getElementById('sidebar_search_clear')?.classList.remove('hidden');
+            document.getElementById('sidebar_search_clear')?.classList.add('block');
+            
+            // Toggle view depending on filter
+            window.currentGlobalSearchFilter = filter;
+            if (filter === 'photos' || filter === 'videos') {
+                document.getElementById('user_list_container')?.classList.add('hidden');
+                document.getElementById('search_results_container')?.classList.add('hidden');
+                document.getElementById('sidebar_no_results')?.classList.add('hidden');
+                document.getElementById('global_search_results_container')?.classList.remove('hidden');
+                document.getElementById('global_search_results_container')?.classList.add('flex');
+                if (filter === 'photos' && window.renderGlobalSearchPhotos) {
+                    window.renderGlobalSearchPhotos();
+                } else if (filter === 'videos' && window.renderGlobalSearchVideos) {
+                    window.renderGlobalSearchVideos();
+                }
+            } else {
+                document.getElementById('user_list_container')?.classList.remove('hidden');
+                document.getElementById('global_search_results_container')?.classList.add('hidden');
+                document.getElementById('global_search_results_container')?.classList.remove('flex');
+                if (typeof window.filterSidebar === 'function') {
+                    window.filterSidebar();
+                }
+            }
+            
+            // Hide all filter buttons since one is selected
+            document.getElementById('global_search_filters_container')?.classList.add('hidden');
+            document.getElementById('global_search_filters_container')?.classList.remove('flex');
+            document.getElementById('chat_filters_container')?.classList.add('hidden');
+            document.getElementById('chat_filters_container')?.classList.remove('flex');
+        };
+
+        window.globalSearchPhotoLayout = 'grid'; // Default layout
+        window.globalSearchVideoLayout = 'grid';
+
+        window.toggleGlobalSearchLayout = function() {
+            const iconSvg = document.getElementById('sidebar_search_list_view_icon');
+            if (window.globalSearchPhotoLayout === 'grid') {
+                window.globalSearchPhotoLayout = 'list';
+                window.globalSearchVideoLayout = 'list';
+                iconSvg.innerHTML = '<path d="M3 3h8v8H3zm0 10h8v8H3zM13 3h8v8h-8zm0 10h8v8h-8z"></path>';
+            } else {
+                window.globalSearchPhotoLayout = 'grid';
+                window.globalSearchVideoLayout = 'grid';
+                iconSvg.innerHTML = '<path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"></path>';
+            }
+            if (!document.getElementById('global_search_results_container').classList.contains('hidden')) {
+                if (window.currentGlobalSearchFilter === 'videos' && window.renderGlobalSearchVideos) {
+                    window.renderGlobalSearchVideos();
+                } else if (window.renderGlobalSearchPhotos) {
+                    window.renderGlobalSearchPhotos();
+                }
+            }
+        };
+
+        window.renderGlobalSearchPhotos = function() {
+            const container = document.getElementById('global_search_results_container');
+            if (!container) return;
+            
+            let allImages = [];
+            if (window.messageCache) {
+                Object.entries(window.messageCache).forEach(([chatId, chatMessages]) => {
+                    chatMessages.forEach(msg => {
+                        if (msg.type === 'image' && msg.file_url) {
+                            allImages.push({...msg, chatId: chatId});
+                        }
+                    });
+                });
+            }
+            if (window.groupMessagesCache) {
+                Object.entries(window.groupMessagesCache).forEach(([groupId, chatMessages]) => {
+                    chatMessages.forEach(msg => {
+                        if (msg.type === 'image' && msg.file_url) {
+                            allImages.push({...msg, chatId: 'group_' + groupId});
+                        }
+                    });
+                });
+            }
+            
+            const searchQuery = document.getElementById('sidebar_search')?.value.toLowerCase().trim() || '';
+
+            allImages = allImages.map(img => {
+                let chatName = 'Unknown Chat';
+                let chatAvatar = '';
+                let chatPhone = '';
+                let isGroup = false;
+
+                if (img.chatId) {
+                    if (img.chatId.startsWith('group_')) {
+                        isGroup = true;
+                        const groupId = img.chatId.replace('group_', '');
+                        const groupEl = document.getElementById(`group_sidebar_${groupId}`);
+                        if (groupEl) {
+                            chatName = groupEl.getAttribute('data-name') || chatName;
+                            chatAvatar = groupEl.getAttribute('data-avatar') || '';
+                        }
+                    } else {
+                        const ids = img.chatId.replace('chat_', '').split('_');
+                        const targetId = ids.find(id => id != window.myUserId) || window.myUserId;
+                        const userEl = document.getElementById(`user_sidebar_${targetId}`);
+                        if (userEl) {
+                            chatName = userEl.getAttribute('data-name') || chatName;
+                            chatAvatar = userEl.getAttribute('data-avatar') || '';
+                            chatPhone = userEl.getAttribute('data-phone') || '';
+                        }
+                    }
+                }
+
+                let senderName = '';
+                let senderPhone = '';
+                if (isGroup && img.senderId) {
+                    const senderEl = document.getElementById(`user_sidebar_${img.senderId}`);
+                    if (senderEl) {
+                        senderName = senderEl.getAttribute('data-name') || '';
+                        senderPhone = senderEl.getAttribute('data-phone') || '';
+                    } else if (img.senderId == window.myUserId) {
+                        senderName = 'You';
+                    }
+                } else if (!isGroup && img.senderId == window.myUserId) {
+                    senderName = 'You';
+                } else if (!isGroup) {
+                    senderName = chatName;
+                }
+
+                return {
+                    ...img,
+                    resolvedChatName: chatName,
+                    resolvedChatAvatar: chatAvatar,
+                    resolvedSenderName: senderName,
+                    searchSenderName: senderName === 'You' ? (window.myUserName || 'You') : senderName,
+                    resolvedChatPhone: chatPhone,
+                    resolvedSenderPhone: senderPhone,
+                    isGroup: isGroup
+                };
+            });
+
+            if (searchQuery !== '') {
+                allImages = allImages.filter(img => {
+                    const cName = (img.resolvedChatName || '').toLowerCase();
+                    const cPhone = (img.resolvedChatPhone || '').toLowerCase();
+                    const sName = (img.searchSenderName || '').toLowerCase();
+                    const sPhone = (img.resolvedSenderPhone || '').toLowerCase();
+                    if (window.globalSearchPhotoLayout === 'list') {
+                        const text = (img.text || '').toLowerCase();
+                        return cName.includes(searchQuery) || cPhone.includes(searchQuery) || sName.includes(searchQuery) || sPhone.includes(searchQuery) || text.includes(searchQuery);
+                    }
+                    return cName.includes(searchQuery) || cPhone.includes(searchQuery) || sName.includes(searchQuery) || sPhone.includes(searchQuery);
+                });
+            }
+            
+            if (allImages.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
+                        <svg class="w-16 h-16 text-[#3b4a54] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-[#8696a0] text-[14px]">No photos found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Helper to extract timestamp from Firebase push key
+            const extractFirebaseTime = (id) => {
+                if (!id || typeof id !== 'string' || id.length < 8 || !id.startsWith('-')) return 0;
+                const PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+                let time = 0;
+                for (let i = 0; i < 8; i++) {
+                    time = time * 64 + PUSH_CHARS.indexOf(id.charAt(i));
+                }
+                return time;
+            };
+
+            // Normalize all timestamps
+            allImages = allImages.map(img => {
+                let timestampMs = (img.time && img.time.toString().length <= 10) ? img.time * 1000 : img.time;
+                
+                // If timestamp evaluates to invalid or 1970 (less than 1980), fallback to Firebase key
+                if (!timestampMs || timestampMs < 315532800000 || isNaN(new Date(timestampMs).getTime())) {
+                    if (img.key && !isNaN(Number(img.key)) && Number(img.key) > 315532800000) {
+                        timestampMs = Number(img.key);
+                    } else {
+                        const extracted = extractFirebaseTime(img.key);
+                        if (extracted > 0) timestampMs = extracted;
+                    }
+                }
+                
+                return { ...img, normalizedTime: timestampMs || 0 };
+            });
+
+            // Sort by normalized time descending
+            allImages.sort((a, b) => b.normalizedTime - a.normalizedTime);
+            
+            const groups = {};
+            const groupKeys = [];
+            
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            // Helper to get start of a day
+            const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            allImages.forEach(img => {
+                const imgDate = new Date(img.normalizedTime);
+                const imgDay = startOfDay(imgDate);
+                
+                // Calculate difference in days
+                const diffTime = Math.abs(today - imgDay);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                let groupName = '';
+                
+                if (diffDays <= 7) {
+                    groupName = 'RECENT';
+                } else if (diffDays <= 14) {
+                    groupName = 'LAST WEEK';
+                } else if (diffDays <= 30) {
+                    groupName = 'LAST MONTH';
+                } else if (imgDate.getFullYear() === today.getFullYear()) {
+                    const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+                    groupName = monthNames[imgDate.getMonth()];
+                } else {
+                    groupName = imgDate.getFullYear().toString();
+                }
+                
+                // If it's 1970 (or earlier), we couldn't determine the time, so put it in "OLDER"
+                if (imgDate.getFullYear() <= 1970) {
+                    groupName = 'OLDER';
+                }
+                
+                if (!groups[groupName]) {
+                    groups[groupName] = [];
+                    groupKeys.push(groupName);
+                }
+                groups[groupName].push(img);
+            });
+            
+            let html = '';
+            
+            groupKeys.forEach((key, index) => {
+                const mtClass = index > 0 ? 'mt-1' : '';
+                html += `
+                    <div class="px-5 py-3 text-[#8696a0] text-[13px] font-medium tracking-wide ${mtClass}">
+                        ${key}
+                    </div>
+                `;
+                
+                if (window.globalSearchPhotoLayout === 'list') {
+                    html += `<div class="flex flex-col">`;
+                    groups[key].forEach(img => {
+                        let chatName = img.resolvedChatName || 'Unknown Chat';
+                        let chatAvatar = img.resolvedChatAvatar || '';
+                        
+                        let senderInfo = 'Photo';
+                        if (img.isGroup && img.resolvedSenderName) {
+                            senderInfo = `${img.resolvedSenderName}: Photo`;
+                        } else if (!img.isGroup && img.senderId == window.myUserId) {
+                            senderInfo = `You: Photo`;
+                        }
+
+                        let senderNameForViewer = 'Photo';
+                        if (img.isGroup && img.resolvedSenderName) {
+                            senderNameForViewer = img.resolvedSenderName;
+                        } else if (!img.isGroup && img.senderId == window.myUserId) {
+                            senderNameForViewer = 'You';
+                        } else if (!img.isGroup) {
+                            senderNameForViewer = img.resolvedChatName || 'Unknown';
+                        }
+                        
+                        let timeStr = new Date(img.normalizedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        let dateStr = new Date(img.normalizedTime).toLocaleDateString();
+                        let timestampStr = `${dateStr}, ${timeStr}`;
+                        let escapedText = (img.text || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        
+                        html += `
+                            <div class="flex items-center px-4 py-2 hover:bg-[#202c33] cursor-pointer transition-colors" onclick="window.openGlobalSearchImageViewer('${img.key}', '${img.chatId}', '${img.file_url}', '${senderNameForViewer.replace(/'/g, "\\'")}', '${timestampStr}', ${img.isGroup}, '${escapedText}')">
+                                <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] shrink-0 mr-4">
+                                    ${chatAvatar ? `<img src="${chatAvatar}" class="w-full h-full object-cover">` : ''}
+                                </div>
+                                <div class="flex-1 min-w-0 pr-4 flex flex-col justify-center">
+                                    <div class="text-[16px] text-[#e9edef] truncate mb-0.5 leading-tight">${chatName}</div>
+                                    <div class="flex items-start text-[#8696a0] text-[14px] leading-tight">
+                                        ${img.isGroup ? '' : `
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="mr-1 shrink-0 mt-0.5">
+                                            <path d="M21.1 5.3h-1.5l-1-1.3C18 3.3 17.3 3 16.5 3h-9C6.7 3 6 3.3 5.4 4L4.4 5.3H2.9C1.3 5.3 0 6.6 0 8.2v10.6C0 20.4 1.3 21.7 2.9 21.7h18.2c1.6 0 2.9-1.3 2.9-2.9V8.2c0-1.6-1.3-2.9-2.9-2.9zM12 18.5c-3.1 0-5.7-2.5-5.7-5.7s2.5-5.7 5.7-5.7 5.7 2.5 5.7 5.7-2.5 5.7-5.7 5.7zm0-9.8c-2.3 0-4.1 1.8-4.1 4.1s1.8 4.1 4.1 4.1 4.1-1.8 4.1-4.1-1.8-4.1-4.1-4.1z"></path>
+                                        </svg>
+                                        `}
+                                        <div class="flex flex-col flex-1 min-w-0">
+                                            <span class="truncate">${senderInfo}</span>
+                                            ${img.text ? `<span class="truncate text-[#d1d7db] mt-0.5">${escapedText}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-[52px] h-[52px] bg-[#202c33] shrink-0 rounded-[4px] overflow-hidden">
+                                    <img src="${img.file_url}" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                } else {
+                    html += `<div class="grid grid-cols-3 gap-[2px]">`;
+                    groups[key].forEach(img => {
+                        let senderInfo = 'Photo';
+                        if (img.isGroup && img.resolvedSenderName) {
+                            senderInfo = img.resolvedSenderName;
+                        } else if (!img.isGroup && img.senderId == window.myUserId) {
+                            senderInfo = 'You';
+                        } else if (!img.isGroup) {
+                            senderInfo = img.resolvedChatName || 'Unknown';
+                        }
+                        let timeStr = new Date(img.normalizedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        let dateStr = new Date(img.normalizedTime).toLocaleDateString();
+                        let timestampStr = `${dateStr}, ${timeStr}`;
+                        let escapedText = (img.text || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        
+                        html += `
+                            <div class="aspect-square bg-[#202c33] cursor-pointer hover:opacity-90 transition-opacity" onclick="window.openGlobalSearchImageViewer('${img.key}', '${img.chatId}', '${img.file_url}', '${senderInfo.replace(/'/g, "\\'")}', '${timestampStr}', ${img.isGroup}, '${escapedText}')">
+                                <img src="${img.file_url}" class="w-full h-full object-cover">
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+            });
+            
+            container.innerHTML = html;
+        };
+    
+window.renderGlobalSearchVideos = function() {
+            const container = document.getElementById('global_search_results_container');
+            if (!container) return;
+            
+            let allVideos = [];
+            if (window.messageCache) {
+                Object.entries(window.messageCache).forEach(([chatId, chatMessages]) => {
+                    chatMessages.forEach(msg => {
+                        if (msg.type === 'video' && msg.file_url) {
+                            allVideos.push({...msg, chatId: chatId});
+                        }
+                    });
+                });
+            }
+            if (window.groupMessagesCache) {
+                Object.entries(window.groupMessagesCache).forEach(([groupId, chatMessages]) => {
+                    chatMessages.forEach(msg => {
+                        if (msg.type === 'video' && msg.file_url) {
+                            allVideos.push({...msg, chatId: 'group_' + groupId});
+                        }
+                    });
+                });
+            }
+            
+            const searchQuery = document.getElementById('sidebar_search')?.value.toLowerCase().trim() || '';
+
+            allVideos = allVideos.map(vid => {
+                let chatName = 'Unknown Chat';
+                let chatAvatar = '';
+                let chatPhone = '';
+                let isGroup = false;
+
+                if (vid.chatId) {
+                    if (vid.chatId.startsWith('group_')) {
+                        isGroup = true;
+                        const groupId = vid.chatId.replace('group_', '');
+                        const groupEl = document.getElementById(`group_sidebar_${groupId}`);
+                        if (groupEl) {
+                            chatName = groupEl.getAttribute('data-name') || chatName;
+                            chatAvatar = groupEl.getAttribute('data-avatar') || '';
+                        }
+                    } else {
+                        const ids = vid.chatId.replace('chat_', '').split('_');
+                        const targetId = ids.find(id => id != window.myUserId) || window.myUserId;
+                        const userEl = document.getElementById(`user_sidebar_${targetId}`);
+                        if (userEl) {
+                            chatName = userEl.getAttribute('data-name') || chatName;
+                            chatAvatar = userEl.getAttribute('data-avatar') || '';
+                            chatPhone = userEl.getAttribute('data-phone') || '';
+                        }
+                    }
+                }
+
+                let senderName = '';
+                let senderPhone = '';
+                if (isGroup && vid.senderId) {
+                    const senderEl = document.getElementById(`user_sidebar_${vid.senderId}`);
+                    if (senderEl) {
+                        senderName = senderEl.getAttribute('data-name') || '';
+                        senderPhone = senderEl.getAttribute('data-phone') || '';
+                    } else if (vid.senderId == window.myUserId) {
+                        senderName = 'You';
+                    }
+                } else if (!isGroup && vid.senderId == window.myUserId) {
+                    senderName = 'You';
+                } else if (!isGroup) {
+                    senderName = chatName;
+                }
+
+                return {
+                    ...vid,
+                    resolvedChatName: chatName,
+                    resolvedChatAvatar: chatAvatar,
+                    resolvedSenderName: senderName,
+                    searchSenderName: senderName === 'You' ? (window.myUserName || 'You') : senderName,
+                    resolvedChatPhone: chatPhone,
+                    resolvedSenderPhone: senderPhone,
+                    isGroup: isGroup
+                };
+            });
+
+            if (searchQuery !== '') {
+                allVideos = allVideos.filter(vid => {
+                    const cName = (vid.resolvedChatName || '').toLowerCase();
+                    const cPhone = (vid.resolvedChatPhone || '').toLowerCase();
+                    const sName = (vid.searchSenderName || '').toLowerCase();
+                    const sPhone = (vid.resolvedSenderPhone || '').toLowerCase();
+                    if (window.globalSearchVideoLayout === 'list') {
+                        const text = (vid.text || '').toLowerCase();
+                        return cName.includes(searchQuery) || cPhone.includes(searchQuery) || sName.includes(searchQuery) || sPhone.includes(searchQuery) || text.includes(searchQuery);
+                    }
+                    return cName.includes(searchQuery) || cPhone.includes(searchQuery) || sName.includes(searchQuery) || sPhone.includes(searchQuery);
+                });
+            }
+            
+            if (allVideos.length === 0) {
+                container.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-16 px-6 text-center">
+                        <svg class="w-16 h-16 text-[#3b4a54] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <p class="text-[#8696a0] text-[14px]">No photos found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Helper to extract timestamp from Firebase push key
+            const extractFirebaseTime = (id) => {
+                if (!id || typeof id !== 'string' || id.length < 8 || !id.startsWith('-')) return 0;
+                const PUSH_CHARS = '-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz';
+                let time = 0;
+                for (let i = 0; i < 8; i++) {
+                    time = time * 64 + PUSH_CHARS.indexOf(id.charAt(i));
+                }
+                return time;
+            };
+
+            // Normalize all timestamps
+            allVideos = allVideos.map(vid => {
+                let timestampMs = (vid.time && vid.time.toString().length <= 10) ? vid.time * 1000 : vid.time;
+                
+                // If timestamp evaluates to invalid or 1970 (less than 1980), fallback to Firebase key
+                if (!timestampMs || timestampMs < 315532800000 || isNaN(new Date(timestampMs).getTime())) {
+                    if (vid.key && !isNaN(Number(vid.key)) && Number(vid.key) > 315532800000) {
+                        timestampMs = Number(vid.key);
+                    } else {
+                        const extracted = extractFirebaseTime(vid.key);
+                        if (extracted > 0) timestampMs = extracted;
+                    }
+                }
+                
+                return { ...vid, normalizedTime: timestampMs || 0 };
+            });
+
+            // Sort by normalized time descending
+            allVideos.sort((a, b) => b.normalizedTime - a.normalizedTime);
+            
+            const groups = {};
+            const groupKeys = [];
+            
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            // Helper to get start of a day
+            const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            
+            allVideos.forEach(vid => {
+                const imgDate = new Date(vid.normalizedTime);
+                const imgDay = startOfDay(imgDate);
+                
+                // Calculate difference in days
+                const diffTime = Math.abs(today - imgDay);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                let groupName = '';
+                
+                if (diffDays <= 7) {
+                    groupName = 'RECENT';
+                } else if (diffDays <= 14) {
+                    groupName = 'LAST WEEK';
+                } else if (diffDays <= 30) {
+                    groupName = 'LAST MONTH';
+                } else if (imgDate.getFullYear() === today.getFullYear()) {
+                    const monthNames = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+                    groupName = monthNames[imgDate.getMonth()];
+                } else {
+                    groupName = imgDate.getFullYear().toString();
+                }
+                
+                // If it's 1970 (or earlier), we couldn't determine the time, so put it in "OLDER"
+                if (imgDate.getFullYear() <= 1970) {
+                    groupName = 'OLDER';
+                }
+                
+                if (!groups[groupName]) {
+                    groups[groupName] = [];
+                    groupKeys.push(groupName);
+                }
+                groups[groupName].push(vid);
+            });
+            
+            let html = '';
+            
+            groupKeys.forEach((key, index) => {
+                const mtClass = index > 0 ? 'mt-1' : '';
+                html += `
+                    <div class="px-5 py-3 text-[#8696a0] text-[13px] font-medium tracking-wide ${mtClass}">
+                        ${key}
+                    </div>
+                `;
+                
+                if (window.globalSearchVideoLayout === 'list') {
+                    html += `<div class="flex flex-col">`;
+                    groups[key].forEach(vid => {
+                        let chatName = vid.resolvedChatName || 'Unknown Chat';
+                        let chatAvatar = vid.resolvedChatAvatar || '';
+                        
+                        let senderInfo = 'Video';
+                        if (vid.isGroup && vid.resolvedSenderName) {
+                            senderInfo = `${vid.resolvedSenderName}: Video`;
+                        } else if (!vid.isGroup && vid.senderId == window.myUserId) {
+                            senderInfo = `You: Video`;
+                        }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                        let senderNameForViewer = 'Video';
+                        if (vid.isGroup && vid.resolvedSenderName) {
+                            senderNameForViewer = vid.resolvedSenderName;
+                        } else if (!vid.isGroup && vid.senderId == window.myUserId) {
+                            senderNameForViewer = 'You';
+                        } else if (!vid.isGroup) {
+                            senderNameForViewer = vid.resolvedChatName || 'Unknown';
+                        }
+                        
+                        let timeStr = new Date(vid.normalizedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        let dateStr = new Date(vid.normalizedTime).toLocaleDateString();
+                        let timestampStr = `${dateStr}, ${timeStr}`;
+                        let escapedText = (vid.text || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
+                        
+                        html += `
+                            <div class="flex items-center px-4 py-2 hover:bg-[#202c33] cursor-pointer transition-colors" onclick="window.openGlobalSearchVideoViewer('${vid.key}', '${vid.chatId}', '${vid.file_url}', '${senderNameForViewer.replace(/'/g, "\\'")}', '${timestampStr}', ${vid.isGroup}, '${escapedText}')">
+                                <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] shrink-0 mr-4">
+                                    ${chatAvatar ? `<img src="${chatAvatar}" class="w-full h-full object-cover">` : ''}
+                                </div>
+                                <div class="flex-1 min-w-0 pr-4 flex flex-col justify-center">
+                                    <div class="text-[16px] text-[#e9edef] truncate mb-0.5 leading-tight">${chatName}</div>
+                                    <div class="flex items-start text-[#8696a0] text-[14px] leading-tight">
+                                        ${vid.isGroup ? '' : `
+                                        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" class="mr-1 shrink-0 mt-0.5">
+                                            <path d="M21.1 5.3h-1.5l-1-1.3C18 3.3 17.3 3 16.5 3h-9C6.7 3 6 3.3 5.4 4L4.4 5.3H2.9C1.3 5.3 0 6.6 0 8.2v10.6C0 20.4 1.3 21.7 2.9 21.7h18.2c1.6 0 2.9-1.3 2.9-2.9V8.2c0-1.6-1.3-2.9-2.9-2.9zM12 18.5c-3.1 0-5.7-2.5-5.7-5.7s2.5-5.7 5.7-5.7 5.7 2.5 5.7 5.7-2.5 5.7-5.7 5.7zm0-9.8c-2.3 0-4.1 1.8-4.1 4.1s1.8 4.1 4.1 4.1 4.1-1.8 4.1-4.1-1.8-4.1-4.1-4.1z"></path>
+                                        </svg>
+                                        `}
+                                        <div class="flex flex-col flex-1 min-w-0">
+                                            <span class="truncate">${senderInfo}</span>
+                                            ${vid.text ? `<span class="truncate text-[#d1d7db] mt-0.5">${escapedText}</span>` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="w-[52px] h-[52px] bg-[#202c33] shrink-0 rounded-[4px] overflow-hidden relative">
+                                    <video src="${vid.file_url}#t=0.1" preload="metadata" class="w-full h-full object-cover pointer-events-none"></video>
+                                    <div class="absolute bottom-1 left-1 text-white opacity-90 flex items-center gap-1 bg-black/40 px-1 rounded pointer-events-none"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg><span class="text-[10px] font-medium">Video</span></div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                } else {
+                    html += `<div class="grid grid-cols-3 gap-[2px]">`;
+                    groups[key].forEach(vid => {
+                        let senderInfo = 'Video';
+                        if (vid.isGroup && vid.resolvedSenderName) {
+                            senderInfo = vid.resolvedSenderName;
+                        } else if (!vid.isGroup && vid.senderId == window.myUserId) {
+                            senderInfo = 'You';
+                        } else if (!vid.isGroup) {
+                            senderInfo = vid.resolvedChatName || 'Unknown';
+                        }
+                        let timeStr = new Date(vid.normalizedTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        let dateStr = new Date(vid.normalizedTime).toLocaleDateString();
+                        let timestampStr = `${dateStr}, ${timeStr}`;
+                        let escapedText = (vid.text || '').replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n').replace(/\r/g, '');
+                        
+                        html += `
+                            <div class="aspect-square bg-[#202c33] relative cursor-pointer hover:opacity-90 transition-opacity" onclick="window.openGlobalSearchVideoViewer('${vid.key}', '${vid.chatId}', '${vid.file_url}', '${senderInfo.replace(/'/g, "\\'")}', '${timestampStr}', ${vid.isGroup}, '${escapedText}')">
+                                <video src="${vid.file_url}#t=0.1" preload="metadata" class="w-full h-full object-cover pointer-events-none"></video>
+                                <div class="absolute bottom-1 left-1 text-white opacity-90 flex items-center gap-1 bg-black/40 px-1 rounded pointer-events-none"><svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg><span class="text-[10px] font-medium">Video</span></div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+            });
+            
+            container.innerHTML = html;
+        };
+
+    // ==========================================
+    // Video Viewer Functions (Global Search)
+    // ==========================================
+    window.gsVideoViewerCurrentContext = null;
+
+    window.openGlobalSearchVideoViewer = function(key, chatId, url, senderName, timestampStr, isGroup, text) {
+        window.gsVideoViewerCurrentContext = { key, chatId, url, senderName, timestampStr, isGroup, text };
+        
+        const videoEl = document.getElementById('gs_video_viewer_video');
+        if (videoEl) videoEl.src = url;
+        const senderEl = document.getElementById('gs_video_viewer_sender_name');
+        if (senderEl) senderEl.textContent = senderName;
+        const timeEl = document.getElementById('gs_video_viewer_time');
+        if (timeEl) timeEl.textContent = timestampStr;
+        
+        // Show existing reactions if available
+        const reactionsContainer = document.getElementById('gs_video_viewer_reactions_container');
+        if (reactionsContainer) reactionsContainer.innerHTML = '';
+        
+        let existingReactions = null;
+        if (isGroup && window.groupMessagesCache && window.groupMessagesCache[chatId.replace('group_', '')]) {
+            const msg = window.groupMessagesCache[chatId.replace('group_', '')].find(m => m.key === key);
+            if (msg && msg.reactions) existingReactions = msg.reactions;
+        } else if (!isGroup && window.messageCache && window.messageCache[chatId.replace('chat_', '')]) {
+            const msg = window.messageCache[chatId.replace('chat_', '')].find(m => m.key === key);
+            if (msg && msg.reactions) existingReactions = msg.reactions;
+        } else if (window.globalMessages && window.globalMessages[key]) {
+            existingReactions = window.globalMessages[key].reactions;
+        }
+        
+        if (existingReactions && reactionsContainer) {
+            const counts = {};
+            Object.values(existingReactions).forEach(r => counts[r] = (counts[r] || 0) + 1);
+            Object.entries(counts).forEach(([emoji, count]) => {
+                reactionsContainer.innerHTML += `<div class="bg-black/50 border border-white/20 rounded-full px-2 py-0.5 text-white text-[13px] flex items-center gap-1"><span>${emoji}</span>${count > 1 ? `<span class="text-white/80">${count}</span>` : ''}</div>`;
+            });
+        }
+
+        const viewer = document.getElementById('gs_video_viewer');
+        if (viewer) {
+            viewer.classList.remove('hidden');
+            void viewer.offsetWidth;
+            viewer.classList.add('show');
+        }
+        
+        if (window.refreshGsVideoViewerReactions) {
+            window.refreshGsVideoViewerReactions();
+        }
+    };
+
+    window.refreshGsVideoViewerReactions = async function() {
+        if (!window.gsVideoViewerCurrentContext) return;
+        const msgId = window.gsVideoViewerCurrentContext.key;
+        const isGroup = window.gsVideoViewerCurrentContext.isGroup;
+        let targetChatId = window.gsVideoViewerCurrentContext.chatId;
+        let path = '';
+        
+        if (isGroup) {
+            let gId = targetChatId;
+            if (gId && gId.toString().startsWith('group_')) gId = gId.toString().replace('group_', '');
+            path = `groups/${gId}/messages/${msgId}/reactions`;
+        } else {
+            let cId = targetChatId;
+            if (cId && !cId.toString().startsWith('chat_')) {
+                const id1 = parseInt(window.myUserId);
+                const id2 = parseInt(cId);
+                cId = `chat_${Math.min(id1, id2)}_${Math.max(id1, id2)}`;
+            }
+            path = `chats/${cId}/messages/${msgId}/reactions`;
+        }
+
+        try {
+            const snap = await window.get(window.ref(window.db, path));
+            const reactionsContainer = document.getElementById('gs_video_viewer_reactions_container');
+            if (reactionsContainer) reactionsContainer.innerHTML = '';
+            
+            if (snap.exists() && reactionsContainer) {
+                const existingReactions = snap.val();
+                const counts = {};
+                Object.values(existingReactions).forEach(r => counts[r] = (counts[r] || 0) + 1);
+                Object.entries(counts).forEach(([emoji, count]) => {
+                    reactionsContainer.innerHTML += `<div class="bg-black/50 border border-white/20 rounded-full px-2 py-0.5 text-white text-[13px] flex items-center gap-1"><span>${emoji}</span>${count > 1 ? `<span class="text-white/80">${count}</span>` : ''}</div>`;
+                });
+            }
+        } catch (e) {
+            console.error("Error fetching latest reactions for viewer", e);
+        }
+    };
+
+    window.closeGlobalSearchVideoViewer = function() {
+        const viewer = document.getElementById('gs_video_viewer');
+        if (viewer) viewer.classList.remove('show');
+        setTimeout(() => {
+            if (viewer) viewer.classList.add('hidden');
+            const videoEl = document.getElementById('gs_video_viewer_video');
+            if (videoEl) videoEl.src = '';
+            window.gsVideoViewerCurrentContext = null;
+        }, 300);
+        if (window.closeGsVideoViewerMenu) window.closeGsVideoViewerMenu();
+    };
+
+    window.toggleGsVideoViewerMenu = function(e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('gs_video_viewer_dropdown_menu');
+        if (menu) menu.classList.toggle('hidden');
+    };
+
+    window.closeGsVideoViewerMenu = function() {
+        const menu = document.getElementById('gs_video_viewer_dropdown_menu');
+        if (menu && !menu.classList.contains('hidden')) {
+            menu.classList.add('hidden');
+        }
+    };
+
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+        const viewer = document.getElementById('gs_video_viewer');
+        if (e.key === 'Escape' && viewer && viewer.classList.contains('show')) {
+            window.closeGlobalSearchVideoViewer();
+        }
+    });
+
+    // Wire up video viewer button event listeners after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        const gsVideoViewer = document.getElementById('gs_video_viewer');
+        if (!gsVideoViewer) return; // Video viewer HTML not loaded
+
+        // Close menu when clicking outside
+        gsVideoViewer.addEventListener('click', (e) => {
+            if (!e.target.closest('#gs_video_viewer_dropdown_menu') && !e.target.closest('button[onclick="window.toggleGsVideoViewerMenu(event)"]')) {
+                window.closeGsVideoViewerMenu();
+            }
+        });
+
+        // Download
+        const btnDownload = document.getElementById('gs_video_viewer_btn_download');
+        if (btnDownload) btnDownload.addEventListener('click', () => {
+            if (!window.gsVideoViewerCurrentContext) return;
+            const link = document.createElement('a');
+            link.href = window.gsVideoViewerCurrentContext.url;
+            link.download = `Video_${window.gsVideoViewerCurrentContext.key}.mp4`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Forward/Share
+        const handleForwardOrShare = () => {
+            if (!window.gsVideoViewerCurrentContext) return;
+            window.closeGlobalSearchVideoViewer();
+            if (window.openForwardModal) {
+                window.selectedMessages = new Set([window.gsVideoViewerCurrentContext.key]);
+                if (!window.globalMessages) window.globalMessages = {};
+                if (!window.globalMessages[window.gsVideoViewerCurrentContext.key]) {
+                    window.globalMessages[window.gsVideoViewerCurrentContext.key] = {
+                        key: window.gsVideoViewerCurrentContext.key,
+                        file_url: window.gsVideoViewerCurrentContext.url,
+                        type: 'video',
+                        text: window.gsVideoViewerCurrentContext.text || ''
+                    };
+                }
+                window.openForwardModal();
+            }
+        };
+        const btnForward = document.getElementById('gs_video_viewer_btn_forward');
+        if (btnForward) btnForward.addEventListener('click', handleForwardOrShare);
+        const btnShare = document.getElementById('gs_video_viewer_btn_share');
+        if (btnShare) btnShare.addEventListener('click', handleForwardOrShare);
+
+        // Status
+        const btnStatus = document.getElementById('gs_video_viewer_btn_status');
+        if (btnStatus) btnStatus.addEventListener('click', async () => {
+            if (!window.gsVideoViewerCurrentContext) return;
+            window.closeGlobalSearchVideoViewer();
+            if (window.openMediaStatusWithFiles) {
+                try {
+                    const response = await fetch(window.gsVideoViewerCurrentContext.url);
+                    const blob = await response.blob();
+                    let filename = 'status_video.mp4';
+                    try {
+                        const urlPath = new URL(window.gsVideoViewerCurrentContext.url).pathname;
+                        const parts = urlPath.split('/');
+                        const lastPart = parts[parts.length - 1];
+                        if (lastPart) filename = decodeURIComponent(lastPart);
+                    } catch(e) {}
+                    const file = new File([blob], filename, { type: blob.type || 'video/mp4' });
+                    window.openMediaStatusWithFiles([file]);
+                } catch (e) {
+                    console.error("Failed to load video for status", e);
+                    if (window.showToast) window.showToast('Error', 'Failed to load video for status.');
+                }
+            }
+        });
+
+        // Reply
+        const btnReply = document.getElementById('gs_video_viewer_btn_reply');
+        if (btnReply) btnReply.addEventListener('click', () => {
+            if (!window.gsVideoViewerCurrentContext) return;
+            window.closeGlobalSearchVideoViewer();
+            const chatId = window.gsVideoViewerCurrentContext.chatId;
+            const key = window.gsVideoViewerCurrentContext.key;
+            let cId = chatId;
+            let isGroup = window.gsVideoViewerCurrentContext.isGroup;
+            if (chatId.startsWith('group_')) {
+                cId = chatId.replace('group_', '');
+                let name = window.gsVideoViewerCurrentContext.senderName;
+                let avatar = '';
+                const groupEl = document.getElementById(`group_sidebar_${cId}`);
+                if (groupEl) {
+                    name = groupEl.getAttribute('data-name') || name;
+                    avatar = groupEl.getAttribute('data-avatar') || '';
+                }
+                if (window.selectGroupChat) window.selectGroupChat(cId, name, avatar);
+            } else {
+                const ids = chatId.replace('chat_', '').split('_');
+                cId = ids.find(id => id != window.myUserId) || window.myUserId;
+                let name = window.gsVideoViewerCurrentContext.senderName;
+                const sidebarEl = document.getElementById(`user_sidebar_${cId}`);
+                if (sidebarEl) name = sidebarEl.getAttribute('data-name') || name;
+                if (window.selectChat) window.selectChat(cId, name);
+            }
+            if (!window.globalMessages) window.globalMessages = {};
+            if (!window.globalMessages[key]) {
+                window.globalMessages[key] = {
+                    key: key,
+                    file_url: window.gsVideoViewerCurrentContext.url,
+                    type: 'video',
+                    text: window.gsVideoViewerCurrentContext.text || ''
+                };
+            }
+            const senderName = window.gsVideoViewerCurrentContext.senderName;
+            const text = window.gsVideoViewerCurrentContext.text || 'Video';
+            const url = window.gsVideoViewerCurrentContext.url;
+            setTimeout(() => {
+                if (window.replyToMsg) {
+                    let groupName = null;
+                    if (isGroup) {
+                        const groupEl = document.getElementById(`group_sidebar_${cId}`);
+                        if (groupEl) groupName = groupEl.getAttribute('data-name');
+                    }
+                    window.replyToMsg(key, senderName, text, groupName, url, 'video');
+                }
+            }, 800);
+        });
+
+        // React
+        const btnReact = document.getElementById('gs_video_viewer_btn_react');
+        if (btnReact) btnReact.addEventListener('click', (e) => {
+            if (!window.gsVideoViewerCurrentContext) return;
+            if (window.showReactionPopup) {
+                window.showReactionPopup(e, window.gsVideoViewerCurrentContext.key, window.gsVideoViewerCurrentContext.isGroup);
+            }
+        });
+
+        // Show in chat
+        const btnShowChat = document.getElementById('gs_video_viewer_btn_show_chat');
+        if (btnShowChat) btnShowChat.addEventListener('click', () => {
+            if (!window.gsVideoViewerCurrentContext) return;
+            window.closeGlobalSearchVideoViewer();
+            const chatId = window.gsVideoViewerCurrentContext.chatId;
+            let cId = chatId;
+            let isGroup = window.gsVideoViewerCurrentContext.isGroup;
+            if (chatId.startsWith('group_')) {
+                cId = chatId.replace('group_', '');
+            } else {
+                const ids = chatId.replace('chat_', '').split('_');
+                cId = ids.find(id => id != window.myUserId) || window.myUserId;
+            }
+            let name = window.gsVideoViewerCurrentContext.senderName;
+            let avatar = '';
+            let status = 'online';
+            const elementId = isGroup ? `group_sidebar_${cId}` : `user_sidebar_${cId}`;
+            const sidebarEl = document.getElementById(elementId);
+            if (sidebarEl) {
+                name = sidebarEl.getAttribute('data-name') || name;
+                avatar = sidebarEl.getAttribute('data-avatar') || avatar;
+                status = sidebarEl.getAttribute('data-status') || status;
+            }
+            if (isGroup) {
+                if (window.selectGroupChat) window.selectGroupChat(cId, name, avatar);
+            } else {
+                if (window.selectChat) window.selectChat(cId, name, '', avatar, status);
+            }
+            if (window.closeGlobalSearch) window.closeGlobalSearch();
+            if (window.jumpToMessage) {
+                setTimeout(() => window.jumpToMessage(chatId, window.gsVideoViewerCurrentContext.key), 500);
+            }
+        });
+
+        // Delete
+        const btnDelete = document.getElementById('gs_video_viewer_btn_delete');
+        if (btnDelete) btnDelete.addEventListener('click', () => {
+            if (!window.gsVideoViewerCurrentContext) return;
+            window.closeGlobalSearchVideoViewer();
+            if (window.deleteMsg) {
+                if (!window.globalMessages) window.globalMessages = {};
+                if (!window.globalMessages[window.gsVideoViewerCurrentContext.key]) {
+                    window.globalMessages[window.gsVideoViewerCurrentContext.key] = {
+                        key: window.gsVideoViewerCurrentContext.key,
+                        file_url: window.gsVideoViewerCurrentContext.url,
+                        type: 'video',
+                        sender_id: window.gsVideoViewerCurrentContext.isGroup ? null : (window.gsVideoViewerCurrentContext.senderName === 'You' ? window.myUserId : 'other')
+                    };
+                }
+                window.deleteMsg(window.gsVideoViewerCurrentContext.key);
+            }
+        });
+
+        // Double click zoom
+        const imgContainer = document.getElementById('gs_video_viewer_image_container');
+        if (imgContainer) imgContainer.addEventListener('dblclick', (e) => {
+            if (e.target.tagName !== 'VIDEO') return;
+            const video = e.target;
+            const isZoomed = video.style.transform === 'scale(2)';
+            if (isZoomed) {
+                video.style.transform = 'scale(1)';
+                video.style.cursor = 'zoom-in';
+            } else {
+                const rect = video.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                video.style.transformOrigin = `${x}% ${y}%`;
+                video.style.transform = 'scale(2)';
+                video.style.cursor = 'zoom-out';
+            }
+        });
+    });
+
+</script>
 </div>
+

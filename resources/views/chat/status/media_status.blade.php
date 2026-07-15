@@ -310,6 +310,34 @@
         event.target.value = '';
     };
 
+    window.openMediaStatusWithFiles = function(files) {
+        if (!files || !files.length) return;
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const type = file.type.startsWith('image/') ? 'image' : 'video';
+            const url = URL.createObjectURL(file);
+
+            selectedMediaItems.push({
+                file: file,
+                type: type,
+                url: url,
+                caption: '',
+                rotation: 0,
+                filter: 'none',
+                isHD: false,
+                canvasData: null,
+                textElements: []
+            });
+        }
+
+        if (selectedMediaItems.length > 0) {
+            document.getElementById('media_status_editor').classList.remove('hidden');
+            renderActiveMedia();
+            renderThumbnails();
+        }
+    };
+
     let currentTool = 'pencil';
     let currentColor = '#ffffff';
     let isDrawing = false;

@@ -98,6 +98,7 @@ class ChatController extends Controller
             'reply_to_id' => $request->reply_to_id ?? null,
             'reply_to_text' => $request->reply_to_text ?? null,
             'reply_to_name' => $request->reply_to_name ?? null,
+            'reply_to_media' => $request->reply_to_media ?? null,
             'lat' => $lat,
             'lng' => $lng,
             'duration' => $request->duration ?? null,

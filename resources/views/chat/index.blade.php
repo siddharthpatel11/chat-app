@@ -551,6 +551,8 @@
             @include('chat.channels.channels_main_column')
             @include('chat.calls.add_favourite_modal')
             @include('chat.media_gallery')
+            @include('chat.global_search.image_viewer')
+            @include('chat.global_search.video_viewer')
 
             <!-- Media Preview Modal -->
             <div id="media_preview_modal"
@@ -1131,11 +1133,18 @@
                             <!-- Replying Block -->
                             <div id="replying_to_block"
                                 class="hidden bg-[#2a3942] backdrop-blur-sm border-l-4 border-[#00a884] px-4 py-2 mb-2 rounded-xl shadow-sm flex justify-between items-center group cursor-pointer transition-all">
-                                <div class="flex flex-col overflow-hidden">
+                                <div class="flex-1 flex flex-col overflow-hidden mr-2">
                                     <span id="replying_to_name"
                                         class="font-semibold text-[#00a884] text-[13px]">Replying to message</span>
                                     <span id="replying_to_text"
                                         class="text-[#8696a0] text-sm truncate max-w-[200px] sm:max-w-md"></span>
+                                </div>
+                                <div id="replying_to_media_container" class="hidden h-10 w-10 shrink-0 mr-3 rounded bg-black/20 overflow-hidden relative">
+                                    <img id="replying_to_media" src="" class="hidden h-full w-full object-cover" />
+                                    <video id="replying_to_media_vid" src="" preload="metadata" class="hidden h-full w-full object-cover pointer-events-none"></video>
+                                    <div id="replying_to_media_vid_icon" class="hidden absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                                    </div>
                                 </div>
                                 <button onclick="cancelReply()"
                                     class="text-[#8696a0] hover:text-red-500 p-1.5 rounded-full hover:bg-black/10 focus:outline-none transition-colors">
@@ -2732,6 +2741,7 @@
                     msgData.reply_to_text = window.replyingToText || (window.globalMessages[window.replyingToKey]
                         ?.text || 'Media');
                     msgData.reply_to_name = window.replyingToName || 'Member';
+                    msgData.reply_to_media = window.replyingToMedia || null;
                 }
 
                 const msgEl = document.getElementById('msg');
@@ -2757,9 +2767,11 @@
             }
             if (window.replyingToKey) {
                 formData.append('reply_to_id', window.replyingToKey);
-                formData.append('reply_to_text', window.replyingToText || (window.globalMessages[window.replyingToKey]
-                    ?.text || 'Media'));
+                formData.append('reply_to_text', window.replyingToText || (window.globalMessages[window.replyingToKey]?.text || 'Media'));
                 formData.append('reply_to_name', window.replyingToName || 'Member');
+                if (window.replyingToMedia) {
+                    formData.append('reply_to_media', window.replyingToMedia);
+                }
             }
 
             // Reset inputs
@@ -2825,12 +2837,17 @@
             }
         };
 
+        window.replyingToMedia = null;
+        window.replyingToType = null;
+
         window.replyTo = function(key) {
             window.closeMsgMenu(key);
             const msgData = window.globalMessages[key];
             if (!msgData) return;
 
             window.replyingToKey = key;
+            window.replyingToMedia = msgData.file_url || null;
+            window.replyingToType = msgData.type || null;
 
             let senderName = "Member";
             if (msgData.sender_id == window.myUserId) {
@@ -2848,17 +2865,65 @@
             document.getElementById('replying_to_block').classList.remove('hidden');
             document.getElementById('replying_to_name').textContent = window.replyingToName;
             document.getElementById('replying_to_text').textContent = window.replyingToText;
+            
+            const mediaContainer = document.getElementById('replying_to_media_container');
+            const mediaImg = document.getElementById('replying_to_media');
+            const mediaVid = document.getElementById('replying_to_media_vid');
+            const mediaVidIcon = document.getElementById('replying_to_media_vid_icon');
+            
+            if (window.replyingToMedia && (window.replyingToType === 'image' || window.replyingToType === 'video')) {
+                mediaContainer.classList.remove('hidden');
+                if (window.replyingToType === 'video') {
+                    if (mediaImg) { mediaImg.classList.add('hidden'); mediaImg.src = ''; }
+                    if (mediaVid) { mediaVid.classList.remove('hidden'); mediaVid.src = window.replyingToMedia + '#t=0.1'; }
+                    if (mediaVidIcon) mediaVidIcon.classList.remove('hidden');
+                } else {
+                    if (mediaVid) { mediaVid.classList.add('hidden'); mediaVid.src = ''; }
+                    if (mediaVidIcon) mediaVidIcon.classList.add('hidden');
+                    if (mediaImg) { mediaImg.classList.remove('hidden'); mediaImg.src = window.replyingToMedia; }
+                }
+            } else {
+                mediaContainer.classList.add('hidden');
+                if (mediaImg) mediaImg.src = '';
+                if (mediaVid) mediaVid.src = '';
+            }
+
             document.getElementById('msg').focus();
         };
 
-        window.replyToMsg = function(key, name, text, groupName = null) {
+        window.replyToMsg = function(key, name, text, groupName = null, mediaUrl = null, mediaType = null) {
             window.replyingToKey = key;
             window.replyingToName = name;
             window.replyingToText = text;
+            window.replyingToMedia = mediaUrl;
+            window.replyingToType = mediaType;
 
             document.getElementById('replying_to_block').classList.remove('hidden');
             document.getElementById('replying_to_name').textContent = groupName ? `${name} . ${groupName}` : name;
             document.getElementById('replying_to_text').textContent = text;
+            
+            const mediaContainer = document.getElementById('replying_to_media_container');
+            const mediaImg = document.getElementById('replying_to_media');
+            const mediaVid = document.getElementById('replying_to_media_vid');
+            const mediaVidIcon = document.getElementById('replying_to_media_vid_icon');
+            
+            if (mediaUrl && (mediaType === 'image' || mediaType === 'video')) {
+                mediaContainer.classList.remove('hidden');
+                if (mediaType === 'video') {
+                    if (mediaImg) { mediaImg.classList.add('hidden'); mediaImg.src = ''; }
+                    if (mediaVid) { mediaVid.classList.remove('hidden'); mediaVid.src = mediaUrl + '#t=0.1'; }
+                    if (mediaVidIcon) mediaVidIcon.classList.remove('hidden');
+                } else {
+                    if (mediaVid) { mediaVid.classList.add('hidden'); mediaVid.src = ''; }
+                    if (mediaVidIcon) mediaVidIcon.classList.add('hidden');
+                    if (mediaImg) { mediaImg.classList.remove('hidden'); mediaImg.src = mediaUrl; }
+                }
+            } else {
+                mediaContainer.classList.add('hidden');
+                if (mediaImg) mediaImg.src = '';
+                if (mediaVid) mediaVid.src = '';
+            }
+
             document.getElementById('msg').focus();
         };
 
@@ -2866,7 +2931,30 @@
             window.replyingToKey = null;
             window.replyingToName = null;
             window.replyingToText = null;
+            window.replyingToMedia = null;
+            window.replyingToType = null;
             document.getElementById('replying_to_block').classList.add('hidden');
+        };
+
+        window.scrollToAndHighlightMessage = function(msgId) {
+            const el = document.getElementById('msg_' + msgId);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Remove existing highlight if any
+                el.classList.remove('bg-white/20', 'transition-colors', 'duration-500', 'duration-1000');
+                
+                // Add highlight
+                setTimeout(() => {
+                    el.classList.add('bg-white/20', 'transition-colors', 'duration-500');
+                    setTimeout(() => {
+                        el.classList.remove('bg-white/20');
+                        el.classList.add('duration-1000');
+                        setTimeout(() => {
+                            el.classList.remove('transition-colors', 'duration-500', 'duration-1000');
+                        }, 1000);
+                    }, 1000);
+                }, 100);
+            }
         };
 
         window.editingMessageKey = null;
@@ -3251,14 +3339,32 @@
         window.onSidebarSearchFocus = function() {
             document.getElementById('sidebar_search_icon')?.classList.add('hidden');
             document.getElementById('sidebar_back_icon')?.classList.remove('hidden');
+            
+            // Toggle filters
+            document.getElementById('chat_filters_container')?.classList.add('hidden');
+            document.getElementById('chat_filters_container')?.classList.remove('flex');
+            document.getElementById('global_search_filters_container')?.classList.remove('hidden');
+            document.getElementById('global_search_filters_container')?.classList.add('flex');
         };
 
         window.onSidebarSearchBlur = function() {
-            const input = document.getElementById('sidebar_search');
-            if (!input || input.value.trim() === '') {
-                document.getElementById('sidebar_search_icon')?.classList.remove('hidden');
-                document.getElementById('sidebar_back_icon')?.classList.add('hidden');
-            }
+            setTimeout(() => {
+                const input = document.getElementById('sidebar_search');
+                // Don't revert if a filter chip is active
+                const chipContainer = document.getElementById('search_selected_filter_chip');
+                const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
+                
+                if (!hasFilter && (!input || input.value.trim() === '')) {
+                    document.getElementById('sidebar_search_icon')?.classList.remove('hidden');
+                    document.getElementById('sidebar_back_icon')?.classList.add('hidden');
+                    
+                    // Toggle filters back
+                    document.getElementById('global_search_filters_container')?.classList.add('hidden');
+                    document.getElementById('global_search_filters_container')?.classList.remove('flex');
+                    document.getElementById('chat_filters_container')?.classList.remove('hidden');
+                    document.getElementById('chat_filters_container')?.classList.add('flex');
+                }
+            }, 150);
         };
 
         window.blurSidebarSearch = function() {
@@ -3270,6 +3376,40 @@
             window.activeSearchQuery = null;
             window.activeSearchMsgTime = null;
             window.filterSidebar();
+            
+            // Clear chip and restore search UI
+            const chipContainer = document.getElementById('search_selected_filter_chip');
+            if (chipContainer) {
+                chipContainer.classList.add('hidden');
+                chipContainer.classList.remove('flex');
+                chipContainer.innerHTML = '';
+            }
+            
+            const searchInput = document.getElementById('sidebar_search');
+            if (searchInput) {
+                searchInput.placeholder = 'Ask Meta AI or Search';
+                searchInput.classList.add('ml-4');
+                searchInput.classList.remove('ml-2');
+            }
+            
+            document.getElementById('sidebar_search_list_view')?.classList.add('hidden');
+            document.getElementById('sidebar_search_list_view')?.classList.remove('block');
+            
+            // Restore views
+            document.getElementById('user_list_container')?.classList.remove('hidden');
+            document.getElementById('global_search_results_container')?.classList.add('hidden');
+            document.getElementById('global_search_results_container')?.classList.remove('flex');
+            
+            // Remove selection styles from buttons
+            document.querySelectorAll('.global-search-filter').forEach(btn => {
+                btn.classList.remove('bg-[#0a332c]');
+                btn.classList.add('bg-[#202c33]');
+                btn.querySelector('svg')?.classList.remove('text-[#00a884]');
+                btn.querySelector('span')?.classList.remove('text-[#00a884]');
+                btn.querySelector('svg')?.classList.add('text-[#aebac1]');
+                btn.querySelector('span')?.classList.add('text-[#aebac1]');
+            });
+            
             document.getElementById('sidebar_search_icon')?.classList.remove('hidden');
             document.getElementById('sidebar_back_icon')?.classList.add('hidden');
             document.getElementById('sidebar_search_clear')?.classList.add('hidden');
@@ -3281,7 +3421,16 @@
                 input.value = '';
                 input.focus();
             }
-            window.filterSidebar();
+            
+            // If there's a filter active, clear it too
+            const chipContainer = document.getElementById('search_selected_filter_chip');
+            if (chipContainer && !chipContainer.classList.contains('hidden')) {
+                window.blurSidebarSearch();
+                // We keep focus in this case but blur logic does what we need
+                document.getElementById('sidebar_search')?.focus();
+            } else {
+                window.filterSidebar();
+            }
         };
 
         window.showToast = function(title, body, otherUserId = null, otherName = null) {
@@ -4004,14 +4153,16 @@
                         return;
                     }
 
-                    // Cache message for search
-                    if (data.text) {
+                    // Cache message for search (text or image)
+                    if (data.text || ((data.type === 'image' || data.type === 'video' || data.type === 'audio') && data.file_url)) {
                         // Avoid duplicates
                         if (!window.messageCache[otherId].find(m => m.key === key)) {
                             window.messageCache[otherId].push({
                                 key: key,
-                                text: data.text,
+                                text: data.text || '',
                                 time: data.time,
+                                type: data.type || 'text',
+                                file_url: data.file_url || null,
                                 senderId: data.sender_id
                             });
                         }
@@ -5373,8 +5524,18 @@
                     mediaContent =
                         `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
                 } else if (data.type === 'video' && data.file_url) {
+                    const vSender = isMe ? 'You' : (window.activeChatUser ? window.activeChatUser.name : 'Member');
+                    const vSenderEscaped = vSender.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                    const vTextEscaped = data.text ? data.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ") : '';
                     mediaContent =
-                        `<video src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs rounded-lg mb-2"></video>`;
+                        `<div class="relative cursor-pointer max-w-[200px] sm:max-w-xs rounded-lg mb-2 overflow-hidden bg-[#233138] border border-[#313d45] flex items-center justify-center min-h-[120px]" onclick="event.stopPropagation(); window.openGlobalSearchVideoViewer('${key}', window.currentChatId, '${data.file_url}', '${vSenderEscaped}', '${time}', false, '${vTextEscaped}')">
+                            <video src="${data.file_url}#t=0.1" preload="metadata" class="w-full h-full max-h-[300px] object-cover pointer-events-none"></video>
+                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div class="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm shadow-sm border border-white/20">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="white" class="ml-1"><path d="M8 5v14l11-7z"/></svg>
+                                </div>
+                            </div>
+                        </div>`;
                 } else if (data.type === 'audio' && data.file_url) {
                     mediaContent =
                         `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;
@@ -5554,10 +5715,21 @@
                 let replyBlock = '';
                 if (data.reply_to_text) {
                     const rName = data.reply_to_name || 'Member';
+                    let replyMediaHtml = '';
+                    if (data.reply_to_media) {
+                        if (data.reply_to_media.match(/\.(mp4|webm|ogg)(\?.*)?$/i) || data.reply_to_text === 'Video') {
+                            replyMediaHtml = `<div class="h-10 w-10 shrink-0 ml-2 rounded overflow-hidden bg-black/20 relative"><video src="${data.reply_to_media}#t=0.1" preload="metadata" class="h-full w-full object-cover pointer-events-none"></video><div class="absolute inset-0 flex items-center justify-center bg-black/20 pointer-events-none"><svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></div></div>`;
+                        } else {
+                            replyMediaHtml = `<div class="h-10 w-10 shrink-0 ml-2 rounded overflow-hidden bg-black/20"><img src="${data.reply_to_media}" class="h-full w-full object-cover"></div>`;
+                        }
+                    }
                     replyBlock = `
-                    <div class="bg-black/5 border-l-4 ${isMe ? 'border-green-600' : 'border-blue-500'} rounded p-2 mb-2 text-sm overflow-hidden opacity-80 cursor-pointer" onclick="if(document.getElementById('msg_${data.reply_to_id}')){document.getElementById('msg_${data.reply_to_id}').scrollIntoView({behavior:'smooth'})}">
-                        <div class="font-semibold ${isMe ? 'text-green-700' : 'text-blue-600'} text-xs">${rName}</div>
-                        <div class="text-[#e9edef] truncate">${data.reply_to_text}</div>
+                    <div class="bg-black/5 border-l-4 ${isMe ? 'border-green-600' : 'border-blue-500'} rounded p-2 mb-2 text-sm overflow-hidden opacity-80 cursor-pointer flex justify-between items-center" onclick="window.scrollToAndHighlightMessage('${data.reply_to_id}')">
+                        <div class="flex flex-col flex-1 overflow-hidden">
+                            <div class="font-semibold ${isMe ? 'text-green-700' : 'text-blue-600'} text-xs truncate">${rName}</div>
+                            <div class="text-[#e9edef] truncate">${data.reply_to_text}</div>
+                        </div>
+                        ${replyMediaHtml}
                     </div>`;
                 }
 
@@ -8176,3 +8348,5 @@
         });
     </script>
 </x-app-layout>
+
+

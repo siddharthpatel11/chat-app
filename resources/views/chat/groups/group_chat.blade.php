@@ -6121,8 +6121,18 @@
                 mediaContent =
                     `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
             } else if (data.type === 'video' && data.file_url) {
+                const vSender = data.sender_id == window.myUserId ? 'You' : (window.allContacts?.find(c => c.id == data.sender_id)?.name || 'Member');
+                const vSenderEscaped = vSender.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                const vTextEscaped = data.text ? data.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ") : '';
                 mediaContent =
-                    `<video src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs rounded-lg mb-2"></video>`;
+                    `<div class="relative cursor-pointer max-w-[200px] sm:max-w-xs rounded-lg mb-2 overflow-hidden bg-[#233138] border border-[#313d45] flex items-center justify-center min-h-[120px]" onclick="event.stopPropagation(); window.openGlobalSearchVideoViewer('${key}', window.currentChatId, '${data.file_url}', '${vSenderEscaped}', '${time}', true, '${vTextEscaped}')">
+                        <video src="${data.file_url}#t=0.1" preload="metadata" class="w-full h-full max-h-[300px] object-cover pointer-events-none"></video>
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div class="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm shadow-sm border border-white/20">
+                                <svg viewBox="0 0 24 24" width="24" height="24" fill="white" class="ml-1"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                        </div>
+                    </div>`;
             } else if (data.type === 'audio' && data.file_url) {
                 mediaContent =
                     `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;

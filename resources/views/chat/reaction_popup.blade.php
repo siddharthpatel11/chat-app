@@ -1,5 +1,5 @@
 <!-- Full Emoji Picker Modal -->
-<div id="full_reaction_picker_modal" class="hidden fixed inset-0 z-[300] items-center justify-center">
+<div id="full_reaction_picker_modal" class="hidden fixed inset-0 z-[3000] items-center justify-center">
     <!-- Overlay -->
     <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] transition-opacity"
         onclick="window.closeFullReactionPicker()"></div>
@@ -14,7 +14,7 @@
 
 <!-- Reaction Popup Container -->
 <div id="reaction_popup"
-    class="hidden absolute z-[200] bg-[#233138]/90 backdrop-blur-md rounded-full px-3 py-2 shadow-2xl border border-white/10 flex items-center gap-1.5 transition-all transform scale-95 opacity-0 duration-200 origin-bottom">
+    class="hidden absolute z-[3000] bg-[#233138]/90 backdrop-blur-md rounded-full px-3 py-2 shadow-2xl border border-white/10 flex items-center gap-1.5 transition-all transform scale-95 opacity-0 duration-200 origin-bottom">
     <style>
         #reaction_popup.show {
             transform: scale(1);
@@ -45,18 +45,24 @@
         }
     </style>
 
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('👍', event)"><span class="emoji-text">👍</span></button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('❤️', event)"><span class="emoji-text">❤️</span></button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('😂', event)"><span class="emoji-text">😂</span></button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('😮', event)"><span class="emoji-text">😮</span></button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('😢', event)"><span class="emoji-text">😢</span></button>
-    <button class="reaction-emoji-btn" onclick="window.sendReaction('🙏', event)"><span class="emoji-text">🙏</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('👍', window.currentReactionMsgId, window.currentReactionIsGroup, event, window.currentReactionIsChannel)"><span class="emoji-text">👍</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('❤️', window.currentReactionMsgId, window.currentReactionIsGroup, event, window.currentReactionIsChannel)"><span class="emoji-text">❤️</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('😂', window.currentReactionMsgId, window.currentReactionIsGroup, event, window.currentReactionIsChannel)"><span class="emoji-text">😂</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('😮', window.currentReactionMsgId, window.currentReactionIsGroup, event, window.currentReactionIsChannel)"><span class="emoji-text">😮</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('😢', window.currentReactionMsgId, window.currentReactionIsGroup, event, window.currentReactionIsChannel)"><span class="emoji-text">😢</span></button>
+    <button class="reaction-emoji-btn" onclick="window.sendReaction('🙏', window.currentReactionMsgId, window.currentReactionIsGroup, event, window.currentReactionIsChannel)"><span class="emoji-text">🙏</span></button>
+    <button class="reaction-emoji-btn" onclick="window.openFullReactionPicker(window.currentReactionMsgId, window.currentReactionIsGroup, event, window.currentReactionIsChannel)" style="background: rgba(255,255,255,0.1); border-radius: 50%; padding: 4px; margin-left: 2px;">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="text-white">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path>
+        </svg>
+    </button>
 </div>
 
 <script>
     window.currentReactionMsgId = null;
     window.currentReactionIsGroup = false;
     window.seenReactions = window.seenReactions || new Set();
+    window.closeReactionPopupTimeout = null;
 
     // Close popup when clicking outside
     document.addEventListener('click', function(e) {
@@ -68,6 +74,11 @@
 
     window.showReactionPopup = function(event, msgId, isGroup) {
         event.stopPropagation();
+        
+        if (window.closeReactionPopupTimeout) {
+            clearTimeout(window.closeReactionPopupTimeout);
+            window.closeReactionPopupTimeout = null;
+        }
 
         window.currentReactionMsgId = msgId;
         window.currentReactionIsGroup = isGroup;
@@ -100,16 +111,16 @@
 
             // Center horizontally relative to bubble
             leftPos = bubbleRect.left + (bubbleRect.width / 2) - (popup.offsetWidth / 2);
-
-            // Keep within screen bounds horizontally
-            if (leftPos < 10) leftPos = 10;
-            if (leftPos + popup.offsetWidth > window.innerWidth - 10) {
-                leftPos = window.innerWidth - popup.offsetWidth - 10;
-            }
         } else {
             // Fallback to button position
             topPos = btnRect.top - 60;
-            leftPos = btnRect.left - (popup.offsetWidth / 2);
+            leftPos = btnRect.left - (popup.offsetWidth / 2) + 20; // Added small offset to center better on button
+        }
+
+        // Keep within screen bounds horizontally
+        if (leftPos < 10) leftPos = 10;
+        if (leftPos + popup.offsetWidth > window.innerWidth - 10) {
+            leftPos = window.innerWidth - popup.offsetWidth - 10;
         }
 
         popup.style.top = topPos + 'px';
@@ -125,10 +136,10 @@
         const popup = document.getElementById('reaction_popup');
         if (popup) {
             popup.classList.remove('show');
-            setTimeout(() => {
+            window.closeReactionPopupTimeout = setTimeout(() => {
                 popup.classList.add('hidden');
                 window.currentReactionMsgId = null;
-            }, 200);
+            }, 100);
         }
     };
 
@@ -141,12 +152,31 @@
         }
 
         let path = '';
+        let targetChatId = window.currentChatId;
+        let isGlobalSearch = false;
+        
+        if (window.gsViewerCurrentContext && window.gsViewerCurrentContext.key === msgId) {
+            targetChatId = window.gsViewerCurrentContext.chatId;
+            isGlobalSearch = true;
+        } else if (window.gsVideoViewerCurrentContext && window.gsVideoViewerCurrentContext.key === msgId) {
+            targetChatId = window.gsVideoViewerCurrentContext.chatId;
+            isGlobalSearch = true;
+        }
+        
         if (isChannel && window.currentChannel) {
             path = `channels/${window.currentChannel.id}/messages/${msgId}/reactions/${window.myUserId}`;
         } else if (isGroup) {
-            path = `groups/${window.currentChatId}/messages/${msgId}/reactions/${window.myUserId}`;
+            let gId = targetChatId;
+            if (gId && gId.toString().startsWith('group_')) gId = gId.toString().replace('group_', '');
+            path = `groups/${gId}/messages/${msgId}/reactions/${window.myUserId}`;
         } else {
-            path = `chats/${window.currentChatId}/messages/${msgId}/reactions/${window.myUserId}`;
+            let cId = targetChatId;
+            if (cId && !cId.toString().startsWith('chat_')) {
+                const id1 = parseInt(window.myUserId);
+                const id2 = parseInt(cId);
+                cId = `chat_${Math.min(id1, id2)}_${Math.max(id1, id2)}`;
+            }
+            path = `chats/${cId}/messages/${msgId}/reactions/${window.myUserId}`;
         }
 
         try {
@@ -160,6 +190,12 @@
             }
         } catch (e) {
             console.error("Error setting reaction", e);
+        }
+
+        if (window.refreshGsViewerReactions && window.gsViewerCurrentContext && window.gsViewerCurrentContext.key === msgId) {
+            window.refreshGsViewerReactions();
+        } else if (window.refreshGsVideoViewerReactions && window.gsVideoViewerCurrentContext && window.gsVideoViewerCurrentContext.key === msgId) {
+            window.refreshGsVideoViewerReactions();
         }
 
         // Close menu
@@ -183,6 +219,13 @@
                 groupMenu.classList.remove('opacity-100', 'scale-100', 'flex');
                 groupMenu.classList.add('opacity-0', 'scale-95', 'hidden');
             }
+        }
+        
+        if (typeof window.closeFullReactionPicker === 'function') {
+            window.closeFullReactionPicker();
+        }
+        if (typeof window.closeReactionPopup === 'function') {
+            window.closeReactionPopup();
         }
     };
 
