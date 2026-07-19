@@ -50,6 +50,41 @@
                 </svg>
                 <span class="text-[#aebac1] text-[14px] font-medium">Links</span>
             </button>
+            <!-- Documents -->
+            <button onclick="setGlobalSearchFilter('documents')" class="global-search-filter flex items-center gap-2 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[14px] font-medium">Documents</span>
+            </button>
+            <!-- Stickers -->
+            <button onclick="setGlobalSearchFilter('stickers')" class="global-search-filter flex items-center gap-2 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M19.5 4h-15C3.1 4 2 5.1 2 6.5v11C2 18.9 3.1 20 4.5 20h10l7-7V6.5C21.5 5.1 20.4 4 19.5 4zm.5 8h-4.5V20l4.5-4.5V12z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[14px] font-medium">Stickers</span>
+            </button>
+            <!-- Polls -->
+            <button onclick="setGlobalSearchFilter('polls')" class="global-search-filter flex items-center gap-2 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M4 5h16v2H4V5zm0 6h12v2H4v-2zm0 6h8v2H4v-2z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[14px] font-medium">Polls</span>
+            </button>
+            <!-- Contacts -->
+            <button onclick="setGlobalSearchFilter('contacts')" class="global-search-filter flex items-center gap-2 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M12 12c2.2 0 4-1.8 4-4s-1.8-4-4-4-4 1.8-4 4 1.8 4 4 4zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[14px] font-medium">Contacts</span>
+            </button>
+            <!-- Non-contacts -->
+            <button onclick="setGlobalSearchFilter('non-contacts')" class="global-search-filter flex items-center gap-2 bg-[#202c33] hover:bg-[#2a3942] rounded-full px-3 py-1.5 shrink-0 transition-colors">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" class="text-[#aebac1]">
+                    <path d="M21 21l-18-18-1.4 1.4 3.7 3.7c-1 .6-1.3 1.9-1.3 2.9 0 2.2 1.8 4 4 4 1 0 2-.4 2.7-1l2.4 2.4C10.7 17.5 7 17.8 4 19v2h14.6l2 2L21 21zm-9-7c-2.2 0-4-1.8-4-4 0-.5.1-.9.3-1.3l5 5c-.4.2-.8.3-1.3.3zm2-6.5c0-1.8-1.5-3.3-3.3-3.3-.8 0-1.5.3-2 .8l5 5c.4-.6.6-1.4.3-2.5zm6.8 9.5c0-.6-.3-1.2-.8-1.6l-1.5-1.5c1.4-.4 2.3-1.5 2.3-2.9 0-2.2-1.8-4-4-4-.3 0-.6.1-.8.1l-1.6-1.6C12.3 2.1 12.8 2 13 2c2.7 0 8 1.3 8 4v2c0 1.2-.5 2.3-1.2 3z"></path>
+                </svg>
+                <span class="text-[#aebac1] text-[14px] font-medium">Non-contacts</span>
+            </button>
         </div>
     </div>
 

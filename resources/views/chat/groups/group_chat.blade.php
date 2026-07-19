@@ -4878,8 +4878,12 @@
             
             const chipContainer = document.getElementById('search_selected_filter_chip');
             const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
-            if (hasFilter && window.currentGlobalSearchFilter === 'unread') {
-                if (window.setSidebarFilter) window.setSidebarFilter('unread');
+            if (hasFilter) {
+                if (window.currentGlobalSearchFilter === 'unread') {
+                    if (window.setSidebarFilter) window.setSidebarFilter('unread');
+                } else if (['contacts', 'non-contacts'].includes(window.currentGlobalSearchFilter)) {
+                    if (typeof window.sortSidebar === 'function') window.sortSidebar();
+                }
             }
             return;
         }

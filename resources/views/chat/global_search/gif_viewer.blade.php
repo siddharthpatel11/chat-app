@@ -349,7 +349,7 @@
     document.getElementById('gs_gif_viewer_btn_react').addEventListener('click', (e) => {
         if (!window.gsGifViewerCurrentContext) return;
         if (window.showReactionPopup) {
-            window.showReactionPopup(e, window.gsGifViewerCurrentContext.key, window.gsGifViewerCurrentContext.isGroup);
+            window.showReactionPopup(e, window.gsGifViewerCurrentContext.key, window.gsGifViewerCurrentContext.isGroup, true);
         }
     });
 

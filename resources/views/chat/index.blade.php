@@ -1347,8 +1347,8 @@
                                                 </div>
                                                 <span class="text-gray-300 text-xs">Contact</span>
                                             </div>
-                                            <!-- Poll (Placeholder) -->
-                                            <div class="flex flex-col items-center gap-1 group cursor-pointer">
+                                            <!-- Poll -->
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="window.openPollModal()">
                                                 <div
                                                     class="w-14 h-14 rounded-2xl bg-[#11a9a1] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
                                                     <svg class="w-7 h-7" fill="none" stroke="currentColor"
@@ -3160,8 +3160,12 @@
                 
                 const chipContainer = document.getElementById('search_selected_filter_chip');
                 const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
-                if (hasFilter && window.currentGlobalSearchFilter === 'unread') {
-                    if (window.setSidebarFilter) window.setSidebarFilter('unread');
+                if (hasFilter) {
+                    if (window.currentGlobalSearchFilter === 'unread') {
+                        if (window.setSidebarFilter) window.setSidebarFilter('unread');
+                    } else if (['contacts', 'non-contacts'].includes(window.currentGlobalSearchFilter)) {
+                        if (typeof window.sortSidebar === 'function') window.sortSidebar();
+                    }
                 }
                 return;
             }
@@ -3186,11 +3190,17 @@
                 
                 const chipContainer = document.getElementById('search_selected_filter_chip');
                 const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
-                if (hasFilter && window.currentGlobalSearchFilter === 'unread') {
-                    const isGroup = user.id.startsWith('group_sidebar_');
-                    const badge = isGroup ? document.getElementById(`group_unread_badge_${userId}`) : document.getElementById(`unread_badge_${userId}`);
-                    const isUnread = badge && !badge.classList.contains('hidden') && parseInt(badge.textContent) > 0;
-                    if (!isUnread) return;
+                if (hasFilter) {
+                    if (window.currentGlobalSearchFilter === 'unread') {
+                        const isGroup = user.id.startsWith('group_sidebar_');
+                        const badge = isGroup ? document.getElementById(`group_unread_badge_${userId}`) : document.getElementById(`unread_badge_${userId}`);
+                        const isUnread = badge && !badge.classList.contains('hidden') && parseInt(badge.textContent) > 0;
+                        if (!isUnread) return;
+                    } else if (window.currentGlobalSearchFilter === 'contacts') {
+                        if (user.getAttribute('data-is-contact') !== 'true' || user.id.startsWith('group_sidebar_')) return;
+                    } else if (window.currentGlobalSearchFilter === 'non-contacts') {
+                        if (user.getAttribute('data-is-contact') === 'true' || user.id.startsWith('group_sidebar_')) return;
+                    }
                 }
 
                 const name = user.getAttribute('data-name') || user.querySelector('h4')?.textContent.trim() ||
@@ -5871,6 +5881,66 @@
                                 <div class="py-2 text-center text-[#00a884] hover:text-[#00c298] font-medium text-[15px] transition-colors">View Invite</div>
                             </div>
                         </div>`;
+                } else if (data.type === 'poll') {
+                    const pollQuestion = data.text || 'Poll';
+                    const options = data.poll_options || [];
+                    const allowMultiple = data.poll_allow_multiple || false;
+                    
+                    let totalVotes = 0;
+                    options.forEach(opt => {
+                        if (opt.votes) totalVotes += Object.keys(opt.votes).length;
+                    });
+                    
+                    let optionsHtml = '';
+                    options.forEach((opt, idx) => {
+                        let voteCount = opt.votes ? Object.keys(opt.votes).length : 0;
+                        let percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0;
+                        let hasVoted = opt.votes && opt.votes[window.myUserId];
+                        
+                        let iconHtml = '';
+                        if (allowMultiple) {
+                            iconHtml = hasVoted ? 
+                                `<svg viewBox="0 0 24 24" width="20" height="20" fill="#00a884"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>` : 
+                                `<svg viewBox="0 0 24 24" width="20" height="20" fill="#8696a0"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path></svg>`;
+                        } else {
+                            iconHtml = hasVoted ? 
+                                `<svg viewBox="0 0 24 24" width="20" height="20" fill="#00a884"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></svg>` : 
+                                `<svg viewBox="0 0 24 24" width="20" height="20" fill="#8696a0"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></svg>`;
+                        }
+
+                        optionsHtml += `
+                            <div class="relative w-full mb-1.5 cursor-pointer group" onclick="window.votePoll('${key}', '${opt.id}', ${allowMultiple})">
+                                <!-- Progress bar background -->
+                                <div class="absolute inset-0 bg-[#00a884]/20 rounded-lg overflow-hidden transition-all duration-300" style="width: ${percentage}%"></div>
+                                
+                                <div class="relative flex items-center justify-between p-2 rounded-lg z-10 hover:bg-white/5 transition-colors">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        <div class="shrink-0 flex items-center justify-center">${iconHtml}</div>
+                                        <div class="text-[14.5px] text-[#e9edef] truncate">${opt.text}</div>
+                                    </div>
+                                    ${voteCount > 0 ? `<div class="text-[12px] text-white/70 font-medium pl-2">${voteCount}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    mediaContent = `
+                        <div id="poll_container_${key}" class="w-[280px] max-w-[100%] rounded-xl p-1 bg-[#202c33] border border-white/5 shadow-sm mt-1 mb-1">
+                            <div class="flex items-center gap-2 mb-2 mt-1 px-2 opacity-70">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                <span class="text-xs font-semibold tracking-wide uppercase">Poll</span>
+                            </div>
+                            
+                            <div class="text-[15.5px] text-white font-medium mb-3 px-2 leading-snug">${pollQuestion}</div>
+                            
+                            <div class="flex flex-col px-1">
+                                ${optionsHtml}
+                            </div>
+                            
+                            <div class="text-white/60 text-xs px-2 pt-2 pb-1 border-t border-white/5 mt-1">
+                                ${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'}
+                            </div>
+                        </div>`;
                 } else if (data.type === 'scheduled_call') {
                     const startStr = new Date(data.start_time * 1000).toLocaleString([], {
                         weekday: 'short',
@@ -6179,6 +6249,71 @@
                             if (timeSpan && !bubbleEl.querySelector('.edited-label')) {
                                 timeSpan.insertAdjacentHTML('beforebegin', '<span class="edited-label text-[10px] text-[#8696a0] select-none italic mr-0.5">Edited</span>');
                             }
+                        }
+                    }
+
+                    // Update poll if it's a poll
+                    if (data.type === 'poll') {
+                        const pollContainer = document.getElementById('poll_container_' + key);
+                        if (pollContainer) {
+                            const pollQuestion = data.text || 'Poll';
+                            const options = data.poll_options || [];
+                            const allowMultiple = data.poll_allow_multiple || false;
+                            
+                            let totalVotes = 0;
+                            options.forEach(opt => {
+                                if (opt.votes) totalVotes += Object.keys(opt.votes).length;
+                            });
+                            
+                            let optionsHtml = '';
+                            options.forEach((opt, idx) => {
+                                let voteCount = opt.votes ? Object.keys(opt.votes).length : 0;
+                                let percentage = totalVotes > 0 ? (voteCount / totalVotes) * 100 : 0;
+                                let hasVoted = opt.votes && opt.votes[window.myUserId];
+                                
+                                let iconHtml = '';
+                                if (allowMultiple) {
+                                    iconHtml = hasVoted ? 
+                                        `<svg viewBox="0 0 24 24" width="20" height="20" fill="#00a884"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>` : 
+                                        `<svg viewBox="0 0 24 24" width="20" height="20" fill="#8696a0"><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path></svg>`;
+                                } else {
+                                    iconHtml = hasVoted ? 
+                                        `<svg viewBox="0 0 24 24" width="20" height="20" fill="#00a884"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></svg>` : 
+                                        `<svg viewBox="0 0 24 24" width="20" height="20" fill="#8696a0"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></svg>`;
+                                }
+
+                                optionsHtml += `
+                                    <div class="relative w-full mb-1.5 cursor-pointer group" onclick="window.votePoll('${key}', '${opt.id}', ${allowMultiple})">
+                                        <!-- Progress bar background -->
+                                        <div class="absolute inset-0 bg-[#00a884]/20 rounded-lg overflow-hidden transition-all duration-300" style="width: ${percentage}%"></div>
+                                        
+                                        <div class="relative flex items-center justify-between p-2 rounded-lg z-10 hover:bg-white/5 transition-colors">
+                                            <div class="flex items-center gap-3 min-w-0">
+                                                <div class="shrink-0 flex items-center justify-center">${iconHtml}</div>
+                                                <div class="text-[14.5px] text-[#e9edef] truncate">${opt.text}</div>
+                                            </div>
+                                            ${voteCount > 0 ? `<div class="text-[12px] text-white/70 font-medium pl-2">${voteCount}</div>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+
+                            pollContainer.innerHTML = `
+                                <div class="flex items-center gap-2 mb-2 mt-1 px-2 opacity-70">
+                                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                                    <span class="text-xs font-semibold tracking-wide uppercase">Poll</span>
+                                </div>
+                                
+                                <div class="text-[15.5px] text-white font-medium mb-3 px-2 leading-snug">${pollQuestion}</div>
+                                
+                                <div class="flex flex-col px-1">
+                                    ${optionsHtml}
+                                </div>
+                                
+                                <div class="text-white/60 text-xs px-2 pt-2 pb-1 border-t border-white/5 mt-1">
+                                    ${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'}
+                                </div>
+                            `;
                         }
                     }
 
@@ -8570,6 +8705,7 @@
         </div>
     </div>
     @include('chat.modals.chat_wallpaper_modal')
+    @include('chat.modals.poll_modal')
     @include('chat.settings.disappearing_messages.index')
     @include('chat.channels.channels_scripts')
 

@@ -72,7 +72,7 @@
         }
     });
 
-    window.showReactionPopup = function(event, msgId, isGroup) {
+    window.showReactionPopup = function(event, msgId, isGroup, forceBtnPosition = false) {
         event.stopPropagation();
         
         if (window.closeReactionPopupTimeout) {
@@ -96,7 +96,7 @@
         const bubble = document.getElementById('bubble_' + msgId);
         let topPos, leftPos;
 
-        if (bubble) {
+        if (bubble && !forceBtnPosition) {
             const bubbleRect = bubble.getBoundingClientRect();
             // Position above the bubble
             topPos = bubbleRect.top - 60;
