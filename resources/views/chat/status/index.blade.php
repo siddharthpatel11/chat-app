@@ -164,7 +164,8 @@
 
 <style>
     .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
+        height: 8px;
     }
 
     .custom-scrollbar::-webkit-scrollbar-thumb {

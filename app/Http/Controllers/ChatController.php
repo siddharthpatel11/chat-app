@@ -62,18 +62,22 @@ class ChatController extends Controller
             $file = $request->file('file');
             $mimeType = $file->getMimeType();
 
-            if (str_starts_with($mimeType, 'image/')) {
-                $type = 'image';
-            } elseif (str_starts_with($mimeType, 'video/')) {
-                $type = 'video';
-            } elseif (str_starts_with($mimeType, 'audio/')) {
-                $type = 'audio';
-            } else {
-                $type = 'document';
+            $type = $request->type;
+            if (!$type) {
+                if (str_starts_with($mimeType, 'image/')) {
+                    $type = 'image';
+                } elseif (str_starts_with($mimeType, 'video/')) {
+                    $type = 'video';
+                } elseif (str_starts_with($mimeType, 'audio/')) {
+                    $type = 'audio';
+                } else {
+                    $type = 'document';
+                }
             }
 
             $fileName = $file->getClientOriginalName();
-            $path = $file->store('uploads', 'public');
+            $extension = $file->getClientOriginalExtension() ?: $file->guessExtension() ?: 'bin';
+            $path = $file->storeAs('uploads', \Illuminate\Support\Str::random(40) . '.' . $extension, 'public');
             $fileUrl = url('storage/' . $path);
         } elseif ($request->has('file_url')) {
             $fileUrl = $request->file_url;

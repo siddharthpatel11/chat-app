@@ -231,7 +231,7 @@
         document.body.removeChild(link);
     });
 
-    const handleForwardOrShare = () => {
+    const handleImageForwardOrShare = () => {
         if (!window.gsViewerCurrentContext) return;
 
         window.closeGlobalSearchImageViewer();
@@ -251,8 +251,8 @@
         }
     };
     
-    document.getElementById('gs_viewer_btn_forward').addEventListener('click', handleForwardOrShare);
-    document.getElementById('gs_viewer_btn_share').addEventListener('click', handleForwardOrShare);
+    document.getElementById('gs_viewer_btn_forward').addEventListener('click', handleImageForwardOrShare);
+    document.getElementById('gs_viewer_btn_share').addEventListener('click', handleImageForwardOrShare);
     
     document.getElementById('gs_viewer_btn_status').addEventListener('click', async () => {
         if (!window.gsViewerCurrentContext) return;

@@ -6,7 +6,8 @@
     }
 
     .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
+        width: 8px;
+        height: 8px;
     }
 
     .custom-scrollbar::-webkit-scrollbar-track {
@@ -4406,6 +4407,14 @@
             const clearedTime = window.clearedChats?.[elementId] || 0;
             if (data.time <= clearedTime) return;
 
+            // Ignore expired disappearing messages
+            if (data.is_disappearing && data.expires_at) {
+                const currentTime = Date.now() / 1000;
+                if (data.expires_at - currentTime <= 0) {
+                    return; // Already expired, ignore it for sidebar/badges
+                }
+            }
+
             // Update Last Message Text
             const lastMsgEl = document.getElementById(`group_last_msg_${groupId}`);
             if (lastMsgEl) {
@@ -4740,7 +4749,10 @@
                         time: data.time || 0,
                         senderId: data.sender_id,
                         type: data.type || 'text',
-                        file_url: data.file_url || ""
+                        file_url: data.file_url || "",
+                        file_name: data.file_name || null,
+                        file_size: data.file_size || null,
+                        caption: data.caption || null
                     });
 
                     // Populate global media cache
@@ -4863,6 +4875,12 @@
             searchResults?.classList.add('hidden');
             noResults?.classList.add('hidden');
             noResults?.classList.remove('flex');
+            
+            const chipContainer = document.getElementById('search_selected_filter_chip');
+            const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
+            if (hasFilter && window.currentGlobalSearchFilter === 'unread') {
+                if (window.setSidebarFilter) window.setSidebarFilter('unread');
+            }
             return;
         }
 
@@ -4904,6 +4922,14 @@
             if (window.lockedChats && window.lockedChats.includes(elementId) && window
                 .activeSidebarFilter !== 'locked') {
                 return; // Skip this user
+            }
+
+            const chipContainer = document.getElementById('search_selected_filter_chip');
+            const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
+            if (hasFilter && window.currentGlobalSearchFilter === 'unread') {
+                const badge = document.getElementById(`unread_badge_${userId}`);
+                const isUnread = badge && !badge.classList.contains('hidden') && parseInt(badge.textContent) > 0;
+                if (!isUnread) return;
             }
 
             if (nameMatch && chatsList) {
@@ -4994,6 +5020,14 @@
             if (window.lockedChats && window.lockedChats.includes(elementId) && window
                 .activeSidebarFilter !== 'locked') {
                 return; // Skip this group
+            }
+
+            const chipContainer = document.getElementById('search_selected_filter_chip');
+            const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
+            if (hasFilter && window.currentGlobalSearchFilter === 'unread') {
+                const badge = document.getElementById(`group_unread_badge_${groupId}`);
+                const isUnread = badge && !badge.classList.contains('hidden') && parseInt(badge.textContent) > 0;
+                if (!isUnread) return;
             }
 
             if (nameMatch && chatsList) {
@@ -6134,8 +6168,49 @@
                         </div>
                     </div>`;
             } else if (data.type === 'audio' && data.file_url) {
-                mediaContent =
-                    `<audio src="${data.file_url}" controls class="max-w-[200px] sm:max-w-xs mb-2"></audio>`;
+                const senderAvatar = data.sender_id == window.myUserId ? window.myUserAvatar : (window.getUserAvatar ? window.getUserAvatar(data.sender_id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.sender_name || 'User')}&background=202c33&color=fff`);
+                mediaContent = `
+                    <div class="flex items-center gap-3 p-2 select-none" style="min-width: 250px; max-width: 320px;">
+                        <!-- Left: Avatar with blue microphone badge -->
+                        <div class="relative shrink-0 w-10 h-10">
+                            <img src="${senderAvatar}" class="w-full h-full rounded-full object-cover">
+                            <div class="absolute -bottom-1 -right-1 w-4.5 h-4.5 rounded-full bg-[#111b21] flex items-center justify-center text-[#53bdeb] shadow-sm border border-[#111b21]">
+                                <svg viewBox="0 0 24 24" width="10" height="10" fill="currentColor">
+                                    <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- Right: Play/Pause button, seekbar, speed -->
+                        <div class="flex-1 flex flex-col gap-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <button onclick="window.toggleCustomAudioPlay('${key}')" id="audio_play_btn_${key}" class="text-[#8696a0] hover:text-[#e9edef] focus:outline-none transition-colors shrink-0">
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" id="play_svg_${key}">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" id="pause_svg_${key}" class="hidden">
+                                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                                    </svg>
+                                </button>
+                                
+                                <div class="flex-1 relative flex items-center h-6">
+                                    <div id="audio_waveform_bars_${key}" class="absolute inset-0 flex items-center gap-[2px] pointer-events-none">
+                                        ${[8, 12, 16, 12, 8, 14, 20, 16, 10, 18, 22, 14, 10, 16, 20, 12, 8, 14, 18, 12, 10, 16, 12, 8].map((h, i) => `
+                                            <div class="w-[2.5px] rounded-full bg-[#8696a0] transition-colors duration-150" style="height: ${h}px;" data-index="${i}"></div>
+                                        `).join('')}
+                                    </div>
+                                    <div id="audio_thumb_${key}" class="absolute w-[8px] h-[8px] rounded-full bg-[#53bdeb] pointer-events-none transform -translate-x-1/2" style="left: 0%;"></div>
+                                    <input type="range" min="0" max="100" value="0" step="0.1" id="audio_slider_${key}" oninput="window.onCustomAudioSliderInput('${key}')" onchange="window.onCustomAudioSliderChange('${key}')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center justify-between text-[10px] text-[#8696a0] px-1 font-semibold">
+                                <span id="audio_time_${key}">0:00</span>
+                                <button onclick="window.toggleCustomAudioSpeed('${key}')" id="audio_speed_${key}" class="hover:text-[#e9edef] bg-[#202c33]/60 px-1 rounded transition-colors focus:outline-none">1.0x</button>
+                            </div>
+                        </div>
+                        
+                        <audio id="audio_element_${key}" src="${data.file_url}" preload="metadata" class="hidden" ontimeupdate="window.onCustomAudioTimeUpdate('${key}')" onended="window.onCustomAudioEnded('${key}')" onloadedmetadata="window.onCustomAudioLoadedMetadata('${key}')"></audio>
+                    </div>`;
             } else if (data.type === 'document' && data.file_url) {
                 mediaContent = `
                     <div class="relative rounded-lg overflow-hidden border border-black/10 bg-black/5 mb-1 cursor-pointer hover:bg-black/10 transition-colors w-[260px] sm:w-[280px]" onclick="window.open('${data.file_url}', '_blank')">
