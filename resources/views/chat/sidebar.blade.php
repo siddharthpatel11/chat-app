@@ -2588,8 +2588,8 @@
                                         </svg>
                                     </button>
                                     
-                                    <div class="flex-1 relative flex items-center h-6">
-                                        <div id="audio_waveform_bars_${key}" class="absolute inset-0 flex items-center gap-[2px] pointer-events-none">
+                                    <div class="flex-1 max-w-[140px] relative flex items-center h-6">
+                                        <div id="audio_waveform_bars_${key}" class="absolute inset-0 flex items-center justify-between pointer-events-none">
                                             ${[8, 12, 16, 12, 8, 14, 20, 16, 10, 18, 22, 14, 10, 16, 20, 12, 8, 14, 18, 12, 10, 16, 12, 8].map((h, i) => `
                                                 <div class="w-[2.5px] rounded-full bg-[#8696a0] transition-colors duration-150" style="height: ${h}px;" data-index="${i}"></div>
                                             `).join('')}

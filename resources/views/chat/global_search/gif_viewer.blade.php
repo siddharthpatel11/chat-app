@@ -40,6 +40,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                 </svg>
             </button>
+            
+            <!-- Share Button -->
+            <button id="gs_gif_viewer_btn_share" class="hover:text-[#d1d7db] transition-colors focus:outline-none p-1 rounded-full" title="Share">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                </svg>
+            </button>
 
             <!-- 3 Dots Menu Button -->
             <button onclick="window.toggleGsGifViewerMenu(event)" class="hover:text-[#d1d7db] transition-colors focus:outline-none p-1 rounded-full" title="Menu">
@@ -50,9 +57,6 @@
             
             <!-- Context Menu Dropdown -->
             <div id="gs_gif_viewer_dropdown_menu" class="hidden absolute top-12 right-0 bg-[#233138] border border-[#313d45] rounded-lg shadow-xl z-[2200] py-2 w-56 transition-opacity duration-150">
-                <button id="gs_gif_viewer_btn_share" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center gap-3">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> Share
-                </button>
                 <button id="gs_gif_viewer_btn_show_chat" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg> Show in chat
                 </button>
@@ -252,7 +256,45 @@
     };
     
     document.getElementById('gs_gif_viewer_btn_forward').addEventListener('click', handleGifForwardOrShare);
-    document.getElementById('gs_gif_viewer_btn_share').addEventListener('click', handleGifForwardOrShare);
+    
+    document.getElementById('gs_gif_viewer_btn_share').addEventListener('click', async () => {
+        if (!window.gsGifViewerCurrentContext) return;
+        const url = window.gsGifViewerCurrentContext.url;
+        const text = window.gsGifViewerCurrentContext.text || '';
+        
+        if (!navigator.share) {
+            if (window.showToast) window.showToast('Notice', 'System sharing is not supported on this device.');
+            return;
+        }
+        
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const ext = url.split('.').pop().split('?')[0] || 'gif';
+            const file = new File([blob], `Shared_Media.${ext}`, { type: blob.type });
+            
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'Shared Media',
+                    text: text
+                });
+                return;
+            }
+        } catch (e) {
+            console.log("Could not share as file, falling back to URL", e);
+        }
+
+        try {
+            await navigator.share({
+                title: 'Shared Media',
+                text: text,
+                url: url
+            });
+        } catch (e) {
+            console.log("Share failed", e);
+        }
+    });
     
     document.getElementById('gs_gif_viewer_btn_status').addEventListener('click', async () => {
         if (!window.gsGifViewerCurrentContext) return;

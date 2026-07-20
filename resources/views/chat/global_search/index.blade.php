@@ -113,6 +113,18 @@
     }
 
     window.closeGlobalSearch = function() {
+        // Stop any playing audio before closing
+        document.querySelectorAll('audio[id^="audio_element_gs_"]').forEach(el => {
+            if (!el.paused) {
+                el.pause();
+                const otherKey = el.id.replace('audio_element_', '');
+                const otherPlay = document.getElementById(`play_svg_${otherKey}`);
+                const otherPause = document.getElementById(`pause_svg_${otherKey}`);
+                if (otherPlay) otherPlay.classList.remove('hidden');
+                if (otherPause) otherPause.classList.add('hidden');
+            }
+        });
+        
         // Hide Global search sidebar
         document.getElementById('global_search_sidebar').classList.add('hidden');
         document.getElementById('global_search_sidebar').classList.remove('flex', 'sm:flex');
@@ -130,6 +142,18 @@
     }
 
     window.clearGlobalSearch = function() {
+        // Stop any playing audio before clearing
+        document.querySelectorAll('audio[id^="audio_element_gs_"]').forEach(el => {
+            if (!el.paused) {
+                el.pause();
+                const otherKey = el.id.replace('audio_element_', '');
+                const otherPlay = document.getElementById(`play_svg_${otherKey}`);
+                const otherPause = document.getElementById(`pause_svg_${otherKey}`);
+                if (otherPlay) otherPlay.classList.remove('hidden');
+                if (otherPause) otherPause.classList.add('hidden');
+            }
+        });
+
         document.getElementById('global_search_input').value = '';
         document.getElementById('global_search_clear').classList.add('hidden');
         
