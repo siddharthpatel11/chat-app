@@ -3378,6 +3378,12 @@
         window.onSidebarSearchBlur = function() {
             setTimeout(() => {
                 const input = document.getElementById('sidebar_search');
+                
+                // If the input regained focus before this timeout executed, abort
+                if (document.activeElement === input) {
+                    return;
+                }
+                
                 // Don't revert if a filter chip is active
                 const chipContainer = document.getElementById('search_selected_filter_chip');
                 const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
@@ -3407,10 +3413,16 @@
             // Revert filter if we applied it via global search
             const chipContainer = document.getElementById('search_selected_filter_chip');
             const hasFilter = chipContainer && !chipContainer.classList.contains('hidden');
+            const wasContactsFilter = ['contacts', 'non-contacts'].includes(window.currentGlobalSearchFilter);
+
             if (hasFilter && window.currentGlobalSearchFilter === 'unread') {
                 if (window.setSidebarFilter) window.setSidebarFilter('all');
             }
             window.currentGlobalSearchFilter = null;
+            
+            if (hasFilter && wasContactsFilter) {
+                if (typeof window.sortSidebar === 'function') window.sortSidebar();
+            }
             
             window.filterSidebar();
             
