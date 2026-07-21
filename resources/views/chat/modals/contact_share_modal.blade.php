@@ -155,31 +155,27 @@
         const ids = Array.from(selectedContactsToShare);
         const csrf = window.csrf || document.querySelector('meta[name="csrf-token"]')?.content;
         
-        let sentCount = 0;
-        ids.forEach(id => {
-            const formData = new FormData();
-            formData.append('chat_id', window.currentChatId);
-            formData.append('type', 'contact');
-            formData.append('shared_contact_id', id);
-            
-            fetch('/send', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': csrf
-                },
-                body: formData
-            }).then(r => {
-                sentCount++;
-                if (sentCount === ids.length) {
-                    closeContactShareModal();
-                }
-            }).catch(err => {
-                console.error("Error sending contact:", err);
-                sentCount++;
-                if (sentCount === ids.length) {
-                    closeContactShareModal();
-                }
-            });
+        const formData = new FormData();
+        formData.append('chat_id', window.currentChatId);
+        formData.append('type', 'contact');
+        
+        if (ids.length === 1) {
+            formData.append('shared_contact_id', ids[0]);
+        } else {
+            formData.append('shared_contact_ids', JSON.stringify(ids));
+        }
+        
+        fetch('/send', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrf
+            },
+            body: formData
+        }).then(r => {
+            closeContactShareModal();
+        }).catch(err => {
+            console.error("Error sending contact:", err);
+            closeContactShareModal();
         });
         
         // Optimistically close

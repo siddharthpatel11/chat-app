@@ -35,6 +35,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/update-live-location', [ChatController::class, 'updateLiveLocation']);
     Route::post('/upload-status-media', [ChatController::class, 'uploadStatusMedia']);
 
+    Route::post('/chat/event/update', [ChatController::class, 'updateEvent']);
+    Route::post('/chat/event/cancel', [ChatController::class, 'cancelEvent']);
     Route::post('/save-contact', [ChatController::class, 'saveContact']);
     Route::post('/delete-contact', [ChatController::class, 'deleteContact']);
     Route::post('/send-group-notification', [ChatController::class, 'sendGroupNotification']);

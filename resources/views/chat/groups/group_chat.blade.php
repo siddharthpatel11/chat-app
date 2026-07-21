@@ -456,7 +456,7 @@
                                 </div>
                                 <span class="text-gray-300 text-xs">Poll</span>
                             </div>
-                            <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="window.showToast ? window.showToast('Notice', 'Event feature coming soon!') : alert('Event feature coming soon!')">
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="window.openCreateEventModal()">
                                 <div class="w-14 h-14 rounded-2xl bg-[#f45197] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
                                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -6262,9 +6262,21 @@
                             </div>
                         </div>
                     </div>`;
-            } else if (data.type === 'contact' && data.shared_contact_id) {
-                    const c = window.allContacts ? window.allContacts.find(u => String(u.id) === String(data.shared_contact_id)) : null;
-                    if (c) {
+            } else if (data.type === 'contact' && (data.shared_contact_id || data.shared_contact_ids)) {
+                    let ids = [];
+                    if (data.shared_contact_ids) {
+                        try {
+                            ids = typeof data.shared_contact_ids === 'string' ? JSON.parse(data.shared_contact_ids) : data.shared_contact_ids;
+                        } catch (e) {
+                            ids = data.shared_contact_ids;
+                        }
+                    }
+                    else if (data.shared_contact_id) ids = [data.shared_contact_id];
+                    
+                    const contacts = (window.allContacts || []).filter(u => ids.includes(String(u.id)) || ids.includes(Number(u.id)) || ids.includes(u.id));
+                    
+                    if (contacts.length === 1) {
+                        const c = contacts[0];
                         const avatar = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(c.id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name || 'User')}&background=202c33&color=fff`;
                         mediaContent = `
                             <div class="mb-2 w-[250px] max-w-[100%] rounded-lg overflow-hidden border ${isMe ? 'border-[#005c4b] bg-[#005c4b]' : 'border-[#202c33] bg-[#202c33]'} shadow-sm">
@@ -6280,7 +6292,79 @@
                                 </div>
                             </div>
                         `;
+                    } else if (contacts.length > 1) {
+                        const firstContact = contacts[0];
+                        const othersCount = contacts.length - 1;
+                        const avatar1 = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(firstContact.id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(firstContact.name || 'User')}&background=202c33&color=fff`;
+                        const avatar2 = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(contacts[1].id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(contacts[1].name || 'User')}&background=202c33&color=fff`;
+                        
+                        mediaContent = `
+                            <div class="mb-2 w-[250px] max-w-[100%] rounded-lg overflow-hidden border ${isMe ? 'border-[#005c4b] bg-[#005c4b]' : 'border-[#202c33] bg-[#202c33]'} shadow-sm">
+                                <div class="flex items-center p-3 gap-3">
+                                    <div class="relative w-12 h-12 shrink-0">
+                                        <img src="${avatar2}" class="absolute right-0 bottom-0 w-9 h-9 rounded-full border-2 ${isMe ? 'border-[#005c4b]' : 'border-[#202c33]'} object-cover z-0">
+                                        <img src="${avatar1}" class="absolute left-0 top-0 w-9 h-9 rounded-full border-2 ${isMe ? 'border-[#005c4b]' : 'border-[#202c33]'} object-cover z-10">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-white text-base font-medium leading-tight line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${firstContact.name || firstContact.phone || 'User'} and ${othersCount} other contact${othersCount > 1 ? 's' : ''}</div>
+                                    </div>
+                                </div>
+                                <div class="border-t ${isMe ? 'border-white/10' : 'border-[#111b21]'} p-0">
+                                    <button class="w-full py-2.5 text-center ${isMe ? 'text-[#00a884] hover:bg-white/5' : 'text-[#00a884] hover:bg-[#2a3942]'} transition-colors text-sm font-medium" onclick="window.viewAllSharedContacts('${ids.join(',')}')">View all</button>
+                                </div>
+                            </div>
+                        `;
                     }
+                } else if (data.type === 'event') {
+                    // Extract event data (if available)
+                    const eventName = data.event_name || 'Event';
+                    const startTime = data.start_time ? new Date(data.start_time) : new Date();
+                    
+                    // Format time string e.g. "Today, 10:35 am - 12:30 pm"
+                    const isToday = startTime.toDateString() === new Date().toDateString();
+                    const dayStr = isToday ? 'Today' : startTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+                    
+                    const formatTime = (d) => {
+                        return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+                    };
+                    
+                    let timeStr = formatTime(startTime);
+                    if (data.end_time) {
+                        const endTime = new Date(data.end_time);
+                        timeStr += ` - ${formatTime(endTime)}`;
+                    }
+
+                    mediaContent = `
+                        <div class="mb-2 w-[250px] max-w-[100%] rounded-lg overflow-hidden border ${isMe ? 'border-[#005c4b] bg-[#005c4b]' : 'border-[#202c33] bg-[#202c33]'} shadow-sm">
+                            <div class="p-3">
+                                <div class="flex gap-3">
+                                    <div class="w-10 h-10 shrink-0 rounded-full bg-[#111b21]/20 flex items-center justify-center text-[#00a884]">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                        <div class="text-[#e9edef] text-base font-medium truncate leading-tight">${eventName}</div>
+                                        <div class="text-[#8696a0] text-sm truncate mt-0.5">${dayStr}, ${timeStr}</div>
+                                        <div class="flex items-center gap-1.5 mt-1">
+                                            <div class="w-4 h-4 rounded-full bg-gray-500 overflow-hidden flex items-center justify-center">
+                                                <img src="${(typeof window.getUserAvatar === 'function') ? window.getUserAvatar(isMe ? window.myUserId : data.sender_id) : 'https://ui-avatars.com/api/?name=U'}" class="w-full h-full object-cover">
+                                            </div>
+                                            <span class="text-[#8696a0] text-xs">1 going</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col border-t ${isMe ? 'border-white/10' : 'border-[#111b21]'}">
+                                <button class="w-full py-2.5 text-center text-[#00a884] hover:bg-black/5 transition-colors text-sm font-medium border-b ${isMe ? 'border-white/10' : 'border-[#111b21]'}" onclick="if(${isMe}){ window.openCreateEventModal(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(data))}')) , '${key}'); } else { window.showToast ? window.showToast('Notice', 'Respond feature coming soon!') : alert('Respond feature coming soon!'); }">
+                                    ${isMe ? 'Edit event' : 'Respond'}
+                                </button>
+                                <button class="w-full py-2.5 text-center text-[#00a884] hover:bg-black/5 transition-colors text-sm font-medium" onclick="window.addToCalendar('${encodeURIComponent(JSON.stringify(data))}')">
+                                    Add to calendar
+                                </button>
+                            </div>
+                        </div>
+                    `;
                 } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data
                 .lng) {
                 const lat = parseFloat(data.lat);
@@ -6467,7 +6551,7 @@
                     <div class="msg-checkbox-container hidden shrink-0 self-center mr-2">
                         <div class="w-5 h-5 rounded border-2 border-gray-400 bg-white flex items-center justify-center transition-all">
                             <input type="checkbox" id="checkbox_${key}" class="msg-checkbox hidden">
-                            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                               <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
                     </div>
                     ` : ''}
@@ -6636,6 +6720,42 @@
                         timeSpan.insertAdjacentHTML('beforebegin',
                             '<span class="edited-label text-[10px] text-[#8696a0] select-none italic mr-0.5">Edited</span>'
                             );
+                    }
+                }
+            }
+
+            // Update event if it's an event
+            if (data.type === 'event') {
+                const bubbleEl = document.getElementById('bubble_' + key);
+                if (bubbleEl) {
+                    const titleEl = bubbleEl.querySelector('.text-base.font-medium.truncate');
+                    const timeEl = bubbleEl.querySelector('.text-sm.truncate.mt-0\\.5');
+                    
+                    if (titleEl && timeEl) {
+                        const eventName = data.event_name || 'Event';
+                        const startTime = data.start_time ? new Date(data.start_time) : new Date();
+                        const isToday = startTime.toDateString() === new Date().toDateString();
+                        const dayStr = isToday ? 'Today' : startTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+                        const formatTime = (d) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+                        
+                        let timeStr = formatTime(startTime);
+                        if (data.end_time) {
+                            const endTime = new Date(data.end_time);
+                            timeStr += ` - ${formatTime(endTime)}`;
+                        }
+                        
+                        titleEl.textContent = eventName;
+                        timeEl.textContent = `${dayStr}, ${timeStr}`;
+                    }
+                    
+                    const editBtn = bubbleEl.querySelector('button[onclick*="window.openCreateEventModal"]');
+                    if (editBtn) {
+                        editBtn.setAttribute('onclick', `if(${isMe}){ window.openCreateEventModal(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(data))}')) , '${key}'); } else { window.showToast ? window.showToast('Notice', 'Respond feature coming soon!') : alert('Respond feature coming soon!'); }`);
+                    }
+                    
+                    const calendarBtn = bubbleEl.querySelector('button[onclick*="window.addToCalendar"], button[onclick*="Add to calendar"]');
+                    if (calendarBtn) {
+                        calendarBtn.setAttribute('onclick', `window.addToCalendar('${encodeURIComponent(JSON.stringify(data))}')`);
                     }
                 }
             }

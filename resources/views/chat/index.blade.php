@@ -128,7 +128,7 @@
 
         <!-- Toast Container -->
         <div id="toast_container"
-            class="fixed top-6 left-1/2 -translate-x-1/2 z-[200] flex flex-col gap-3 pointer-events-none w-full max-w-sm px-4">
+            class="fixed top-6 left-1/2 -translate-x-1/2 z-[9999] flex flex-col gap-3 pointer-events-none w-full max-w-sm px-4">
         </div>
 
         <!-- Incoming Call Overlay -->
@@ -418,6 +418,121 @@
                 </div>
             </div>
         </div>
+
+        <!-- View Contacts Modal -->
+        <div id="view_contacts_modal"
+            class="hidden fixed inset-0 z-[4000] flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300">
+            <div class="bg-[#111b21] w-[90%] max-w-[400px] h-[70vh] max-h-[600px] rounded-2xl flex flex-col overflow-hidden shadow-2xl transform scale-95 transition-all duration-300 opacity-0"
+                id="view_contacts_modal_content">
+                <!-- Header -->
+                <div class="flex items-center gap-4 px-4 py-3 bg-[#202c33] shrink-0 border-b border-white/5">
+                    <button onclick="window.closeViewContactsModal()"
+                        class="text-[#8696a0] hover:text-[#e9edef] p-2 rounded-full focus:outline-none transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4M10 18l-6-6 6-6"></path>
+                        </svg>
+                    </button>
+                    <h3 class="text-[#e9edef] text-[18px] font-medium">View contacts</h3>
+                </div>
+                <!-- Scrollable Content -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-2 bg-[#111b21]" id="view_contacts_list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <script>
+            window.addToCalendar = function(eventDataRaw) {
+                if (typeof openAddToCalendarModal === 'function') {
+                    openAddToCalendarModal(eventDataRaw);
+                } else {
+                    console.error('openAddToCalendarModal is not defined');
+                }
+            };
+
+            window.viewAllSharedContacts = function(idsStr) {
+                const ids = idsStr.split(',');
+                const contacts = (window.allContacts || []).filter(u => ids.includes(String(u.id)) || ids.includes(Number(u.id)) || ids.includes(u.id));
+                
+                const listEl = document.getElementById('view_contacts_list');
+                listEl.innerHTML = '';
+                
+                contacts.forEach(c => {
+                    const avatar = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(c.id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name || 'User')}&background=202c33&color=fff`;
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center p-3 hover:bg-[#202c33] cursor-pointer rounded-xl transition-colors mb-1 gap-4';
+                    
+                    div.innerHTML = `
+                        <img src="${avatar}" class="w-12 h-12 rounded-full object-cover shrink-0">
+                        <div class="flex-1 min-w-0 flex flex-col justify-center msg-btn cursor-pointer">
+                            <div class="text-[#e9edef] text-base font-medium truncate">${c.name || c.phone || 'User'}</div>
+                            <div class="text-[#8696a0] text-sm truncate">${c.phone || c.about || 'Mobile'}</div>
+                        </div>
+                        <div class="flex items-center gap-3 shrink-0 mr-2">
+                            <button class="text-[#00a884] hover:text-[#008f72] p-2 rounded-full focus:outline-none transition-colors msg-btn">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                    <path d="M19.005 3.175H4.674C3.642 3.175 3 3.789 3 4.821V21.02l3.544-3.514h12.461c1.033 0 2.064-1.06 2.064-2.093V4.821c-.001-1.032-1.032-1.646-2.064-1.646zm-4.989 9.869H7.041V11.1h6.975v1.944zm3-4H7.041V7.1h9.975v1.944z"></path>
+                                </svg>
+                            </button>
+                            <button class="text-[#00a884] hover:text-[#008f72] p-2 rounded-full focus:outline-none transition-colors" onclick="window.location.href='/chat/voice-call?call_id=new&callee_id=${c.id}&name=${encodeURIComponent(c.name || c.phone || 'User')}&avatar=${encodeURIComponent(avatar)}'">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                    <path d="M17.47 13.5l-3.37-1.42c-.22-.09-.48-.05-.67.11l-2.06 1.76a13.371 13.371 0 01-6.19-6.19l1.76-2.06c.16-.19.2-.45.11-.67L5.63 1.66c-.14-.32-.48-.52-.83-.5L3.38 1.3C2.17 1.45 1.13 2.5 1 3.73c-.22 2.05.21 4.2 1.25 6.25 1.5 2.94 3.91 5.35 6.85 6.85 2.05 1.04 4.2 1.47 6.25 1.25 1.23-.13 2.28-1.17 2.43-2.38l.14-1.42c.02-.35-.18-.69-.5-.83z"></path>
+                                </svg>
+                            </button>
+                            <button class="text-[#00a884] hover:text-[#008f72] p-2 rounded-full focus:outline-none transition-colors" onclick="window.location.href='/chat/video-call?call_id=new&callee_id=${c.id}&name=${encodeURIComponent(c.name || c.phone || 'User')}&avatar=${encodeURIComponent(avatar)}'">
+                                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                    <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    `;
+                    div.querySelectorAll('.msg-btn').forEach(btn => {
+                        btn.onclick = () => {
+                            if (window.selectChat) {
+                                window.selectChat(c.id, c.name, c.phone, avatar, c.about);
+                            } else {
+                                const sidebarItem = document.getElementById('user_sidebar_' + c.id);
+                                if (sidebarItem) sidebarItem.click();
+                            }
+                            window.closeViewContactsModal();
+                        };
+                    });
+                    listEl.appendChild(div);
+                });
+                
+                const modal = document.getElementById('view_contacts_modal');
+                const content = document.getElementById('view_contacts_modal_content');
+                modal.classList.remove('hidden');
+                modal.classList.add('show');
+                setTimeout(() => {
+                    modal.classList.add('opacity-100');
+                    content.classList.remove('scale-95', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 10);
+            };
+
+            window.openContactChatFromMessage = function(id) {
+                const c = window.allContacts ? window.allContacts.find(u => String(u.id) === String(id)) : null;
+                if (c && window.selectChat) {
+                    const avatar = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(c.id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name || c.phone || 'User')}&background=202c33&color=fff`;
+                    window.selectChat(c.id, c.name, c.phone, avatar, c.about);
+                } else {
+                    const sidebarItem = document.getElementById('user_sidebar_' + id);
+                    if (sidebarItem) sidebarItem.click();
+                }
+            };
+
+            window.closeViewContactsModal = function() {
+                const modal = document.getElementById('view_contacts_modal');
+                const content = document.getElementById('view_contacts_modal_content');
+                content.classList.remove('scale-100', 'opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    modal.classList.remove('opacity-100', 'show');
+                    modal.classList.add('hidden');
+                }, 300);
+            };
+        </script>
         <style>
             #delete_modal.show {
                 display: flex;
@@ -433,6 +548,14 @@
             }
 
             #forward_modal.show #forward_modal_content {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            #view_contacts_modal.show {
+                display: flex;
+            }
+            #view_contacts_modal.show #view_contacts_modal_content {
                 transform: scale(1);
                 opacity: 1;
             }
@@ -1355,14 +1478,14 @@
                                                         viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
-                                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                                              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                                                         </path>
                                                     </svg>
                                                 </div>
                                                 <span class="text-gray-300 text-xs">Poll</span>
                                             </div>
                                             <!-- Event -->
-                                            <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="window.showToast ? window.showToast('Notice', 'Event feature coming soon!') : alert('Event feature coming soon!')">
+                                            <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="window.openCreateEventModal()">
                                                 <div class="w-14 h-14 rounded-2xl bg-[#f45197] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
                                                     <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -5841,9 +5964,15 @@
                                 </div>
                             </div>
                         </div>`;
-                } else if (data.type === 'contact' && data.shared_contact_id) {
-                    const c = window.allContacts ? window.allContacts.find(u => String(u.id) === String(data.shared_contact_id)) : null;
-                    if (c) {
+                } else if (data.type === 'contact' && (data.shared_contact_id || data.shared_contact_ids)) {
+                    let ids = [];
+                    if (data.shared_contact_ids) ids = data.shared_contact_ids;
+                    else if (data.shared_contact_id) ids = [data.shared_contact_id];
+                    
+                    const contacts = (window.allContacts || []).filter(u => ids.includes(String(u.id)) || ids.includes(Number(u.id)) || ids.includes(u.id));
+                    
+                    if (contacts.length === 1) {
+                        const c = contacts[0];
                         const avatar = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(c.id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name || 'User')}&background=202c33&color=fff`;
                         mediaContent = `
                             <div class="mb-2 w-[250px] max-w-[100%] rounded-lg overflow-hidden border ${isMe ? 'border-[#005c4b] bg-[#005c4b]' : 'border-[#202c33] bg-[#202c33]'} shadow-sm">
@@ -5855,11 +5984,83 @@
                                     </div>
                                 </div>
                                 <div class="border-t ${isMe ? 'border-white/10' : 'border-[#111b21]'} p-0">
-                                    <button class="w-full py-2.5 text-center ${isMe ? 'text-[#00a884] hover:bg-white/5' : 'text-[#00a884] hover:bg-[#2a3942]'} transition-colors text-sm font-medium" onclick="document.getElementById('user_sidebar_${c.id}')?.click() || alert('User not in recent chats')">Message</button>
+                                    <button class="w-full py-2.5 text-center ${isMe ? 'text-[#00a884] hover:bg-white/5' : 'text-[#00a884] hover:bg-[#2a3942]'} transition-colors text-sm font-medium" onclick="window.openContactChatFromMessage('${c.id}')">Message</button>
+                                </div>
+                            </div>
+                        `;
+                    } else if (contacts.length > 1) {
+                        const firstContact = contacts[0];
+                        const othersCount = contacts.length - 1;
+                        const avatar1 = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(firstContact.id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(firstContact.name || 'User')}&background=202c33&color=fff`;
+                        const avatar2 = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(contacts[1].id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(contacts[1].name || 'User')}&background=202c33&color=fff`;
+                        
+                        mediaContent = `
+                            <div class="mb-2 w-[250px] max-w-[100%] rounded-lg overflow-hidden border ${isMe ? 'border-[#005c4b] bg-[#005c4b]' : 'border-[#202c33] bg-[#202c33]'} shadow-sm">
+                                <div class="flex items-center p-3 gap-3">
+                                    <div class="relative w-12 h-12 shrink-0">
+                                        <img src="${avatar2}" class="absolute right-0 bottom-0 w-9 h-9 rounded-full border-2 ${isMe ? 'border-[#005c4b]' : 'border-[#202c33]'} object-cover z-0">
+                                        <img src="${avatar1}" class="absolute left-0 top-0 w-9 h-9 rounded-full border-2 ${isMe ? 'border-[#005c4b]' : 'border-[#202c33]'} object-cover z-10">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-white text-base font-medium leading-tight line-clamp-2" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${firstContact.name || firstContact.phone || 'User'} and ${othersCount} other contact${othersCount > 1 ? 's' : ''}</div>
+                                    </div>
+                                </div>
+                                <div class="border-t ${isMe ? 'border-white/10' : 'border-[#111b21]'} p-0">
+                                    <button class="w-full py-2.5 text-center ${isMe ? 'text-[#00a884] hover:bg-white/5' : 'text-[#00a884] hover:bg-[#2a3942]'} transition-colors text-sm font-medium" onclick="window.viewAllSharedContacts('${ids.join(',')}')">View all</button>
                                 </div>
                             </div>
                         `;
                     }
+                } else if (data.type === 'event') {
+                    // Extract event data (if available)
+                    const eventName = data.event_name || 'Event';
+                    const startTime = data.start_time ? new Date(data.start_time) : new Date();
+                    
+                    // Format time string e.g. "Today, 10:35 am - 12:30 pm"
+                    const isToday = startTime.toDateString() === new Date().toDateString();
+                    const dayStr = isToday ? 'Today' : startTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+                    
+                    const formatTime = (d) => {
+                        return d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+                    };
+                    
+                    let timeStr = formatTime(startTime);
+                    if (data.end_time) {
+                        const endTime = new Date(data.end_time);
+                        timeStr += ` - ${formatTime(endTime)}`;
+                    }
+
+                    mediaContent = `
+                        <div class="mb-2 w-[250px] max-w-[100%] rounded-lg overflow-hidden border ${isMe ? 'border-[#005c4b] bg-[#005c4b]' : 'border-[#202c33] bg-[#202c33]'} shadow-sm">
+                            <div class="p-3">
+                                <div class="flex gap-3">
+                                    <div class="w-10 h-10 shrink-0 rounded-full bg-[#111b21]/20 flex items-center justify-center text-[#00a884]">
+                                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                                            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                        <div class="text-[#e9edef] text-base font-medium truncate leading-tight">${eventName}</div>
+                                        <div class="text-[#8696a0] text-sm truncate mt-0.5">${dayStr}, ${timeStr}</div>
+                                        <div class="flex items-center gap-1.5 mt-1">
+                                            <div class="w-4 h-4 rounded-full bg-gray-500 overflow-hidden flex items-center justify-center">
+                                                <img src="${(typeof window.getUserAvatar === 'function') ? window.getUserAvatar(isMe ? window.myUserId : data.sender_id) : 'https://ui-avatars.com/api/?name=U'}" class="w-full h-full object-cover">
+                                            </div>
+                                            <span class="text-[#8696a0] text-xs">1 going</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex flex-col border-t ${isMe ? 'border-white/10' : 'border-[#111b21]'}">
+                                <button class="w-full py-2.5 text-center text-[#00a884] hover:bg-black/5 transition-colors text-sm font-medium border-b ${isMe ? 'border-white/10' : 'border-[#111b21]'}" onclick="if(${isMe}){ window.openCreateEventModal(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(data))}')) , '${key}'); } else { window.showToast ? window.showToast('Notice', 'Respond feature coming soon!') : alert('Respond feature coming soon!'); }">
+                                    ${isMe ? 'Edit event' : 'Respond'}
+                                </button>
+                                <button class="w-full py-2.5 text-center text-[#00a884] hover:bg-black/5 transition-colors text-sm font-medium" onclick="window.addToCalendar('${encodeURIComponent(JSON.stringify(data))}')">
+                                    Add to calendar
+                                </button>
+                            </div>
+                        </div>
+                    `;
                 } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data
                     .lng) {
                     const lat = parseFloat(data.lat);
@@ -6354,6 +6555,42 @@
                                     ${totalVotes} ${totalVotes === 1 ? 'vote' : 'votes'}
                                 </div>
                             `;
+                        }
+                    }
+
+                    // Update event if it's an event
+                    if (data.type === 'event') {
+                        const bubbleEl = document.getElementById('bubble_' + key);
+                        if (bubbleEl) {
+                            const titleEl = bubbleEl.querySelector('.text-base.font-medium.truncate');
+                            const timeEl = bubbleEl.querySelector('.text-sm.truncate.mt-0\\.5');
+                            
+                            if (titleEl && timeEl) {
+                                const eventName = data.event_name || 'Event';
+                                const startTime = data.start_time ? new Date(data.start_time) : new Date();
+                                const isToday = startTime.toDateString() === new Date().toDateString();
+                                const dayStr = isToday ? 'Today' : startTime.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+                                const formatTime = (d) => d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+                                
+                                let timeStr = formatTime(startTime);
+                                if (data.end_time) {
+                                    const endTime = new Date(data.end_time);
+                                    timeStr += ` - ${formatTime(endTime)}`;
+                                }
+                                
+                                titleEl.textContent = eventName;
+                                timeEl.textContent = `${dayStr}, ${timeStr}`;
+                            }
+                            
+                            const editBtn = bubbleEl.querySelector('button[onclick*="window.openCreateEventModal"]');
+                            if (editBtn) {
+                                editBtn.setAttribute('onclick', `if(${isMe}){ window.openCreateEventModal(JSON.parse(decodeURIComponent('${encodeURIComponent(JSON.stringify(data))}')) , '${key}'); } else { window.showToast ? window.showToast('Notice', 'Respond feature coming soon!') : alert('Respond feature coming soon!'); }`);
+                            }
+                            
+                            const calendarBtn = bubbleEl.querySelector('button[onclick*="window.addToCalendar"], button[onclick*="Add to calendar"]');
+                            if (calendarBtn) {
+                                calendarBtn.setAttribute('onclick', `window.addToCalendar('${encodeURIComponent(JSON.stringify(data))}')`);
+                            }
                         }
                     }
 
@@ -8746,8 +8983,11 @@
     </div>
     @include('chat.modals.chat_wallpaper_modal')
     @include('chat.modals.poll_modal')
+    @include('chat.modals.create_event_modal')
+    @include('chat.modals.time_picker_modal')
     @include('chat.settings.disappearing_messages.index')
     @include('chat.modals.contact_share_modal')
+    @include('chat.modals.add_to_calendar_modal')
     @include('chat.channels.channels_scripts')
 
     <script>

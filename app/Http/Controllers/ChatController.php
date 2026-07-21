@@ -93,6 +93,8 @@ class ChatController extends Controller
             $type = 'scheduled_call';
         } elseif ($request->type === 'contact') {
             $type = 'contact';
+        } elseif ($request->type === 'event') {
+            $type = 'event';
         }
 
         $data = [
@@ -109,6 +111,7 @@ class ChatController extends Controller
             'lng' => $lng,
             'duration' => $request->duration ?? null,
             'shared_contact_id' => $request->shared_contact_id ?? null,
+            'shared_contact_ids' => $request->shared_contact_ids ? json_decode($request->shared_contact_ids, true) : null,
             'time' => microtime(true),
             'status' => 'sent',
         ];
@@ -121,6 +124,17 @@ class ChatController extends Controller
             $data['call_type'] = $request->call_type;
             $data['require_approval'] = filter_var($request->require_approval, FILTER_VALIDATE_BOOLEAN);
             $data['group_call_id'] = $request->group_call_id;
+        } elseif ($type === 'event') {
+            $data['event_name'] = $request->event_name;
+            $data['event_description'] = $request->event_description;
+            $data['start_time'] = $request->start_time;
+            $data['end_time'] = $request->end_time;
+            $data['location'] = $request->location;
+            $data['call_link'] = filter_var($request->call_link, FILTER_VALIDATE_BOOLEAN);
+            $data['call_type'] = $request->call_type;
+            $data['require_approval'] = filter_var($request->require_approval, FILTER_VALIDATE_BOOLEAN);
+            $data['reminder'] = $request->reminder;
+            $data['allow_guests'] = filter_var($request->allow_guests, FILTER_VALIDATE_BOOLEAN);
         }
 
         // Determine node (chats or groups)
@@ -635,6 +649,98 @@ class ChatController extends Controller
         return response()->json([
             'status' => true,
             'message' => 'Hide Chat settings updated successfully'
+        ]);
+    }
+
+    // Edit Event
+    public function updateEvent(Request $request)
+    {
+        $db = $this->db;
+        $chatId = $request->chat_id;
+        $messageId = $request->message_id;
+        $senderId = auth()->id();
+
+        if (!$senderId || !$chatId || !$messageId) {
+            return response()->json(['status' => false, 'message' => 'Invalid parameters'], 400);
+        }
+
+        $isGroup = str_starts_with($chatId, 'group_');
+        $firebaseChatId = $chatId;
+        if ($isGroup && str_starts_with($firebaseChatId, 'group_group_')) {
+            $firebaseChatId = substr($firebaseChatId, 6);
+        }
+        $node = $isGroup ? "groups/{$firebaseChatId}/messages/{$messageId}" : "chats/{$firebaseChatId}/messages/{$messageId}";
+        $messageRef = $db->getReference($node);
+        $message = $messageRef->getValue();
+
+        if (!$message) {
+            return response()->json(['status' => false, 'message' => 'Message not found'], 404);
+        }
+
+        if (isset($message['sender_id']) && (int)$message['sender_id'] !== (int)$senderId) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized to edit this event'], 403);
+        }
+
+        if (isset($message['type']) && $message['type'] !== 'event') {
+            return response()->json(['status' => false, 'message' => 'Not an event'], 400);
+        }
+
+        $updates = [
+            'event_name' => $request->event_name,
+            'event_description' => $request->event_description,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'location' => $request->location,
+            'call_link' => filter_var($request->call_link, FILTER_VALIDATE_BOOLEAN),
+            'call_type' => $request->call_type,
+            'require_approval' => filter_var($request->require_approval, FILTER_VALIDATE_BOOLEAN),
+            'reminder' => $request->reminder,
+            'allow_guests' => filter_var($request->allow_guests, FILTER_VALIDATE_BOOLEAN),
+            'is_edited' => true,
+        ];
+
+        $messageRef->update($updates);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Event updated successfully'
+        ]);
+    }
+
+    // Cancel Event
+    public function cancelEvent(Request $request)
+    {
+        $db = $this->db;
+        $chatId = $request->chat_id;
+        $messageId = $request->message_id;
+        $senderId = auth()->id();
+
+        if (!$senderId || !$chatId || !$messageId) {
+            return response()->json(['status' => false, 'message' => 'Invalid parameters'], 400);
+        }
+
+        $isGroup = str_starts_with($chatId, 'group_');
+        $firebaseChatId = $chatId;
+        if ($isGroup && str_starts_with($firebaseChatId, 'group_group_')) {
+            $firebaseChatId = substr($firebaseChatId, 6);
+        }
+        $node = $isGroup ? "groups/{$firebaseChatId}/messages/{$messageId}" : "chats/{$firebaseChatId}/messages/{$messageId}";
+        $messageRef = $db->getReference($node);
+        $message = $messageRef->getValue();
+
+        if (!$message) {
+            return response()->json(['status' => false, 'message' => 'Message not found'], 404);
+        }
+
+        if (isset($message['sender_id']) && (int)$message['sender_id'] !== (int)$senderId) {
+            return response()->json(['status' => false, 'message' => 'Unauthorized to cancel this event'], 403);
+        }
+
+        $messageRef->update(['is_cancelled' => true]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Event cancelled successfully'
         ]);
     }
 }
