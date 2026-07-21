@@ -289,7 +289,7 @@
                             <span class="text-gray-300 text-xs">Location</span>
                         </div>
                         <!-- Contact -->
-                        <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="alert('Contact sharing coming soon!')">
+                        <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="openContactShareModal()">
                             <div class="w-14 h-14 rounded-2xl bg-[#09a5eb] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
                                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
                             </div>
@@ -301,6 +301,15 @@
                                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                             </div>
                             <span class="text-gray-300 text-xs">Poll</span>
+                        </div>
+                        <!-- Event -->
+                        <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="alert('Event feature coming soon!')">
+                            <div class="w-14 h-14 rounded-2xl bg-[#f45197] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <span class="text-gray-300 text-xs">Event</span>
                         </div>
                     </div>
                 </div>

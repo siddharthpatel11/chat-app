@@ -91,6 +91,8 @@ class ChatController extends Controller
             $lng = $request->lng;
         } elseif ($request->type === 'scheduled_call') {
             $type = 'scheduled_call';
+        } elseif ($request->type === 'contact') {
+            $type = 'contact';
         }
 
         $data = [
@@ -106,6 +108,7 @@ class ChatController extends Controller
             'lat' => $lat,
             'lng' => $lng,
             'duration' => $request->duration ?? null,
+            'shared_contact_id' => $request->shared_contact_id ?? null,
             'time' => microtime(true),
             'status' => 'sent',
         ];

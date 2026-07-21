@@ -440,6 +440,30 @@
                                 </div>
                                 <span class="text-gray-300 text-xs">Location</span>
                             </div>
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="openContactShareModal()">
+                                <div class="w-14 h-14 rounded-2xl bg-[#09a5eb] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                    <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-300 text-xs">Contact</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="window.showToast ? window.showToast('Notice', 'Poll feature coming soon!') : alert('Poll feature coming soon!')">
+                                <div class="w-14 h-14 rounded-2xl bg-[#11a9a1] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-300 text-xs">Poll</span>
+                            </div>
+                            <div class="flex flex-col items-center gap-1 group cursor-pointer" onclick="window.showToast ? window.showToast('Notice', 'Event feature coming soon!') : alert('Event feature coming soon!')">
+                                <div class="w-14 h-14 rounded-2xl bg-[#f45197] flex items-center justify-center text-white shadow-sm group-active:scale-95 transition-transform">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                </div>
+                                <span class="text-gray-300 text-xs">Event</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -6238,7 +6262,26 @@
                             </div>
                         </div>
                     </div>`;
-            } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data
+            } else if (data.type === 'contact' && data.shared_contact_id) {
+                    const c = window.allContacts ? window.allContacts.find(u => String(u.id) === String(data.shared_contact_id)) : null;
+                    if (c) {
+                        const avatar = (typeof window.getUserAvatar === 'function') ? window.getUserAvatar(c.id) : `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name || 'User')}&background=202c33&color=fff`;
+                        mediaContent = `
+                            <div class="mb-2 w-[250px] max-w-[100%] rounded-lg overflow-hidden border ${isMe ? 'border-[#005c4b] bg-[#005c4b]' : 'border-[#202c33] bg-[#202c33]'} shadow-sm">
+                                <div class="flex items-center p-3 gap-3">
+                                    <img src="${avatar}" class="w-12 h-12 rounded-full object-cover shrink-0">
+                                    <div class="flex-1 min-w-0">
+                                        <div class="text-white text-base font-medium truncate">${c.name || c.phone || 'User'}</div>
+                                        <div class="text-gray-300 text-xs truncate">${c.about || 'Available'}</div>
+                                    </div>
+                                </div>
+                                <div class="border-t ${isMe ? 'border-white/10' : 'border-[#111b21]'} p-0">
+                                    <button class="w-full py-2.5 text-center ${isMe ? 'text-[#00a884] hover:bg-white/5' : 'text-[#00a884] hover:bg-[#2a3942]'} transition-colors text-sm font-medium" onclick="document.getElementById('user_sidebar_${c.id}')?.click() || alert('User not in recent chats')">Message</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                } else if ((data.type === 'location' || data.type === 'live_location') && data.lat && data
                 .lng) {
                 const lat = parseFloat(data.lat);
                 const lng = parseFloat(data.lng);

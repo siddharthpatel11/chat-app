@@ -4311,6 +4311,8 @@ window.renderGlobalSearchVideos = function() {
 
     // Wire up video viewer button event listeners after DOM is ready
     document.addEventListener('DOMContentLoaded', () => {
+        return; // Prevent duplicate listeners (already handled in video_viewer.blade.php)
+        
         const gsVideoViewer = document.getElementById('gs_video_viewer');
         if (!gsVideoViewer) return; // Video viewer HTML not loaded
 
