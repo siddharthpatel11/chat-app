@@ -2375,7 +2375,11 @@
                 window.showToast?.('Error', 'Failed to exit group.');
             }
         };
-        if (confirm(`Are you sure you want to exit ${groupName}?`)) {
+        if (window.openDeleteModal) {
+            window.openDeleteModal(`Are you sure you want to exit ${groupName}?`, () => {
+                confirmAction();
+            }, null, 'Exit Group');
+        } else if (confirm(`Are you sure you want to exit ${groupName}?`)) {
             confirmAction();
         }
     };
@@ -2440,7 +2444,11 @@
                 window.showToast?.('Error', 'Failed to report group.');
             }
         };
-        if (confirm(
+        if (window.openDeleteModal) {
+            window.openDeleteModal(`Report ${groupName}?`, () => {
+                confirmAction();
+            }, null, 'Report');
+        } else if (confirm(
                 `Report ${groupName} to WhatsApp? The last 5 messages from this group will be forwarded. If you exit this group, messages will be removed from this device.`
                 )) {
             confirmAction();
@@ -5676,8 +5684,7 @@
                 } else {
                     const adminsList = gData.admins || [];
                     const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(
-                        parseInt(myUidStr)) || adminsList.includes(String(myUidStr)) || String(
-                        gData.createdBy) === String(myUidStr);
+                        parseInt(myUidStr)) || adminsList.includes(String(myUidStr));
                     const canSend = gData.permissions ? gData.permissions.sendMessages !== false :
                         true;
 
@@ -6573,7 +6580,7 @@
 
                         ${(!isMe || (window.currentGroupData && window.currentGroupData.is_announcement)) ? (() => {
                             const adminsList = window.currentGroupData?.admins || [];
-                            const isSenderAdmin = adminsList.includes(data.sender_id) || adminsList.includes(parseInt(data.sender_id)) || adminsList.includes(String(data.sender_id)) || String(window.currentGroupData?.createdBy) === String(data.sender_id);
+                            const isSenderAdmin = adminsList.includes(data.sender_id) || adminsList.includes(parseInt(data.sender_id)) || adminsList.includes(String(data.sender_id));
                             const badgeHtml = (window.currentGroupData?.is_announcement && isSenderAdmin)
                                 ? `<span class="bg-[#00a884]/20 text-[#00a884] text-[9.5px] font-bold px-1.5 py-0.5 rounded ml-2 border border-[#00a884]/30">Community admin</span>`
                                 : '';
@@ -7076,7 +7083,7 @@
         const myUidStr = String(window.myUserId);
         const adminsList = group.admins || [];
         const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) ||
-            adminsList.includes(String(myUidStr)) || (String(group.createdBy) === myUidStr);
+            adminsList.includes(String(myUidStr));
 
         // Check if settings row should be displayed
         const settingsRow = document.getElementById('group_settings_info_row');
@@ -7146,8 +7153,7 @@
             let phone = "";
 
             const isThisMemberAdmin = adminsList.includes(userId) || adminsList.includes(parseInt(
-                userId)) || adminsList.includes(String(userId)) || (String(group.createdBy) === String(
-                    userId));
+                userId)) || adminsList.includes(String(userId));
             const isAdminBadge = isThisMemberAdmin ?
                 `<div class="border border-[#00a884]/40 bg-[#00a884]/10 rounded px-1.5 py-0.5 text-[11px] text-[#00a884]">Group admin</div>` :
                 '';
@@ -7241,9 +7247,9 @@
         const myUidStr = String(window.myUserId);
         const adminsList = group.admins || [];
         const isCurrentUserAdmin = adminsList.includes(myUidStr) || adminsList.includes(parseInt(myUidStr)) ||
-            adminsList.includes(String(myUidStr)) || (String(group.createdBy) === myUidStr);
+            adminsList.includes(String(myUidStr));
         const isTargetAdmin = adminsList.includes(targetUserId) || adminsList.includes(parseInt(targetUserId)) ||
-            adminsList.includes(String(targetUserId)) || (String(group.createdBy) === String(targetUserId));
+            adminsList.includes(String(targetUserId));
 
         const makeAdminBtn = document.getElementById('member_menu_make_admin');
         const dismissAdminBtn = document.getElementById('member_menu_dismiss_admin');
@@ -7260,22 +7266,13 @@
 
         if (isCurrentUserAdmin) {
             if (isTargetAdmin) {
-                if (String(group.createdBy) === String(targetUserId)) {
-                    if (makeAdminBtn) makeAdminBtn.classList.add('hidden');
-                    if (dismissAdminBtn) dismissAdminBtn.classList.add('hidden');
-                } else {
-                    if (makeAdminBtn) makeAdminBtn.classList.add('hidden');
-                    if (dismissAdminBtn) dismissAdminBtn.classList.remove('hidden');
-                }
+                if (makeAdminBtn) makeAdminBtn.classList.add('hidden');
+                if (dismissAdminBtn) dismissAdminBtn.classList.remove('hidden');
             } else {
                 if (makeAdminBtn) makeAdminBtn.classList.remove('hidden');
                 if (dismissAdminBtn) dismissAdminBtn.classList.add('hidden');
             }
-            if (String(group.createdBy) === String(targetUserId)) {
-                if (removeBtn) removeBtn.classList.add('hidden');
-            } else {
-                if (removeBtn) removeBtn.classList.remove('hidden');
-            }
+            if (removeBtn) removeBtn.classList.remove('hidden');
         } else {
             if (makeAdminBtn) makeAdminBtn.classList.add('hidden');
             if (dismissAdminBtn) dismissAdminBtn.classList.add('hidden');
@@ -7345,6 +7342,12 @@
             await window.update(window.ref(window.db, `groups/${groupId}`), {
                 admins: adminsList
             });
+            if (window.currentGroupData) {
+                window.currentGroupData.admins = adminsList;
+                if (typeof window.updateGroupInfoMembersList === 'function') {
+                    window.updateGroupInfoMembersList();
+                }
+            }
             window.showToast?.(makeAdmin ? "Promoted" : "Demoted",
                 `${makeAdmin ? "Promoted to admin" : "Dismissed as admin"}.`);
         } catch (err) {
@@ -7372,17 +7375,30 @@
             adminsList.splice(adminIdx, 1);
         }
 
-        if (confirm(`Are you sure you want to remove this member from the group?`)) {
+        const confirmRemove = async () => {
             try {
                 await window.update(window.ref(window.db, `groups/${groupId}`), {
                     users: usersList,
                     admins: adminsList
                 });
+                if (window.currentGroupData) {
+                    window.currentGroupData.users = usersList;
+                    window.currentGroupData.admins = adminsList;
+                    if (typeof window.updateGroupInfoMembersList === 'function') {
+                        window.updateGroupInfoMembersList();
+                    }
+                }
                 window.showToast?.("Removed", "Member removed from the group.");
             } catch (err) {
                 console.error("Error removing member:", err);
                 alert("Failed to remove member.");
             }
+        };
+
+        if (window.openDeleteModal) {
+            window.openDeleteModal(`Remove this member?`, confirmRemove, null, 'Remove');
+        } else if (confirm(`Are you sure you want to remove this member from the group?`)) {
+            confirmRemove();
         }
     };
 
