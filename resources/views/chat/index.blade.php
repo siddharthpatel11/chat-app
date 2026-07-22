@@ -110,6 +110,7 @@
                 #chats_wallpaper_panel,
                 #chats_upload_quality_panel,
                 #chats_auto_download_panel,
+                #chat_backup_panel,
                 #notifications_taskbar_panel,
                 #notifications_banner_panel,
                 #notifications_subpanel,
@@ -634,6 +635,7 @@
             @include('chat.settings.chats_panels.chats_modals')
             @include('chat.settings.chats_panels.chats_upload_quality')
             @include('chat.settings.chats_panels.chats_auto_download')
+            @include('chat.settings.chats_panels.chat_backup')
             @include('chat.settings.chats_panels.chats_wallpaper')
             @include('chat.settings.chats_panels.chats_hide')
             @include('chat.settings.account')
@@ -5258,6 +5260,7 @@
                     'chats_wallpaper_panel',
                     'chats_upload_quality_panel',
                     'chats_auto_download_panel',
+                    'chat_backup_panel',
                     'notifications_taskbar_panel',
                     'notifications_banner_panel',
                     'notifications_subpanel',

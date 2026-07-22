@@ -185,6 +185,7 @@
             'chats_wallpaper_panel',
             'chats_upload_quality_panel',
             'chats_auto_download_panel',
+            'chat_backup_panel',
             'notifications_taskbar_panel',
             'notifications_banner_panel',
             'notifications_subpanel',
@@ -234,7 +235,7 @@
             'privacy_last_seen_panel', 'privacy_status_panel', 'privacy_profile_photo_panel',
             'privacy_about_panel', 'privacy_exclude_panel', 'privacy_blocked_contacts_panel',
             'chats_wallpaper_panel', 'chats_upload_quality_panel', 'chats_auto_download_panel',
-            'notifications_taskbar_panel', 'notifications_banner_panel', 'notifications_subpanel'
+            'chat_backup_panel', 'notifications_taskbar_panel', 'notifications_banner_panel', 'notifications_subpanel'
         ];
         
         let isAnySettingsVisible = false;
