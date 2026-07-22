@@ -1018,7 +1018,7 @@
                     // Hide deleted chats unless new message exists (timestamp > cleared timestamp)
                     if (window.deletedChats.includes(item.id)) {
                         const itemTime = parseFloat(item.getAttribute('data-timestamp') || '0');
-                        const clearedTime = window.clearedChats[item.id] || 0;
+                        const clearedTime = (window.clearedChats[item.id] || 0) * 1000;
                         if (itemTime <= clearedTime) {
                             matchesFilter = false;
                         }

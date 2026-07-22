@@ -823,8 +823,8 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
-        if (!localStorage.getItem('whatsapp_setup_complete')) {
-            document.getElementById('initial_setup_restore_overlay').classList.remove('hidden');
+          if (!localStorage.getItem('whatsapp_setup_complete_' + window.myUserId)) {
+              document.getElementById('initial_setup_restore_overlay').classList.remove('hidden');
         }
     });
 
@@ -844,9 +844,9 @@
         tokenClient.requestAccessToken();
     };
 
-    window.skipInitialRestore = function() {
-        localStorage.setItem('whatsapp_setup_complete', 'true');
-        localStorage.setItem('skipped_initial_restore_time', Math.floor(Date.now() / 1000).toString());
+      window.skipInitialRestore = function() {
+          localStorage.setItem('whatsapp_setup_complete_' + window.myUserId, 'true');
+          localStorage.setItem('skipped_initial_restore_time_' + window.myUserId, Math.floor(Date.now() / 1000).toString());
         document.getElementById('initial_setup_restore_overlay').classList.add('hidden');
         location.reload(); // Reload to apply the fresh install filter
     };
@@ -889,7 +889,6 @@
                     // Reset cleared/deleted state locally so restored messages are not incorrectly hidden
                     localStorage.removeItem('cleared_chats');
                     localStorage.removeItem('deleted_chats');
-                    localStorage.removeItem('skipped_initial_restore_time');
                     if (window.clearedChats) window.clearedChats = {};
                     if (window.deletedChats) window.deletedChats = [];
 
@@ -898,7 +897,8 @@
                         btn.disabled = false;
                         btn.classList.remove('opacity-50', 'cursor-not-allowed');
                         if (isInitialSetup) {
-                            localStorage.setItem('whatsapp_setup_complete', 'true');
+                            localStorage.setItem('whatsapp_setup_complete_' + window.myUserId, 'true');
+                            localStorage.removeItem('skipped_initial_restore_time_' + window.myUserId);
                         }
                         if (window.showToast) window.showToast('Restore Complete', 'Your chats have been restored successfully.');
                         setTimeout(() => location.reload(), 1500);

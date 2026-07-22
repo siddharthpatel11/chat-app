@@ -4437,8 +4437,8 @@
             if (!data) return;
 
             const elementId = `group_sidebar_${groupId}`;
-            const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time') || '0');
-            const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
+            const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId + '') || '0');
+            const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
             if (data.time <= clearedTime) return;
 
             // Ignore expired disappearing messages
@@ -4770,8 +4770,8 @@
             const data = snapshot.val();
             if (data) {
                 const elementId = `group_sidebar_${groupId}`;
-                const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time') || '0');
-                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
+                const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId + '') || '0');
+                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
                 if (data.time <= clearedTime) return;
                 if (data.deleted_for && data.deleted_for[window.myUserId]) return;
 
@@ -5606,8 +5606,8 @@
                 window._currentGroupPinIndex = 0;
 
                 const elementId = `group_sidebar_${window.currentGroupId}`;
-                const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time') || '0');
-                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
+                const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId + '') || '0');
+                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
 
                 if (gData.pinned_msgs && typeof gData.pinned_msgs === 'object') {
                     for (const [key, val] of Object.entries(gData.pinned_msgs)) {
@@ -5980,8 +5980,8 @@
             }
 
             const elementId = `group_sidebar_${groupId}`;
-            const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time') || '0');
-            const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
+            const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId + '') || '0');
+            const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
             if (data.time && data.time <= clearedTime) return;
             if (data.deleted_for && data.deleted_for[window.myUserId]) return;
 
