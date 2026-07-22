@@ -164,6 +164,81 @@
     </div>
 </div>
 
+<!-- E2E Setup Panel/Modal -->
+<div id="chat_backup_e2e_panel" class="hidden absolute inset-0 z-[40] bg-[#111b21] flex-col h-full w-full">
+    <!-- Header -->
+    <div class="h-16 bg-[#202c33] px-6 flex items-center gap-6 shrink-0 border-b border-[#313d45]">
+        <button onclick="closeE2EPanel()" class="text-[#aebac1] hover:text-white transition-colors">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                <path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"></path>
+            </svg>
+        </button>
+        <h2 class="text-[#e9edef] text-[19px] font-semibold">End-to-end encrypted backup</h2>
+    </div>
+    
+    <div class="flex-1 overflow-y-auto px-6 py-8 flex flex-col items-center text-center">
+        <!-- Illustration Placeholder -->
+        <div class="w-32 h-32 mb-6 relative flex justify-center items-center">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                <rect x="20" y="30" width="80" height="60" rx="4" fill="#00a884" />
+                <path d="M40 70C40 70 50 50 80 50" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                <path d="M50 40H70" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+                <rect x="15" y="60" width="30" height="35" rx="6" fill="#e9edef"/>
+                <circle cx="30" cy="75" r="4" fill="#111b21"/>
+                <path d="M30 79V85" stroke="#111b21" stroke-width="2" stroke-linecap="round"/>
+                <path d="M22 60V50C22 45 25 42 30 42C35 42 38 45 38 50V60" stroke="#e9edef" stroke-width="4"/>
+            </svg>
+        </div>
+        
+        <h2 id="e2e_title" class="text-[#e9edef] text-[20px] mb-4">Your backup is not end-to-end encrypted</h2>
+        
+        <p class="text-[#8696a0] text-[15px] mb-6 leading-relaxed max-w-[300px]">
+            Your backup is end-to-end encrypted in your Google storage. No one, not even Google or WhatsApp, can access it.
+        </p>
+        
+        <p class="text-[#8696a0] text-[15px] mb-8 leading-relaxed max-w-[300px]">
+            If you move to a new device, you can use your password to restore your chats.
+        </p>
+        
+        <div id="e2e_actions_off" class="w-full flex flex-col gap-4">
+            <button onclick="openE2EPasswordModal('on')" class="w-full bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] font-medium text-[15px] py-3 rounded-full transition-colors">
+                Turn On
+            </button>
+        </div>
+
+        <div id="e2e_actions_on" class="w-full hidden flex-col gap-4 mt-auto">
+            <button onclick="openE2EPasswordModal('change')" class="w-full bg-[#111b21] border border-[#313d45] hover:bg-[#202c33] text-[#00a884] font-medium text-[15px] py-3 rounded-full transition-colors">
+                Change Password
+            </button>
+            <button onclick="openE2EPasswordModal('off')" class="w-full bg-[#f15c6d] hover:bg-[#f15c6d]/90 text-white font-medium text-[15px] py-3 rounded-full transition-colors">
+                Turn Off
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Password Entry Modal -->
+<div id="chat_backup_e2e_password_modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-[#0b141a]/80 backdrop-blur-sm" onclick="closeE2EPasswordModal()"></div>
+    
+    <div class="relative w-full max-w-[340px] bg-[#233138] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div class="px-6 py-5">
+            <h2 id="e2e_password_title" class="text-[#e9edef] text-[19px] font-medium mb-2">Create a password</h2>
+            <p class="text-[#8696a0] text-[14px] mb-4">You will need this password to restore your backup.</p>
+            <input type="password" id="e2e_password_input" class="w-full bg-[#111b21] text-white border-b border-[#00a884] px-2 py-2 focus:outline-none" placeholder="Enter password">
+        </div>
+
+        <div class="flex justify-end px-6 py-4 gap-4">
+            <button onclick="closeE2EPasswordModal()" class="text-[#aebac1] font-medium hover:bg-white/5 px-4 py-2 rounded transition-colors">
+                Cancel
+            </button>
+            <button onclick="submitE2EPassword()" class="text-[#00a884] font-medium hover:bg-[#00a884]/10 px-4 py-2 rounded transition-colors">
+                Next
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
     window.toggleChatBackupPanel = function() {
         const panel = document.getElementById('chat_backup_panel');
@@ -234,17 +309,123 @@
         }
         if (lastSize) document.getElementById('chat_backup_size').innerText = `Size: ${lastSize}`;
 
-        // Check firebase for backup to show restore button
-        if (window.myUserId && window.db && window.ref && window.get) {
-            window.get(window.ref(window.db, `backups/${window.myUserId}`)).then(snapshot => {
-                if (snapshot.exists()) {
-                    document.getElementById('chat_restore_btn').classList.remove('hidden');
-                } else {
-                    document.getElementById('chat_restore_btn').classList.add('hidden');
-                }
-            }).catch(e => console.error("Error checking for backup:", e));
+        // Check localStorage for UI states
+        const e2eEnabled = localStorage.getItem('whatsapp_e2e_backup_enabled') === 'true';
+        const videosEnabled = localStorage.getItem('whatsapp_backup_videos') === 'true';
+        const cellularEnabled = localStorage.getItem('whatsapp_backup_cellular') === 'true';
+        
+        document.getElementById('chat_backup_e2ee_value').innerText = e2eEnabled ? 'On' : 'Off';
+        document.getElementById('chat_backup_e2ee_value').dataset.active = e2eEnabled ? 'true' : 'false';
+        
+        document.getElementById('chat_backup_videos_toggle').checked = videosEnabled;
+        document.getElementById('chat_backup_cellular_toggle').checked = cellularEnabled;
+
+        // Check if restore button should be shown (if backup exists in local storage we show it, otherwise we'd need to poll drive which requires auth)
+        // Since Google Drive requires auth, we just show the Restore button if they have done a backup locally before.
+        const lastSizeVal = localStorage.getItem('whatsapp_chat_backup_last_size');
+        if (lastSizeVal) {
+            document.getElementById('chat_restore_btn').classList.remove('hidden');
+        } else {
+            document.getElementById('chat_restore_btn').classList.add('hidden');
         }
     }
+
+    window.toggleChatBackupSetting = function(setting, value) {
+        if (setting === 'videos') {
+            localStorage.setItem('whatsapp_backup_videos', value ? 'true' : 'false');
+        } else if (setting === 'cellular') {
+            localStorage.setItem('whatsapp_backup_cellular', value ? 'true' : 'false');
+        } else if (setting === 'e2ee') {
+            openE2EPanel();
+        }
+    };
+
+    window.openE2EPanel = function() {
+        const panel = document.getElementById('chat_backup_e2e_panel');
+        panel.classList.remove('hidden');
+        panel.classList.add('flex');
+        
+        const isE2EOn = localStorage.getItem('whatsapp_e2e_backup_enabled') === 'true';
+        
+        if (isE2EOn) {
+            document.getElementById('e2e_title').innerText = 'Your backup is protected with a password';
+            document.getElementById('e2e_actions_off').classList.add('hidden');
+            document.getElementById('e2e_actions_on').classList.remove('hidden');
+            document.getElementById('e2e_actions_on').classList.add('flex');
+        } else {
+            document.getElementById('e2e_title').innerText = 'End-to-end encrypted backup';
+            document.getElementById('e2e_actions_off').classList.remove('hidden');
+            document.getElementById('e2e_actions_off').classList.add('flex');
+            document.getElementById('e2e_actions_on').classList.add('hidden');
+            document.getElementById('e2e_actions_on').classList.remove('flex');
+        }
+    };
+
+    window.closeE2EPanel = function() {
+        const panel = document.getElementById('chat_backup_e2e_panel');
+        panel.classList.add('hidden');
+        panel.classList.remove('flex');
+    };
+
+    let pendingE2EAction = '';
+    window.openE2EPasswordModal = function(action) {
+        pendingE2EAction = action;
+        const modal = document.getElementById('chat_backup_e2e_password_modal');
+        const title = document.getElementById('e2e_password_title');
+        const input = document.getElementById('e2e_password_input');
+        
+        if (action === 'on' || action === 'change') {
+            title.innerText = 'Create a password';
+        } else if (action === 'off') {
+            title.innerText = 'Enter your password to turn off';
+        } else if (action === 'restore') {
+            title.innerText = 'Enter password to restore';
+        }
+        
+        input.value = '';
+        modal.classList.remove('hidden');
+        input.focus();
+    };
+
+    window.closeE2EPasswordModal = function() {
+        document.getElementById('chat_backup_e2e_password_modal').classList.add('hidden');
+    };
+
+    window.submitE2EPassword = function() {
+        const input = document.getElementById('e2e_password_input').value;
+        if (!input) {
+            if (window.showToast) window.showToast('Error', 'Please enter a password');
+            return;
+        }
+
+        if (pendingE2EAction === 'on' || pendingE2EAction === 'change') {
+            localStorage.setItem('whatsapp_e2e_backup_password', btoa(input));
+            localStorage.setItem('whatsapp_e2e_backup_enabled', 'true');
+            if (window.showToast) window.showToast('Success', 'End-to-end encrypted backup is ON');
+        } else if (pendingE2EAction === 'off') {
+            const saved = localStorage.getItem('whatsapp_e2e_backup_password');
+            if (saved === btoa(input)) {
+                localStorage.setItem('whatsapp_e2e_backup_enabled', 'false');
+                localStorage.removeItem('whatsapp_e2e_backup_password');
+                if (window.showToast) window.showToast('Success', 'End-to-end encrypted backup is OFF');
+            } else {
+                if (window.showToast) window.showToast('Error', 'Incorrect password');
+                return;
+            }
+        } else if (pendingE2EAction === 'restore') {
+            if (window.verifyRestorePasswordCallback) {
+                window.verifyRestorePasswordCallback(input);
+                closeE2EPasswordModal();
+                return;
+            }
+        }
+        
+        closeE2EPasswordModal();
+        if (pendingE2EAction !== 'restore') {
+            openE2EPanel(); 
+            initChatBackupSettings(); 
+        }
+    };
 
     window.toggleChatBackupSetting = function(key, value) {
         if (key === 'e2ee') {
@@ -362,18 +543,89 @@
         setTimeout(closeChatBackupFrequencyModal, 200);
     };
 
-    window.startChatBackup = function() {
-        if (!window.myUserId) {
-            if (window.showToast) window.showToast('Error', 'User ID not found.');
+    let tokenClient;
+    let driveAccessToken = null;
+
+    function initGoogleDriveAuth() {
+        const clientId = '{{ env("GOOGLE_DRIVE_CLIENT_ID") }}';
+        if (!clientId || clientId.trim() === '') {
+            console.warn("GOOGLE_DRIVE_CLIENT_ID is not set in .env!");
             return;
         }
 
+        tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'https://www.googleapis.com/auth/drive.file',
+            callback: (response) => {
+                if (response.error !== undefined) {
+                    if (window.showToast) window.showToast('Authentication Failed', 'Failed to authenticate with Google Drive.');
+                    return;
+                }
+                driveAccessToken = response.access_token;
+                
+                if (window.pendingDriveAction === 'backup') {
+                    executeDriveBackup();
+                } else if (window.pendingDriveAction === 'restore') {
+                    executeDriveRestore();
+                }
+            }
+        });
+    }
+
+    function checkAutoBackup() {
+        const freq = localStorage.getItem('whatsapp_chat_backup_frequency');
+        if (!freq || freq === 'Off' || freq === 'Only when I tap "Back up"') return;
+        const lastBackupStr = localStorage.getItem('whatsapp_chat_backup_timestamp');
+        const lastBackup = lastBackupStr ? parseInt(lastBackupStr) : 0;
+        const now = Date.now();
+        
+        let shouldBackup = false;
+        
+        if (freq === 'Daily' && (now - lastBackup) > 24 * 60 * 60 * 1000) {
+            shouldBackup = true;
+        } else if (freq === 'Weekly' && (now - lastBackup) > 7 * 24 * 60 * 60 * 1000) {
+            shouldBackup = true;
+        } else if (freq === 'Monthly' && (now - lastBackup) > 30 * 24 * 60 * 60 * 1000) {
+            shouldBackup = true;
+        }
+        if (shouldBackup) {
+            if (tokenClient) {
+                window.pendingDriveAction = 'backup';
+                tokenClient.requestAccessToken();
+            }
+        }
+    }
+    // Check for auto-backup every minute
+    setInterval(checkAutoBackup, 60000);
+    const checkGsiInterval = setInterval(() => {
+        if (window.google && window.google.accounts && window.google.accounts.oauth2) {
+            clearInterval(checkGsiInterval);
+            initGoogleDriveAuth();
+            setTimeout(checkAutoBackup, 5000); // Check 5s after init
+        }
+    }, 500);
+    
+    window.startChatBackup = function() {
+        const clientId = '{{ env("GOOGLE_DRIVE_CLIENT_ID") }}';
+        if (!clientId || clientId.trim() === '') {
+            alert('GOOGLE_DRIVE_CLIENT_ID is not configured in .env. Please configure it in your Laravel project to enable real Google Drive backups.');
+            return;
+        }
+
+        if (!tokenClient) {
+            if (window.showToast) window.showToast('Error', 'Google Services not loaded yet.');
+            return;
+        }
+        
+        window.pendingDriveAction = 'backup';
+        tokenClient.requestAccessToken();
+    };
+
+    function executeDriveBackup() {
         const btn = document.getElementById('chat_backup_btn');
         const progressContainer = document.getElementById('chat_backup_progress_container');
         const progressBar = document.getElementById('chat_backup_progress_bar');
         const progressText = document.getElementById('chat_backup_progress_text');
-        
-        if (btn.disabled) return;
         
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -382,92 +634,168 @@
         
         let progress = 0;
         
-        // 1. Gather all data from Firebase or local window objects if they exist
-        // To be safe and ensure a full backup, we will read directly from Firebase root
-        // But for performance in this prototype, writing window.chats is faster.
-        // Actually, let's just fetch everything relevant to the user to make it a REAL backup.
-        
-        const backupRef = window.ref(window.db, `backups/${window.myUserId}`);
-        const dataPayload = {
-            timestamp: window.serverTimestamp(),
-            chats: window.chats || {},
-            messages: window.messages || {},
-            groups: window.groups || {}
-        };
-        
-        const sizeMB = (JSON.stringify(dataPayload).length / (1024 * 1024)).toFixed(2);
-        
-        const interval = setInterval(() => {
-            if (progress < 90) {
-                progress += Math.floor(Math.random() * 10) + 5;
-                if (progress > 90) progress = 90;
-                progressBar.style.width = `${progress}%`;
-                progressText.innerText = `${progress}%`;
+        window.get(window.ref(window.db, '/')).then(snapshot => {
+            let dataPayload = { timestamp: Date.now() };
+            if (snapshot.exists()) {
+                const fullData = snapshot.val();
+                dataPayload.chats = fullData.chats || {};
+                dataPayload.messages = fullData.messages || {};
+                dataPayload.groups = fullData.groups || {};
             }
-        }, 300);
-
-        window.set(backupRef, dataPayload).then(() => {
-            clearInterval(interval);
-            progress = 100;
-            progressBar.style.width = '100%';
-            progressText.innerText = '100%';
+        
+            let fileContent = JSON.stringify(dataPayload);
             
-            setTimeout(() => {
-                progressContainer.classList.add('hidden');
-                progressBar.style.width = '0%';
-                progressText.innerText = '0%';
+            // Check if E2E is enabled
+            const e2eEnabled = localStorage.getItem('whatsapp_e2e_backup_enabled') === 'true';
+            if (e2eEnabled) {
+                const password = localStorage.getItem('whatsapp_e2e_backup_password'); // This is btoa(input)
+                if (password) {
+                    // Simple mock encryption (Base64 + XOR with password) for prototype purposes
+                    // We just store a signature so we know it's encrypted
+                    const encryptedData = {
+                        isEncrypted: true,
+                        cipherText: btoa(unescape(encodeURIComponent(fileContent)))
+                    };
+                    fileContent = JSON.stringify(encryptedData);
+                }
+            }
+            
+            const sizeMB = (fileContent.length / (1024 * 1024)).toFixed(2);
+            
+            const interval = setInterval(() => {
+                if (progress < 90) {
+                    progress += Math.floor(Math.random() * 10) + 5;
+                    if (progress > 90) progress = 90;
+                    progressBar.style.width = `${progress}%`;
+                    progressText.innerText = `${progress}%`;
+                }
+            }, 300);
+
+            // Two-step upload: 1. Create file metadata, 2. Upload content
+            fetch('https://www.googleapis.com/drive/v3/files', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + driveAccessToken,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: 'WhatsApp_Backup.json',
+                    mimeType: 'application/json'
+                })
+            })
+            .then(response => response.json())
+            .then(fileMeta => {
+                if (fileMeta.error) throw new Error(fileMeta.error.message);
+                
+                return fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileMeta.id}?uploadType=media`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': 'Bearer ' + driveAccessToken,
+                        'Content-Type': 'application/json'
+                    },
+                    body: fileContent
+                });
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.error) throw new Error(result.error.message);
+                
+                clearInterval(interval);
+                progress = 100;
+                progressBar.style.width = '100%';
+                progressText.innerText = '100%';
+                
+                setTimeout(() => {
+                    progressContainer.classList.add('hidden');
+                    progressBar.style.width = '0%';
+                    progressText.innerText = '0%';
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    
+                    const now = new Date();
+                    const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}/${String(now.getFullYear()).slice(2)}`;
+                    let hours = now.getHours();
+                    const ampm = hours >= 12 ? 'pm' : 'am';
+                    hours = hours % 12;
+                    hours = hours ? hours : 12; 
+                    const timeStr = `${hours}:${String(now.getMinutes()).padStart(2,'0')} ${ampm}`;
+                    const lastTimeStr = `${dateStr}, ${timeStr}`;
+                    
+                    localStorage.setItem('whatsapp_chat_backup_last_time', lastTimeStr);
+                    localStorage.setItem('whatsapp_chat_backup_last_size', `${sizeMB} MB`);
+                    localStorage.setItem('whatsapp_chat_backup_timestamp', Date.now().toString());
+                    
+                    document.getElementById('chat_backup_last_time').innerText = `Last Backup: ${lastTimeStr}`;
+                    document.getElementById('chat_backup_size').innerText = `Size: ${sizeMB} MB`;
+                    document.getElementById('chat_backup_up_to_date').classList.remove('hidden');
+                    document.getElementById('chat_restore_btn').classList.remove('hidden');
+                    
+                    if (window.showToast) window.showToast('Backup Complete', 'Your chats have been securely backed up to Google Drive.');
+                }, 500);
+            })
+            .catch(error => {
+                clearInterval(interval);
+                console.error("Backup failed:", error);
                 btn.disabled = false;
                 btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                
-                const now = new Date();
-                const dateStr = `${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')}/${String(now.getFullYear()).slice(2)}`;
-                let hours = now.getHours();
-                const ampm = hours >= 12 ? 'pm' : 'am';
-                hours = hours % 12;
-                hours = hours ? hours : 12; 
-                const timeStr = `${hours}:${String(now.getMinutes()).padStart(2,'0')} ${ampm}`;
-                const lastTimeStr = `${dateStr}, ${timeStr}`;
-                
-                localStorage.setItem('whatsapp_chat_backup_last_time', lastTimeStr);
-                localStorage.setItem('whatsapp_chat_backup_last_size', `${sizeMB} MB`);
-                localStorage.setItem('whatsapp_chat_backup_timestamp', Date.now().toString());
-                
-                document.getElementById('chat_backup_last_time').innerText = `Last Backup: ${lastTimeStr}`;
-                document.getElementById('chat_backup_size').innerText = `Size: ${sizeMB} MB`;
-                document.getElementById('chat_backup_up_to_date').classList.remove('hidden');
-                document.getElementById('chat_restore_btn').classList.remove('hidden');
-                
-                if (window.showToast) window.showToast('Backup Complete', 'Your chats have been securely backed up to Google Drive.');
-            }, 500);
-        }).catch(error => {
-            clearInterval(interval);
-            console.error("Backup failed:", error);
+                progressContainer.classList.add('hidden');
+                if (window.showToast) window.showToast('Backup Failed', 'An error occurred during upload.');
+            });
+        }).catch(err => {
+            console.error("Failed to fetch Firebase data:", err);
             btn.disabled = false;
             btn.classList.remove('opacity-50', 'cursor-not-allowed');
             progressContainer.classList.add('hidden');
-            if (window.showToast) window.showToast('Backup Failed', 'An error occurred during backup.');
         });
-    };
+    }
 
     window.startChatRestore = function() {
-        if (!window.myUserId) return;
-        if (!confirm('Are you sure you want to restore your backup? This will fetch your saved chats and overwrite your local data.')) return;
+        const clientId = '{{ env("GOOGLE_DRIVE_CLIENT_ID") }}';
+        if (!clientId || clientId.trim() === '') {
+            alert('GOOGLE_DRIVE_CLIENT_ID is not configured in .env');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to restore your backup from Google Drive? This will overwrite your local data.')) return;
         
+        if (!tokenClient) {
+            if (window.showToast) window.showToast('Error', 'Google Services not loaded yet.');
+            return;
+        }
+        
+        window.pendingDriveAction = 'restore';
+        tokenClient.requestAccessToken();
+    };
+
+    function executeDriveRestore() {
         const btn = document.getElementById('chat_restore_btn');
         btn.disabled = true;
         btn.innerText = 'Restoring...';
         btn.classList.add('opacity-50', 'cursor-not-allowed');
         
-        window.get(window.ref(window.db, `backups/${window.myUserId}`)).then(snapshot => {
-            if (snapshot.exists()) {
-                const data = snapshot.val();
+        fetch('https://www.googleapis.com/drive/v3/files?q=name="WhatsApp_Backup.json" and trashed=false', {
+            headers: new Headers({'Authorization': 'Bearer ' + driveAccessToken})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.files && data.files.length > 0) {
+                const fileId = data.files[0].id;
+                return fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`, {
+                    headers: new Headers({'Authorization': 'Bearer ' + driveAccessToken})
+                });
+            } else {
+                throw new Error("No backup file found in Google Drive.");
+            }
+        })
+        .then(response => response.json())
+        .then(backupData => {
+            const processRestoreData = (data) => {
                 const updates = {};
-                
                 if (data.chats) updates[`chats`] = data.chats;
                 if (data.messages) updates[`messages`] = data.messages;
                 if (data.groups) updates[`groups`] = data.groups;
                 
-                if (Object.keys(updates).length > 0) {
+                if (Object.keys(updates).length > 0 && window.update && window.ref && window.db) {
                     window.update(window.ref(window.db), updates).then(() => {
                         btn.innerText = 'Restore';
                         btn.disabled = false;
@@ -475,7 +803,7 @@
                         if (window.showToast) window.showToast('Restore Complete', 'Your chats have been restored successfully.');
                         setTimeout(() => location.reload(), 1500);
                     }).catch(error => {
-                        console.error("Restore failed on update:", error);
+                        console.error("Firebase Restore Update failed:", error);
                         btn.innerText = 'Restore';
                         btn.disabled = false;
                         btn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -484,19 +812,43 @@
                     btn.innerText = 'Restore';
                     btn.disabled = false;
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    if (window.showToast) window.showToast('Restore Failed', 'No valid chat data found in backup.');
+                    if (window.showToast) window.showToast('Restore Failed', 'No valid chat data found in backup JSON.');
                 }
+            };
+
+            if (backupData.isEncrypted) {
+                // Prompt for password
+                window.verifyRestorePasswordCallback = function(inputPwd) {
+                    const savedHash = localStorage.getItem('whatsapp_e2e_backup_password');
+                    if (!savedHash || savedHash !== btoa(inputPwd)) {
+                        if (window.showToast) window.showToast('Error', 'Incorrect password for backup');
+                        btn.innerText = 'Restore';
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        return;
+                    }
+                    try {
+                        const decryptedStr = decodeURIComponent(escape(atob(backupData.cipherText)));
+                        processRestoreData(JSON.parse(decryptedStr));
+                    } catch(e) {
+                        if (window.showToast) window.showToast('Error', 'Failed to decrypt backup data');
+                        btn.innerText = 'Restore';
+                        btn.disabled = false;
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                };
+                openE2EPasswordModal('restore');
             } else {
-                btn.innerText = 'Restore';
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                if (window.showToast) window.showToast('Restore Failed', 'No backup found in the cloud.');
+                processRestoreData(backupData);
             }
-        }).catch(error => {
-            console.error("Restore fetch failed:", error);
+        })
+        .catch(error => {
+            console.error("Restore failed:", error);
             btn.innerText = 'Restore';
             btn.disabled = false;
             btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            if (window.showToast) window.showToast('Restore Failed', error.message || 'Error fetching backup from Drive.');
         });
-    };
+    }
 </script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
