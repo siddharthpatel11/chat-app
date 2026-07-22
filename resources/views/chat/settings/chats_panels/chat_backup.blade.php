@@ -239,6 +239,51 @@
     </div>
 </div>
 
+<!-- Restore Confirmation Modal -->
+<div id="chat_backup_restore_confirm_modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-[#0b141a]/80 backdrop-blur-sm" onclick="closeRestoreConfirmModal()"></div>
+    
+    <div class="relative w-full max-w-[340px] bg-[#233138] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div class="px-6 py-5 pb-2">
+            <h2 class="text-[#e9edef] text-[19px] font-medium">Restore Backup</h2>
+            <p class="text-[#8696a0] text-[14px] mt-2 leading-relaxed">Are you sure you want to restore your backup from Google Drive? This will overwrite your local data.</p>
+        </div>
+        
+        <div class="flex justify-end px-6 py-4 gap-4 mt-2">
+            <button onclick="closeRestoreConfirmModal()" class="text-[#aebac1] font-medium hover:bg-white/5 px-4 py-2 rounded transition-colors">
+                Cancel
+            </button>
+            <button onclick="confirmRestoreAction()" class="bg-[#00a884] text-[#111b21] font-medium hover:bg-[#06cf9c] px-4 py-2 rounded transition-colors">
+                Restore
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Initial Setup Restore Overlay -->
+<div id="initial_setup_restore_overlay" class="hidden fixed inset-0 z-[9999] bg-[#111b21] flex flex-col items-center justify-center p-6">
+    <div class="max-w-[400px] w-full bg-[#233138] rounded-2xl shadow-2xl overflow-hidden flex flex-col items-center text-center p-8">
+        <div class="w-20 h-20 bg-[#00a884]/20 rounded-full flex items-center justify-center mb-6">
+            <svg class="w-10 h-10 text-[#00a884]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+        </div>
+        <h2 class="text-[#e9edef] text-[22px] font-medium mb-3">Restore Backup</h2>
+        <p class="text-[#8696a0] text-[15px] leading-relaxed mb-8">
+            Restore your chats and media from Google Drive. If you skip this step, you won't be able to restore later.
+        </p>
+        
+        <div class="w-full flex flex-col gap-3">
+            <button id="initial_restore_btn" onclick="startInitialRestore()" class="w-full bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] font-medium py-3 rounded-full transition-colors flex items-center justify-center gap-2">
+                Restore from Google Drive
+            </button>
+            <button onclick="skipInitialRestore()" class="w-full text-[#aebac1] hover:text-[#e9edef] font-medium py-3 transition-colors">
+                Skip
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
     window.toggleChatBackupPanel = function() {
         const panel = document.getElementById('chat_backup_panel');
@@ -566,7 +611,9 @@
                 if (window.pendingDriveAction === 'backup') {
                     executeDriveBackup();
                 } else if (window.pendingDriveAction === 'restore') {
-                    executeDriveRestore();
+                    executeDriveRestore(false);
+                } else if (window.pendingDriveAction === 'initial_restore') {
+                    executeDriveRestore(true);
                 }
             }
         });
@@ -752,14 +799,22 @@
     window.startChatRestore = function() {
         const clientId = '{{ env("GOOGLE_DRIVE_CLIENT_ID") }}';
         if (!clientId || clientId.trim() === '') {
-            alert('GOOGLE_DRIVE_CLIENT_ID is not configured in .env');
+            if (window.showToast) window.showToast('Configuration Error', 'GOOGLE_DRIVE_CLIENT_ID is not configured in .env');
             return;
         }
 
-        if (!confirm('Are you sure you want to restore your backup from Google Drive? This will overwrite your local data.')) return;
+        document.getElementById('chat_backup_restore_confirm_modal').classList.remove('hidden');
+    };
+
+    window.closeRestoreConfirmModal = function() {
+        document.getElementById('chat_backup_restore_confirm_modal').classList.add('hidden');
+    };
+
+    window.confirmRestoreAction = function() {
+        closeRestoreConfirmModal();
         
         if (!tokenClient) {
-            if (window.showToast) window.showToast('Error', 'Google Services not loaded yet.');
+            if (window.showToast) window.showToast('Error', 'Google Services not loaded yet. Please wait a moment and try again.');
             return;
         }
         
@@ -767,8 +822,43 @@
         tokenClient.requestAccessToken();
     };
 
-    function executeDriveRestore() {
-        const btn = document.getElementById('chat_restore_btn');
+    document.addEventListener('DOMContentLoaded', () => {
+        if (!localStorage.getItem('whatsapp_setup_complete')) {
+            document.getElementById('initial_setup_restore_overlay').classList.remove('hidden');
+        }
+    });
+
+    window.startInitialRestore = function() {
+        const clientId = '{{ env("GOOGLE_DRIVE_CLIENT_ID") }}';
+        if (!clientId || clientId.trim() === '') {
+            if (window.showToast) window.showToast('Configuration Error', 'GOOGLE_DRIVE_CLIENT_ID is not configured in .env');
+            return;
+        }
+        
+        if (!tokenClient) {
+            if (window.showToast) window.showToast('Error', 'Google Services not loaded yet. Please wait a moment and try again.');
+            return;
+        }
+
+        window.pendingDriveAction = 'initial_restore';
+        tokenClient.requestAccessToken();
+    };
+
+    window.skipInitialRestore = function() {
+        localStorage.setItem('whatsapp_setup_complete', 'true');
+        localStorage.setItem('skipped_initial_restore_time', Math.floor(Date.now() / 1000).toString());
+        document.getElementById('initial_setup_restore_overlay').classList.add('hidden');
+        location.reload(); // Reload to apply the fresh install filter
+    };
+
+    function executeDriveRestore(isInitialSetup = false) {
+        let btn;
+        if (isInitialSetup) {
+            btn = document.getElementById('initial_restore_btn');
+        } else {
+            btn = document.getElementById('chat_restore_btn');
+        }
+        
         btn.disabled = true;
         btn.innerText = 'Restoring...';
         btn.classList.add('opacity-50', 'cursor-not-allowed');
@@ -796,20 +886,30 @@
                 if (data.groups) updates[`groups`] = data.groups;
                 
                 if (Object.keys(updates).length > 0 && window.update && window.ref && window.db) {
+                    // Reset cleared/deleted state locally so restored messages are not incorrectly hidden
+                    localStorage.removeItem('cleared_chats');
+                    localStorage.removeItem('deleted_chats');
+                    localStorage.removeItem('skipped_initial_restore_time');
+                    if (window.clearedChats) window.clearedChats = {};
+                    if (window.deletedChats) window.deletedChats = [];
+
                     window.update(window.ref(window.db), updates).then(() => {
-                        btn.innerText = 'Restore';
+                        btn.innerText = isInitialSetup ? 'Restore from Google Drive' : 'Restore';
                         btn.disabled = false;
                         btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                        if (isInitialSetup) {
+                            localStorage.setItem('whatsapp_setup_complete', 'true');
+                        }
                         if (window.showToast) window.showToast('Restore Complete', 'Your chats have been restored successfully.');
                         setTimeout(() => location.reload(), 1500);
                     }).catch(error => {
                         console.error("Firebase Restore Update failed:", error);
-                        btn.innerText = 'Restore';
+                        btn.innerText = isInitialSetup ? 'Restore from Google Drive' : 'Restore';
                         btn.disabled = false;
                         btn.classList.remove('opacity-50', 'cursor-not-allowed');
                     });
                 } else {
-                    btn.innerText = 'Restore';
+                    btn.innerText = isInitialSetup ? 'Restore from Google Drive' : 'Restore';
                     btn.disabled = false;
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                     if (window.showToast) window.showToast('Restore Failed', 'No valid chat data found in backup JSON.');
@@ -822,7 +922,7 @@
                     const savedHash = localStorage.getItem('whatsapp_e2e_backup_password');
                     if (!savedHash || savedHash !== btoa(inputPwd)) {
                         if (window.showToast) window.showToast('Error', 'Incorrect password for backup');
-                        btn.innerText = 'Restore';
+                        btn.innerText = isInitialSetup ? 'Restore from Google Drive' : 'Restore';
                         btn.disabled = false;
                         btn.classList.remove('opacity-50', 'cursor-not-allowed');
                         return;

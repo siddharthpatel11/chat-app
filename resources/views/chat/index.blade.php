@@ -4590,7 +4590,8 @@
                     const sidebarElementId = `user_sidebar_${otherId}`;
                     const deletedIndex = window.deletedChats?.indexOf(sidebarElementId) ?? -1;
                     if (deletedIndex > -1) {
-                        const clearedTime = window.clearedChats?.[sidebarElementId] || 0;
+                        const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time') || '0');
+                        const clearedTime = Math.max(window.clearedChats?.[sidebarElementId] || 0, skippedRestoreTime);
                         if (data.time > clearedTime) {
                             window.deletedChats.splice(deletedIndex, 1);
                             localStorage.setItem('deleted_chats', JSON.stringify(window.deletedChats));
@@ -5732,7 +5733,8 @@
                 const targetId = isGroup ? window.currentChatId.replace('group_', '') : window.currentChatId
                     .replace('chat_', '').split('_').find(id => id != window.myUserId);
                 const elementId = isGroup ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
-                const clearedTime = window.clearedChats?.[elementId] || 0;
+                const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time') || '0');
+                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
 
                 if (pinnedData && typeof pinnedData === 'object') {
                     // Build sorted list (newest first)
@@ -5802,7 +5804,8 @@
                 const targetId = isGroup ? window.currentChatId.replace('group_', '') : window.currentChatId
                     .replace('chat_', '').split('_').find(id => id != window.myUserId);
                 const elementId = isGroup ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
-                const clearedTime = window.clearedChats?.[elementId] || 0;
+                const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time') || '0');
+                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
 
                 if (data.time && data.time <= clearedTime) {
                     return; // Ignore this message because chat was cleared after it was sent
