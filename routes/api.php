@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\BackupRestoreApiController;
 use App\Http\Controllers\Api\BroadcastApiController;
 use App\Http\Controllers\Api\CallApiController;
 use App\Http\Controllers\Api\ChannelApiController;
@@ -157,6 +158,10 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     // Profile Chats Settings
     Route::get('/profile/chats', [ChatsApiController::class, 'getSettings']);
     Route::patch('/profile/chats', [ChatsApiController::class, 'updateSettings']);
+    
+    // Backup and Restore API
+    Route::post('/profile/chats/backup', [BackupRestoreApiController::class, 'backup']);
+    Route::post('/profile/chats/restore', [BackupRestoreApiController::class, 'restore']);
     
     // Chat Wallpaper API
     Route::post('/profile/chats/wallpaper', [SettingsApiController::class, 'updateWallpaper']);

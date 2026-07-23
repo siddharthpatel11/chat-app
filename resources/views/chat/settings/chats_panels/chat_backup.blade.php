@@ -682,14 +682,171 @@
         let progress = 0;
         
         window.get(window.ref(window.db, '/')).then(snapshot => {
-            let dataPayload = { timestamp: Date.now() };
+            const userId = '{{ auth()->id() ?? "" }}';
+            let dataPayload = { timestamp: Date.now(), chats: {}, messages: {}, groups: {}, broadcasts: {}, communities: {}, channels: {}, pinned_msgs: {}, starred_messages: {}, meta_ai_chats: {}, local_storage: {} };
+            
             if (snapshot.exists()) {
                 const fullData = snapshot.val();
-                dataPayload.chats = fullData.chats || {};
-                dataPayload.messages = fullData.messages || {};
-                dataPayload.groups = fullData.groups || {};
+                
+                if (userId) {
+                    // Filter Groups
+                    const validGroupIds = {};
+                    if (fullData.groups) {
+                        for (const [groupId, groupData] of Object.entries(fullData.groups)) {
+                            let isMember = false;
+                            if (groupData.members) {
+                                for (const member of Object.values(groupData.members)) {
+                                    if (member.user_id == userId) {
+                                        isMember = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (isMember || groupData.created_by == userId) {
+                                dataPayload.groups[groupId] = groupData;
+                                validGroupIds[groupId] = true;
+                            }
+                        }
+                    }
+                    
+                    // Filter Broadcasts
+                    const validBroadcastIds = {};
+                    if (fullData.broadcasts) {
+                        for (const [bcastId, bcastData] of Object.entries(fullData.broadcasts)) {
+                            if (bcastData.created_by == userId) {
+                                dataPayload.broadcasts[bcastId] = bcastData;
+                                validBroadcastIds[bcastId] = true;
+                            }
+                        }
+                    }
+                    
+                    // Filter Chats
+                    const validChatIds = {};
+                    if (fullData.chats) {
+                        for (const [chatId, chatData] of Object.entries(fullData.chats)) {
+                            let include = false;
+                            if (/^\d+_\d+$/.test(chatId)) {
+                                // 1-on-1 chat
+                                const parts = chatId.split('_');
+                                if (parts.includes(userId.toString())) include = true;
+                            } else if (chatId.startsWith('chat_') || chatId.startsWith('group_') || chatId.startsWith('gc_')) {
+                                // Group chat
+                                if (chatData.users && Object.values(chatData.users).includes(parseInt(userId))) {
+                                    include = true;
+                                } else if (chatData.participants && Object.values(chatData.participants).includes(parseInt(userId))) {
+                                    include = true;
+                                } else if (chatData.users && Object.values(chatData.users).includes(userId.toString())) {
+                                    include = true;
+                                } else if (chatData.participants && Object.values(chatData.participants).includes(userId.toString())) {
+                                    include = true;
+                                }
+                            } else if (chatId.startsWith('broadcast_') || chatId.startsWith('bcast_')) {
+                                // Broadcast chat
+                                const baseBcastId = chatId.replace('broadcast_', '').replace('bcast_', '');
+                                if (validBroadcastIds[chatId] || validBroadcastIds['bcast_' + baseBcastId] || validBroadcastIds[baseBcastId]) {
+                                    include = true;
+                                }
+                            }
+                            
+                            if (include) {
+                                dataPayload.chats[chatId] = chatData;
+                                validChatIds[chatId] = true;
+                            }
+                        }
+                    }
+                    
+                    // Filter Messages (if they are at the root)
+                    if (fullData.messages) {
+                        for (const [msgChatId, msgData] of Object.entries(fullData.messages)) {
+                            if (validChatIds[msgChatId]) {
+                                dataPayload.messages[msgChatId] = msgData;
+                            }
+                        }
+                    }
+
+                    // Filter Communities
+                    if (fullData.communities) {
+                        for (const [commId, commData] of Object.entries(fullData.communities)) {
+                            let include = false;
+                            if (commData.created_by == userId) include = true;
+                            if (commData.users) {
+                                const uList = Array.isArray(commData.users) ? commData.users : Object.values(commData.users);
+                                if (uList.map(String).includes(userId.toString())) include = true;
+                            }
+                            if (include) dataPayload.communities[commId] = commData;
+                        }
+                    }
+
+                    // Filter Channels
+                    if (fullData.channels) {
+                        for (const [chId, chData] of Object.entries(fullData.channels)) {
+                            let include = false;
+                            if (chData.created_by == userId) include = true;
+                            if (chData.followers && chData.followers[userId]) include = true;
+                            if (chData.admins && chData.admins[userId]) include = true;
+                            
+                            if (include) dataPayload.channels[chId] = chData;
+                        }
+                    }
+
+                    // User Profile and Settings
+                    if (fullData.users && fullData.users[userId]) {
+                        dataPayload.users = { [userId]: fullData.users[userId] };
+                    }
+                    if (fullData.settings) {
+                        if (Array.isArray(fullData.settings) && fullData.settings[userId]) {
+                            dataPayload.settings = [];
+                            dataPayload.settings[userId] = fullData.settings[userId];
+                        } else if (fullData.settings[userId]) {
+                            dataPayload.settings = { [userId]: fullData.settings[userId] };
+                        }
+                    }
+
+                    // Filter Global Pinned Messages
+                    if (fullData.pinned_msgs) {
+                        for (const [msgKey, msgData] of Object.entries(fullData.pinned_msgs)) {
+                            let found = false;
+                            for (const chatData of Object.values(dataPayload.chats)) {
+                                if (chatData.messages && chatData.messages[msgKey]) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (found) {
+                                dataPayload.pinned_msgs[msgKey] = msgData;
+                            }
+                        }
+                    }
+
+                    // Starred Messages
+                    if (fullData.starred_messages && fullData.starred_messages[userId]) {
+                        dataPayload.starred_messages[userId] = fullData.starred_messages[userId];
+                    }
+
+                    // Meta AI Chats
+                    if (fullData.meta_ai_chats && fullData.meta_ai_chats[userId]) {
+                        dataPayload.meta_ai_chats[userId] = fullData.meta_ai_chats[userId];
+                    }
+                }
             }
         
+            // Backup all relevant local storage
+            const lsKeysToBackup = ['archived_chats', 'locked_chats', 'muted_chats', 'pinned_chats', 'cleared_chats', 'deleted_chats', 'favourite_chats', 'blocked_users', 'custom_lists', 'hiddenStatusUsers'];
+            for (const key of lsKeysToBackup) {
+                const val = localStorage.getItem(key);
+                if (val !== null) dataPayload.local_storage[key] = val;
+            }
+            // Backup whatsapp_ prefixed local storage keys
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('whatsapp_')) {
+                    // Don't backup backup-specific keys
+                    if (!key.startsWith('whatsapp_chat_backup_') && !key.startsWith('whatsapp_e2e_backup_')) {
+                        dataPayload.local_storage[key] = localStorage.getItem(key);
+                    }
+                }
+            }
+
             let fileContent = JSON.stringify(dataPayload);
             
             // Check if E2E is enabled
@@ -863,7 +1020,7 @@
         btn.innerText = 'Restoring...';
         btn.classList.add('opacity-50', 'cursor-not-allowed');
         
-        fetch('https://www.googleapis.com/drive/v3/files?q=name="WhatsApp_Backup.json" and trashed=false', {
+        fetch('https://www.googleapis.com/drive/v3/files?q=name="WhatsApp_Backup.json" and trashed=false&orderBy=createdTime desc', {
             headers: new Headers({'Authorization': 'Bearer ' + driveAccessToken})
         })
         .then(response => response.json())
@@ -881,10 +1038,55 @@
         .then(backupData => {
             const processRestoreData = (data) => {
                 const updates = {};
-                if (data.chats) updates[`chats`] = data.chats;
-                if (data.messages) updates[`messages`] = data.messages;
-                if (data.groups) updates[`groups`] = data.groups;
+                if (data.chats) {
+                    for (const [id, val] of Object.entries(data.chats)) updates[`chats/${id}`] = val;
+                }
+                if (data.messages) {
+                    for (const [id, val] of Object.entries(data.messages)) updates[`messages/${id}`] = val;
+                }
+                if (data.groups) {
+                    for (const [id, val] of Object.entries(data.groups)) updates[`groups/${id}`] = val;
+                }
+                if (data.broadcasts) {
+                    for (const [id, val] of Object.entries(data.broadcasts)) updates[`broadcasts/${id}`] = val;
+                }
+                if (data.communities) {
+                    for (const [id, val] of Object.entries(data.communities)) updates[`communities/${id}`] = val;
+                }
+                if (data.channels) {
+                    for (const [id, val] of Object.entries(data.channels)) updates[`channels/${id}`] = val;
+                }
+                if (data.settings) {
+                    if (Array.isArray(data.settings)) {
+                        for (let i = 0; i < data.settings.length; i++) {
+                            if (data.settings[i] !== null && data.settings[i] !== undefined) {
+                                updates[`settings/${i}`] = data.settings[i];
+                            }
+                        }
+                    } else {
+                        for (const [id, val] of Object.entries(data.settings)) updates[`settings/${id}`] = val;
+                    }
+                }
+                if (data.users) {
+                    for (const [id, val] of Object.entries(data.users)) updates[`users/${id}`] = val;
+                }
+                if (data.pinned_msgs) {
+                    for (const [id, val] of Object.entries(data.pinned_msgs)) updates[`pinned_msgs/${id}`] = val;
+                }
+                if (data.starred_messages) {
+                    for (const [id, val] of Object.entries(data.starred_messages)) updates[`starred_messages/${id}`] = val;
+                }
+                if (data.meta_ai_chats) {
+                    for (const [id, val] of Object.entries(data.meta_ai_chats)) updates[`meta_ai_chats/${id}`] = val;
+                }
                 
+                // Restore local storage
+                if (data.local_storage) {
+                    for (const [key, val] of Object.entries(data.local_storage)) {
+                        localStorage.setItem(key, val);
+                    }
+                }
+
                 if (Object.keys(updates).length > 0 && window.update && window.ref && window.db) {
                     // Reset cleared/deleted state locally so restored messages are not incorrectly hidden
                     localStorage.removeItem('cleared_chats');
