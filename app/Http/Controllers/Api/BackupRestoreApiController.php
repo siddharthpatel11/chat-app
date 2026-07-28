@@ -405,4 +405,56 @@ class BackupRestoreApiController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function setupAutoBackup(Request $request)
+    {
+        $request->validate([
+            'auth_code' => 'nullable|string',
+            'frequency' => 'required|string',
+        ]);
+
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $user->chat_backup_frequency = $request->frequency;
+
+        if ($request->auth_code) {
+            // Exchange auth_code for refresh_token using Google API Client
+            try {
+                $client = new \Google\Client();
+                $client->setClientId(env('GOOGLE_DRIVE_CLIENT_ID'));
+                // Use a default string if secret is missing to avoid null errors, though it will fail the API call
+                $client->setClientSecret(env('GOOGLE_DRIVE_CLIENT_SECRET', ''));
+                $client->setRedirectUri('postmessage');
+                $client->setAccessType('offline');
+                
+                // Disable SSL verification for local Windows development
+                $guzzleClient = new \GuzzleHttp\Client(['verify' => false]);
+                $client->setHttpClient($guzzleClient);
+                
+                $token = $client->fetchAccessTokenWithAuthCode($request->auth_code);
+                
+                if (isset($token['error'])) {
+                    return response()->json(['error' => 'Failed to exchange auth code: ' . $token['error_description']], 400);
+                }
+
+                if (isset($token['refresh_token'])) {
+                    $user->google_drive_refresh_token = $token['refresh_token'];
+                }
+            } catch (\Exception $e) {
+                return response()->json(['error' => 'Google API Error: ' . $e->getMessage()], 500);
+            }
+        }
+
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Auto backup settings saved.',
+            'frequency' => $user->chat_backup_frequency,
+            'has_refresh_token' => !empty($user->google_drive_refresh_token)
+        ]);
+    }
 }

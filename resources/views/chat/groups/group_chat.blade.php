@@ -4327,31 +4327,34 @@
                     document.getElementById('media_preview_modal')?.classList.add('hidden');
                 }
 
+                // Cleanup UI immediately so user can keep typing
+                if (window.clearFile) window.clearFile();
+                if (window.cancelGroupReply) window.cancelGroupReply();
+                const msgInput = document.getElementById('msg');
+                if (msgInput) {
+                    msgInput.value = '';
+                    if (window.handleInputToggle) window.handleInputToggle();
+                }
+
                 try {
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || (
                         typeof csrf !== 'undefined' ? csrf : '');
-                    const response = await fetch('/send', {
+                    
+                    fetch('/send', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': csrfToken
                         },
                         body: formData
+                    }).then(response => {
+                        if (!response.ok) console.error('Failed to send group message via server');
+                        else console.log("Group message sent successfully via /send");
+                    }).catch(error => {
+                        console.error("Error sending group message:", error);
                     });
 
-                    if (!response.ok) throw new Error('Failed to send group message via server');
-
-                    // Cleanup UI
-                    if (window.clearFile) window.clearFile();
-                    if (window.cancelGroupReply) window.cancelGroupReply();
-                    const msgInput = document.getElementById('msg');
-                    if (msgInput) {
-                        msgInput.value = '';
-                        if (window.handleInputToggle) window.handleInputToggle();
-                    }
-                    console.log("Group message sent successfully via /send");
                 } catch (error) {
-                    console.error("Error sending group message:", error);
-                    alert("Failed to send message to group.");
+                    console.error("Error setting up group message fetch:", error);
                 }
                 return;
             }
@@ -4438,7 +4441,7 @@
 
             const elementId = `group_sidebar_${groupId}`;
             const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId + '') || '0');
-            const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
+            const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
             if (data.time <= clearedTime) return;
 
             // Ignore expired disappearing messages
@@ -4771,7 +4774,7 @@
             if (data) {
                 const elementId = `group_sidebar_${groupId}`;
                 const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId + '') || '0');
-                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
+                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
                 if (data.time <= clearedTime) return;
                 if (data.deleted_for && data.deleted_for[window.myUserId]) return;
 
@@ -5607,7 +5610,7 @@
 
                 const elementId = `group_sidebar_${window.currentGroupId}`;
                 const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId + '') || '0');
-                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
+                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
 
                 if (gData.pinned_msgs && typeof gData.pinned_msgs === 'object') {
                     for (const [key, val] of Object.entries(gData.pinned_msgs)) {
@@ -5981,7 +5984,7 @@
 
             const elementId = `group_sidebar_${groupId}`;
             const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId + '') || '0');
-            const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
+            const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
             if (data.time && data.time <= clearedTime) return;
             if (data.deleted_for && data.deleted_for[window.myUserId]) return;
 

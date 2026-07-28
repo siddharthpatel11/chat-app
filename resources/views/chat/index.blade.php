@@ -638,6 +638,7 @@
             @include('chat.settings.chats_panels.chat_backup')
             @include('chat.settings.chats_panels.chats_wallpaper')
             @include('chat.settings.chats_panels.chats_hide')
+            @include('chat.settings.chats_panels.chat_history')
             @include('chat.settings.account')
             @include('chat.settings.security_notifications')
             @include('chat.settings.video_voice_panels.video_voice')
@@ -2838,62 +2839,56 @@
                 return;
             }
 
-            if (window.currentChatId && typeof window.currentChatId === 'string' && window.currentChatId.startsWith(
-                    'group_')) {
-                let msgData = {
-                    text: msgText,
-                    sender_id: window.myUserId,
-                    time: Math.floor(Date.now() / 1000),
-                    type: 'text',
-                    status: 'sent'
-                };
-                if (fileObj) {
-                    const fd = new FormData();
-                    fd.append('file', fileObj);
-                    const res = await fetch('/upload-status-media', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': csrf
-                        },
-                        body: fd
-                    });
-                    const rData = await res.json();
-                    if (rData.status && rData.url) {
-                        msgData.file_url = rData.url;
-                        msgData.file_name = fileObj.name;
-                        if (fileObj.type.startsWith('image/')) {
-                            msgData.type = 'image';
-                        } else if (fileObj.type.startsWith('video/')) {
-                            msgData.type = 'video';
-                        } else if (fileObj.type.startsWith('audio/')) {
-                            msgData.type = 'audio';
-                        } else {
-                            msgData.type = 'document';
-                        }
+            let msgData = {
+                text: msgText,
+                sender_id: window.myUserId,
+                time: Math.floor(Date.now() / 1000),
+                type: 'text',
+                status: 'sent'
+            };
+            if (fileObj) {
+                const fd = new FormData();
+                fd.append('file', fileObj);
+                const res = await fetch('/upload-status-media', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf
+                    },
+                    body: fd
+                });
+                const rData = await res.json();
+                if (rData.status && rData.url) {
+                    msgData.file_url = rData.url;
+                    msgData.file_name = fileObj.name;
+                    if (fileObj.type.startsWith('image/')) {
+                        msgData.type = 'image';
+                    } else if (fileObj.type.startsWith('video/')) {
+                        msgData.type = 'video';
+                    } else if (fileObj.type.startsWith('audio/')) {
+                        msgData.type = 'audio';
+                    } else {
+                        msgData.type = 'document';
                     }
                 }
-                if (window.replyingToKey) {
-                    msgData.reply_to_id = window.replyingToKey;
-                    msgData.reply_to_text = window.replyingToText || (window.globalMessages[window.replyingToKey]
-                        ?.text || 'Media');
-                    msgData.reply_to_name = window.replyingToName || 'Member';
-                    msgData.reply_to_media = window.replyingToMedia || null;
-                }
-
-                const msgEl = document.getElementById('msg');
-                if (msgEl) {
-                    msgEl.value = "";
-                    autoResizeTextarea(msgEl);
-                }
-                clearFile();
-                cancelReply();
-                if (typeof handleInputToggle === 'function') handleInputToggle();
-
-                await window.push(window.ref(window.db, `chats/${window.currentChatId}/messages`), msgData);
-                document.getElementById('msg').focus();
-                return;
+            }
+            if (window.replyingToKey) {
+                msgData.reply_to_id = window.replyingToKey;
+                msgData.reply_to_text = window.replyingToText || (window.globalMessages[window.replyingToKey]
+                    ?.text || 'Media');
+                msgData.reply_to_name = window.replyingToName || 'Member';
+                msgData.reply_to_media = window.replyingToMedia || null;
             }
 
+            const msgEl = document.getElementById('msg');
+            if (msgEl) {
+                msgEl.value = "";
+                autoResizeTextarea(msgEl);
+            }
+            clearFile();
+            cancelReply();
+            if (typeof handleInputToggle === 'function') handleInputToggle();
+
+            // Fire the backend /send endpoint asynchronously for Firebase push and notifications
             let formData = new FormData();
             formData.append('chat_id', window.currentChatId);
             formData.append('message', msgText);
@@ -2910,29 +2905,17 @@
                 }
             }
 
-            // Reset inputs
-            const msgEl = document.getElementById('msg');
-            if (msgEl) {
-                msgEl.value = "";
-                autoResizeTextarea(msgEl);
-            }
-            clearFile();
-            cancelReply();
-            if (typeof handleInputToggle === 'function') handleInputToggle();
-
             try {
-                await fetch('/send', {
+                fetch('/send', {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': csrf
                     },
                     body: formData
-                });
+                }).catch(e => console.error('Send error:', e));
             } catch (e) {
                 console.error('Send error:', e);
             }
-
-            document.getElementById('msg').focus();
         }
         window.emitMessage = emitMessage;
 
@@ -4501,7 +4484,7 @@
                     // Check if chat was cleared/skipped to hide these messages globally
                     const sidebarElementId = `user_sidebar_${otherId}`;
                     const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId) || '0');
-                    const clearedTime = Math.max(window.clearedChats?.[sidebarElementId] || 0, skippedRestoreTime) * 1000;
+                    const clearedTime = Math.max(window.clearedChats?.[sidebarElementId] || 0, skippedRestoreTime);
                     if (data.time && data.time <= clearedTime) {
                         return; // Ignore completely!
                     }
@@ -4598,7 +4581,7 @@
                     const deletedIndex = window.deletedChats?.indexOf(sidebarElementId) ?? -1;
                     if (deletedIndex > -1) {
                         const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId) || '0');
-                        const clearedTime = Math.max(window.clearedChats?.[sidebarElementId] || 0, skippedRestoreTime) * 1000;
+                        const clearedTime = Math.max(window.clearedChats?.[sidebarElementId] || 0, skippedRestoreTime);
                         if (data.time > clearedTime) {
                             window.deletedChats.splice(deletedIndex, 1);
                             localStorage.setItem('deleted_chats', JSON.stringify(window.deletedChats));
@@ -5812,7 +5795,7 @@
                     .replace('chat_', '').split('_').find(id => id != window.myUserId);
                 const elementId = isGroup ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                 const skippedRestoreTime = parseInt(localStorage.getItem('skipped_initial_restore_time_' + window.myUserId) || '0');
-                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime) * 1000;
+                const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
 
                 if (data.time && data.time <= clearedTime) {
                     return; // Ignore this message because chat was cleared after it was sent

@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\GroupApiController;
 use App\Http\Controllers\Api\MediaApiController;
 use App\Http\Controllers\Api\MetaAiApiController;
 use App\Http\Controllers\Api\Profile\AccountApiController;
+use App\Http\Controllers\Api\Profile\ChatHistoryApiController;
 use App\Http\Controllers\Api\Profile\ChatsApiController;
 use App\Http\Controllers\Api\Profile\GeneralApiController;
 use App\Http\Controllers\Api\Profile\HelpFeedbackApiController;
@@ -159,9 +160,22 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     Route::get('/profile/chats', [ChatsApiController::class, 'getSettings']);
     Route::patch('/profile/chats', [ChatsApiController::class, 'updateSettings']);
     
+    // Chat History API
+    Route::post('/profile/chats/history/export', [ChatHistoryApiController::class, 'exportChat']);
+    Route::post('/profile/chats/history/archive-all', [ChatHistoryApiController::class, 'archiveAllChats']);
+    Route::post('/profile/chats/history/clear-all', [ChatHistoryApiController::class, 'clearAllChats']);
+    Route::post('/profile/chats/history/delete-all', [ChatHistoryApiController::class, 'deleteAllChats']);
+    
     // Backup and Restore API
     Route::post('/profile/chats/backup', [BackupRestoreApiController::class, 'backup']);
     Route::post('/profile/chats/restore', [BackupRestoreApiController::class, 'restore']);
+    Route::post('/profile/chats/backup/setup', [BackupRestoreApiController::class, 'setupAutoBackup']);
+    
+    // Trigger Auto Backups Manually (Web Cron)
+    Route::get('/cron/run-auto-backups', function () {
+        \Illuminate\Support\Facades\Artisan::call('app:run-auto-backups');
+        return response()->json(['success' => true, 'message' => 'Auto backups job triggered successfully.']);
+    });
     
     // Chat Wallpaper API
     Route::post('/profile/chats/wallpaper', [SettingsApiController::class, 'updateWallpaper']);

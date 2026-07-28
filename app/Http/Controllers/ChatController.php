@@ -52,6 +52,9 @@ class ChatController extends Controller
             return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
         }
 
+        // \Log::info("ChatController@send reached for chat_id: " . $chatId);
+
+
         $type = 'text';
         $fileUrl = null;
         $fileName = null;
@@ -484,6 +487,8 @@ class ChatController extends Controller
 
         $userId = auth()->id();
         if (!$userId) return response()->json(['status' => false, 'message' => 'Unauthorized'], 401);
+        
+        // session_write_close();
 
         $db->getReference("chats/{$request->chat_id}/settings/{$userId}/{$request->setting_key}")
             ->set($request->setting_value);

@@ -317,6 +317,7 @@
     }
 
     const backupFrequencies = [
+        '5 Minutes',
         'Daily',
         'Weekly',
         'Monthly',
@@ -583,9 +584,64 @@
     };
 
     window.selectChatBackupFrequency = function(freq) {
+        // Save locally first
         localStorage.setItem('whatsapp_chat_backup_frequency', freq);
         document.getElementById('chat_backup_frequency_label').innerText = freq;
         setTimeout(closeChatBackupFrequencyModal, 200);
+
+        const clientId = '{{ env("GOOGLE_DRIVE_CLIENT_ID") }}';
+        
+        // If it's an automated frequency, we need offline access for the server
+        if (['5 Minutes', 'Daily', 'Weekly', 'Monthly'].includes(freq)) {
+            if (!clientId) return;
+            
+            if (window.showToast) window.showToast('Setting up...', 'Authorizing Google Drive for background backups.');
+            
+            const client = google.accounts.oauth2.initCodeClient({
+                client_id: clientId,
+                scope: 'https://www.googleapis.com/auth/drive.file',
+                ux_mode: 'popup',
+                callback: (response) => {
+                    if (response.code) {
+                        // Send auth code and frequency to backend
+                        fetch('/api/v1/profile/chats/backup/setup', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${window.authToken}`,
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                            },
+                            body: JSON.stringify({
+                                auth_code: response.code,
+                                frequency: freq
+                            })
+                        }).then(res => res.json()).then(data => {
+                            if (data.success) {
+                                if (window.showToast) window.showToast('Success', 'Auto-backup configured successfully.');
+                            } else {
+                                if (window.showToast) window.showToast('Error', data.error || 'Failed to configure auto-backup.');
+                            }
+                        }).catch(err => {
+                            console.error('Setup auto backup error:', err);
+                            if (window.showToast) window.showToast('Error', 'Network error during setup.');
+                        });
+                    }
+                },
+            });
+            client.requestCode();
+        } else {
+            fetch('/api/v1/profile/chats/backup/setup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${window.authToken}`,
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                },
+                body: JSON.stringify({
+                    frequency: freq
+                })
+            });
+        }
     };
 
     let tokenClient;
@@ -619,36 +675,13 @@
         });
     }
 
-    function checkAutoBackup() {
-        const freq = localStorage.getItem('whatsapp_chat_backup_frequency');
-        if (!freq || freq === 'Off' || freq === 'Only when I tap "Back up"') return;
-        const lastBackupStr = localStorage.getItem('whatsapp_chat_backup_timestamp');
-        const lastBackup = lastBackupStr ? parseInt(lastBackupStr) : 0;
-        const now = Date.now();
-        
-        let shouldBackup = false;
-        
-        if (freq === 'Daily' && (now - lastBackup) > 24 * 60 * 60 * 1000) {
-            shouldBackup = true;
-        } else if (freq === 'Weekly' && (now - lastBackup) > 7 * 24 * 60 * 60 * 1000) {
-            shouldBackup = true;
-        } else if (freq === 'Monthly' && (now - lastBackup) > 30 * 24 * 60 * 60 * 1000) {
-            shouldBackup = true;
-        }
-        if (shouldBackup) {
-            if (tokenClient) {
-                window.pendingDriveAction = 'backup';
-                tokenClient.requestAccessToken();
-            }
-        }
-    }
-    // Check for auto-backup every minute
-    setInterval(checkAutoBackup, 60000);
+    // Frontend auto backup polling removed as it is now handled by Server Cron Job
     const checkGsiInterval = setInterval(() => {
         if (window.google && window.google.accounts && window.google.accounts.oauth2) {
             clearInterval(checkGsiInterval);
             initGoogleDriveAuth();
-            setTimeout(checkAutoBackup, 5000); // Check 5s after init
+            // Frontend auto backup disabled, handled by server
+            // setTimeout(checkAutoBackup, 5000); // Check 5s after init
         }
     }, 500);
     
