@@ -135,7 +135,7 @@
         </div>
 
         <!-- Transfer chats -->
-        <div class="flex items-center py-4 hover:bg-[#202c33] px-6 transition-colors cursor-pointer group">
+        <div class="flex items-center py-4 hover:bg-[#202c33] px-6 transition-colors cursor-pointer group" onclick="window.toggleTransferChatHistoryPanel()">
             <div class="text-[#8696a0] mr-6">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M16 1H8C6.9 1 6 1.9 6 3v18c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 19H8V4h8v16zm-3.5 1h-1v-1h1v1zM11 12H7V10h4V7l5 4-5 4v-3z"></path>
@@ -159,7 +159,7 @@
         </div>
 
         <!-- Private Processing -->
-        <div class="flex items-center py-4 hover:bg-[#202c33] px-6 transition-colors cursor-pointer group mb-10">
+        <div class="flex items-center py-4 hover:bg-[#202c33] px-6 transition-colors cursor-pointer group mb-10" onclick="window.togglePrivateProcessingPanel()">
             <div class="text-[#8696a0] mr-6">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2H8.9V6zM18 20H6V10h12v10zm-5-3h-2v-2H9v-2h2v-2h2v2h2v2h-2v2z"></path>
@@ -169,7 +169,6 @@
                 <div class="text-[#e9edef] text-[16px]">Private Processing</div>
             </div>
         </div>
-
     </div>
 </div>
 

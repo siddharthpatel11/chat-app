@@ -639,6 +639,8 @@
             @include('chat.settings.chats_panels.chats_wallpaper')
             @include('chat.settings.chats_panels.chats_hide')
             @include('chat.settings.chats_panels.chat_history')
+            @include('chat.settings.chats_panels.private_processing')
+            @include('chat.settings.chats_panels.transfer_chat_history')
             @include('chat.settings.account')
             @include('chat.settings.security_notifications')
             @include('chat.settings.video_voice_panels.video_voice')

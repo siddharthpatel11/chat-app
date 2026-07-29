@@ -43,8 +43,11 @@ class MetaAiController extends Controller
             'content' => $userMessage,
         ];
 
-        $tools = [
-            [
+        $webSearchEnabled = filter_var($request->input('web_search_enabled', true), FILTER_VALIDATE_BOOLEAN);
+
+        $tools = [];
+        if ($webSearchEnabled) {
+            $tools[] = [
                 'type' => 'function',
                 'function' => [
                     'name' => 'web_search',
@@ -60,20 +63,26 @@ class MetaAiController extends Controller
                         'required' => ['query']
                     ]
                 ]
-            ]
+            ];
+        }
+
+        $payload = [
+            'model' => 'llama-3.3-70b-versatile',
+            'messages' => $messages,
+            'max_tokens' => 1000,
+            'temperature' => 0.7,
         ];
+
+        if (!empty($tools)) {
+            $payload['tools'] = $tools;
+            $payload['tool_choice'] = 'auto';
+        }
 
         try {
             $response = Http::withToken($apiKey)
+                ->withOptions(['verify' => false])
                 ->timeout(60)
-                ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => 'llama-3.3-70b-versatile',
-                    'messages' => $messages,
-                    'max_tokens' => 1000,
-                    'temperature' => 0.7,
-                    'tools' => $tools,
-                    'tool_choice' => 'auto'
-                ]);
+                ->post('https://api.groq.com/openai/v1/chat/completions', $payload);
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -100,6 +109,7 @@ class MetaAiController extends Controller
                     }
 
                     $finalResponse = Http::withToken($apiKey)
+                        ->withOptions(['verify' => false])
                         ->timeout(60)
                         ->post('https://api.groq.com/openai/v1/chat/completions', [
                             'model' => 'llama-3.3-70b-versatile',

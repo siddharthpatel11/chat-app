@@ -386,7 +386,8 @@
                 },
                 body: JSON.stringify({
                     message: apiText,
-                    history: history
+                    history: history,
+                    web_search_enabled: localStorage.getItem('meta_ai_web_search_' + window.myUserId) !== '0'
                 })
             });
             
