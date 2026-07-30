@@ -610,6 +610,14 @@
         const scanScreen = document.getElementById('transfer_scan_screen');
         const qrScreen = document.getElementById('transfer_qr_display_screen');
         
+        // Register intent in Firebase so new phone detects it
+        if (window.db && window.set && window.ref) {
+            window.set(window.ref(window.db, `transfer_intents/${window.myUserId || 'demo'}`), {
+                status: 'waiting_for_receiver',
+                timestamp: Date.now()
+            });
+        }
+
         if (verifyScreen && scanScreen && qrScreen) {
             verifyScreen.classList.add('hidden');
             verifyScreen.classList.remove('flex');
@@ -763,23 +771,27 @@
             window.logTransferEvent('Opened QR Display Screen (New Phone)');
         }
 
-        // Simulate "Empty New Phone" state on the laptop
-        const userListContainer = document.getElementById('user_list_container');
+        // Simulate "Empty New Phone" state on the laptop using an overlay
+        const userListContainer = document.getElementById('user_sidebar_container') || document.getElementById('user_list_container');
         if (userListContainer) {
-            if (!window.originalChatsHTML) {
-                window.originalChatsHTML = userListContainer.innerHTML;
-            }
-            userListContainer.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full text-center px-6 py-10 opacity-60">
-                    <div class="w-16 h-16 bg-[#202c33] rounded-full flex items-center justify-center mb-4 text-[#8696a0]">
-                        <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
-                            <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
-                        </svg>
-                    </div>
-                    <p class="text-[#e9edef] text-[17px] font-medium mb-2">No chats yet</p>
-                    <p class="text-[#8696a0] text-[14px]">Scan the QR code to securely transfer your chat history from your old phone.</p>
+            // Remove existing overlay if any
+            const existingOverlay = document.getElementById('transfer_empty_overlay');
+            if (existingOverlay) existingOverlay.remove();
+            
+            const emptyOverlay = document.createElement('div');
+            emptyOverlay.id = 'transfer_empty_overlay';
+            emptyOverlay.className = 'absolute inset-0 bg-[#111b21] z-[40] flex flex-col items-center justify-center text-center px-6 py-10 opacity-100 transition-opacity duration-500';
+            emptyOverlay.innerHTML = `
+                <div class="w-16 h-16 bg-[#202c33] rounded-full flex items-center justify-center mb-4 text-[#8696a0]">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
+                    </svg>
                 </div>
+                <p class="text-[#e9edef] text-[17px] font-medium mb-2">No chats yet</p>
+                <p class="text-[#8696a0] text-[14px]">Scan the QR code to securely transfer your chat history from your old phone.</p>
             `;
+            userListContainer.style.position = 'relative'; // Ensure overlay stays inside
+            userListContainer.appendChild(emptyOverlay);
         }
 
         // Generate a unique session ID for the laptop
@@ -852,6 +864,9 @@
             `);
             // Clear the session state
             window.scannedTransferSessionId = null;
+            if (window.db && window.set && window.ref) {
+                window.set(window.ref(window.db, `transfer_intents/${window.myUserId || 'demo'}`), null);
+            }
 
             // Make the old phone's chat list EMPTY and say "Logged out"
             const userListContainer = document.getElementById('user_list_container');
@@ -865,14 +880,24 @@
                         </div>
                         <p class="text-[#e9edef] text-[19px] font-medium mb-3">Logged out</p>
                         <p class="text-[#8696a0] text-[15px] leading-relaxed mb-6">Your chats have been transferred to your new device.<br><br>You can no longer use WhatsApp on this phone.</p>
-                        <button class="bg-[#00a884] text-[#111b21] font-medium px-6 py-2 rounded-full hover:bg-[#008f72] transition-colors" onclick="window.location.reload(true)">
+                        <button class="bg-[#00a884] text-[#111b21] font-medium px-6 py-2 rounded-full hover:bg-[#008f72] transition-colors" onclick="document.getElementById('logout-form').submit()">
                             Log In Again
                         </button>
+                        <form id="logout-form" action="/logout" method="POST" class="hidden">
+                            <input type="hidden" name="_token" value="${window.csrf}">
+                        </form>
                     </div>
                 `;
             }
         } else {
             // New Phone (Receiver) Experience
+            // The user just completed a full device-to-device transfer. 
+            // We must clear any 'skipped restore' time so that all old messages become visible!
+            if (window.myUserId) {
+                localStorage.removeItem('skipped_initial_restore_time_' + window.myUserId);
+                localStorage.setItem('whatsapp_setup_complete_' + window.myUserId, 'true');
+            }
+
             const leftPanel = document.querySelector('#user_sidebar_container') || document.getElementById('user_list_container');
             if (leftPanel) {
                 const overlay = document.createElement('div');
@@ -908,50 +933,10 @@
                             </div>
                         `);
 
-                        // Inject the fake "Restored" chat into the DOM
-                        const userListContainer = document.getElementById('user_list_container');
-                        if (userListContainer) {
-                            // First, restore the original chats!
-                            if (window.originalChatsHTML) {
-                                userListContainer.innerHTML = window.originalChatsHTML;
-                                window.originalChatsHTML = null;
-                            }
-
-                            const restoredChatItem = document.createElement('div');
-                            restoredChatItem.className = 'flex relative items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-all duration-500 user-chat-item group';
-                            restoredChatItem.style.backgroundColor = 'rgba(0, 168, 132, 0.15)';
-                            restoredChatItem.innerHTML = `
-                                <div class="w-12 h-12 rounded-full overflow-hidden bg-[#00a884] flex items-center justify-center shrink-0">
-                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#111b21" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M20 6L9 17l-5-5"></path>
-                                    </svg>
-                                </div>
-                                <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
-                                    <div class="flex justify-between items-center">
-                                        <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-medium">
-                                            WhatsApp System
-                                        </h4>
-                                        <span class="text-[12px] text-[#00a884] whitespace-nowrap">Just now</span>
-                                    </div>
-                                    <div class="flex justify-between items-center mt-0.5">
-                                        <p class="text-[14px] text-[#8696a0] truncate flex-1 min-w-0 leading-snug">
-                                            Chat history has been restored successfully.
-                                        </p>
-                                    </div>
-                                </div>
-                            `;
-                            
-                            const lockedChatsBtn = document.getElementById('locked_chats_btn');
-                            if (lockedChatsBtn && lockedChatsBtn.nextSibling) {
-                                userListContainer.insertBefore(restoredChatItem, lockedChatsBtn.nextSibling);
-                            } else {
-                                userListContainer.prepend(restoredChatItem);
-                            }
-
-                            setTimeout(() => {
-                                restoredChatItem.style.backgroundColor = 'transparent';
-                            }, 3000);
-                        }
+                        // Remove the empty overlay to reveal the real chats
+                        const emptyOverlay = document.getElementById('transfer_empty_overlay');
+                        if (emptyOverlay) emptyOverlay.remove();
+                        
                     }, 500);
                 }, 2500);
             }
@@ -963,6 +948,11 @@
     window.restartTransferChatHistory = function() {
         window.logTransferEvent('Restarted Transfer Chat History Process');
         if (transferInterval) clearInterval(transferInterval);
+        
+        // Clear intent
+        if (window.db && window.set && window.ref) {
+            window.set(window.ref(window.db, `transfer_intents/${window.myUserId || 'demo'}`), null);
+        }
         if (window.transferFirebaseListener) {
             window.transferFirebaseListener();
             window.transferFirebaseListener = null;
@@ -1011,17 +1001,17 @@
         if (menu2) menu2.classList.add('hidden');
 
         // Restore original chats if they were hidden (since it's a restart)
-        if (window.originalChatsHTML) {
-            const userListContainer = document.getElementById('user_list_container');
-            if (userListContainer) {
-                userListContainer.innerHTML = window.originalChatsHTML;
-                window.originalChatsHTML = null;
-            }
-        }
+        const emptyOverlay = document.getElementById('transfer_empty_overlay');
+        if (emptyOverlay) emptyOverlay.remove();
     };
 
     window.closeTransferChatHistoryPanel = function() {
         if (transferInterval) clearInterval(transferInterval);
+        
+        // Clear intent
+        if (window.db && window.set && window.ref) {
+            window.set(window.ref(window.db, `transfer_intents/${window.myUserId || 'demo'}`), null);
+        }
         if (window.transferFirebaseListener) {
             window.transferFirebaseListener();
             window.transferFirebaseListener = null;
@@ -1043,17 +1033,21 @@
             transferPanel.classList.add('hidden');
             transferPanel.classList.remove('flex');
             
-            chatsPanel.classList.remove('hidden');
-            chatsPanel.classList.add('flex');
-
-            // Restore chats if they were hidden and the process was cancelled
-            if (window.originalChatsHTML) {
-                const userListContainer = document.getElementById('user_list_container');
-                if (userListContainer) {
-                    userListContainer.innerHTML = window.originalChatsHTML;
-                    window.originalChatsHTML = null;
+            if (window.transferFromPrompt) {
+                window.transferFromPrompt = false;
+                if (typeof window.showChats === 'function') {
+                    window.showChats();
+                }
+            } else {
+                if (chatsPanel) {
+                    chatsPanel.classList.remove('hidden');
+                    chatsPanel.classList.add('flex');
                 }
             }
+
+            // Restore chats if they were hidden and the process was cancelled
+            const emptyOverlay = document.getElementById('transfer_empty_overlay');
+            if (emptyOverlay) emptyOverlay.remove();
 
             // Reset to first screen for next time
             if (startScreen && progressScreen && verifyScreen && scanScreen && qrScreen && syncScreen && completeScreen && authScreen) {

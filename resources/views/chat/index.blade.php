@@ -9009,7 +9009,79 @@
                     }, 100);
                 }
             }
+
+            // Transfer Chat History - New Device Detection Logic
+            setTimeout(() => {
+                if (window.db && window.myUserId && window.onValue && window.ref) {
+                    const isNewLoginSession = {{ session('just_logged_in') ? 'true' : 'false' }};
+                    
+                    if (isNewLoginSession || window.location.search.includes('new_login=1')) {
+                        window.onValue(window.ref(window.db, `transfer_intents/${window.myUserId}`), (snapshot) => {
+                            const data = snapshot.val();
+                            // Check if there is an active intent in the last 30 minutes
+                            if (data && data.status === 'waiting_for_receiver' && (Date.now() - data.timestamp < 30 * 60 * 1000)) {
+                                if (!window.hasShownTransferPrompt) {
+                                    window.hasShownTransferPrompt = true;
+                                    window.showNewDeviceTransferPrompt();
+                                }
+                            }
+                        });
+                    }
+                }
+            }, 2000);
         });
+
+        window.showNewDeviceTransferPrompt = function() {
+            document.body.insertAdjacentHTML('beforeend', `
+                <div id="new_device_transfer_prompt" class="fixed inset-0 bg-[#111b21]/90 backdrop-blur-sm z-[99999] flex flex-col items-center justify-center p-6 text-center animate-fade-in">
+                    <div class="bg-[#202c33] p-8 rounded-2xl max-w-[400px] w-full shadow-2xl border border-white/5">
+                        <div class="w-16 h-16 mx-auto bg-[#00a884]/10 text-[#00a884] rounded-full flex items-center justify-center mb-6">
+                            <svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+                            </svg>
+                        </div>
+                        <h1 class="text-[#e9edef] text-[22px] font-medium mb-3">Transfer chat history</h1>
+                        <p class="text-[#8696a0] text-[15px] mb-8 leading-relaxed">
+                            We detected that your old phone is ready to transfer chats. Would you like to securely transfer your chat history to this new device?
+                        </p>
+                        <div class="flex flex-col gap-3">
+                            <button onclick="window.acceptTransferPrompt()" class="w-full bg-[#00a884] text-[#111b21] font-medium px-4 py-3 rounded-full hover:bg-[#008f72] transition-colors shadow-lg">
+                                Start Transfer
+                            </button>
+                            <button onclick="document.getElementById('new_device_transfer_prompt').classList.add('hidden')" class="w-full text-[#8696a0] font-medium px-4 py-3 rounded-full hover:bg-white/5 transition-colors border border-white/10">
+                                Skip for now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        };
+
+        window.acceptTransferPrompt = function() {
+            window.transferFromPrompt = true;
+            const prompt = document.getElementById('new_device_transfer_prompt');
+            if (prompt) prompt.classList.add('hidden');
+            
+            // Hide the user sidebar so the transfer panel doesn't open side-by-side with it
+            if (typeof window.closeAllSidebarPanels === 'function') {
+                window.closeAllSidebarPanels();
+            }
+            const sidebar = document.getElementById('user_sidebar_container');
+            if (sidebar) {
+                sidebar.classList.add('hidden');
+                sidebar.classList.remove('flex', 'sm:flex');
+            }
+            
+            // Navigate directly to the QR Code Generation screen in the transfer panel
+            if (typeof window.toggleTransferChatHistoryPanel === 'function') {
+                window.toggleTransferChatHistoryPanel(); // Opens the sidebar
+                setTimeout(() => {
+                    if (typeof window.showTransferQRCode === 'function') {
+                        window.showTransferQRCode(); // Immediately shows QR code
+                    }
+                }, 300);
+            }
+        };
     </script>
 </x-app-layout>
 

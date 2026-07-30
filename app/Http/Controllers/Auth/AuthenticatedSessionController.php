@@ -27,8 +27,9 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+        $request->session()->flash('just_logged_in', true);
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        return redirect()->intended('/chat');
     }
 
     /**
