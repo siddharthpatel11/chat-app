@@ -748,4 +748,15 @@ class ChatController extends Controller
             'message' => 'Event cancelled successfully'
         ]);
     }
+
+    public function transferLog(Request $request)
+    {
+        $user = auth()->user();
+        $identifier = $user->phone ?? $user->mobile ?? $user->email ?? 'Unknown User';
+        $message = $request->input('message');
+        
+        \Log::info("Chat Transfer Log [User: {$identifier}]: {$message}");
+        
+        return response()->json(['status' => 'success']);
+    }
 }

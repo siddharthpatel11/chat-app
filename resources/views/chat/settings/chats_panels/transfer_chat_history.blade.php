@@ -398,6 +398,20 @@
     let qrScanAnimation = null;
     window.previousTransferScreenId = null;
 
+    window.logTransferEvent = function(message) {
+        const token = document.querySelector('meta[name="csrf-token"]');
+        if (token) {
+            fetch('/chat/transfer-log', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token.getAttribute('content')
+                },
+                body: JSON.stringify({ message: message })
+            }).catch(err => console.error('Error logging transfer event:', err));
+        }
+    };
+
     window.showTransferChatHistoryHelp = function() {
         // Find which screen is currently visible
         const screens = [
@@ -527,6 +541,8 @@
             
             transferPanel.classList.remove('hidden');
             transferPanel.classList.add('flex');
+            
+            window.logTransferEvent('Opened Transfer Chat History Panel');
         }
     };
 
@@ -546,6 +562,8 @@
             
             progressScreen.classList.remove('hidden');
             progressScreen.classList.add('flex');
+
+            window.logTransferEvent('Started transfer process - Preparing chats');
 
             // Reset progress
             let progress = 1;
@@ -601,6 +619,8 @@
             
             scanScreen.classList.remove('hidden');
             scanScreen.classList.add('flex');
+
+            window.logTransferEvent('Opened QR Scanner Screen');
 
             // Start Camera
             const video = document.getElementById('transfer_camera_feed');
@@ -661,6 +681,8 @@
         if (syncScreen) {
             syncScreen.classList.remove('hidden');
             syncScreen.classList.add('flex');
+            
+            window.logTransferEvent('Started Data Transfer Sync');
             
             // Animate progress
             const progressBar = document.getElementById('transfer_sync_progress');
@@ -737,6 +759,8 @@
             
             qrScreen.classList.remove('hidden');
             qrScreen.classList.add('flex');
+            
+            window.logTransferEvent('Opened QR Display Screen (New Phone)');
         }
 
         // Simulate "Empty New Phone" state on the laptop
@@ -802,6 +826,7 @@
     };
 
     window.finishChatTransfer = function() {
+        window.logTransferEvent('Finished Chat Transfer (Done clicked)');
         window.closeTransferChatHistoryPanel();
         
         const isSender = !!window.scannedTransferSessionId; // The one who scanned (Phone)
@@ -936,6 +961,7 @@
     };
 
     window.restartTransferChatHistory = function() {
+        window.logTransferEvent('Restarted Transfer Chat History Process');
         if (transferInterval) clearInterval(transferInterval);
         if (window.transferFirebaseListener) {
             window.transferFirebaseListener();

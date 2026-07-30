@@ -81,6 +81,9 @@ Route::middleware('auth')->group(function () {
     // Disappearing messages timers
     Route::post('/chat/settings/disappearing-message-timer', [ChatController::class, 'setDisappearingMessageTimer']);
     Route::post('/chat/settings/default-message-timer', [ChatController::class, 'setDefaultMessageTimer']);
+
+    // Log chat transfer events
+    Route::post('/chat/transfer-log', [ChatController::class, 'transferLog']);
 });
 
 require __DIR__.'/auth.php';
