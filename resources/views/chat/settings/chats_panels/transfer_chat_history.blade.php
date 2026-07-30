@@ -18,8 +18,8 @@
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path></svg>
                 </button>
                 <div id="transfer_chat_history_menu" class="hidden absolute top-full right-0 mt-1 w-44 bg-[#233138] rounded-md shadow-lg py-2 z-50 transform origin-top-right transition-transform">
-                    <button class="w-full text-left px-5 py-3 text-[#e9edef] text-[15px] hover:bg-[#182229] transition-colors">Help</button>
-                    <button class="w-full text-left px-5 py-3 text-[#e9edef] text-[15px] hover:bg-[#182229] transition-colors">Restart</button>
+                    <button onclick="window.showTransferChatHistoryHelp()" class="w-full text-left px-5 py-3 text-[#e9edef] text-[15px] hover:bg-[#182229] transition-colors">Help</button>
+                    <button onclick="window.restartTransferChatHistory()" class="w-full text-left px-5 py-3 text-[#e9edef] text-[15px] hover:bg-[#182229] transition-colors">Restart</button>
                 </div>
             </div>
         </div>
@@ -88,8 +88,8 @@
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path></svg>
                 </button>
                 <div id="transfer_chat_history_menu_2" class="hidden absolute top-full right-0 mt-1 w-44 bg-[#233138] rounded-md shadow-lg py-2 z-50 transform origin-top-right transition-transform">
-                    <button class="w-full text-left px-5 py-3 text-[#e9edef] text-[15px] hover:bg-[#182229] transition-colors">Help</button>
-                    <button class="w-full text-left px-5 py-3 text-[#e9edef] text-[15px] hover:bg-[#182229] transition-colors">Restart</button>
+                    <button onclick="window.showTransferChatHistoryHelp()" class="w-full text-left px-5 py-3 text-[#e9edef] text-[15px] hover:bg-[#182229] transition-colors">Help</button>
+                    <button onclick="window.restartTransferChatHistory()" class="w-full text-left px-5 py-3 text-[#e9edef] text-[15px] hover:bg-[#182229] transition-colors">Restart</button>
                 </div>
             </div>
         </div>
@@ -351,11 +351,98 @@
         </div>
     </div>
 
+    <!-- SCREEN 8: Help Screen -->
+    <div id="transfer_help_screen" class="hidden flex-1 bg-[#111b21] flex-col overflow-hidden">
+        <!-- Header -->
+        <div class="h-16 px-4 flex items-center shrink-0 border-b border-transparent">
+            <button onclick="window.closeTransferChatHistoryHelp()" class="text-[#e9edef] hover:bg-[#202c33] p-2 rounded-full transition-colors flex items-center gap-6">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+                </svg>
+                <span class="text-[20px] font-normal text-[#e9edef]">Transfer your chat history</span>
+            </button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-6 pt-4 pb-6 custom-scrollbar text-[#e9edef] text-[15px] leading-relaxed">
+            <p class="mb-6 text-[#d1d7db]">You can transfer your full chat and media history, such as personal messages, photos, videos, and documents. You can't transfer peer-to-peer payment messages and your call history, or media received over WhatsApp Channels.</p>
+            
+            <p class="mb-6 text-[#d1d7db]">On your old phone, open WhatsApp and tap <strong class="font-medium text-[#e9edef]">More Options > Settings > Chats > Transfer chats > Start</strong>. Accept requested permissions and prepare to scan the QR code that will be shown on your new phone.</p>
+            
+            <p class="mb-4 text-[#d1d7db]">On your new phone:</p>
+            
+            <ol class="list-decimal pl-4 space-y-4 mb-6 ml-1 text-[#d1d7db]">
+                <li class="pl-2">Download and then open WhatsApp on your new phone. Go through the setup.</li>
+                <li class="pl-2">Tap <strong class="font-medium text-[#e9edef]">Accept terms and conditions > Verify your phone number</strong>.</li>
+                <li class="pl-2">Tap <strong class="font-medium text-[#e9edef]">Start</strong> on <strong class="font-medium text-[#e9edef]">Transfer chat history</strong> from your old phone.</li>
+                <li class="pl-2">Accept requested permissions and then you'll see a QR code.</li>
+                <li class="pl-2">On your old phone, scan the QR code shown on your new phone.</li>
+                <li class="pl-2">Accept the invitation to connect on your new phone to link your new phone to your old phone.</li>
+                <li class="pl-2">While your chat history is transferring, a percentage bar will track the progress. Keep both phones unlocked and don't leave WhatsApp. Messaging is paused during the chat history transfer. You can cancel the process at any time.</li>
+                <li class="pl-2">Once the import is complete, tap Done.</li>
+            </ol>
+            
+            <p class="mb-6 text-[#d1d7db]"><strong class="font-medium text-[#e9edef]">Note:</strong> Don't delete your old phone's data, reset your old phone, or uninstall WhatsApp on your old phone until you can confirm the data has successfully transferred to your new phone. In case your transfer fails, gets stuck, or you receive an error, your data will still be available on your old phone.</p>
+        </div>
+
+        <div class="px-6 pb-6 pt-2 shrink-0 bg-[#111b21]">
+            <button class="w-full bg-[#25d366] hover:bg-[#20bd5a] text-[#111b21] font-medium text-[15px] py-[10px] rounded-full transition-colors">
+                Contact us
+            </button>
+        </div>
+    </div>
+
 </div>
 
 <script>
     let transferCameraStream = null;
     let qrScanAnimation = null;
+    window.previousTransferScreenId = null;
+
+    window.showTransferChatHistoryHelp = function() {
+        // Find which screen is currently visible
+        const screens = [
+            'transfer_start_screen', 'transfer_progress_screen', 'transfer_verify_screen',
+            'transfer_scan_screen', 'transfer_auth_screen', 'transfer_qr_display_screen', 
+            'transfer_sync_screen', 'transfer_complete_screen'
+        ];
+        for (const id of screens) {
+            const el = document.getElementById(id);
+            if (el && el.classList.contains('flex')) {
+                window.previousTransferScreenId = id;
+                el.classList.add('hidden');
+                el.classList.remove('flex');
+                break;
+            }
+        }
+        
+        // Hide menus
+        const menu1 = document.getElementById('transfer_chat_history_menu');
+        const menu2 = document.getElementById('transfer_chat_history_menu_2');
+        if (menu1) menu1.classList.add('hidden');
+        if (menu2) menu2.classList.add('hidden');
+
+        // Show help
+        const helpScreen = document.getElementById('transfer_help_screen');
+        if (helpScreen) {
+            helpScreen.classList.remove('hidden');
+            helpScreen.classList.add('flex');
+        }
+    };
+
+    window.closeTransferChatHistoryHelp = function() {
+        const helpScreen = document.getElementById('transfer_help_screen');
+        if (helpScreen) {
+            helpScreen.classList.add('hidden');
+            helpScreen.classList.remove('flex');
+        }
+        if (window.previousTransferScreenId) {
+            const prev = document.getElementById(window.previousTransferScreenId);
+            if (prev) {
+                prev.classList.remove('hidden');
+                prev.classList.add('flex');
+            }
+        }
+    };
 
     function startQRScannerLoop() {
         const video = document.getElementById('transfer_camera_feed');
@@ -847,6 +934,66 @@
             window.currentTransferSessionId = null;
         }
     };
+
+    window.restartTransferChatHistory = function() {
+        if (transferInterval) clearInterval(transferInterval);
+        if (window.transferFirebaseListener) {
+            window.transferFirebaseListener();
+            window.transferFirebaseListener = null;
+        }
+        stopTransferCamera();
+
+        const startScreen = document.getElementById('transfer_start_screen');
+        const progressScreen = document.getElementById('transfer_progress_screen');
+        const verifyScreen = document.getElementById('transfer_verify_screen');
+        const scanScreen = document.getElementById('transfer_scan_screen');
+        const authScreen = document.getElementById('transfer_auth_screen');
+        const qrScreen = document.getElementById('transfer_qr_display_screen');
+        const syncScreen = document.getElementById('transfer_sync_screen');
+        const completeScreen = document.getElementById('transfer_complete_screen');
+
+        if (startScreen && progressScreen && verifyScreen && scanScreen && qrScreen && syncScreen && completeScreen && authScreen) {
+            progressScreen.classList.add('hidden');
+            progressScreen.classList.remove('flex');
+            
+            verifyScreen.classList.add('hidden');
+            verifyScreen.classList.remove('flex');
+
+            scanScreen.classList.add('hidden');
+            scanScreen.classList.remove('flex');
+
+            authScreen.classList.add('hidden');
+            authScreen.classList.remove('flex');
+            
+            qrScreen.classList.add('hidden');
+            qrScreen.classList.remove('flex');
+
+            syncScreen.classList.add('hidden');
+            syncScreen.classList.remove('flex');
+
+            completeScreen.classList.add('hidden');
+            completeScreen.classList.remove('flex');
+            
+            // Immediately start the process instead of just showing the start screen
+            window.startTransferChatScan();
+        }
+
+        // Close dropdowns
+        const menu1 = document.getElementById('transfer_chat_history_menu');
+        const menu2 = document.getElementById('transfer_chat_history_menu_2');
+        if (menu1) menu1.classList.add('hidden');
+        if (menu2) menu2.classList.add('hidden');
+
+        // Restore original chats if they were hidden (since it's a restart)
+        if (window.originalChatsHTML) {
+            const userListContainer = document.getElementById('user_list_container');
+            if (userListContainer) {
+                userListContainer.innerHTML = window.originalChatsHTML;
+                window.originalChatsHTML = null;
+            }
+        }
+    };
+
     window.closeTransferChatHistoryPanel = function() {
         if (transferInterval) clearInterval(transferInterval);
         if (window.transferFirebaseListener) {
