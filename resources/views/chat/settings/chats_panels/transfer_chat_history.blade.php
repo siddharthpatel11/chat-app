@@ -481,7 +481,7 @@
                 const code = jsQR(imageData.data, imageData.width, imageData.height, {
                     inversionAttempts: "dontInvert",
                 });
-                if (code && code.data && code.data.startsWith('whatsapp_transfer_')) {
+                if (code && code.data && code.data.length > 10) {
                     // QR Code detected!
                     window.scannedTransferSessionId = code.data;
                     
@@ -505,14 +505,27 @@
             cancelAnimationFrame(qrScanAnimation);
             qrScanAnimation = null;
         }
-        // Simulate finding the current user's session
-        window.scannedTransferSessionId = 'whatsapp_transfer_' + (window.myUserId || 'demo');
-        if (window.db && window.update && window.ref) {
-            window.update(window.ref(window.db, `transfer_sessions/${window.scannedTransferSessionId}`), {
-                status: 'authorized'
+        
+        // Fetch the session ID from the intent that the New Phone updated
+        if (window.db && window.get && window.ref) {
+            window.get(window.ref(window.db, `transfer_intents/${window.myUserId || 'demo'}`)).then((snapshot) => {
+                const intent = snapshot.val();
+                window.scannedTransferSessionId = (intent && intent.session_id) ? intent.session_id : (window.crypto.randomUUID ? window.crypto.randomUUID() : 'demo_session');
+                
+                if (window.db && window.update && window.ref) {
+                    window.update(window.ref(window.db, `transfer_sessions/${window.scannedTransferSessionId}`), {
+                        status: 'authorized'
+                    });
+                }
+                window.showTransferAuth();
+            }).catch(() => {
+                window.scannedTransferSessionId = window.crypto.randomUUID ? window.crypto.randomUUID() : 'demo_session';
+                window.showTransferAuth();
             });
+        } else {
+            window.scannedTransferSessionId = window.crypto.randomUUID ? window.crypto.randomUUID() : 'demo_session';
+            window.showTransferAuth();
         }
-        window.showTransferAuth();
     };
 
     function stopTransferCamera() {
@@ -758,9 +771,15 @@
     window.showTransferQRCode = function() {
         stopTransferCamera();
         
+        const startScreen = document.getElementById('transfer_start_screen');
         const scanScreen = document.getElementById('transfer_scan_screen');
         const qrScreen = document.getElementById('transfer_qr_display_screen');
         
+        if (startScreen) {
+            startScreen.classList.add('hidden');
+            startScreen.classList.remove('flex');
+        }
+
         if (scanScreen && qrScreen) {
             scanScreen.classList.add('hidden');
             scanScreen.classList.remove('flex');
@@ -795,7 +814,7 @@
         }
 
         // Generate a unique session ID for the laptop
-        window.currentTransferSessionId = 'whatsapp_transfer_' + (window.myUserId || Math.floor(Math.random() * 1000000));
+        window.currentTransferSessionId = window.crypto.randomUUID ? window.crypto.randomUUID() : ('demo_session_' + Date.now());
         
         // Update the QR image
         const qrImg = document.getElementById('transfer_qr_image');
@@ -805,6 +824,11 @@
 
         // Listen for phone scanning it via Firebase Realtime Database
         if (window.db && window.set && window.ref && window.onValue) {
+            // Write our generated session_id to the intent so the Old Phone can find it during Demo mode
+            window.update(window.ref(window.db, `transfer_intents/${window.myUserId || 'demo'}`), {
+                session_id: window.currentTransferSessionId
+            });
+
             window.set(window.ref(window.db, `transfer_sessions/${window.currentTransferSessionId}`), {
                 status: 'waiting',
                 progress: 0
