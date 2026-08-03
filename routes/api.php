@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\MediaApiController;
 use App\Http\Controllers\Api\MetaAiApiController;
 use App\Http\Controllers\Api\Profile\AccountApiController;
 use App\Http\Controllers\Api\Profile\ChatHistoryApiController;
+use App\Http\Controllers\Api\Profile\TransferChatApiController;
 use App\Http\Controllers\Api\Profile\ChatsApiController;
 use App\Http\Controllers\Api\Profile\GeneralApiController;
 use App\Http\Controllers\Api\Profile\HelpFeedbackApiController;
@@ -159,12 +160,20 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     // Profile Chats Settings
     Route::get('/profile/chats', [ChatsApiController::class, 'getSettings']);
     Route::patch('/profile/chats', [ChatsApiController::class, 'updateSettings']);
+    Route::patch('/profile/chats/private-processing', [ChatsApiController::class, 'updatePrivateProcessing']);
     
     // Chat History API
     Route::post('/profile/chats/history/export', [ChatHistoryApiController::class, 'exportChat']);
     Route::post('/profile/chats/history/archive-all', [ChatHistoryApiController::class, 'archiveAllChats']);
     Route::post('/profile/chats/history/clear-all', [ChatHistoryApiController::class, 'clearAllChats']);
     Route::post('/profile/chats/history/delete-all', [ChatHistoryApiController::class, 'deleteAllChats']);
+    
+    // Transfer Chat History API
+    Route::post('/profile/chats/transfer/initiate', [TransferChatApiController::class, 'initiate']);
+    Route::post('/profile/chats/transfer/scan', [TransferChatApiController::class, 'scan']);
+    Route::post('/profile/chats/transfer/progress', [TransferChatApiController::class, 'updateProgress']);
+    Route::post('/profile/chats/transfer/complete', [TransferChatApiController::class, 'complete']);
+    Route::post('/profile/chats/transfer/cancel', [TransferChatApiController::class, 'cancel']);
     
     // Backup and Restore API
     Route::post('/profile/chats/backup', [BackupRestoreApiController::class, 'backup']);

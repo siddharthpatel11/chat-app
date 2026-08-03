@@ -93,6 +93,12 @@
         isEnabled = (isEnabled === '0') ? '1' : '0';
         localStorage.setItem('meta_ai_web_search_' + window.myUserId, isEnabled);
         window.updateMetaAiWebSearchUI(isEnabled);
+
+        if (window.db && window.update && window.ref) {
+            window.update(window.ref(window.db, `users/${window.myUserId}/settings/private_processing`), {
+                meta_ai_web_search: isEnabled === '1'
+            }).catch(err => console.error("Error saving private processing to Firebase:", err));
+        }
     };
 
     window.updateMetaAiWebSearchUI = function(val) {
@@ -124,6 +130,8 @@
     // Initialize toggle state
     window.addEventListener('load', function() {
         if (window.myUserId) {
+            // Check Firebase first if we have data, but normally we rely on localStorage as immediate cache.
+            // When app loads, `index.blade.php` usually fetches user settings from Firebase and sets localStorage.
             let val = localStorage.getItem('meta_ai_web_search_' + window.myUserId);
             // Default to true (1) if not set
             if (val === null) {
