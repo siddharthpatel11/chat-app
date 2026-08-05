@@ -79,10 +79,10 @@
 
             <div class="text-[#8696a0] text-[14px] font-medium mb-3 mt-6">Disappearing messages</div>
 
-            <!-- Default message timer -->
-            <div class="flex items-center justify-between py-4 border-b border-[#202c33] cursor-pointer hover:bg-[#202c33] -mx-6 px-6 transition-colors group" onclick="window.openDefaultTimerSidebar()">
+            <!-- Disappearing messages -->
+            <div class="flex items-center justify-between py-4 border-b border-[#202c33] cursor-pointer hover:bg-[#202c33] -mx-6 px-6 transition-colors group" onclick="window.openPrivacyDisappearingMessages()">
                 <div class="flex-1 pr-4">
-                    <div class="text-[#e9edef] text-[16px] mb-1">Default message timer</div>
+                    <div class="text-[#e9edef] text-[16px] mb-1">Disappearing messages</div>
                     <div class="text-[#8696a0] text-[14px]" id="privacy_message_timer_label">Off</div>
                 </div>
                 <div class="text-[#8696a0]">
@@ -194,7 +194,7 @@
         } else {
             privacyPanel.classList.add('hidden');
             privacyPanel.classList.remove('flex');
-            if (settingsPanel) settingsPanel.classList.remove('hidden');
+            if (settingsPanel) { settingsPanel.classList.remove('hidden'); settingsPanel.classList.add('flex'); }
         }
     }
 

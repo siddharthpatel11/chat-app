@@ -149,7 +149,7 @@
         } else {
             notificationsPanel.classList.add('hidden');
             notificationsPanel.classList.remove('flex');
-            if (settingsPanel) settingsPanel.classList.remove('hidden');
+            if (settingsPanel) { settingsPanel.classList.remove('hidden'); settingsPanel.classList.add('flex'); }
         }
     }
 </script>

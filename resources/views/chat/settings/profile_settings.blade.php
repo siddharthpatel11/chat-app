@@ -11,7 +11,7 @@
     </div>
 
     <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto custom-scrollbar bg-[#111b21]">
+    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar bg-[#111b21]">
         <!-- Title & Search (Matching Image 2) -->
         <div class="px-6 pt-4 pb-2">
             <h1 class="text-[#e9edef] text-[22px] font-bold mb-4 settings-profile-name">{{ auth()->user()->name }}</h1>
@@ -60,6 +60,7 @@
                     ['icon' => 'message-square', 'title' => 'Chats', 'desc' => 'Theme, wallpaper, chat settings'],
                     ['icon' => 'video', 'title' => 'Video & voice', 'desc' => 'Camera, microphone & speakers'],
                     ['icon' => 'bell', 'title' => 'Notifications', 'desc' => 'Messages, groups, sounds'],
+                    ['icon' => 'refresh', 'title' => 'Storage and data', 'desc' => 'Network usage, auto-download'],
                     ['icon' => 'keyboard', 'title' => 'Keyboard shortcuts', 'desc' => 'Quick actions'],
                     ['icon' => 'help-circle', 'title' => 'Help and feedback', 'desc' => 'Help centre, contact us, privacy policy'],
                 ];
@@ -68,7 +69,7 @@
             @foreach($settings as $item)
                 <div
                     class="flex items-center px-4 py-3.5 hover:bg-[#202c33] rounded-lg cursor-pointer group transition-all"
-                    onclick="{{ $item['title'] == 'Profile' ? 'toggleEditProfile()' : ($item['title'] == 'General' ? 'toggleGeneralSettings()' : ($item['title'] == 'Account' ? 'toggleAccountSettings()' : ($item['title'] == 'Privacy' ? 'togglePrivacySettings()' : ($item['title'] == 'Chats' ? 'toggleChatSettings()' : ($item['title'] == 'Video & voice' ? 'toggleVideoVoiceSettings()' : ($item['title'] == 'Notifications' ? 'toggleNotificationsSettings()' : ($item['title'] == 'Keyboard shortcuts' ? 'openKeyboardShortcutsModal()' : ($item['title'] == 'Help and feedback' ? 'toggleHelpFeedbackSettings()' : '')))))))) }}">
+                    onclick="{{ $item['title'] == 'Profile' ? 'toggleEditProfile()' : ($item['title'] == 'General' ? 'toggleGeneralSettings()' : ($item['title'] == 'Account' ? 'toggleAccountSettings()' : ($item['title'] == 'Privacy' ? 'togglePrivacySettings()' : ($item['title'] == 'Chats' ? 'toggleChatSettings()' : ($item['title'] == 'Video & voice' ? 'toggleVideoVoiceSettings()' : ($item['title'] == 'Notifications' ? 'toggleNotificationsSettings()' : ($item['title'] == 'Storage and data' ? 'toggleStorageAndDataSettings()' : ($item['title'] == 'Keyboard shortcuts' ? 'openKeyboardShortcutsModal()' : ($item['title'] == 'Help and feedback' ? 'toggleHelpFeedbackSettings()' : ''))))))))) }}">
                     <div class="w-10 text-[#8696a0] group-hover:text-[#00a884] transition-colors shrink-0">
                         @if($item['icon'] == 'monitor')
                             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
@@ -112,6 +113,12 @@
                                 stroke-width="1.5">
                                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                        @elseif($item['icon'] == 'refresh')
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
+                                stroke-width="1.5">
+                                <path d="M21 2v6h-6"></path>
+                                <path d="M3 12a9 9 0 1 0 2.5-6.5L21 8"></path>
                             </svg>
                         @elseif($item['icon'] == 'keyboard')
                             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
@@ -174,6 +181,10 @@
             'video_voice_settings_panel',
             'notifications_settings_panel',
             'help_feedback_settings_panel',
+            'storage_and_data_settings_panel',
+            'manage_storage_panel',
+            'manage_storage_larger_than_5mb_panel',
+            'manage_storage_chat_details_panel',
             'account_settings_panel',
             'security_settings_panel',
             'privacy_last_seen_panel',
@@ -232,7 +243,7 @@
         const settingsPanels = [
             'settings_panel', 'edit_profile_panel', 'general_settings_panel', 'privacy_settings_panel',
             'chats_settings_panel', 'video_voice_settings_panel', 'notifications_settings_panel',
-            'help_feedback_settings_panel', 'account_settings_panel', 'security_settings_panel',
+            'help_feedback_settings_panel', 'storage_and_data_settings_panel', 'manage_storage_panel', 'manage_storage_larger_than_5mb_panel', 'manage_storage_chat_details_panel', 'account_settings_panel', 'security_settings_panel',
             'privacy_last_seen_panel', 'privacy_status_panel', 'privacy_profile_photo_panel',
             'privacy_about_panel', 'privacy_exclude_panel', 'privacy_blocked_contacts_panel',
             'chats_wallpaper_panel', 'chats_upload_quality_panel', 'chats_auto_download_panel',
@@ -345,6 +356,57 @@
             
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
             document.getElementById('nav_profile')?.classList.add('active');
+        }
+    }
+
+    window.toggleStorageAndDataSettings = function() {
+        const storagePanel = document.getElementById('storage_and_data_settings_panel');
+        const settingsPanel = document.getElementById('settings_panel');
+
+        if (storagePanel.classList.contains('hidden')) {
+            storagePanel.classList.remove('hidden');
+            storagePanel.classList.add('flex');
+            if (settingsPanel) settingsPanel.classList.add('hidden');
+        } else {
+            storagePanel.classList.add('hidden');
+            storagePanel.classList.remove('flex');
+            if (settingsPanel) { settingsPanel.classList.remove('hidden'); settingsPanel.classList.add('flex'); }
+        }
+    }
+
+    window.toggleManageStorage = function() {
+        const managePanel = document.getElementById('manage_storage_panel');
+        const storagePanel = document.getElementById('storage_and_data_settings_panel');
+        
+        if (managePanel.classList.contains('hidden')) {
+            window.closeAllSettings();
+            managePanel.classList.remove('hidden');
+            managePanel.classList.add('flex');
+        } else {
+            managePanel.classList.add('hidden');
+            managePanel.classList.remove('flex');
+            if (storagePanel) {
+                storagePanel.classList.remove('hidden');
+                storagePanel.classList.add('flex');
+            }
+        }
+    }
+
+    window.toggleLargerThan5MB = function() {
+        const largerPanel = document.getElementById('manage_storage_larger_than_5mb_panel');
+        const managePanel = document.getElementById('manage_storage_panel');
+        
+        if (largerPanel.classList.contains('hidden')) {
+            window.closeAllSettings();
+            largerPanel.classList.remove('hidden');
+            largerPanel.classList.add('flex');
+        } else {
+            largerPanel.classList.add('hidden');
+            largerPanel.classList.remove('flex');
+            if (managePanel) {
+                managePanel.classList.remove('hidden');
+                managePanel.classList.add('flex');
+            }
         }
     }
 </script>

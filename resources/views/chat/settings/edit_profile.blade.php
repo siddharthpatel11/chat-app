@@ -417,7 +417,7 @@
         } else {
             editPanel.classList.add('hidden');
             editPanel.classList.remove('flex');
-            if (settingsPanel) settingsPanel.classList.remove('hidden');
+            if (settingsPanel) { settingsPanel.classList.remove('hidden'); settingsPanel.classList.add('flex'); }
         }
     }
     // Name Edit Logic

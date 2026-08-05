@@ -99,6 +99,10 @@
                 #video_voice_settings_panel,
                 #notifications_settings_panel,
                 #help_feedback_settings_panel,
+                #storage_and_data_settings_panel,
+                #manage_storage_panel,
+                #manage_storage_larger_than_5mb_panel,
+                #manage_storage_chat_details_panel,
                 #account_settings_panel,
                 #security_settings_panel,
                 #privacy_last_seen_panel,
@@ -625,6 +629,8 @@
             @include('chat.settings.general')
             @include('chat.settings.privacy')
             @include('chat.settings.disappearing_messages.default_timer')
+            @include('chat.settings.privacy_panels.privacy_disappearing_messages')
+            @include('chat.settings.privacy_panels.apply_timer_to_chats')
             @include('chat.settings.privacy_panels.privacy_last_seen')
             @include('chat.settings.privacy_panels.privacy_profile_photo')
             @include('chat.settings.privacy_panels.privacy_about')
@@ -648,6 +654,11 @@
             @include('chat.settings.notifications_panels.notifications_banner')
             @include('chat.settings.notifications_panels.notifications_taskbar')
             @include('chat.settings.notifications_panels.notifications_subpanel')
+            @include('chat.settings.storage_and_data_panels.storage_and_data')
+            @include('chat.settings.storage_and_data_panels.manage_storage')
+            @include('chat.settings.storage_and_data_panels.manage_storage_downloads')
+            @include('chat.settings.storage_and_data_panels.manage_storage_larger_than_5mb')
+            @include('chat.settings.storage_and_data_panels.manage_storage_chat_details')
             @include('chat.settings.help_and_feedback_panels.help_and_feedback')
             @include('chat.settings.keyboard_shortcuts_modal')
             @include('chat.about.about_modal')

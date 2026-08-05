@@ -81,7 +81,7 @@
         } else {
             videoVoicePanel.classList.add('hidden');
             videoVoicePanel.classList.remove('flex');
-            if (settingsPanel) settingsPanel.classList.remove('hidden');
+            if (settingsPanel) { settingsPanel.classList.remove('hidden'); settingsPanel.classList.add('flex'); }
         }
     }
 </script>

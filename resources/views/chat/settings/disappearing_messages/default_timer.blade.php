@@ -20,40 +20,40 @@
             <div class="space-y-6 mb-6">
                 <label class="flex items-center gap-4 cursor-pointer group">
                     <input type="radio" name="default_disappearing_duration" value="2 minutes" class="hidden peer" onchange="saveDefaultTimer(120)">
-                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] flex items-center justify-center transition-colors relative">
-                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] peer-checked:[&>div]:opacity-100 flex items-center justify-center transition-colors relative">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 transition-opacity"></div>
                     </div>
                     <span class="text-[#e9edef] text-[16px]">2 minutes (Testing)</span>
                 </label>
 
                 <label class="flex items-center gap-4 cursor-pointer group">
                     <input type="radio" name="default_disappearing_duration" value="24 hours" class="hidden peer" onchange="saveDefaultTimer(86400)">
-                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] flex items-center justify-center transition-colors relative">
-                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] peer-checked:[&>div]:opacity-100 flex items-center justify-center transition-colors relative">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 transition-opacity"></div>
                     </div>
                     <span class="text-[#e9edef] text-[16px]">24 hours</span>
                 </label>
                 
                 <label class="flex items-center gap-4 cursor-pointer group">
                     <input type="radio" name="default_disappearing_duration" value="7 days" class="hidden peer" onchange="saveDefaultTimer(604800)">
-                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] flex items-center justify-center transition-colors relative">
-                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] peer-checked:[&>div]:opacity-100 flex items-center justify-center transition-colors relative">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 transition-opacity"></div>
                     </div>
                     <span class="text-[#e9edef] text-[16px]">7 days</span>
                 </label>
 
                 <label class="flex items-center gap-4 cursor-pointer group">
                     <input type="radio" name="default_disappearing_duration" value="90 days" class="hidden peer" onchange="saveDefaultTimer(7776000)">
-                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] flex items-center justify-center transition-colors relative">
-                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] peer-checked:[&>div]:opacity-100 flex items-center justify-center transition-colors relative">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 transition-opacity"></div>
                     </div>
                     <span class="text-[#e9edef] text-[16px]">90 days</span>
                 </label>
 
                 <label class="flex items-center gap-4 cursor-pointer group">
                     <input type="radio" name="default_disappearing_duration" value="Off" class="hidden peer" onchange="saveDefaultTimer(0)">
-                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] flex items-center justify-center transition-colors relative">
-                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] peer-checked:border-[#00a884] peer-checked:[&>div]:opacity-100 flex items-center justify-center transition-colors relative">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 transition-opacity"></div>
                     </div>
                     <span class="text-[#e9edef] text-[16px]">Off</span>
                 </label>
@@ -75,28 +75,28 @@
             radio.checked = (radio.value === saved);
         });
 
-        const privacyPanel = document.getElementById('privacy_settings_panel');
+        const hub = document.getElementById('privacy_disappearing_messages_sidebar');
         const sidebar = document.getElementById('default_timer_sidebar');
         
-        if (privacyPanel) {
-            privacyPanel.classList.add('hidden');
-            privacyPanel.classList.remove('flex');
+        if (hub) {
+            hub.classList.add('hidden');
+            hub.classList.remove('flex');
         }
         sidebar.classList.remove('hidden');
         sidebar.classList.add('flex');
     }
 
     window.closeDefaultTimerSidebar = function() {
-        const privacyPanel = document.getElementById('privacy_settings_panel');
+        const hub = document.getElementById('privacy_disappearing_messages_sidebar');
         const sidebar = document.getElementById('default_timer_sidebar');
         
         if (sidebar) {
             sidebar.classList.add('hidden');
             sidebar.classList.remove('flex');
         }
-        if (privacyPanel) {
-            privacyPanel.classList.remove('hidden');
-            privacyPanel.classList.add('flex');
+        if (hub) {
+            hub.classList.remove('hidden');
+            hub.classList.add('flex');
         }
     }
 
