@@ -1,0 +1,25 @@
+{
+  "name": "desktop_app",
+  "version": "1.0.0",
+  "description": "WhatsApp Desktop Clone",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-packager . \"Chat App\" --platform=win32 --arch=x64 --out=dist --overwrite"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.siddharth.chatapp",
+    "productName": "Chat App",
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
