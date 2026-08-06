@@ -103,6 +103,7 @@
                 #manage_storage_panel,
                 #manage_storage_larger_than_5mb_panel,
                 #manage_storage_chat_details_panel,
+                #network_usage_panel,
                 #account_settings_panel,
                 #security_settings_panel,
                 #privacy_last_seen_panel,
@@ -654,8 +655,11 @@
             @include('chat.settings.notifications_panels.notifications_banner')
             @include('chat.settings.notifications_panels.notifications_taskbar')
             @include('chat.settings.notifications_panels.notifications_subpanel')
-            @include('chat.settings.storage_and_data_panels.storage_and_data')
+            @include('chat.settings.storage_and_data_panels.storage_and_data')            <!-- Manage Storage Panel -->
             @include('chat.settings.storage_and_data_panels.manage_storage')
+
+            <!-- Network Usage Panel -->
+            @include('chat.settings.storage_and_data_panels.network_usage')
             @include('chat.settings.storage_and_data_panels.manage_storage_downloads')
             @include('chat.settings.storage_and_data_panels.manage_storage_larger_than_5mb')
             @include('chat.settings.storage_and_data_panels.manage_storage_chat_details')

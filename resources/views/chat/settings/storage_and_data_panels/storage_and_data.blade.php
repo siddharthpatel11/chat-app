@@ -28,7 +28,7 @@
             </div>
 
             <!-- Network usage -->
-            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4">
+            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4" onclick="toggleNetworkUsage()">
                 <div class="w-12 shrink-0 flex justify-start text-[#8696a0]">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21 2v6h-6"></path>
@@ -37,7 +37,7 @@
                 </div>
                 <div class="flex-1 flex flex-col">
                     <span class="text-[#e9edef] text-[16px]">Network usage</span>
-                    <span class="text-[#8696a0] text-[14px] mt-1">360.5 MB sent &bull; 484.1 MB received</span>
+                    <span id="main_network_usage_text" class="text-[#8696a0] text-[14px] mt-1">360.5 MB sent &bull; 484.1 MB received</span>
                 </div>
             </div>
 
@@ -47,11 +47,26 @@
                 <div class="flex-1 flex justify-between items-center">
                     <span class="text-[#e9edef] text-[16px]">Use less data for calls</span>
                     <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" class="sr-only peer" checked>
+                        <input type="checkbox" id="use_less_data_calls_toggle" class="sr-only peer" onchange="toggleUseLessDataForCalls(this.checked)">
                         <div class="w-11 h-6 bg-[#313d45] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#00a884]"></div>
                     </label>
                 </div>
             </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const lessDataToggle = document.getElementById('use_less_data_calls_toggle');
+                    if (lessDataToggle) {
+                        // Load saved preference from localStorage, default to false if not set
+                        const savedSetting = localStorage.getItem('whatsapp_use_less_data_calls');
+                        lessDataToggle.checked = savedSetting === 'true';
+                    }
+                });
+
+                function toggleUseLessDataForCalls(isChecked) {
+                    localStorage.setItem('whatsapp_use_less_data_calls', isChecked);
+                }
+            </script>
 
             <!-- Proxy -->
             <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4">

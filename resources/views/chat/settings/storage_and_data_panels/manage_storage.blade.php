@@ -34,7 +34,7 @@
                     <span id="storage_used_unit" class="text-[#e9edef] text-[16px] font-medium ml-1">GB</span>
                     <div class="text-[#8696a0] text-[13px] mt-1">Used</div>
                 </div>
-                <div class="text-right">
+                <div id="storage_free_container" class="text-right">
                     <span id="storage_free_value" class="text-[#8696a0] text-[24px] font-normal leading-none"></span>
                     <span id="storage_free_unit" class="text-[#8696a0] text-[14px] font-medium ml-1">GB</span>
                     <div class="text-[#8696a0] text-[13px] mt-1">Free</div>
@@ -42,14 +42,14 @@
             </div>
             
             <!-- Progress Bar -->
-            <div class="w-full h-3 bg-transparent border border-[#e9edef] rounded-full overflow-hidden flex mb-4">
+            <div id="storage_progress_bar_container" class="w-full h-3 bg-transparent border border-[#e9edef] rounded-full overflow-hidden flex mb-4">
                 <div id="storage_bar_whatsapp" class="bg-[#25D366] h-full" style="width: 0%"></div>
                 <div id="storage_bar_other" class="bg-[#FFB02E] h-full" style="width: 0%"></div>
                 <div id="storage_bar_free" class="bg-[#202c33] h-full" style="width: 0%"></div>
             </div>
 
             <!-- Legend -->
-            <div class="flex gap-6 justify-center">
+            <div id="storage_legend_container" class="flex gap-6 justify-center">
                 <div class="flex items-center gap-2">
                     <div class="w-2.5 h-2.5 rounded-full bg-[#25D366]"></div>
                     <span id="storage_legend_whatsapp" class="text-[#8696a0] text-[13px]"></span>
@@ -370,15 +370,17 @@
                 chatContainer.innerHTML = chatHtml;
             }
 
-            // Calculate main storage
-            let quotaBytes = 128 * 1024 * 1024 * 1024; // Assume 128GB quota
+            // Calculate main storage dynamically based on server's real disk space
+            let quotaBytes = {{ @disk_total_space(base_path()) ?: (128 * 1024 * 1024 * 1024) }};
+            let freeBytes = {{ @disk_free_space(base_path()) ?: (64 * 1024 * 1024 * 1024) }};
+            
             let whatsappGb = (totalBytes / (1024 * 1024 * 1024));
             let totalStorageGb = (quotaBytes / (1024 * 1024 * 1024));
+            let freeGb = (freeBytes / (1024 * 1024 * 1024));
             
-            let otherAppsGb = totalStorageGb * 0.5; // Simulate 50% usage by other apps
-            
-            let freeGb = totalStorageGb - otherAppsGb - whatsappGb;
-            let usedGb = otherAppsGb + whatsappGb;
+            let usedGb = totalStorageGb - freeGb;
+            let otherAppsGb = usedGb - whatsappGb;
+            if (otherAppsGb < 0) otherAppsGb = 0;
 
             const formatGb = val => val < 0.1 ? val.toFixed(3) : val.toFixed(1);
             const formatSize = bytes => {
@@ -387,21 +389,53 @@
                 return (bytes / 1024).toFixed(1) + ' KB';
             };
 
-            document.getElementById('storage_used_value').innerText = formatGb(usedGb);
-            document.getElementById('storage_used_unit').innerText = 'GB';
-            document.getElementById('storage_free_value').innerText = formatGb(freeGb);
-            document.getElementById('storage_free_unit').innerText = 'GB';
-            
-            const pctWhatsapp = (whatsappGb / totalStorageGb) * 100;
-            const pctOther = (otherAppsGb / totalStorageGb) * 100;
-            const pctFree = (freeGb / totalStorageGb) * 100;
-            
-            document.getElementById('storage_bar_whatsapp').style.width = pctWhatsapp + '%';
-            document.getElementById('storage_bar_other').style.width = pctOther + '%';
-            document.getElementById('storage_bar_free').style.width = pctFree + '%';
-            
-            document.getElementById('storage_legend_whatsapp').innerText = `WhatsApp (${formatSize(totalBytes)})`;
-            document.getElementById('storage_legend_other').innerText = `Other apps (${otherAppsGb.toFixed(1)} GB)`;
+            const isDesktopApp = navigator.userAgent.toLowerCase().includes('electron') || 
+                                 navigator.userAgent.toLowerCase().includes('tauri') || 
+                                 navigator.userAgent.toLowerCase().includes('whatsapp') || 
+                                 (typeof process !== 'undefined' && process.versions && process.versions.electron) ||
+                                 window.__TAURI__ || 
+                                 window.isDesktop;
+
+            if (!isDesktopApp) {
+                // WEB MODE: Only show WhatsApp usage, hide OS storage info
+                const parts = formatSize(totalBytes).split(' ');
+                document.getElementById('storage_used_value').innerText = parts[0];
+                document.getElementById('storage_used_unit').innerText = parts[1];
+                
+                document.getElementById('storage_free_container').style.display = 'none';
+                document.getElementById('storage_progress_bar_container').style.display = 'none';
+                document.getElementById('storage_legend_container').style.display = 'none';
+            } else {
+                // DESKTOP MODE: Show full OS storage
+                document.getElementById('storage_free_container').style.display = 'block';
+                document.getElementById('storage_progress_bar_container').style.display = 'flex';
+                document.getElementById('storage_legend_container').style.display = 'flex';
+                
+                document.getElementById('storage_used_value').innerText = formatGb(usedGb);
+                document.getElementById('storage_used_unit').innerText = 'GB';
+                document.getElementById('storage_free_value').innerText = formatGb(freeGb);
+                document.getElementById('storage_free_unit').innerText = 'GB';
+                
+                let pctWhatsapp = (whatsappGb / totalStorageGb) * 100;
+                // Ensure WhatsApp is visibly green even if very small
+                if (pctWhatsapp > 0 && pctWhatsapp < 1) pctWhatsapp = 1; 
+                
+                let pctFree = (freeGb / totalStorageGb) * 100;
+                let pctOther = (otherAppsGb / totalStorageGb) * 100;
+                
+                // Adjust other apps percentage if WhatsApp was artificially boosted for visibility
+                if (pctWhatsapp === 1) {
+                    pctOther -= 1;
+                    if (pctOther < 0) pctOther = 0;
+                }
+                
+                document.getElementById('storage_bar_whatsapp').style.width = pctWhatsapp + '%';
+                document.getElementById('storage_bar_other').style.width = pctOther + '%';
+                document.getElementById('storage_bar_free').style.width = pctFree + '%';
+                
+                document.getElementById('storage_legend_whatsapp').innerText = `WhatsApp (${formatSize(totalBytes)})`;
+                document.getElementById('storage_legend_other').innerText = `Other apps (${otherAppsGb.toFixed(1)} GB)`;
+            }
             
             document.getElementById('storage_larger_5mb_text').innerText = formatSize(largerThan5MbBytes);
             

@@ -260,7 +260,7 @@
                 </div>` : '';
 
             html += `
-                <div class="aspect-square relative cursor-pointer group ${isSelected ? 'grid-item-selected' : ''}" onclick="openRealMediaItem('${item.id}')">
+                <div class="aspect-square relative cursor-pointer group ${isSelected ? 'grid-item-selected' : ''}" onclick="chatDetailsOpenRealMediaItem('${item.id}')">
                     <div class="w-full h-full ${bgClass} flex flex-col items-center justify-center relative overflow-hidden">
                         ${iconHtml}
                         
@@ -291,14 +291,18 @@
         chatDetailsUpdateSelectionHeader();
     }
 
-    function openRealMediaItem(id) {
+    function chatDetailsOpenRealMediaItem(id) {
         const item = chatDetailsMockMediaItems.find(m => m.id === id);
         if (!item) return;
         
+        const senderName = item.senderName || 'Unknown';
+        const timestamp = item.timestamp || '';
+        const name = item.name || 'Media';
+        
         if (item.type === 'image' && window.openGlobalSearchImageViewer) {
-            window.openGlobalSearchImageViewer(item.id, item.chatId, item.url, item.senderName, item.timestamp, false, item.name);
+            window.openGlobalSearchImageViewer(item.id, item.chatId, item.url, senderName, timestamp, false, name);
         } else if (item.type === 'video' && window.openGlobalSearchVideoViewer) {
-            window.openGlobalSearchVideoViewer(item.id, item.chatId, item.url, item.senderName, item.timestamp, false, item.name);
+            window.openGlobalSearchVideoViewer(item.id, item.chatId, item.url, senderName, timestamp, false, name);
         } else if (item.type === 'document') {
             window.open(item.url, '_blank');
         } else if (window.showToast) {

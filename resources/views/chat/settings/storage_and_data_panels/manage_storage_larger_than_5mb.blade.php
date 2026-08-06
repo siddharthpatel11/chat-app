@@ -23,7 +23,7 @@
     <!-- Selection Header (Hidden by default) -->
     <div id="larger_5mb_selection_header" class="hidden h-16 bg-[#202c33] px-6 flex items-center justify-between shrink-0 border-b border-[#313d45] transition-all">
         <div class="flex items-center gap-6">
-            <button onclick="clearSelection()" class="text-[#aebac1] hover:text-white transition-colors">
+            <button onclick="larger5MBClearSelection()" class="text-[#aebac1] hover:text-white transition-colors">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path>
                 </svg>
@@ -34,12 +34,12 @@
             </div>
         </div>
         <div class="flex items-center gap-4 text-[#aebac1]">
-            <button class="hover:text-white transition-colors" onclick="starSelectedItems()">
+            <button class="hover:text-white transition-colors" onclick="larger5MBStarSelectedItems()">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path>
                 </svg>
             </button>
-            <button class="hover:text-white transition-colors" onclick="deleteSelectedItems()">
+            <button class="hover:text-white transition-colors" onclick="larger5MBDeleteSelectedItems()">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                     <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path>
                 </svg>
@@ -53,7 +53,7 @@
         <label class="flex items-center gap-2 cursor-pointer group">
             <span class="text-[#8696a0] text-[14px]">Select all</span>
             <div class="relative w-5 h-5 border-2 border-[#8696a0] rounded-[4px] flex items-center justify-center transition-colors group-hover:border-[#00a884]">
-                <input type="checkbox" id="select_all_checkbox" class="absolute opacity-0 w-full h-full cursor-pointer" onchange="toggleSelectAll(this.checked)">
+                <input type="checkbox" id="select_all_checkbox" class="absolute opacity-0 w-full h-full cursor-pointer" onchange="larger5MBToggleSelectAll(this.checked)">
                 <svg id="select_all_checkmark" class="hidden w-3.5 h-3.5 text-[#111b21]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
             </div>
         </label>
@@ -93,8 +93,8 @@
             <h3 class="text-[#e9edef] text-[20px] font-normal mb-5">Delete items?</h3>
             <p class="text-[#8696a0] text-[15px] mb-8 leading-relaxed">Items will be deleted from your WhatsApp media, but they may still be saved on your device.</p>
             <div class="flex justify-end gap-6 items-center">
-                <button onclick="closeStorageDeleteModal()" class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-3 py-2 rounded-lg transition-colors">Cancel</button>
-                <button onclick="executeStorageDeletion()" class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-3 py-2 rounded-lg transition-colors">Delete</button>
+                <button onclick="larger5MBCloseStorageDeleteModal()" class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-3 py-2 rounded-lg transition-colors">Cancel</button>
+                <button onclick="larger5MBExecuteStorageDeletion()" class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-3 py-2 rounded-lg transition-colors">Delete</button>
             </div>
         </div>
     </div>
@@ -229,7 +229,7 @@
                 </div>` : '';
 
             html += `
-                <div class="aspect-square relative cursor-pointer group ${isSelected ? 'grid-item-selected' : ''}" onclick="openRealMediaItem('${item.id}')">
+                <div class="aspect-square relative cursor-pointer group ${isSelected ? 'grid-item-selected' : ''}" onclick="larger5MBOpenRealMediaItem('${item.id}')">
                     <div class="w-full h-full ${bgClass} flex flex-col items-center justify-center relative overflow-hidden">
                         ${iconHtml}
                         
@@ -246,7 +246,7 @@
                         <div class="selection-overlay absolute inset-0 bg-white/30 opacity-0 transition-opacity z-20 pointer-events-none"></div>
                         
                         <!-- Checkbox -->
-                        <div class="item-checkbox absolute top-1.5 left-1.5 z-30 p-2 -m-2 opacity-0 group-hover:opacity-100 transition-opacity ${isSelected ? '!opacity-100' : ''}" onclick="event.stopPropagation(); toggleItemSelection('${item.id}')">
+                        <div class="item-checkbox absolute top-1.5 left-1.5 z-30 p-2 -m-2 opacity-0 group-hover:opacity-100 transition-opacity ${isSelected ? '!opacity-100' : ''}" onclick="event.stopPropagation(); larger5MBToggleItemSelection('${item.id}')">
                             <div class="w-5 h-5 border-[1.5px] border-white rounded-[4px] flex items-center justify-center transition-colors shadow-sm bg-black/20 hover:bg-black/40">
                                 <svg class="hidden w-3.5 h-3.5 text-[#111b21]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
                             </div>
@@ -257,17 +257,21 @@
         });
         
         document.getElementById('larger_5mb_grid').innerHTML = html;
-        updateSelectionHeader();
+        larger5MBUpdateSelectionHeader();
     }
-
-    function openRealMediaItem(id) {
+0
+    function larger5MBOpenRealMediaItem(id) {
         const item = mockMediaItems.find(m => m.id === id);
         if (!item) return;
         
+        const senderName = item.senderName || 'Unknown';
+        const timestamp = item.timestamp || '';
+        const name = item.name || 'Media';
+        
         if (item.type === 'image' && window.openGlobalSearchImageViewer) {
-            window.openGlobalSearchImageViewer(item.id, item.chatId, item.url, item.senderName, item.timestamp, false, item.name);
+            window.openGlobalSearchImageViewer(item.id, item.chatId, item.url, senderName, timestamp, false, name);
         } else if (item.type === 'video' && window.openGlobalSearchVideoViewer) {
-            window.openGlobalSearchVideoViewer(item.id, item.chatId, item.url, item.senderName, item.timestamp, false, item.name);
+            window.openGlobalSearchVideoViewer(item.id, item.chatId, item.url, senderName, timestamp, false, name);
         } else if (item.type === 'document') {
             window.open(item.url, '_blank');
         } else if (window.showToast) {
@@ -275,7 +279,7 @@
         }
     }
 
-    function starSelectedItems() {
+    function larger5MBStarSelectedItems() {
         if (selectedItemIds.size === 0) return;
         
         let promises = [];
@@ -297,14 +301,14 @@
         
         Promise.all(promises).then(() => {
             if(window.showToast) window.showToast('Starred', `${selectedItemIds.size} message(s) starred.`);
-            clearSelection();
+            larger5MBClearSelection();
             renderGrid();
         }).catch(err => {
             if (window.showToast) window.showToast('Error', 'Failed to star messages.');
         });
     }
 
-    function deleteSelectedItems() {
+    function larger5MBDeleteSelectedItems() {
         if (selectedItemIds.size === 0) return;
         
         // Show custom modal instead of native confirm
@@ -317,7 +321,7 @@
         }, 10);
     }
     
-    function closeStorageDeleteModal() {
+    function larger5MBCloseStorageDeleteModal() {
         const modal = document.getElementById('storage_delete_modal');
         const content = document.getElementById('storage_delete_modal_content');
         content.classList.remove('scale-100', 'opacity-100');
@@ -327,8 +331,8 @@
         }, 300);
     }
     
-    function executeStorageDeletion() {
-        closeStorageDeleteModal();
+    function larger5MBExecuteStorageDeletion() {
+        larger5MBCloseStorageDeleteModal();
         if (selectedItemIds.size === 0) return;
         
         let promises = [];
@@ -355,7 +359,7 @@
             }
             
             if(window.showToast) window.showToast('Deleted', `${selectedItemIds.size} message(s) deleted.`);
-            clearSelection();
+            larger5MBClearSelection();
             
             // Re-render
             renderGrid();
@@ -369,7 +373,7 @@
         });
     }
 
-    function toggleItemSelection(id) {
+    function larger5MBToggleItemSelection(id) {
         if (selectedItemIds.has(id)) {
             selectedItemIds.delete(id);
         } else {
@@ -394,7 +398,7 @@
         renderGrid(); // Re-render to update classes (inefficient but works for mock)
     }
 
-    function toggleSelectAll(isChecked) {
+    function larger5MBToggleSelectAll(isChecked) {
         if (isChecked) {
             mockMediaItems.forEach(item => selectedItemIds.add(item.id));
             const selectAllIcon = document.getElementById('select_all_checkmark');
@@ -409,12 +413,12 @@
         renderGrid();
     }
 
-    function clearSelection() {
+    function larger5MBClearSelection() {
         document.getElementById('select_all_checkbox').checked = false;
-        toggleSelectAll(false);
+        larger5MBToggleSelectAll(false);
     }
 
-    function updateSelectionHeader() {
+    function larger5MBUpdateSelectionHeader() {
         const defaultHeader = document.getElementById('larger_5mb_default_header');
         const selectionHeader = document.getElementById('larger_5mb_selection_header');
         

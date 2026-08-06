@@ -185,6 +185,7 @@
             'manage_storage_panel',
             'manage_storage_larger_than_5mb_panel',
             'manage_storage_chat_details_panel',
+            'network_usage_panel',
             'account_settings_panel',
             'security_settings_panel',
             'privacy_last_seen_panel',
@@ -385,6 +386,24 @@
         } else {
             managePanel.classList.add('hidden');
             managePanel.classList.remove('flex');
+            if (storagePanel) {
+                storagePanel.classList.remove('hidden');
+                storagePanel.classList.add('flex');
+            }
+        }
+    }
+
+    window.toggleNetworkUsage = function() {
+        const networkPanel = document.getElementById('network_usage_panel');
+        const storagePanel = document.getElementById('storage_and_data_settings_panel');
+        
+        if (networkPanel.classList.contains('hidden')) {
+            window.closeAllSettings();
+            networkPanel.classList.remove('hidden');
+            networkPanel.classList.add('flex');
+        } else {
+            networkPanel.classList.add('hidden');
+            networkPanel.classList.remove('flex');
             if (storagePanel) {
                 storagePanel.classList.remove('hidden');
                 storagePanel.classList.add('flex');
