@@ -62,18 +62,76 @@
                         lessDataToggle.checked = savedSetting === 'true';
                     }
                     
-                    // Fetch real-time setting from Firebase once db is ready
+                    // Load Media Upload Quality
+                    const savedMediaQuality = localStorage.getItem('whatsapp_media_upload_quality');
+                    if (savedMediaQuality) {
+                        currentSelectedMediaQuality = savedMediaQuality;
+                        updateMediaUploadQualityUI();
+                    }
+
+                    // Load Auto Download Quality
+                    const savedAutoDownloadQuality = localStorage.getItem('whatsapp_auto_download_quality');
+                    if (savedAutoDownloadQuality) {
+                        currentSelectedAutoDownloadQuality = savedAutoDownloadQuality;
+                        updateAutoDownloadQualityUI();
+                    }
+
+                    // Load Media Auto Download Settings
+                    ['mobile', 'wifi', 'roaming'].forEach(type => {
+                        const saved = localStorage.getItem('whatsapp_media_auto_download_' + type);
+                        if (saved) {
+                            try {
+                                currentMediaAutoDownloadSettings[type] = JSON.parse(saved);
+                            } catch(e) {}
+                        }
+                        updateMediaAutoDownloadUI(type);
+                    });
+                    
                     checkAndLoadFirebaseStorageSettings();
                 });
 
                 function checkAndLoadFirebaseStorageSettings() {
                     if (window.db && window.ref && window.get && window.myUserId && window.myUserId !== '0') {
-                        window.get(window.ref(window.db, `users/${window.myUserId}/settings/use_less_data_calls`)).then(snap => {
-                            if (snap.exists()) {
-                                const isChecked = snap.val();
-                                const lessDataToggle = document.getElementById('use_less_data_calls_toggle');
-                                if (lessDataToggle) lessDataToggle.checked = isChecked;
-                                localStorage.setItem('whatsapp_use_less_data_calls', isChecked);
+                        window.get(window.ref(window.db, `users/${window.myUserId}/settings`)).then(snapshot => {
+                            if (snapshot.exists()) {
+                                const settings = snapshot.val();
+                                
+                                // Proxy
+                                if (settings.use_proxy !== undefined && !localStorage.getItem('whatsapp_use_proxy')) {
+                                    localStorage.setItem('whatsapp_use_proxy', settings.use_proxy ? 'true' : 'false');
+                                }
+                                
+                                // Media Upload
+                                if (settings.media_upload_quality !== undefined && !localStorage.getItem('whatsapp_media_upload_quality')) {
+                                    localStorage.setItem('whatsapp_media_upload_quality', settings.media_upload_quality);
+                                    currentSelectedMediaQuality = settings.media_upload_quality;
+                                    updateMediaUploadQualityUI();
+                                }
+
+                                // Auto Download
+                                if (settings.auto_download_quality !== undefined && !localStorage.getItem('whatsapp_auto_download_quality')) {
+                                    localStorage.setItem('whatsapp_auto_download_quality', settings.auto_download_quality);
+                                    currentSelectedAutoDownloadQuality = settings.auto_download_quality;
+                                    updateAutoDownloadQualityUI();
+                                }
+
+                                // Media Auto Download Settings
+                                ['mobile', 'wifi', 'roaming'].forEach(type => {
+                                    if (settings['media_auto_download_' + type] !== undefined && !localStorage.getItem('whatsapp_media_auto_download_' + type)) {
+                                        localStorage.setItem('whatsapp_media_auto_download_' + type, JSON.stringify(settings['media_auto_download_' + type]));
+                                        currentMediaAutoDownloadSettings[type] = settings['media_auto_download_' + type];
+                                        updateMediaAutoDownloadUI(type);
+                                    }
+                                });
+                                
+                                if(typeof updateProxyUI === 'function') updateProxyUI();
+                                
+                                if (settings.use_less_data_calls !== undefined) {
+                                    const isChecked = settings.use_less_data_calls;
+                                    const lessDataToggle = document.getElementById('use_less_data_calls_toggle');
+                                    if (lessDataToggle) lessDataToggle.checked = isChecked;
+                                    localStorage.setItem('whatsapp_use_less_data_calls', isChecked);
+                                }
                             }
                         }).catch(e => console.error("Firebase fetch error:", e));
                     } else {
@@ -84,39 +142,13 @@
                 function toggleUseLessDataForCalls(isChecked) {
                     localStorage.setItem('whatsapp_use_less_data_calls', isChecked);
                     
-                    // Sync with Firebase backend
                     if (window.db && window.ref && window.set && window.myUserId && window.myUserId !== '0') {
                         window.set(window.ref(window.db, `users/${window.myUserId}/settings/use_less_data_calls`), isChecked)
                             .catch(e => console.error("Firebase save error:", e));
                     }
                 }
 
-                // Media Upload Quality Logic
                 let currentSelectedMediaQuality = 'HD quality';
-
-                document.addEventListener('DOMContentLoaded', () => {
-                    const savedQ = localStorage.getItem('whatsapp_media_upload_quality');
-                    if (savedQ) {
-                        currentSelectedMediaQuality = savedQ;
-                        updateMediaUploadQualityUI();
-                    }
-                    checkAndLoadFirebaseMediaQuality();
-                });
-
-                function checkAndLoadFirebaseMediaQuality() {
-                    if (window.db && window.ref && window.get && window.myUserId && window.myUserId !== '0') {
-                        window.get(window.ref(window.db, `users/${window.myUserId}/settings/media_upload_quality`)).then(snap => {
-                            if (snap.exists()) {
-                                currentSelectedMediaQuality = snap.val();
-                                localStorage.setItem('whatsapp_media_upload_quality', currentSelectedMediaQuality);
-                                updateMediaUploadQualityUI();
-                            }
-                        }).catch(e => console.error(e));
-                    } else {
-                        setTimeout(checkAndLoadFirebaseMediaQuality, 1000);
-                    }
-                }
-
                 function updateMediaUploadQualityUI() {
                     const textEl = document.getElementById('storage_media_upload_quality_text');
                     if(textEl) textEl.innerText = currentSelectedMediaQuality;
@@ -167,6 +199,167 @@
                     }
                     closeMediaUploadQualityModal();
                 }
+
+                let currentSelectedAutoDownloadQuality = 'HD quality';
+
+                function updateAutoDownloadQualityUI() {
+                    const textEl = document.getElementById('storage_auto_download_quality_text');
+                    if(textEl) textEl.innerText = currentSelectedAutoDownloadQuality;
+                }
+
+                function openAutoDownloadQualityModal() {
+                    document.getElementById('auto_download_quality_modal').classList.remove('hidden');
+                    currentSelectedAutoDownloadQuality = localStorage.getItem('whatsapp_auto_download_quality') || 'HD quality';
+                    selectAutoDownloadQuality(currentSelectedAutoDownloadQuality);
+                }
+
+                function closeAutoDownloadQualityModal() {
+                    document.getElementById('auto_download_quality_modal').classList.add('hidden');
+                }
+
+                function selectAutoDownloadQuality(quality) {
+                    currentSelectedAutoDownloadQuality = quality;
+                    
+                    const autoOut = document.getElementById('auto_download_radio_auto');
+                    const autoIn = document.getElementById('auto_download_radio_inner_auto');
+                    const stdOut = document.getElementById('auto_download_radio_standard');
+                    const stdIn = document.getElementById('auto_download_radio_inner_standard');
+                    const hdOut = document.getElementById('auto_download_radio_hd');
+                    const hdIn = document.getElementById('auto_download_radio_inner_hd');
+
+                    // Reset all
+                    autoOut.classList.remove('border-[#00a884]'); autoOut.classList.add('border-[#8696a0]');
+                    stdOut.classList.remove('border-[#00a884]'); stdOut.classList.add('border-[#8696a0]');
+                    hdOut.classList.remove('border-[#00a884]'); hdOut.classList.add('border-[#8696a0]');
+                    autoIn.classList.add('hidden');
+                    stdIn.classList.add('hidden');
+                    hdIn.classList.add('hidden');
+
+                    // Activate selected & update subtitle
+                    const subtitle = document.getElementById('auto_download_modal_subtitle');
+                    if (quality === 'Auto') {
+                        autoOut.classList.add('border-[#00a884]'); autoOut.classList.remove('border-[#8696a0]');
+                        autoIn.classList.remove('hidden');
+                        if (subtitle) subtitle.innerText = "Photos and videos will be automatically downloaded in Auto quality. This balances data and storage.";
+                    } else if (quality === 'Standard quality') {
+                        stdOut.classList.add('border-[#00a884]'); stdOut.classList.remove('border-[#8696a0]');
+                        stdIn.classList.remove('hidden');
+                        if (subtitle) subtitle.innerText = "Photos and videos will be automatically downloaded in standard quality. This uses less storage space.";
+                    } else {
+                        hdOut.classList.add('border-[#00a884]'); hdOut.classList.remove('border-[#8696a0]');
+                        hdIn.classList.remove('hidden');
+                        if (subtitle) subtitle.innerText = "Photos and videos will be automatically downloaded in HD quality. This uses the most storage space.";
+                    }
+                }
+
+                function saveAutoDownloadQuality() {
+                    localStorage.setItem('whatsapp_auto_download_quality', currentSelectedAutoDownloadQuality);
+                    updateAutoDownloadQualityUI();
+                    
+                    if (window.db && window.ref && window.set && window.myUserId && window.myUserId !== '0') {
+                        window.set(window.ref(window.db, `users/${window.myUserId}/settings/auto_download_quality`), currentSelectedAutoDownloadQuality)
+                            .then(() => { if(window.showToast) window.showToast('Setting Saved', 'Auto-download quality updated.'); })
+                            .catch(e => console.error("Firebase save auto download quality error:", e));
+                    }
+                    closeAutoDownloadQualityModal();
+                }
+
+                // Media Auto-Download Logic
+                let currentMediaAutoDownloadSettings = {
+                    'mobile': ['photos'],
+                    'wifi': ['photos', 'audio', 'videos', 'documents'],
+                    'roaming': []
+                };
+                let activeMediaAutoDownloadType = null; // 'mobile', 'wifi', or 'roaming'
+                let tempMediaAutoDownloadSelection = [];
+
+                function getMediaAutoDownloadText(arr) {
+                    if (!arr || arr.length === 0) return 'No media';
+                    if (arr.length === 4) return 'All media';
+                    const map = {
+                        'photos': 'Photos',
+                        'audio': 'Audio',
+                        'videos': 'Videos',
+                        'documents': 'Documents'
+                    };
+                    return arr.map(i => map[i]).join(', ');
+                }
+
+                function updateMediaAutoDownloadUI(type) {
+                    const textEl = document.getElementById('media_auto_download_' + type + '_text');
+                    if (textEl) textEl.innerText = getMediaAutoDownloadText(currentMediaAutoDownloadSettings[type]);
+                }
+
+                function openMediaAutoDownloadModal(type) {
+                    activeMediaAutoDownloadType = type;
+                    tempMediaAutoDownloadSelection = [...currentMediaAutoDownloadSettings[type]];
+                    
+                    let title = 'When using mobile data';
+                    if (type === 'wifi') title = 'When connected on Wi-Fi';
+                    else if (type === 'roaming') title = 'When roaming';
+                    
+                    document.getElementById('media_auto_download_modal_title').innerText = title;
+                    
+                    // Update checkboxes
+                    ['photos', 'audio', 'videos', 'documents'].forEach(item => {
+                        const isChecked = tempMediaAutoDownloadSelection.includes(item);
+                        const box = document.getElementById('media_auto_download_check_' + item);
+                        const svg = document.getElementById('media_auto_download_svg_' + item);
+                        if (isChecked) {
+                            box.classList.add('bg-[#00a884]', 'border-[#00a884]');
+                            box.classList.remove('border-[#8696a0]');
+                            svg.classList.remove('hidden');
+                        } else {
+                            box.classList.remove('bg-[#00a884]', 'border-[#00a884]');
+                            box.classList.add('border-[#8696a0]');
+                            svg.classList.add('hidden');
+                        }
+                    });
+
+                    document.getElementById('media_auto_download_modal').classList.remove('hidden');
+                }
+
+                function closeMediaAutoDownloadModal() {
+                    document.getElementById('media_auto_download_modal').classList.add('hidden');
+                }
+
+                function toggleMediaAutoDownloadItem(item) {
+                    const idx = tempMediaAutoDownloadSelection.indexOf(item);
+                    if (idx > -1) {
+                        tempMediaAutoDownloadSelection.splice(idx, 1);
+                    } else {
+                        tempMediaAutoDownloadSelection.push(item);
+                    }
+                    
+                    // Update visual
+                    const isChecked = tempMediaAutoDownloadSelection.includes(item);
+                    const box = document.getElementById('media_auto_download_check_' + item);
+                    const svg = document.getElementById('media_auto_download_svg_' + item);
+                    if (isChecked) {
+                        box.classList.add('bg-[#00a884]', 'border-[#00a884]');
+                        box.classList.remove('border-[#8696a0]');
+                        svg.classList.remove('hidden');
+                    } else {
+                        box.classList.remove('bg-[#00a884]', 'border-[#00a884]');
+                        box.classList.add('border-[#8696a0]');
+                        svg.classList.add('hidden');
+                    }
+                }
+
+                function saveMediaAutoDownload() {
+                    if (!activeMediaAutoDownloadType) return;
+                    currentMediaAutoDownloadSettings[activeMediaAutoDownloadType] = [...tempMediaAutoDownloadSelection];
+                    localStorage.setItem('whatsapp_media_auto_download_' + activeMediaAutoDownloadType, JSON.stringify(currentMediaAutoDownloadSettings[activeMediaAutoDownloadType]));
+                    updateMediaAutoDownloadUI(activeMediaAutoDownloadType);
+                    
+                    if (window.db && window.ref && window.set && window.myUserId && window.myUserId !== '0') {
+                        window.set(window.ref(window.db, `users/${window.myUserId}/settings/media_auto_download_${activeMediaAutoDownloadType}`), currentMediaAutoDownloadSettings[activeMediaAutoDownloadType])
+                            .then(() => { if(window.showToast) window.showToast('Setting Saved', 'Media auto-download updated.'); })
+                            .catch(e => console.error("Firebase save error:", e));
+                    }
+                    
+                    closeMediaAutoDownloadModal();
+                }
             </script>
 
             <!-- Proxy -->
@@ -195,11 +388,11 @@
             </div>
 
             <!-- Auto-download quality -->
-            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4 border-b border-[#313d45]">
+            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4 border-b border-[#313d45]" onclick="openAutoDownloadQualityModal()">
                 <div class="w-12 shrink-0 flex justify-start text-[#8696a0]"></div>
                 <div class="flex-1 flex flex-col mb-4">
                     <span class="text-[#e9edef] text-[16px]">Auto-download quality</span>
-                    <span class="text-[#8696a0] text-[14px] mt-1">HD quality</span>
+                    <span id="storage_auto_download_quality_text" class="text-[#8696a0] text-[14px] mt-1">HD quality</span>
                 </div>
             </div>
             
@@ -210,29 +403,29 @@
             </div>
 
             <!-- When using mobile data -->
-            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4">
+            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4" onclick="openMediaAutoDownloadModal('mobile')">
                 <div class="w-12 shrink-0 flex justify-start text-[#8696a0]"></div>
                 <div class="flex-1 flex flex-col">
                     <span class="text-[#e9edef] text-[16px]">When using mobile data</span>
-                    <span class="text-[#8696a0] text-[14px] mt-1">Photos</span>
+                    <span id="media_auto_download_mobile_text" class="text-[#8696a0] text-[14px] mt-1">Photos</span>
                 </div>
             </div>
 
             <!-- When connected on Wi-Fi -->
-            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4">
+            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4" onclick="openMediaAutoDownloadModal('wifi')">
                 <div class="w-12 shrink-0 flex justify-start text-[#8696a0]"></div>
                 <div class="flex-1 flex flex-col">
                     <span class="text-[#e9edef] text-[16px]">When connected on Wi-Fi</span>
-                    <span class="text-[#8696a0] text-[14px] mt-1">No media</span>
+                    <span id="media_auto_download_wifi_text" class="text-[#8696a0] text-[14px] mt-1">No media</span>
                 </div>
             </div>
 
             <!-- When roaming -->
-            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4">
+            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4" onclick="openMediaAutoDownloadModal('roaming')">
                 <div class="w-12 shrink-0 flex justify-start text-[#8696a0]"></div>
                 <div class="flex-1 flex flex-col">
                     <span class="text-[#e9edef] text-[16px]">When roaming</span>
-                    <span class="text-[#8696a0] text-[14px] mt-1">No media</span>
+                    <span id="media_auto_download_roaming_text" class="text-[#8696a0] text-[14px] mt-1">No media</span>
                 </div>
             </div>
 
@@ -270,6 +463,102 @@
             <div class="flex justify-end gap-6 text-[#00a884] font-medium text-[14px]">
                 <button onclick="closeMediaUploadQualityModal()" class="hover:text-[#00c99f]">Cancel</button>
                 <button onclick="saveMediaUploadQuality()" class="hover:text-[#00c99f]">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-download quality Modal overlay -->
+    <div id="auto_download_quality_modal" class="hidden absolute top-0 left-0 w-full h-full z-50 bg-black bg-opacity-70 flex items-center justify-center px-4">
+        <div class="bg-[#2a3942] rounded-2xl w-full max-w-[340px] p-6 shadow-2xl relative">
+            <h2 class="text-[#e9edef] text-[20px] mb-2 font-medium">Auto-download quality</h2>
+            <p id="auto_download_modal_subtitle" class="text-[#8696a0] text-[14px] mb-6 leading-snug">Photos and videos will be automatically downloaded in HD quality. This uses the most storage space.</p>
+            
+            <div class="flex flex-col gap-5 mb-8">
+                <!-- Auto -->
+                <div class="flex items-start gap-4 cursor-pointer" onclick="selectAutoDownloadQuality('Auto')">
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] flex items-center justify-center shrink-0 transition-colors" id="auto_download_radio_auto">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] hidden" id="auto_download_radio_inner_auto"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[#e9edef] text-[16px] leading-tight mt-0.5">Auto</span>
+                    </div>
+                </div>
+
+                <!-- Standard quality -->
+                <div class="flex items-start gap-4 cursor-pointer" onclick="selectAutoDownloadQuality('Standard quality')">
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] flex items-center justify-center shrink-0 transition-colors" id="auto_download_radio_standard">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] hidden" id="auto_download_radio_inner_standard"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[#e9edef] text-[16px] leading-tight mt-0.5">Standard quality</span>
+                    </div>
+                </div>
+
+                <!-- HD quality -->
+                <div class="flex items-start gap-4 cursor-pointer" onclick="selectAutoDownloadQuality('HD quality')">
+                    <div class="w-5 h-5 rounded-full border-2 border-[#00a884] flex items-center justify-center shrink-0 transition-colors" id="auto_download_radio_hd">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884]" id="auto_download_radio_inner_hd"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[#e9edef] text-[16px] leading-tight mt-0.5">HD quality</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-6 text-[#00a884] font-medium text-[14px]">
+                <button onclick="closeAutoDownloadQualityModal()" class="hover:text-[#00c99f]">Cancel</button>
+                <button onclick="saveAutoDownloadQuality()" class="hover:text-[#00c99f]">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media Auto-Download Modal -->
+    <div id="media_auto_download_modal" class="hidden absolute top-0 left-0 w-full h-full z-50 bg-black bg-opacity-70 flex items-center justify-center px-4">
+        <div class="bg-[#2a3942] rounded-2xl w-full max-w-[340px] p-6 shadow-2xl relative">
+            <h2 id="media_auto_download_modal_title" class="text-[#e9edef] text-[20px] mb-6 font-medium">When using mobile data</h2>
+            
+            <div class="flex flex-col gap-5 mb-8">
+                <!-- Photos -->
+                <div class="flex items-center gap-4 cursor-pointer" onclick="toggleMediaAutoDownloadItem('photos')">
+                    <div class="w-5 h-5 rounded border-2 border-[#8696a0] flex items-center justify-center shrink-0 transition-colors" id="media_auto_download_check_photos">
+                        <svg id="media_auto_download_svg_photos" class="hidden w-3 h-3 text-[#111b21]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <span class="text-[#e9edef] text-[16px] leading-tight mt-0.5">Photos</span>
+                </div>
+                <!-- Audio -->
+                <div class="flex items-center gap-4 cursor-pointer" onclick="toggleMediaAutoDownloadItem('audio')">
+                    <div class="w-5 h-5 rounded border-2 border-[#8696a0] flex items-center justify-center shrink-0 transition-colors" id="media_auto_download_check_audio">
+                        <svg id="media_auto_download_svg_audio" class="hidden w-3 h-3 text-[#111b21]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <span class="text-[#e9edef] text-[16px] leading-tight mt-0.5">Audio</span>
+                </div>
+                <!-- Videos -->
+                <div class="flex items-center gap-4 cursor-pointer" onclick="toggleMediaAutoDownloadItem('videos')">
+                    <div class="w-5 h-5 rounded border-2 border-[#8696a0] flex items-center justify-center shrink-0 transition-colors" id="media_auto_download_check_videos">
+                        <svg id="media_auto_download_svg_videos" class="hidden w-3 h-3 text-[#111b21]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <span class="text-[#e9edef] text-[16px] leading-tight mt-0.5">Videos</span>
+                </div>
+                <!-- Documents -->
+                <div class="flex items-center gap-4 cursor-pointer" onclick="toggleMediaAutoDownloadItem('documents')">
+                    <div class="w-5 h-5 rounded border-2 border-[#8696a0] flex items-center justify-center shrink-0 transition-colors" id="media_auto_download_check_documents">
+                        <svg id="media_auto_download_svg_documents" class="hidden w-3 h-3 text-[#111b21]" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <span class="text-[#e9edef] text-[16px] leading-tight mt-0.5">Documents</span>
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-6 text-[#00a884] font-medium text-[14px]">
+                <button onclick="closeMediaAutoDownloadModal()" class="hover:text-[#00c99f]">Cancel</button>
+                <button onclick="saveMediaAutoDownload()" class="hover:text-[#00c99f]">OK</button>
             </div>
         </div>
     </div>

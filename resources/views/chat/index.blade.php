@@ -5959,23 +5959,73 @@
                     minute: '2-digit'
                 });
 
+                window.getAutoDownloadedMediaUrl = function(url) {
+                    if (!url) return url;
+                    const quality = localStorage.getItem('whatsapp_auto_download_quality') || 'HD quality';
+                    let qualityParam = '';
+                    if (quality === 'Standard quality') qualityParam = 'standard';
+                    else if (quality === 'HD quality') qualityParam = 'hd';
+                    else if (quality === 'Auto') qualityParam = 'auto';
+
+                    if (qualityParam) {
+                        const separator = url.includes('?') ? '&' : '?';
+                        return url + separator + 'quality=' + qualityParam;
+                    }
+                    return url;
+                };
+
+                window.isMediaAutoDownloadAllowed = function(mediaType) {
+                    let networkType = 'wifi';
+                    if (navigator.connection) {
+                        if (navigator.connection.type === 'cellular') networkType = 'mobile';
+                    }
+                    const settingsStr = localStorage.getItem('whatsapp_media_auto_download_' + networkType);
+                    let allowedArr = [];
+                    if (networkType === 'mobile') allowedArr = ['photos'];
+                    else if (networkType === 'wifi') allowedArr = ['photos', 'audio', 'videos', 'documents'];
+                    
+                    if (settingsStr) {
+                        try {
+                            allowedArr = JSON.parse(settingsStr);
+                        } catch(e) {}
+                    }
+                    return allowedArr.includes(mediaType);
+                };
+
+                const downloadIconSvg = `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+
+
                 let mediaContent = '';
                 if (data.type === 'image' && data.file_url) {
-                    mediaContent =
-                        `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
+                    const renderUrl = window.getAutoDownloadedMediaUrl(data.file_url);
+                    if (window.isMediaAutoDownloadAllowed('photos') || isMe) {
+                        mediaContent = `<img src="${renderUrl}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
+                    } else {
+                        mediaContent = `<div class="relative w-[200px] h-[200px] bg-[#233138] rounded-lg mb-2 flex flex-col items-center justify-center cursor-pointer border border-[#313d45] hover:bg-[#2a3942] transition-colors" onclick="this.outerHTML = \\\`<img src='${renderUrl}' class='max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90' onclick='window.open(\\\\\\\`${data.file_url}\\\\\\\`, \\\\\\\`_blank\\\\\\\')'>\\\`">
+                            <div class="w-12 h-12 rounded-full border-2 border-white/60 flex items-center justify-center text-white/80 mb-2">${downloadIconSvg}</div>
+                        </div>`;
+                    }
                 } else if (data.type === 'video' && data.file_url) {
+                    const renderUrl = window.getAutoDownloadedMediaUrl(data.file_url);
                     const vSender = isMe ? 'You' : (window.activeChatUser ? window.activeChatUser.name : 'Member');
                     const vSenderEscaped = vSender.replace(/'/g, "\\'").replace(/"/g, "&quot;");
                     const vTextEscaped = data.text ? data.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ") : '';
-                    mediaContent =
-                        `<div class="relative cursor-pointer max-w-[200px] sm:max-w-xs rounded-lg mb-2 overflow-hidden bg-[#233138] border border-[#313d45] flex items-center justify-center min-h-[120px]" onclick="event.stopPropagation(); window.openGlobalSearchVideoViewer('${key}', window.currentChatId, '${data.file_url}', '${vSenderEscaped}', '${time}', false, '${vTextEscaped}')">
-                            <video src="${data.file_url}#t=0.1" preload="metadata" class="w-full h-full max-h-[300px] object-cover pointer-events-none"></video>
-                            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                <div class="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm shadow-sm border border-white/20">
-                                    <svg viewBox="0 0 24 24" width="24" height="24" fill="white" class="ml-1"><path d="M8 5v14l11-7z"/></svg>
+                    
+                    if (window.isMediaAutoDownloadAllowed('videos') || isMe) {
+                        mediaContent =
+                            `<div class="relative cursor-pointer max-w-[200px] sm:max-w-xs rounded-lg mb-2 overflow-hidden bg-[#233138] border border-[#313d45] flex items-center justify-center min-h-[120px]" onclick="event.stopPropagation(); window.openGlobalSearchVideoViewer('${key}', window.currentChatId, '${data.file_url}', '${vSenderEscaped}', '${time}', false, '${vTextEscaped}')">
+                                <video src="${renderUrl}#t=0.1" preload="metadata" class="w-full h-full max-h-[300px] object-cover pointer-events-none"></video>
+                                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                    <div class="w-12 h-12 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm shadow-sm border border-white/20">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="white" class="ml-1"><path d="M8 5v14l11-7z"/></svg>
+                                    </div>
                                 </div>
-                            </div>
+                            </div>`;
+                    } else {
+                        mediaContent = `<div class="relative w-[200px] h-[200px] bg-[#233138] rounded-lg mb-2 flex flex-col items-center justify-center cursor-pointer border border-[#313d45] hover:bg-[#2a3942] transition-colors" onclick="this.outerHTML = \\\`<div class='relative cursor-pointer max-w-[200px] sm:max-w-xs rounded-lg mb-2 overflow-hidden bg-[#233138] border border-[#313d45] flex items-center justify-center min-h-[120px]' onclick='event.stopPropagation(); window.openGlobalSearchVideoViewer(\\\\\\\`${key}\\\\\\\`, window.currentChatId, \\\\\\\`${data.file_url}\\\\\\\`, \\\\\\\`${vSenderEscaped}\\\\\\\`, \\\\\\\`${time}\\\\\\\`, false, \\\\\\\`${vTextEscaped}\\\\\\\`)'><video src='${renderUrl}#t=0.1' preload='metadata' class='w-full h-full max-h-[300px] object-cover pointer-events-none'></video><div class='absolute inset-0 flex items-center justify-center pointer-events-none'><div class='w-12 h-12 rounded-full bg-black/50 flex items-center justify-center backdrop-blur-sm shadow-sm border border-white/20'><svg viewBox='0 0 24 24' width='24' height='24' fill='white' class='ml-1'><path d='M8 5v14l11-7z'/></svg></div></div></div>\\\`">
+                            <div class="w-12 h-12 rounded-full border-2 border-white/60 flex items-center justify-center text-white/80 mb-2">${downloadIconSvg}</div>
                         </div>`;
+                    }
                 } else if (data.type === 'audio' && data.file_url) {
                     const senderAvatar = isMe ? window.myUserAvatar : (window.activeChatUser?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(window.activeChatUser?.name || 'User')}&background=202c33&color=fff`);
                     mediaContent = `
@@ -6018,7 +6068,7 @@
                                 </div>
                             </div>
                             
-                            <audio id="audio_element_${key}" src="${data.file_url}" preload="metadata" class="hidden" ontimeupdate="window.onCustomAudioTimeUpdate('${key}')" onended="window.onCustomAudioEnded('${key}')" onloadedmetadata="window.onCustomAudioLoadedMetadata('${key}')"></audio>
+                            <audio id="audio_element_${key}" src="${data.file_url}" preload="${window.isMediaAutoDownloadAllowed('audio') || isMe ? 'metadata' : 'none'}" class="hidden" ontimeupdate="window.onCustomAudioTimeUpdate('${key}')" onended="window.onCustomAudioEnded('${key}')" onloadedmetadata="window.onCustomAudioLoadedMetadata('${key}')"></audio>
                         </div>`;
                 } else if (data.type === 'document' && data.file_url) {
                     mediaContent = `
