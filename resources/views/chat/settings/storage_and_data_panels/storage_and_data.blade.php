@@ -61,24 +61,125 @@
                         const savedSetting = localStorage.getItem('whatsapp_use_less_data_calls');
                         lessDataToggle.checked = savedSetting === 'true';
                     }
+                    
+                    // Fetch real-time setting from Firebase once db is ready
+                    checkAndLoadFirebaseStorageSettings();
                 });
+
+                function checkAndLoadFirebaseStorageSettings() {
+                    if (window.db && window.ref && window.get && window.myUserId && window.myUserId !== '0') {
+                        window.get(window.ref(window.db, `users/${window.myUserId}/settings/use_less_data_calls`)).then(snap => {
+                            if (snap.exists()) {
+                                const isChecked = snap.val();
+                                const lessDataToggle = document.getElementById('use_less_data_calls_toggle');
+                                if (lessDataToggle) lessDataToggle.checked = isChecked;
+                                localStorage.setItem('whatsapp_use_less_data_calls', isChecked);
+                            }
+                        }).catch(e => console.error("Firebase fetch error:", e));
+                    } else {
+                        setTimeout(checkAndLoadFirebaseStorageSettings, 1000);
+                    }
+                }
 
                 function toggleUseLessDataForCalls(isChecked) {
                     localStorage.setItem('whatsapp_use_less_data_calls', isChecked);
+                    
+                    // Sync with Firebase backend
+                    if (window.db && window.ref && window.set && window.myUserId && window.myUserId !== '0') {
+                        window.set(window.ref(window.db, `users/${window.myUserId}/settings/use_less_data_calls`), isChecked)
+                            .catch(e => console.error("Firebase save error:", e));
+                    }
+                }
+
+                // Media Upload Quality Logic
+                let currentSelectedMediaQuality = 'HD quality';
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    const savedQ = localStorage.getItem('whatsapp_media_upload_quality');
+                    if (savedQ) {
+                        currentSelectedMediaQuality = savedQ;
+                        updateMediaUploadQualityUI();
+                    }
+                    checkAndLoadFirebaseMediaQuality();
+                });
+
+                function checkAndLoadFirebaseMediaQuality() {
+                    if (window.db && window.ref && window.get && window.myUserId && window.myUserId !== '0') {
+                        window.get(window.ref(window.db, `users/${window.myUserId}/settings/media_upload_quality`)).then(snap => {
+                            if (snap.exists()) {
+                                currentSelectedMediaQuality = snap.val();
+                                localStorage.setItem('whatsapp_media_upload_quality', currentSelectedMediaQuality);
+                                updateMediaUploadQualityUI();
+                            }
+                        }).catch(e => console.error(e));
+                    } else {
+                        setTimeout(checkAndLoadFirebaseMediaQuality, 1000);
+                    }
+                }
+
+                function updateMediaUploadQualityUI() {
+                    const textEl = document.getElementById('storage_media_upload_quality_text');
+                    if(textEl) textEl.innerText = currentSelectedMediaQuality;
+                }
+
+                function openMediaUploadQualityModal() {
+                    document.getElementById('media_upload_quality_modal').classList.remove('hidden');
+                    currentSelectedMediaQuality = localStorage.getItem('whatsapp_media_upload_quality') || 'HD quality';
+                    selectMediaQuality(currentSelectedMediaQuality);
+                }
+
+                function closeMediaUploadQualityModal() {
+                    document.getElementById('media_upload_quality_modal').classList.add('hidden');
+                }
+
+                function selectMediaQuality(quality) {
+                    currentSelectedMediaQuality = quality;
+                    
+                    const stdOut = document.getElementById('media_quality_radio_standard');
+                    const stdIn = document.getElementById('media_quality_radio_inner_standard');
+                    const hdOut = document.getElementById('media_quality_radio_hd');
+                    const hdIn = document.getElementById('media_quality_radio_inner_hd');
+
+                    // Reset both
+                    stdOut.classList.remove('border-[#00a884]'); stdOut.classList.add('border-[#8696a0]');
+                    hdOut.classList.remove('border-[#00a884]'); hdOut.classList.add('border-[#8696a0]');
+                    stdIn.classList.add('hidden');
+                    hdIn.classList.add('hidden');
+
+                    // Activate selected
+                    if (quality === 'Standard quality') {
+                        stdOut.classList.add('border-[#00a884]'); stdOut.classList.remove('border-[#8696a0]');
+                        stdIn.classList.remove('hidden');
+                    } else {
+                        hdOut.classList.add('border-[#00a884]'); hdOut.classList.remove('border-[#8696a0]');
+                        hdIn.classList.remove('hidden');
+                    }
+                }
+
+                function saveMediaUploadQuality() {
+                    localStorage.setItem('whatsapp_media_upload_quality', currentSelectedMediaQuality);
+                    updateMediaUploadQualityUI();
+                    
+                    if (window.db && window.ref && window.set && window.myUserId && window.myUserId !== '0') {
+                        window.set(window.ref(window.db, `users/${window.myUserId}/settings/media_upload_quality`), currentSelectedMediaQuality)
+                            .then(() => { if(window.showToast) window.showToast('Setting Saved', 'Media upload quality updated.'); })
+                            .catch(e => console.error("Firebase save media quality error:", e));
+                    }
+                    closeMediaUploadQualityModal();
                 }
             </script>
 
             <!-- Proxy -->
-            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4">
+            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4" onclick="toggleProxySettings()">
                 <div class="w-12 shrink-0 flex justify-start text-[#8696a0]"></div>
                 <div class="flex-1 flex flex-col">
                     <span class="text-[#e9edef] text-[16px]">Proxy</span>
-                    <span class="text-[#8696a0] text-[14px] mt-1">Off</span>
+                    <span id="storage_and_data_proxy_text" class="text-[#8696a0] text-[14px] mt-1">Off</span>
                 </div>
             </div>
 
             <!-- Media upload quality -->
-            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4">
+            <div class="flex items-center py-4 cursor-pointer hover:bg-[#202c33] transition-colors -mx-4 px-4" onclick="openMediaUploadQualityModal()">
                 <div class="w-12 shrink-0 flex justify-start text-[#8696a0]">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -89,7 +190,7 @@
                 </div>
                 <div class="flex-1 flex flex-col">
                     <span class="text-[#e9edef] text-[16px]">Media upload quality</span>
-                    <span class="text-[#8696a0] text-[14px] mt-1">HD quality</span>
+                    <span id="storage_media_upload_quality_text" class="text-[#8696a0] text-[14px] mt-1">HD quality</span>
                 </div>
             </div>
 
@@ -137,4 +238,40 @@
 
         </div>
     </div>
+
+    <!-- Media upload quality Modal overlay -->
+    <div id="media_upload_quality_modal" class="hidden absolute top-0 left-0 w-full h-full z-50 bg-black bg-opacity-70 flex items-center justify-center px-4">
+        <div class="bg-[#2a3942] rounded-2xl w-full max-w-[340px] p-6 shadow-2xl relative">
+            <h2 class="text-[#e9edef] text-[20px] mb-2 font-medium">Media upload quality</h2>
+            <p class="text-[#8696a0] text-[14px] mb-6 leading-snug">Select the quality for photos and videos to be sent at in chats.</p>
+            
+            <div class="flex flex-col gap-5 mb-8">
+                <div class="flex items-start gap-4 cursor-pointer" onclick="selectMediaQuality('Standard quality')">
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] flex items-center justify-center shrink-0 mt-0.5 transition-colors" id="media_quality_radio_standard">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] hidden" id="media_quality_radio_inner_standard"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[#e9edef] text-[16px] leading-tight">Standard quality</span>
+                        <span class="text-[#8696a0] text-[14px] mt-1 leading-snug">Faster to send, smaller file size</span>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4 cursor-pointer" onclick="selectMediaQuality('HD quality')">
+                    <div class="w-5 h-5 rounded-full border-2 border-[#8696a0] flex items-center justify-center shrink-0 mt-0.5 transition-colors" id="media_quality_radio_hd">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] hidden" id="media_quality_radio_inner_hd"></div>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[#e9edef] text-[16px] leading-tight">HD quality</span>
+                        <span class="text-[#8696a0] text-[14px] mt-1 leading-snug">Slower to send, can be 6 times larger</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-6 text-[#00a884] font-medium text-[14px]">
+                <button onclick="closeMediaUploadQualityModal()" class="hover:text-[#00c99f]">Cancel</button>
+                <button onclick="saveMediaUploadQuality()" class="hover:text-[#00c99f]">Save</button>
+            </div>
+        </div>
+    </div>
+
 </div>

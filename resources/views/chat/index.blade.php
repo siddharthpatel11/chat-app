@@ -658,11 +658,13 @@
             @include('chat.settings.storage_and_data_panels.storage_and_data')            <!-- Manage Storage Panel -->
             @include('chat.settings.storage_and_data_panels.manage_storage')
 
-            <!-- Network Usage Panel -->
+            <!-- Individual Storage Pages -->
             @include('chat.settings.storage_and_data_panels.network_usage')
             @include('chat.settings.storage_and_data_panels.manage_storage_downloads')
             @include('chat.settings.storage_and_data_panels.manage_storage_larger_than_5mb')
             @include('chat.settings.storage_and_data_panels.manage_storage_chat_details')
+            @include('chat.settings.storage_and_data_panels.proxy_settings')
+            @include('chat.settings.storage_and_data_panels.proxy_setup')
             @include('chat.settings.help_and_feedback_panels.help_and_feedback')
             @include('chat.settings.keyboard_shortcuts_modal')
             @include('chat.about.about_modal')
@@ -2808,6 +2810,66 @@
             }
         }
 
+        // Media Upload Quality Compressor
+        window.applyMediaUploadQuality = async function(file) {
+            if (!file || !file.type.startsWith('image/')) {
+                return file; // Only compress images
+            }
+
+            const qualitySetting = localStorage.getItem('whatsapp_media_upload_quality') || 'HD quality';
+            if (qualitySetting === 'HD quality') {
+                return file; // Do nothing for HD
+            }
+
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        // Standard quality max width/height (approx 800px)
+                        const MAX_WIDTH = 800;
+                        const MAX_HEIGHT = 800;
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > MAX_WIDTH) {
+                                height *= MAX_WIDTH / width;
+                                width = MAX_WIDTH;
+                            }
+                        } else {
+                            if (height > MAX_HEIGHT) {
+                                width *= MAX_HEIGHT / height;
+                                height = MAX_HEIGHT;
+                            }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        canvas.toBlob((blob) => {
+                            if (!blob) {
+                                resolve(file); // fallback
+                                return;
+                            }
+                            const compressedFile = new File([blob], file.name, {
+                                type: 'image/jpeg',
+                                lastModified: Date.now()
+                            });
+                            resolve(compressedFile);
+                        }, 'image/jpeg', 0.7); // 70% quality JPEG
+                    };
+                    img.onerror = () => resolve(file);
+                };
+                reader.onerror = () => resolve(file);
+            });
+        };
+
         // Core Send Function (used for text & modal)
         async function emitMessage(msgText, fileObj = null) {
             if (!window.currentChatId) {
@@ -2864,6 +2926,9 @@
                 status: 'sent'
             };
             if (fileObj) {
+                if (window.applyMediaUploadQuality) {
+                    fileObj = await window.applyMediaUploadQuality(fileObj);
+                }
                 const fd = new FormData();
                 fd.append('file', fileObj);
                 const res = await fetch('/upload-status-media', {

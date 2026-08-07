@@ -1697,6 +1697,9 @@
         formData.append('message', msgText);
 
         if (fileObj) {
+            if (window.applyMediaUploadQuality) {
+                fileObj = await window.applyMediaUploadQuality(fileObj);
+            }
             formData.append('file', fileObj);
         }
 
