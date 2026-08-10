@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\Profile\LogoutApiController;
 use App\Http\Controllers\Api\Profile\NotificationsApiController;
 use App\Http\Controllers\Api\Profile\PrivacyApiController;
 use App\Http\Controllers\Api\Profile\ProfileApiController;
+use App\Http\Controllers\Api\Profile\StorageAndDataApiController;
 use App\Http\Controllers\Api\Profile\VideoVoiceApiController;
 use App\Http\Controllers\Api\SettingsApiController;
 use App\Http\Controllers\Api\StatusApiController;
@@ -157,6 +158,13 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     Route::get('/profile/privacy', [PrivacyApiController::class, 'getSettings']);
     Route::patch('/profile/privacy', [PrivacyApiController::class, 'updateSettings']);
     
+    // Profile Storage and Data Settings
+    Route::get('/profile/storage-and-data', [StorageAndDataApiController::class, 'getSettings']);
+    Route::patch('/profile/storage-and-data', [StorageAndDataApiController::class, 'updateSettings']);
+    Route::get('/profile/manage-storage', [StorageAndDataApiController::class, 'getManageStorageStats']);
+    Route::get('/profile/network-usage', [StorageAndDataApiController::class, 'getNetworkUsageStats']);
+    Route::post('/profile/network-usage/reset', [StorageAndDataApiController::class, 'resetNetworkUsageStats']);
+
     // Profile Chats Settings
     Route::get('/profile/chats', [ChatsApiController::class, 'getSettings']);
     Route::patch('/profile/chats', [ChatsApiController::class, 'updateSettings']);
