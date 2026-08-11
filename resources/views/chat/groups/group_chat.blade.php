@@ -5935,7 +5935,17 @@
         }
 
         const gMsgs = document.getElementById('group_messages');
-        if (gMsgs) gMsgs.innerHTML = '';
+        if (gMsgs) {
+            const patternOverlay = gMsgs.querySelector('.theme-pattern-overlay');
+            gMsgs.innerHTML = '';
+            
+            // Re-apply wallpaper based on current chat
+            if (typeof window.applyGlobalWallpaper === 'function') {
+                window.applyGlobalWallpaper();
+            } else if (patternOverlay) {
+                gMsgs.appendChild(patternOverlay);
+            }
+        }
         window.globalMessages = {};
 
         const messagesRef = window.ref(window.db, 'groups/' + groupId + '/messages');

@@ -357,40 +357,10 @@
                 `;
              }
         } else {
-            const color = localStorage.getItem(`whatsapp_wallpaper_color_${currentUserId}`) || '#0b141a';
-            const doodles = localStorage.getItem(`whatsapp_wallpaper_doodles_${currentUserId}`) !== 'false';
-            const globalImg = localStorage.getItem(`whatsapp_wallpaper_global_image_${currentUserId}`);
-            
-            if (globalImg) {
-                styleTag.innerHTML = `
-                    ${selector} {
-                        background-image: url('${globalImg}') !important;
-                        background-size: cover !important;
-                        background-position: center !important;
-                        background-repeat: no-repeat !important;
-                        background-blend-mode: normal !important;
-                        background-color: transparent !important;
-                    }
-                `;
-            } else if (doodles) {
-                styleTag.innerHTML = `
-                    ${selector} {
-                        background-color: ${color} !important;
-                        background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png') !important;
-                        background-blend-mode: overlay !important;
-                        background-size: auto !important;
-                        background-position: left top !important;
-                        background-repeat: repeat !important;
-                    }
-                `;
-            } else {
-                styleTag.innerHTML = `
-                    ${selector} {
-                        background-color: ${color} !important;
-                        background-image: none !important;
-                    }
-                `;
-            }
+            // No custom wallpaper for this chat.
+            // Clear the dynamic style tag so that window.applyGlobalWallpaper() 
+            // can properly apply the global chat theme or global wallpaper via inline styles.
+            styleTag.innerHTML = '';
         }
     };
 </script>

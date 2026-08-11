@@ -823,7 +823,15 @@
                     // Clear messages box and render local broadcast history
                     const messagesContainer = document.getElementById('messages');
                     if (messagesContainer) {
+                        const patternOverlay = messagesContainer.querySelector('.theme-pattern-overlay');
                         messagesContainer.innerHTML = '';
+                        
+                        // Re-apply wallpaper based on current chat
+                        if (typeof window.applyGlobalWallpaper === 'function') {
+                            window.applyGlobalWallpaper();
+                        } else if (patternOverlay) {
+                            messagesContainer.appendChild(patternOverlay);
+                        }
 
                         const bcastMessages = JSON.parse(localStorage.getItem('bcast_msgs_' + otherUserId) || '[]');
                         let lastDateString = null;

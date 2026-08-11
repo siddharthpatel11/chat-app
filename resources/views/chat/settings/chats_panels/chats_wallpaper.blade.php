@@ -87,13 +87,12 @@
     window.toggleChatWallpaperPanel = function() {
         const wpPanel = document.getElementById('chats_wallpaper_panel');
         const overlay = document.getElementById('wallpaper_preview_overlay');
-        const chatPanel = document.getElementById('chats_settings_panel');
 
         if (wpPanel.classList.contains('hidden')) {
+            if (window.closeAllSettings) window.closeAllSettings();
             wpPanel.classList.remove('hidden');
             wpPanel.classList.add('flex');
             overlay.classList.remove('hidden');
-            if (chatPanel) chatPanel.classList.add('hidden');
 
             // Init colors
             const grid = document.getElementById('wallpaper_colors_grid');
@@ -143,7 +142,8 @@
             wpPanel.classList.add('hidden');
             wpPanel.classList.remove('flex');
             overlay.classList.add('hidden');
-            if (chatPanel) chatPanel.classList.remove('hidden');
+            const themePanel = document.getElementById('chat_theme_panel');
+            if (themePanel) { themePanel.classList.remove('hidden'); themePanel.classList.add('flex'); }
         }
     }
 

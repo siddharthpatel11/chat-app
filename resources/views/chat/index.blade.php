@@ -567,40 +567,132 @@
             }
         </style>
 
+        <style id="dynamic_chat_theme_style"></style>
         <script>
             window.applyGlobalWallpaper = function() {
                 const currentUserId = window.myUserId || 'default';
                 const color = localStorage.getItem(`whatsapp_wallpaper_color_${currentUserId}`) || '#0b141a';
                 const doodles = localStorage.getItem(`whatsapp_wallpaper_doodles_${currentUserId}`) !== 'false';
                 const globalImg = localStorage.getItem(`whatsapp_wallpaper_global_image_${currentUserId}`);
+                const themeData = localStorage.getItem(`whatsapp_chat_theme_${currentUserId}`);
+                
+                let theme = null;
+                if (themeData) {
+                    try {
+                        theme = JSON.parse(themeData);
+                    } catch(e) {}
+                }
+
+                // Inject CSS for bubbles
+                const styleEl = document.getElementById('dynamic_chat_theme_style');
+                if (theme && theme.in && theme.out) {
+                    // Extract hex colors from tailwind classes (e.g. bg-[#005c4b])
+                    const outColor = theme.bubbleColor || theme.out.replace('bg-[', '').replace(']', '');
+                    const inColor = theme.in.replace('bg-[', '').replace(']', '');
+                    
+                    styleEl.innerHTML = `
+                        .chat-bg .bg-\\[\\#005c4b\\] { background-color: ${outColor} !important; }
+                        .chat-bg .border-\\[\\#005c4b\\] { border-color: ${outColor} !important; }
+                        .chat-bg .text-\\[\\#00a884\\] { color: ${outColor} !important; }
+                        .chat-bg .from-\\[\\#005c4b\\] { background-image: linear-gradient(to left, ${outColor}, ${outColor} 50%, transparent) !important; }
+                        
+                        .chat-bg .bg-\\[\\#202c33\\] { background-color: ${inColor} !important; }
+                        .chat-bg .border-\\[\\#202c33\\] { border-color: ${inColor} !important; }
+                        .chat-bg .from-\\[\\#202c33\\] { background-image: linear-gradient(to left, ${inColor}, ${inColor} 50%, transparent) !important; }
+                    `;
+                } else {
+                    styleEl.innerHTML = '';
+                }
 
                 const bgElements = document.querySelectorAll('.chat-bg');
                 bgElements.forEach(el => {
-                    // Check if it's #messages or #group_messages and if they have custom wallpaper
-                    let hasCustom = false;
-                    if (el.id === 'messages' && window.activeChatUser && window.activeChatUser.id) {
-                        if (localStorage.getItem(`custom_wallpaper_${currentUserId}_user_${window.activeChatUser.id}`)) hasCustom = true;
-                    }
-                    if (el.id === 'group_messages' && window.currentGroupId) {
-                        if (localStorage.getItem(`custom_wallpaper_${currentUserId}_group_${window.currentGroupId}`)) hasCustom = true;
-                    }
+                    // We no longer skip applying global theme based on hasCustom because custom wallpapers 
+                    // inject !important CSS rules which perfectly override these inline styles.
+                    // This prevents bugs where stale localStorage causes no wallpaper to be applied at all.
+                    if (true) {
+                        if (theme && theme.id !== 't1000') {
+                            // Apply chat theme background
+                            // Clear standard bg
+                            el.style.backgroundColor = '';
+                            el.style.backgroundImage = '';
+                            el.style.backgroundBlendMode = 'normal';
+                            el.style.backgroundSize = '';
+                            el.style.backgroundPosition = '';
+                            
+                            // Get background classes
+                            const bgClasses = theme.bg.split(' ');
+                            
+                            // For solid colors (e.g., bg-[#2e1d1d])
+                            const solidColorClass = bgClasses.find(c => c.startsWith('bg-['));
+                            if (solidColorClass) {
+                                el.style.backgroundColor = solidColorClass.replace('bg-[', '').replace(']', '');
+                            } 
+                            // For predefined tailwind colors (e.g., bg-gray-900) - just approximate or keep standard
+                            else if (bgClasses.find(c => c.startsWith('bg-'))) {
+                                // Default dark if it's a tailwind class we can't parse easily
+                                el.style.backgroundColor = '#111b21'; 
+                            }
+                            
+                            // If it has a gradient (e.g. from-[#...] to-[#...])
+                            const fromClass = bgClasses.find(c => c.startsWith('from-['));
+                            const toClass = bgClasses.find(c => c.startsWith('to-['));
+                            const viaClass = bgClasses.find(c => c.startsWith('via-['));
+                            const dirClass = bgClasses.find(c => c.startsWith('bg-gradient-to-'));
+                            
+                            if (fromClass && toClass) {
+                                const fromColor = fromClass.replace('from-[', '').replace(']', '');
+                                const toColor = toClass.replace('to-[', '').replace(']', '');
+                                let viaStr = '';
+                                if (viaClass) {
+                                    const viaColor = viaClass.replace('via-[', '').replace(']', '');
+                                    viaStr = `, ${viaColor}`;
+                                }
+                                
+                                let direction = 'to bottom';
+                                if (dirClass) {
+                                    const dir = dirClass.replace('bg-gradient-to-', '');
+                                    if (dir === 't') direction = 'to top';
+                                    else if (dir === 'tr') direction = 'to top right';
+                                    else if (dir === 'r') direction = 'to right';
+                                    else if (dir === 'br') direction = 'to bottom right';
+                                    else if (dir === 'b') direction = 'to bottom';
+                                    else if (dir === 'bl') direction = 'to bottom left';
+                                    else if (dir === 'l') direction = 'to left';
+                                    else if (dir === 'tl') direction = 'to top left';
+                                }
+                                
+                                el.style.backgroundImage = `linear-gradient(${direction}, ${fromColor}${viaStr}, ${toColor})`;
+                            }
+                            
+                            // Inject custom SVG patterns into the element
+                            let patternDiv = el.querySelector('.theme-pattern-overlay');
+                            if (!patternDiv) {
+                                patternDiv = document.createElement('div');
+                                patternDiv.className = 'theme-pattern-overlay absolute inset-0 pointer-events-none z-0';
+                                el.style.position = 'relative';
+                                el.insertBefore(patternDiv, el.firstChild);
+                            }
+                            patternDiv.innerHTML = theme.custom || '';
 
-                    if (!hasCustom) {
-                        if (globalImg) {
-                            el.style.backgroundColor = 'transparent';
+                        } else if (globalImg) {
+                            let patternDiv = el.querySelector('.theme-pattern-overlay');
+                            if (patternDiv) patternDiv.remove();
+                            
+                            el.style.backgroundColor = '';
+                            el.style.backgroundBlendMode = 'normal';
                             el.style.backgroundImage = `url('${globalImg}')`;
                             el.style.backgroundSize = 'cover';
                             el.style.backgroundPosition = 'center';
-                            el.style.backgroundRepeat = 'no-repeat';
-                            el.style.backgroundBlendMode = 'normal';
                         } else {
+                            let patternDiv = el.querySelector('.theme-pattern-overlay');
+                            if (patternDiv) patternDiv.remove();
+                            
                             el.style.backgroundColor = color;
+                            el.style.backgroundBlendMode = 'multiply';
+                            el.style.backgroundSize = '';
+                            el.style.backgroundPosition = '';
                             if (doodles) {
                                 el.style.backgroundImage = "url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')";
-                                el.style.backgroundBlendMode = "overlay";
-                                el.style.backgroundSize = '';
-                                el.style.backgroundPosition = '';
-                                el.style.backgroundRepeat = '';
                             } else {
                                 el.style.backgroundImage = 'none';
                                 el.style.backgroundSize = '';
@@ -648,6 +740,8 @@
             @include('chat.settings.chats_panels.chat_history')
             @include('chat.settings.chats_panels.private_processing')
             @include('chat.settings.chats_panels.transfer_chat_history')
+            @include('chat.settings.appearance')
+            @include('chat.settings.appearance_panels.chat_theme')
             @include('chat.settings.account')
             @include('chat.settings.security_notifications')
             @include('chat.settings.video_voice_panels.video_voice')
@@ -5786,7 +5880,17 @@
                 }
             });
 
-            document.getElementById('messages').innerHTML = '';
+            const msgContainerEl = document.getElementById('messages');
+            const patternOverlay = msgContainerEl ? msgContainerEl.querySelector('.theme-pattern-overlay') : null;
+            if (msgContainerEl) msgContainerEl.innerHTML = '';
+            
+            // Re-apply wallpaper based on current chat
+            if (typeof window.applyGlobalWallpaper === 'function') {
+                window.applyGlobalWallpaper();
+            } else if (patternOverlay && msgContainerEl) {
+                msgContainerEl.appendChild(patternOverlay);
+            }
+            
             window.globalMessages = {};
 
             // Multi-pin listener
@@ -7486,7 +7590,9 @@
                     // Clear messages container
                     const msgsContainer = document.getElementById(isGroup ? 'group_messages' : 'messages');
                     if (msgsContainer) {
+                        const patternOverlay = msgsContainer.querySelector('.theme-pattern-overlay');
                         msgsContainer.innerHTML = '';
+                        if (patternOverlay) msgsContainer.appendChild(patternOverlay);
                     }
                     // Clear reply state
                     if (isGroup && typeof window.cancelGroupReply === 'function') {

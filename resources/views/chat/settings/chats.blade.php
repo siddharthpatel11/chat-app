@@ -31,18 +31,6 @@
             </div>
         </div>
 
-        <!-- Wallpaper -->
-        <div class="flex items-center justify-between py-4 hover:bg-[#202c33] px-6 transition-colors group cursor-pointer" onclick="toggleChatWallpaperPanel()">
-            <div class="flex-1 pr-4">
-                <div class="text-[#e9edef] text-[16px]">Wallpaper</div>
-            </div>
-            <div class="text-[#8696a0] group-hover:text-[#e9edef] transition-colors">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path>
-                </svg>
-            </div>
-        </div>
-
         <!-- Chat settings Section -->
         <div class="px-6 mb-2 mt-6">
             <h3 class="text-[#8696a0] text-[14px] font-medium mb-3">Chat settings</h3>
@@ -178,9 +166,9 @@
         const settingsPanel = document.getElementById('settings_panel');
 
         if (chatPanel.classList.contains('hidden')) {
+            if (window.closeAllSettings) window.closeAllSettings();
             chatPanel.classList.remove('hidden');
             chatPanel.classList.add('flex');
-            if (settingsPanel) settingsPanel.classList.add('hidden');
             initChatSettings();
         } else {
             chatPanel.classList.add('hidden');

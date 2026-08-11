@@ -58,6 +58,7 @@
                     ['icon' => 'key', 'title' => 'Account', 'desc' => 'Security notifications, account info'],
                     ['icon' => 'lock', 'title' => 'Privacy', 'desc' => 'Blocked contacts, disappearing messages'],
                     ['icon' => 'message-square', 'title' => 'Chats', 'desc' => 'Theme, wallpaper, chat settings'],
+                    ['icon' => 'palette', 'title' => 'Appearance', 'desc' => 'Chat theme, app icon, app theme'],
                     ['icon' => 'video', 'title' => 'Video & voice', 'desc' => 'Camera, microphone & speakers'],
                     ['icon' => 'bell', 'title' => 'Notifications', 'desc' => 'Messages, groups, sounds'],
                     ['icon' => 'refresh', 'title' => 'Storage and data', 'desc' => 'Network usage, auto-download'],
@@ -69,7 +70,7 @@
             @foreach($settings as $item)
                 <div
                     class="flex items-center px-4 py-3.5 hover:bg-[#202c33] rounded-lg cursor-pointer group transition-all"
-                    onclick="{{ $item['title'] == 'Profile' ? 'toggleEditProfile()' : ($item['title'] == 'General' ? 'toggleGeneralSettings()' : ($item['title'] == 'Account' ? 'toggleAccountSettings()' : ($item['title'] == 'Privacy' ? 'togglePrivacySettings()' : ($item['title'] == 'Chats' ? 'toggleChatSettings()' : ($item['title'] == 'Video & voice' ? 'toggleVideoVoiceSettings()' : ($item['title'] == 'Notifications' ? 'toggleNotificationsSettings()' : ($item['title'] == 'Storage and data' ? 'toggleStorageAndDataSettings()' : ($item['title'] == 'Keyboard shortcuts' ? 'openKeyboardShortcutsModal()' : ($item['title'] == 'Help and feedback' ? 'toggleHelpFeedbackSettings()' : ''))))))))) }}">
+                    onclick="{{ $item['title'] == 'Profile' ? 'toggleEditProfile()' : ($item['title'] == 'General' ? 'toggleGeneralSettings()' : ($item['title'] == 'Account' ? 'toggleAccountSettings()' : ($item['title'] == 'Privacy' ? 'togglePrivacySettings()' : ($item['title'] == 'Chats' ? 'toggleChatSettings()' : ($item['title'] == 'Appearance' ? 'toggleAppearanceSettings()' : ($item['title'] == 'Video & voice' ? 'toggleVideoVoiceSettings()' : ($item['title'] == 'Notifications' ? 'toggleNotificationsSettings()' : ($item['title'] == 'Storage and data' ? 'toggleStorageAndDataSettings()' : ($item['title'] == 'Keyboard shortcuts' ? 'openKeyboardShortcutsModal()' : ($item['title'] == 'Help and feedback' ? 'toggleHelpFeedbackSettings()' : '')))))))))) }}">
                     <div class="w-10 text-[#8696a0] group-hover:text-[#00a884] transition-colors shrink-0">
                         @if($item['icon'] == 'monitor')
                             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
@@ -101,6 +102,10 @@
                             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
                                 stroke-width="1.5">
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                        @elseif($item['icon'] == 'palette')
+                            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
                             </svg>
                         @elseif($item['icon'] == 'video')
                             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor"
@@ -177,6 +182,8 @@
             'general_settings_panel',
             'privacy_settings_panel',
             'chats_settings_panel',
+            'appearance_settings_panel',
+            'chat_theme_panel',
             'chats_hide_panel',
             'video_voice_settings_panel',
             'notifications_settings_panel',
@@ -243,7 +250,7 @@
         // Check if settings_panel or ANY settings subpanel is currently visible
         const settingsPanels = [
             'settings_panel', 'edit_profile_panel', 'general_settings_panel', 'privacy_settings_panel',
-            'chats_settings_panel', 'video_voice_settings_panel', 'notifications_settings_panel',
+            'chats_settings_panel', 'appearance_settings_panel', 'chat_theme_panel', 'video_voice_settings_panel', 'notifications_settings_panel',
             'help_feedback_settings_panel', 'storage_and_data_settings_panel', 'manage_storage_panel', 'manage_storage_larger_than_5mb_panel', 'manage_storage_chat_details_panel', 'account_settings_panel', 'security_settings_panel',
             'privacy_last_seen_panel', 'privacy_status_panel', 'privacy_profile_photo_panel',
             'privacy_about_panel', 'privacy_exclude_panel', 'privacy_blocked_contacts_panel',
