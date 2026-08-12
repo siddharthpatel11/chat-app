@@ -242,3 +242,4 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     Route::delete('/media', [MediaApiController::class, 'deleteMedia']);
     Route::post('/media/forward', [MediaApiController::class, 'forwardMedia']);
 });
+Route::post('/ai/generate-theme', [\App\Http\Controllers\AiThemeController::class, 'generate']);

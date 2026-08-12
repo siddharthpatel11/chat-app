@@ -227,6 +227,19 @@
         if (overlay) {
             overlay.classList.add('hidden');
         }
+        
+        const bubblePanel = document.getElementById('chat_bubble_settings_panel');
+        if (bubblePanel) {
+            bubblePanel.classList.add('hidden');
+            bubblePanel.classList.add('translate-x-full');
+        }
+        
+        const aiThemePanel = document.getElementById('ai_theme_panel');
+        if (aiThemePanel) {
+            aiThemePanel.classList.add('hidden');
+            aiThemePanel.classList.add('translate-x-full');
+        }
+        
         document.getElementById('nav_profile')?.classList.remove('active');
         
         // Restore main chat column if it was hidden

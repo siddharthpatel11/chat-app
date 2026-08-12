@@ -9,11 +9,23 @@
             </button>
             <h2 class="text-[#e9edef] text-[19px] font-medium">Chat theme</h2>
         </div>
-        <button class="text-[#aebac1] hover:text-white transition-colors">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-                <path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path>
-            </svg>
-        </button>
+        <div class="relative">
+            <button onclick="toggleChatThemeDropdown(event)" id="chat_theme_menu_btn" class="text-[#aebac1] hover:text-white transition-colors">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"></path>
+                </svg>
+            </button>
+            <!-- Dropdown -->
+            <div id="chat_theme_menu_dropdown" class="hidden absolute right-0 top-10 w-48 bg-[#233138] rounded shadow-lg py-2 z-50 transform origin-top-right transition-transform scale-95 opacity-0">
+                <div class="px-4 py-3 hover:bg-[#111b21] cursor-pointer text-[#d1d7db] text-[14px] flex items-center gap-3 transition-colors" onclick="resetChatTheme()">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"></path>
+                        <path d="M21 3v5h-5"></path>
+                    </svg>
+                    Reset theme
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Scrollable Content -->
@@ -54,7 +66,7 @@
                 @foreach($themes as $index => $theme)
                     @if(isset($theme['isAi']) && $theme['isAi'])
                         <!-- Create with AI Card -->
-                        <div class="aspect-[1/1.6] rounded-xl bg-gradient-to-br from-[#282f48] to-[#201d36] flex flex-col items-center justify-center cursor-pointer hover:opacity-90 transition-opacity border border-transparent" onclick="window.showToast('Theme', 'Create with AI not implemented')">
+                        <div class="aspect-[1/1.6] rounded-xl bg-gradient-to-br from-[#282f48] to-[#201d36] flex flex-col items-center justify-center cursor-pointer hover:opacity-90 transition-opacity border border-transparent" onclick="toggleAiThemePanel()">
                             <svg viewBox="0 0 24 24" width="20" height="20" fill="white" class="mb-2">
                                 <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
                             </svg>
@@ -91,7 +103,7 @@
         <div class="px-6 mt-8">
             <h3 class="text-[#8696a0] text-[14px] font-medium mb-3">Customize</h3>
             
-            <div class="flex items-center justify-between cursor-pointer hover:bg-[#202c33] -mx-6 px-6 py-4 transition-colors">
+            <div class="flex items-center justify-between cursor-pointer hover:bg-[#202c33] -mx-6 px-6 py-4 transition-colors" onclick="toggleChatBubblePanel()">
                 <div class="flex items-center gap-5">
                     <div class="text-[#8696a0]">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -114,10 +126,343 @@
                     </div>
                     <div class="text-[#e9edef] text-[16px]">Wallpaper</div>
                 </div>
+            </div> <!-- Closes line 106 Wallpaper row -->
+        </div> <!-- Closes line 91 Customize Section -->
+    </div> <!-- Closes line 20 Scrollable Content -->
+
+    <!-- Chat Bubble Settings Panel (Nested) -->
+    <div id="chat_bubble_settings_panel" class="hidden absolute inset-0 z-30 flex-col bg-[#111b21] transition-transform duration-300 transform translate-x-full">
+        <!-- Header -->
+        <div class="h-16 bg-[#202c33] px-6 flex items-center gap-6 shrink-0 border-b border-[#313d45]">
+            <button onclick="toggleChatBubblePanel()" class="text-[#aebac1] hover:text-white transition-colors">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path>
+                </svg>
+            </button>
+            <h2 class="text-[#e9edef] text-[19px] font-semibold">Chat bubble</h2>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar bg-[#0b141a] py-6 px-6">
+            <div class="grid grid-cols-4 gap-y-6 gap-x-4 justify-items-center" id="settings_bubble_color_grid">
+                <!-- Colors injected via JS -->
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Create with Meta AI Panel (Nested) -->
+    <div id="ai_theme_panel" class="hidden absolute inset-0 z-40 flex-col bg-[#111b21] transition-transform duration-300 transform translate-x-full">
+        <!-- Header -->
+        <div class="h-16 bg-[#202c33] px-6 flex items-center shrink-0 border-b border-[#313d45]">
+            <button onclick="toggleAiThemePanel()" class="text-[#aebac1] hover:text-white transition-colors mr-6">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+                </svg>
+            </button>
+            <div class="flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="#a48cff" class="shrink-0">
+                    <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
+                </svg>
+                <h2 class="text-[#e9edef] text-[16px] font-medium">Create with Meta AI</h2>
+            </div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar bg-[#111b21] flex flex-col">
+            <div class="p-4 flex gap-3">
+                <button class="flex-1 bg-transparent border border-[#313d45] hover:bg-[#202c33] rounded-xl py-3 flex flex-col items-center justify-center gap-2 transition-colors" onclick="openAiInteractivePanel()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="#25D366">
+                        <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"></path>
+                        <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25z" fill="#25D366"></path>
+                    </svg>
+                    <span class="text-[#e9edef] text-[14px]">Create image</span>
+                </button>
+                <button class="flex-1 bg-transparent border border-[#313d45] hover:bg-[#202c33] rounded-xl py-3 flex flex-col items-center justify-center gap-2 transition-colors" onclick="document.getElementById('ai_edit_photo_input').click()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="#25D366">
+                        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path>
+                        <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25z" fill="#25D366"></path>
+                    </svg>
+                    <span class="text-[#e9edef] text-[14px]">Edit photo</span>
+                </button>
+                <input type="file" id="ai_edit_photo_input" class="hidden" accept="image/*" onchange="window.showToast('Edit Photo', 'Gallery selected: ' + this.files[0].name)">
+            </div>
+
+            <!-- Grid -->
+            <div class="px-4 pb-4 grid grid-cols-2 gap-3" id="ai_inspiration_grid">
+                <!-- Hardcoded for now like the screenshot -->
+                <div class="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group" onclick="setAiPrompt('Sweet storm')">
+                    <img src="https://image.pollinations.ai/prompt/sweet%20storm?width=400&height=533&nologo=true&seed=42" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Sweet storm">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-3 right-3">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="white" class="mb-1">
+                            <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
+                        </svg>
+                        <span class="text-white text-[13px] font-medium truncate block">Sweet storm</span>
+                    </div>
+                </div>
+                <div class="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group" onclick="setAiPrompt('Mountain lake')">
+                    <img src="https://image.pollinations.ai/prompt/mountain%20lake%20landscape?width=400&height=533&nologo=true&seed=10" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="Mountain lake">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-3 right-3">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="white" class="mb-1">
+                            <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
+                        </svg>
+                        <span class="text-white text-[13px] font-medium truncate block">Mountain lake</span>
+                    </div>
+                </div>
+                <div class="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group" onclick="setAiPrompt('a rooftop garden')">
+                    <img src="https://image.pollinations.ai/prompt/rooftop%20garden%20cityscape?width=400&height=533&nologo=true&seed=24" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="rooftop garden">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-3 right-3">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="white" class="mb-1">
+                            <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
+                        </svg>
+                        <span class="text-white text-[13px] font-medium truncate block">a rooftop garden</span>
+                    </div>
+                </div>
+                <div class="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer group" onclick="setAiPrompt('a field of sunflowers')">
+                    <img src="https://image.pollinations.ai/prompt/field%20of%20sunflowers%20sunset?width=400&height=533&nologo=true&seed=33" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="sunflowers">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-3 right-3">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="white" class="mb-1">
+                            <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
+                        </svg>
+                        <span class="text-white text-[13px] font-medium truncate block">a field of sunflowers</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Bottom Input Box -->
+        <div class="p-4 shrink-0 border-t border-[#313d45]">
+            <div class="bg-[#2a2f32] rounded-full px-5 py-3.5 flex items-center gap-3">
+                <input type="text" id="ai_prompt_input" class="bg-transparent outline-none border-none ring-0 focus:ring-0 focus:outline-none focus:border-none text-[#d1d7db] text-[15px] w-full placeholder-[#8696a0] p-0 m-0 shadow-none" placeholder="Describe an image..." onkeydown="handleAiInput(event)">
+                <button onclick="submitAiPrompt()" class="text-[#8696a0] hover:text-[#00a884] transition-colors shrink-0">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Interactive Panel (Full UI logic based on new screenshots) -->
+    <div id="ai_interactive_panel" class="hidden absolute inset-0 z-50 flex-col bg-[#111b21] transition-transform duration-300 transform translate-x-full">
+        <!-- Header -->
+        <div class="h-16 px-6 flex items-center shrink-0 border-b border-transparent">
+            <button onclick="closeAiInteractivePanel()" class="text-[#aebac1] hover:text-white transition-colors mr-6">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
+                </svg>
+            </button>
+            <div class="flex items-center gap-2">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="#a48cff" class="shrink-0">
+                    <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
+                </svg>
+                <h2 class="text-[#e9edef] text-[16px] font-medium">Create with Meta AI</h2>
+            </div>
+        </div>
+
+        <!-- State 1: Create Image Input (Empty State) -->
+        <div id="ai_state_input" class="flex-1 flex flex-col hidden">
+            <!-- Chat Area -->
+            <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+                <!-- AI Welcome Message -->
+                <div class="flex items-start gap-3 mt-4">
+                    <div class="w-8 h-8 rounded-full bg-[#1da0f2]/20 flex items-center justify-center flex-shrink-0">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="#1da0f2">
+                            <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
+                        </svg>
+                    </div>
+                    <div class="bg-[#202c33] rounded-2xl rounded-tl-none p-3 max-w-[85%] text-[15px] text-[#e9edef] shadow-sm">
+                        Hi! I can generate custom chat themes for you. Describe what you'd like to see.
+                    </div>
+                </div>
+                
+                <!-- Examples -->
+                <div class="flex flex-wrap gap-2 mt-2 ml-11">
+                    <button onclick="setAiPrompt('A serene anime sunset over a calm ocean')" class="px-4 py-2 rounded-full bg-transparent border border-[#313d45] text-[14px] text-[#00a884] hover:bg-[#202c33] transition-colors">A serene anime sunset</button>
+                    <button onclick="setAiPrompt('Cyberpunk city street in the rain, neon lights')" class="px-4 py-2 rounded-full bg-transparent border border-[#313d45] text-[14px] text-[#00a884] hover:bg-[#202c33] transition-colors">Cyberpunk city street</button>
+                    <button onclick="setAiPrompt('Minimalist dark mode geometric patterns')" class="px-4 py-2 rounded-full bg-transparent border border-[#313d45] text-[14px] text-[#00a884] hover:bg-[#202c33] transition-colors">Minimalist geometric</button>
+                </div>
+            </div>
+            
+            <!-- Input Area (WhatsApp Style) -->
+            <div class="p-3 bg-[#202c33] flex items-end gap-2">
+                <div class="flex-1 bg-[#2a3942] rounded-3xl flex items-center px-2 py-1 min-h-[44px]">
+                    <input type="text" id="ai_interactive_input" 
+                           class="flex-1 bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none text-white text-[15px] px-3 placeholder-[#8696a0] shadow-none m-0" 
+                           placeholder="Message Meta AI..."
+                           onkeypress="if(event.key === 'Enter') submitAiInteractivePrompt()">
+                </div>
+                <button onclick="submitAiInteractivePrompt()" class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white hover:bg-[#008f6f] transition-colors flex-shrink-0 shadow-md">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="translate-x-[-1px] translate-y-[1px]">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- State 2: Loading (Dotted Animation) -->
+        <div id="ai_state_loading" class="flex-1 flex flex-col hidden">
+            <div class="flex-1 flex flex-col items-center justify-center p-6 relative">
+                <!-- Mock dotted animation using background pattern -->
+                <div class="w-full max-w-[280px] aspect-[1/1.5] rounded-[24px] bg-[#1a2328] relative overflow-hidden flex items-center justify-center opacity-50 shadow-2xl">
+                <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(#a48cff 2px, transparent 2px); background-size: 20px 20px; background-position: center; animation: pulse 1.5s infinite alternate;"></div>
+                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#a48cff" stroke-width="1.5" class="z-10 animate-pulse">
+                    <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
+                </svg>
+                </div>
+            </div>
+            <div class="p-4 mt-auto flex justify-center pb-8">
+                <button onclick="cancelAiGeneration()" class="bg-[#2a2f32] hover:bg-[#3b4246] transition-colors rounded-full px-8 py-2.5 text-[#e9edef] text-[15px] font-medium">Cancel</button>
+            </div>
+        </div>
+
+        <!-- State 3: Results (4-image swiper) -->
+        <div id="ai_state_results" class="flex-1 flex flex-col hidden h-full overflow-hidden relative">
+            <!-- Swiper Container -->
+            <div class="flex-1 relative flex items-center justify-center overflow-hidden px-4 py-2" id="ai_carousel_container">
+                <div id="ai_carousel_track" class="flex w-full h-full transition-transform duration-300 ease-in-out" style="transform: translateX(0%);">
+                    <!-- Images injected here -->
+                </div>
+            </div>
+            
+            <!-- Pagination Dots -->
+            <div class="flex justify-center gap-2 mb-6" id="ai_carousel_dots">
+                <!-- Dots injected here -->
+            </div>
+
+            <!-- Action Buttons (Edit/Restyle) -->
+            <div class="flex justify-center gap-12 mb-8">
+                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="editAiPrompt()">
+                    <div class="w-12 h-12 rounded-full bg-[#2a2f32] group-hover:bg-[#3b4246] flex items-center justify-center transition-colors shadow-sm">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"></path></svg>
+                    </div>
+                    <span class="text-[#d1d7db] text-[13px] font-medium">Edit</span>
+                </div>
+                <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="restyleAiPrompt()">
+                    <div class="w-12 h-12 rounded-full bg-[#2a2f32] group-hover:bg-[#3b4246] flex items-center justify-center transition-colors shadow-sm">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="white"><path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path></svg>
+                    </div>
+                    <span class="text-[#d1d7db] text-[13px] font-medium">Restyle</span>
+                </div>
+            </div>
+
+            <!-- Bottom Bar (Refresh / Confirm) -->
+            <div class="px-6 py-4 flex justify-between items-center pb-8 border-t border-[#313d45] border-opacity-30">
+                <button onclick="regenerateAiTheme()" class="w-12 h-12 rounded-full bg-[#2a2f32] hover:bg-[#3b4246] flex items-center justify-center transition-colors">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="white"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"></path></svg>
+                </button>
+                <button onclick="applyAiThemeSelection()" class="w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#1EBE5D] flex items-center justify-center transition-colors shadow-lg">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="#111b21"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- State 4: Edit Image -->
+        <div id="ai_state_edit" class="flex-1 flex flex-col hidden h-full overflow-hidden absolute inset-0 z-50 bg-[#111b21]">
+            <!-- Top Bar -->
+            <div class="h-16 px-4 flex items-center justify-between shrink-0">
+                <button onclick="closeAiEdit()" class="text-white p-2">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                </button>
+                <button onclick="applyAiEdit()" class="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="black" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </button>
+            </div>
+            
+            <!-- Image Preview -->
+            <div class="flex-1 p-4 flex items-center justify-center pb-2">
+                <img id="ai_edit_preview_img" src="" class="w-full max-w-[280px] aspect-[9/16] object-cover rounded-[24px]">
+            </div>
+            
+            <!-- Bottom Controls -->
+            <div class="p-4 flex flex-col gap-4 mb-4">
+                <!-- Pills -->
+                <div class="flex gap-2 justify-center">
+                    <button onclick="selectEditAction('Add', this)" class="edit-action-pill px-6 py-2 rounded-full bg-[#2a2f32] hover:bg-[#3b4246] text-white text-[14px] font-medium transition-colors">Add</button>
+                    <button onclick="selectEditAction('Remove', this)" class="edit-action-pill px-6 py-2 rounded-full bg-[#2a2f32] hover:bg-[#3b4246] text-white text-[14px] font-medium transition-colors">Remove</button>
+                    <button onclick="selectEditAction('Change', this)" class="edit-action-pill px-6 py-2 rounded-full bg-[#2a2f32] hover:bg-[#3b4246] text-white text-[14px] font-medium transition-colors">Change</button>
+                </div>
+                <!-- Input -->
+                <div class="bg-[#2a2f32] rounded-full px-5 py-3">
+                    <input type="text" id="ai_edit_input" class="bg-transparent border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none text-[#d1d7db] text-[15px] w-full placeholder-[#8696a0] p-0 m-0 shadow-none" placeholder="Describe edits..." onkeypress="if(event.key === 'Enter') applyAiEdit()">
+                </div>
+            </div>
+        </div>
+
+        <!-- State 5: Restyle Image -->
+        <div id="ai_state_restyle" class="flex-1 flex flex-col hidden h-full overflow-hidden absolute inset-0 z-50 bg-[#111b21]">
+            <!-- Top Bar -->
+            <div class="h-16 px-4 flex items-center justify-between shrink-0">
+                <button onclick="closeAiRestyle()" class="text-white p-2">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+                </button>
+                <button onclick="applyAiRestyle()" class="w-10 h-10 rounded-full bg-white flex items-center justify-center hover:bg-gray-200 transition-colors">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="black" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </button>
+            </div>
+            
+            <!-- Image Preview -->
+            <div class="flex-1 p-4 flex items-center justify-center pb-2">
+                <img id="ai_restyle_preview_img" src="" class="w-full max-w-[280px] aspect-[9/16] object-cover rounded-[24px]">
+            </div>
+            
+            <!-- Bottom Controls -->
+            <div class="p-4 flex flex-col gap-4 mb-4">
+                <!-- Categories (Scrollable) -->
+                <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-2">
+                    <button class="px-4 py-1.5 rounded-full bg-[#1e3a2f] text-white text-[14px] font-medium whitespace-nowrap shrink-0">Featured</button>
+                    <button class="px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Styles</button>
+                    <button class="px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Moods</button>
+                    <button class="px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Lighting</button>
+                    <button class="px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Colors</button>
+                </div>
+                
+                <!-- Style Chips (Scrollable) -->
+                <div class="flex gap-3 overflow-x-auto custom-scrollbar pb-2 px-1">
+                    <!-- 3D -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('3D', this)">
+                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-gray-200 to-gray-500 shadow-inner flex items-center justify-center text-[24px]">
+                            🧊
+                        </div>
+                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">3D</span>
+                    </div>
+                    <!-- Anime -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Anime', this)">
+                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-pink-300 to-purple-400 shadow-inner flex items-center justify-center text-[24px]">
+                            🌸
+                        </div>
+                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Anime</span>
+                    </div>
+                    <!-- Paper -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Papercraft', this)">
+                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-yellow-100 to-orange-300 shadow-inner flex items-center justify-center text-[24px]">
+                            📄
+                        </div>
+                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Paper</span>
+                    </div>
+                    <!-- Illustrated -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Illustrated', this)">
+                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-blue-300 to-green-300 shadow-inner flex items-center justify-center text-[24px]">
+                            🎨
+                        </div>
+                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Illustrated</span>
+                    </div>
+                     <!-- Low Poly -->
+                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Low Poly', this)">
+                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-purple-400 to-indigo-600 shadow-inner flex items-center justify-center text-[24px]">
+                            💠
+                        </div>
+                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Low Poly</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <!-- Closes line 1 chat_theme_panel -->
 
 <!-- Preview Overlay Panel -->
 <div id="chat_theme_preview_panel" class="hidden flex-col h-full bg-[#111b21] absolute z-[100] top-0 right-0 transition-transform duration-300 transform translate-x-full" style="width: calc(100% - 350px);">
@@ -238,6 +583,65 @@
     let activeThemeIndex = 0; // Default active
     let previewIndex = 0;
     window.isPreviewDarkMode = true; // Default to dark mode
+
+    window.toggleChatThemeDropdown = function(e) {
+        if(e) e.stopPropagation();
+        const dropdown = document.getElementById('chat_theme_menu_dropdown');
+        if (dropdown.classList.contains('hidden')) {
+            dropdown.classList.remove('hidden');
+            setTimeout(() => {
+                dropdown.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+        } else {
+            dropdown.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                dropdown.classList.add('hidden');
+            }, 150);
+        }
+    };
+
+    window.resetChatTheme = function() {
+        const currentUserId = window.myUserId || 'default';
+        localStorage.removeItem(`whatsapp_chat_theme_${currentUserId}`);
+        
+        // Remove custom user/group wallpaper so theme applies globally
+        if (window.activeChatUser && window.activeChatUser.id) {
+            localStorage.removeItem(`custom_wallpaper_${currentUserId}_user_${window.activeChatUser.id}`);
+        }
+        if (window.currentGroupId) {
+            localStorage.removeItem(`custom_wallpaper_${currentUserId}_group_${window.currentGroupId}`);
+        }
+        
+        // Re-apply globally
+        if (typeof window.applyGlobalWallpaper === 'function') {
+            window.applyGlobalWallpaper();
+        }
+        
+        // Update UI
+        activeThemeIndex = 0;
+        updateGridActiveState();
+        
+        const theme = chatThemes[0];
+        const headerIndicator = document.getElementById('appearance_theme_header');
+        if (headerIndicator) {
+            headerIndicator.style.backgroundColor = theme.bubbleColor || theme.out.replace('bg-[', '').replace(']', '');
+        }
+        
+        if (window.showToast) {
+            window.showToast('Theme Reset', 'Chat theme has been reset to default');
+        }
+        
+        window.toggleChatThemeDropdown();
+    };
+
+    // Close dropdown on outside click
+    document.addEventListener('click', (e) => {
+        const btn = document.getElementById('chat_theme_menu_btn');
+        const dropdown = document.getElementById('chat_theme_menu_dropdown');
+        if (dropdown && !dropdown.classList.contains('hidden') && !dropdown.contains(e.target) && e.target !== btn && !btn?.contains(e.target)) {
+            window.toggleChatThemeDropdown();
+        }
+    });
 
     // Filter out the AI card which doesn't have a normal theme structure for the preview
     const previewableThemes = chatThemes.filter(t => !t.isAi);
@@ -683,6 +1087,506 @@
         
         updatePreviewUI();
         renderBubbleColorGrid();
+    };
+
+    // Global Bubble Color Picker Panel Logic
+    window.toggleChatBubblePanel = function() {
+        const panel = document.getElementById('chat_bubble_settings_panel');
+        if (panel.classList.contains('translate-x-full')) {
+            panel.classList.remove('hidden');
+            // Small delay to allow display:block to apply before animating transform
+            setTimeout(() => {
+                panel.classList.remove('translate-x-full');
+            }, 10);
+            renderGlobalBubbleColorGrid();
+        } else {
+            panel.classList.add('translate-x-full');
+            // Wait for animation to finish before hiding
+            setTimeout(() => {
+                panel.classList.add('hidden');
+            }, 300);
+        }
+    };
+
+    function renderGlobalBubbleColorGrid() {
+        const grid = document.getElementById('settings_bubble_color_grid');
+        
+        const currentUserId = window.myUserId || 'default';
+        const themeData = localStorage.getItem(`whatsapp_chat_theme_${currentUserId}`);
+        let currentTheme = null;
+        if (themeData) {
+            try { currentTheme = JSON.parse(themeData); } catch(e){}
+        }
+        
+        // If no theme, WhatsApp defaults to standard t1 bubble color
+        const currentBubbleColor = currentTheme && currentTheme.bubbleColor ? currentTheme.bubbleColor : '#005c4b';
+        
+        grid.innerHTML = bubbleColors.map(color => {
+            const isSelected = color === currentBubbleColor;
+            return `
+                <div class="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-transform hover:scale-110 shadow-sm"
+                     style="background-color: ${color}; border: ${isSelected ? '3px solid white' : 'none'};"
+                     onclick="setGlobalBubbleColor('${color}')">
+                     ${isSelected ? `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>` : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    window.setGlobalBubbleColor = function(color) {
+        const currentUserId = window.myUserId || 'default';
+        const themeData = localStorage.getItem(`whatsapp_chat_theme_${currentUserId}`);
+        let currentTheme = null;
+        if (themeData) {
+            try { currentTheme = JSON.parse(themeData); } catch(e){}
+        }
+        
+        if (!currentTheme) {
+            // Default to t1 if no theme exists
+            currentTheme = chatThemes.find(t => t.id === 't1') || chatThemes[0];
+        }
+        
+        currentTheme.bubbleColor = color;
+        currentTheme.out = `bg-[${color}]`;
+        
+        // Save back to localStorage
+        localStorage.setItem(`whatsapp_chat_theme_${currentUserId}`, JSON.stringify(currentTheme));
+        
+        // Re-render grid to show active checkmark
+        renderGlobalBubbleColorGrid();
+        
+        // Apply globally
+        if (typeof window.applyGlobalWallpaper === 'function') {
+            window.applyGlobalWallpaper();
+        }
+    };
+
+    window.toggleAiThemePanel = function() {
+        const panel = document.getElementById('ai_theme_panel');
+        if (panel.classList.contains('translate-x-full')) {
+            panel.classList.remove('hidden');
+            panel.classList.add('flex');
+            setTimeout(() => {
+                panel.classList.remove('translate-x-full');
+            }, 10);
+        } else {
+            panel.classList.add('translate-x-full');
+            setTimeout(() => {
+                panel.classList.add('hidden');
+                panel.classList.remove('flex');
+            }, 300);
+        }
+    };
+   
+    window.openAiInteractivePanel = function() {
+        const panel = document.getElementById('ai_interactive_panel');
+        panel.classList.remove('hidden');
+        panel.classList.add('flex');
+        setTimeout(() => {
+            panel.classList.remove('translate-x-full');
+        }, 10);
+        showAiState('input');
+        // Clear input
+        document.getElementById('ai_interactive_input').value = '';
+    };
+
+    window.closeAiInteractivePanel = function() {
+        const panel = document.getElementById('ai_interactive_panel');
+        panel.classList.add('translate-x-full');
+        setTimeout(() => {
+            panel.classList.add('hidden');
+            panel.classList.remove('flex');
+            if(window.aiGenerationController) {
+                window.aiGenerationController.abort();
+            }
+        }, 300);
+    };
+
+    window.showAiState = function(state) {
+        document.getElementById('ai_state_input').classList.add('hidden');
+        document.getElementById('ai_state_loading').classList.add('hidden');
+        document.getElementById('ai_state_results').classList.add('hidden');
+        
+        if (state === 'input') {
+            document.getElementById('ai_state_input').classList.remove('hidden');
+            setTimeout(() => document.getElementById('ai_interactive_input').focus(), 100);
+        } else if (state === 'loading') {
+            document.getElementById('ai_state_loading').classList.remove('hidden');
+        } else if (state === 'results') {
+            document.getElementById('ai_state_results').classList.remove('hidden');
+        }
+    };
+
+    window.handleAiInput = function(e) {
+        if (e.key === 'Enter') {
+            submitAiPrompt();
+        }
+    };
+
+    window.submitAiPrompt = function() {
+        const val = document.getElementById('ai_prompt_input').value.trim();
+        if (val) {
+            window.setAiPrompt(val);
+            document.getElementById('ai_prompt_input').value = '';
+        }
+    };
+
+    window.handleAiInteractiveInput = function(e) {
+        if (e.key === 'Enter') {
+            submitAiInteractivePrompt();
+        }
+    };
+
+    window.submitAiInteractivePrompt = function() {
+        const val = document.getElementById('ai_interactive_input').value.trim();
+        if (val) {
+            window.currentAiPrompt = val;
+            triggerAiGeneration(val);
+        }
+    };
+    
+    // Override old setAiPrompt from grid click to open the interactive panel and generate
+    window.setAiPrompt = function(promptText) {
+        window.openAiInteractivePanel();
+        document.getElementById('ai_interactive_input').value = promptText;
+        window.currentAiPrompt = promptText;
+        triggerAiGeneration(promptText);
+    };
+
+    window.cancelAiGeneration = function() {
+        if(window.aiGenerationController) {
+            window.aiGenerationController.abort();
+        }
+        showAiState('input');
+    };
+
+    window.regenerateAiTheme = function() {
+        if (window.currentAiPrompt) {
+            triggerAiGeneration(window.currentAiPrompt);
+        }
+    };
+
+    window.aiGeneratedVariations = [];
+    window.currentAiVariationIndex = 0;
+
+    window.triggerAiGeneration = async function(promptText) {
+        showAiState('loading');
+        
+        if(window.aiGenerationController) {
+            window.aiGenerationController.abort();
+        }
+        window.aiGenerationController = new AbortController();
+
+        try {
+            const response = await fetch('/api/ai/generate-theme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': window.csrf || document.querySelector('meta[name="csrf-token"]')?.content || ''
+                },
+                body: JSON.stringify({ prompt: promptText }),
+                signal: window.aiGenerationController.signal
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.imageUrls && data.imageUrls.length > 0) {
+                window.aiGeneratedVariations = data.imageUrls;
+                window.currentAiVariationIndex = 0;
+                renderAiCarousel();
+                showAiState('results');
+            } else {
+                showAiState('input');
+                if (window.showToast) window.showToast('Error', data.message || 'Failed to generate images');
+            }
+        } catch (err) {
+            if (err.name === 'AbortError') return;
+            console.error(err);
+            showAiState('input');
+            if (window.showToast) window.showToast('Error', 'Network error. Please try again.');
+        }
+    };
+
+    window.renderAiCarousel = function() {
+        const track = document.getElementById('ai_carousel_track');
+        const dotsContainer = document.getElementById('ai_carousel_dots');
+        track.innerHTML = '';
+        dotsContainer.innerHTML = '';
+        
+        window.aiGeneratedVariations.forEach((url, idx) => {
+            // Slide
+            const slide = document.createElement('div');
+            slide.className = 'min-w-full h-full flex items-center justify-center px-4 cursor-pointer';
+            
+            // Add a container with rounded corners and shadow to match the UI precisely
+            slide.innerHTML = `<div class="relative h-full w-full max-w-[280px] aspect-[9/16] rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 ${idx === window.currentAiVariationIndex ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}">
+                <img src="${url}" class="w-full h-full object-cover aspect-[9/16]" loading="lazy">
+            </div>`;
+            track.appendChild(slide);
+            
+            // Dot
+            const dot = document.createElement('div');
+            dot.className = `w-2 h-2 rounded-full bg-white cursor-pointer transition-all duration-300 ${idx === window.currentAiVariationIndex ? 'opacity-100 scale-110' : 'opacity-30'}`;
+            dot.onclick = () => goToAiVariation(idx);
+            dotsContainer.appendChild(dot);
+        });
+        
+        updateAiCarouselTransform();
+        setupAiCarouselSwipe();
+    };
+
+    window.updateAiVariationClasses = function(index) {
+        const track = document.getElementById('ai_carousel_track');
+        const slides = track.children;
+        for (let i = 0; i < slides.length; i++) {
+            const innerDiv = slides[i].querySelector('div');
+            if (i === index) {
+                innerDiv.className = 'relative h-full w-full max-w-[280px] aspect-[9/16] rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 scale-100 opacity-100';
+            } else {
+                innerDiv.className = 'relative h-full w-full max-w-[280px] aspect-[9/16] rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 scale-95 opacity-50';
+            }
+        }
+    };
+
+    window.goToAiVariation = function(index) {
+        if (index < 0 || index >= window.aiGeneratedVariations.length) return;
+        window.currentAiVariationIndex = index;
+        
+        window.updateAiVariationClasses(index);
+        
+        updateAiCarouselTransform();
+        
+        // Update dots
+        const dots = document.getElementById('ai_carousel_dots').children;
+        for (let i = 0; i < dots.length; i++) {
+            if (i === index) {
+                dots[i].className = 'w-2 h-2 rounded-full bg-white cursor-pointer transition-all duration-300 opacity-100 scale-110';
+            } else {
+                dots[i].className = 'w-2 h-2 rounded-full bg-white cursor-pointer transition-all duration-300 opacity-30';
+            }
+        }
+    };
+
+    window.updateAiCarouselTransform = function() {
+        const track = document.getElementById('ai_carousel_track');
+        track.style.transform = `translateX(-${window.currentAiVariationIndex * 100}%)`;
+    };
+
+    window.setupAiCarouselSwipe = function() {
+        const track = document.getElementById('ai_carousel_track');
+        let startX = 0;
+        let isDragging = false;
+        
+        track.onmousedown = (e) => {
+            startX = e.pageX;
+            isDragging = true;
+            track.style.transition = 'none';
+        };
+        track.onmousemove = (e) => {
+            if (!isDragging) return;
+            const diff = e.pageX - startX;
+            const baseTranslate = -(window.currentAiVariationIndex * 100);
+            // Rough calculation to move track with mouse
+            const movePercent = (diff / track.offsetWidth) * 100;
+            track.style.transform = `translateX(${baseTranslate + movePercent}%)`;
+        };
+        track.onmouseup = track.onmouseleave = (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            track.style.transition = 'transform 300ms ease-in-out';
+            
+            const diff = e.pageX - startX;
+            if (diff < -50 && window.currentAiVariationIndex < window.aiGeneratedVariations.length - 1) {
+                goToAiVariation(window.currentAiVariationIndex + 1);
+            } else if (diff > 50 && window.currentAiVariationIndex > 0) {
+                goToAiVariation(window.currentAiVariationIndex - 1);
+            } else {
+                goToAiVariation(window.currentAiVariationIndex); // snap back
+            }
+        };
+    };
+
+    window.applyAiThemeSelection = function() {
+        const selectedUrl = window.aiGeneratedVariations[window.currentAiVariationIndex];
+        if (!selectedUrl) return;
+        
+        const aiTheme = {
+            id: 'ai_generated',
+            bg: 'bg-black',
+            custom: `<div class="absolute inset-0 bg-cover bg-center opacity-80" style="background-image: url('${selectedUrl}')"></div>`,
+            in: 'bg-[#202c33]',
+            out: 'bg-[#005c4b]',
+            bubbleColor: '#005c4b'
+        };
+        
+        // Add to array
+        const existingIdx = chatThemes.findIndex(t => t.id === 'ai_generated');
+        let finalIdx = 0;
+        if (existingIdx !== -1) {
+            chatThemes[existingIdx] = aiTheme;
+            finalIdx = existingIdx;
+            previewIndex = previewableThemes.findIndex(t => t.id === 'ai_generated');
+        } else {
+            chatThemes.push(aiTheme);
+            previewableThemes.push(aiTheme);
+            finalIdx = chatThemes.length - 1;
+            previewIndex = previewableThemes.length - 1;
+        }
+        
+        // Close interactive panel
+        closeAiInteractivePanel();
+        
+        // Open the wallpaper preview using the standard function to calculate flexible layout correctly
+        setTimeout(() => {
+            openThemePreview(finalIdx);
+        }, 300); // Wait for interactive panel to close before animating preview
+        
+        if (window.showToast) {
+            window.showToast('Theme Generated', 'Previewing your new wallpaper!');
+        }
+    };
+    window.editAiPrompt = function() {
+        const selectedUrl = window.aiGeneratedVariations[window.currentAiVariationIndex];
+        if (!selectedUrl) return;
+        
+        document.getElementById('ai_edit_preview_img').src = selectedUrl;
+        document.getElementById('ai_state_edit').classList.remove('hidden');
+        window.currentEditAction = '';
+        window.tempEditPrompt = window.currentAiPrompt;
+        
+        // Reset pills
+        document.querySelectorAll('.edit-action-pill').forEach(el => {
+            el.classList.remove('bg-[#1e3a2f]', 'text-[#00a884]');
+            el.classList.add('bg-[#2a2f32]', 'text-white');
+        });
+        document.getElementById('ai_edit_input').value = '';
+    };
+
+    window.closeAiEdit = function() {
+        document.getElementById('ai_state_edit').classList.add('hidden');
+    };
+
+    window.selectEditAction = function(action, element) {
+        window.currentEditAction = action;
+        // Reset all pills
+        document.querySelectorAll('.edit-action-pill').forEach(el => {
+            el.classList.remove('bg-[#1e3a2f]', 'text-[#00a884]');
+            el.classList.add('bg-[#2a2f32]', 'text-white');
+        });
+        // Set active pill
+        element.classList.remove('bg-[#2a2f32]', 'text-white');
+        element.classList.add('bg-[#1e3a2f]', 'text-[#00a884]');
+        
+        document.getElementById('ai_edit_input').focus();
+    };
+
+    window.generateEditPreview = function() {
+        const val = document.getElementById('ai_edit_input').value.trim();
+        if (val) {
+            const action = window.currentEditAction ? window.currentEditAction + " " : "";
+            window.tempEditPrompt = window.currentAiPrompt + ", " + action + val;
+            
+            // Show loading overlay
+            document.getElementById('ai_edit_loading').classList.remove('hidden');
+            
+            // Dynamically load new image
+            const img = document.getElementById('ai_edit_preview_img');
+            const newSrc = `https://image.pollinations.ai/prompt/${encodeURIComponent(window.tempEditPrompt)}?width=400&height=711&nologo=true&seed=${Math.floor(Math.random()*100000)}`;
+            
+            img.onload = function() {
+                document.getElementById('ai_edit_loading').classList.add('hidden');
+            };
+            img.onerror = function() {
+                document.getElementById('ai_edit_loading').classList.add('hidden');
+                if (window.showToast) window.showToast('Error', 'Failed to generate image. Please try again.');
+            };
+            img.src = newSrc;
+        }
+    };
+
+    window.applyAiEdit = function() {
+        const finalUrl = document.getElementById('ai_edit_preview_img').src;
+        if (!finalUrl || finalUrl === window.aiGeneratedVariations[window.currentAiVariationIndex]) {
+            closeAiEdit();
+            return;
+        }
+        closeAiEdit();
+        
+        window.aiGeneratedVariations.push(finalUrl);
+        window.currentAiVariationIndex = window.aiGeneratedVariations.length - 1;
+        window.currentAiPrompt = window.tempEditPrompt;
+        
+        renderAiCarousel();
+        goToAiVariation(window.currentAiVariationIndex);
+        applyAiThemeSelection();
+    };
+
+    window.restyleAiPrompt = function() {
+        const selectedUrl = window.aiGeneratedVariations[window.currentAiVariationIndex];
+        if (!selectedUrl) return;
+        
+        document.getElementById('ai_restyle_preview_img').src = selectedUrl;
+        document.getElementById('ai_state_restyle').classList.remove('hidden');
+        window.currentRestyleStyle = '';
+        window.tempRestylePrompt = window.currentAiPrompt;
+        
+        // Reset chips
+        document.querySelectorAll('.style-thumb').forEach(el => {
+            el.classList.remove('border-[#25D366]');
+            el.classList.add('border-transparent');
+        });
+    };
+
+    window.closeAiRestyle = function() {
+        document.getElementById('ai_state_restyle').classList.add('hidden');
+    };
+
+    window.selectStyle = function(style, element) {
+        window.currentRestyleStyle = style;
+        
+        // Reset all chips
+        document.querySelectorAll('.style-thumb').forEach(el => {
+            el.classList.remove('border-[#25D366]');
+            el.classList.add('border-transparent');
+        });
+        // Set active chip
+        element.querySelector('.style-thumb').classList.remove('border-transparent');
+        element.querySelector('.style-thumb').classList.add('border-[#25D366]');
+        
+        window.tempRestylePrompt = window.currentAiPrompt + ", in " + style + " style";
+        
+        // Show loading overlay
+        document.getElementById('ai_restyle_loading').classList.remove('hidden');
+        
+        // Dynamically load new image
+        const img = document.getElementById('ai_restyle_preview_img');
+        const newSrc = `https://image.pollinations.ai/prompt/${encodeURIComponent(window.tempRestylePrompt)}?width=400&height=711&nologo=true&seed=${Math.floor(Math.random()*100000)}`;
+        
+        img.onload = function() {
+            document.getElementById('ai_restyle_loading').classList.add('hidden');
+        };
+        img.onerror = function() {
+            document.getElementById('ai_restyle_loading').classList.add('hidden');
+            if (window.showToast) window.showToast('Error', 'Failed to generate image. Please try again.');
+        };
+        img.src = newSrc;
+    };
+
+    window.applyAiRestyle = function() {
+        const finalUrl = document.getElementById('ai_restyle_preview_img').src;
+        if (!finalUrl || finalUrl === window.aiGeneratedVariations[window.currentAiVariationIndex]) {
+            closeAiRestyle();
+            return;
+        }
+        closeAiRestyle();
+        
+        window.aiGeneratedVariations.push(finalUrl);
+        window.currentAiVariationIndex = window.aiGeneratedVariations.length - 1;
+        window.currentAiPrompt = window.tempRestylePrompt;
+        
+        renderAiCarousel();
+        goToAiVariation(window.currentAiVariationIndex);
+        applyAiThemeSelection();
     };
 
 </script>
