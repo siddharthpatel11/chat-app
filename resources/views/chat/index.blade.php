@@ -7,6 +7,13 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
         <style>
+            /* Apply global app scaling (WhatsApp web style) to a dedicated container to avoid body zoom centering bugs */
+            #app-container {
+                zoom: var(--chat-zoom, 1);
+                width: calc(100vw / var(--chat-zoom, 1)) !important;
+                height: calc(100vh / var(--chat-zoom, 1)) !important;
+                transform-origin: top left;
+            }
             .chat-bg {
                 background-color: #efeae2;
                 background-image: url('https://w0.peakpx.com/wallpaper/508/871/HD-wallpaper-whatsapp-background-theme-pattern.jpg');
@@ -710,7 +717,7 @@
             });
         </script>
 
-        <div class="flex w-full h-full bg-[#111b21] overflow-hidden border-none">
+        <div id="app-container" class="flex w-full h-full bg-[#111b21] overflow-hidden border-none">
 
             @include('chat.nav_sidebar')
             @include('chat.status.index')
@@ -5191,6 +5198,8 @@
 
             // Hide communities panel and sidebar
             const cSidebar = document.getElementById('communities_sidebar_container');
+            if (window.closeDisappearingMessagesSidebar) window.closeDisappearingMessagesSidebar();
+            if (window.closeAllSettings) window.closeAllSettings();
             if (cSidebar) {
                 cSidebar.classList.add('hidden');
                 cSidebar.classList.remove('sm:flex', 'flex');

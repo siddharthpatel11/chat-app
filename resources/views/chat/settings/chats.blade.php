@@ -36,6 +36,19 @@
             <h3 class="text-[#8696a0] text-[14px] font-medium mb-3">Chat settings</h3>
         </div>
 
+        <!-- Font size -->
+        <div class="flex items-center justify-between py-4 hover:bg-[#202c33] px-6 transition-colors group cursor-pointer" onclick="openFontSizeModal()">
+            <div class="flex-1 pr-4">
+                <div class="text-[#e9edef] text-[16px]">Font size</div>
+                <div id="chat_font_size_label" class="text-[#8696a0] text-[14px] mt-0.5">Medium</div>
+            </div>
+            <div class="text-[#8696a0] group-hover:text-[#e9edef] transition-colors">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"></path>
+                </svg>
+            </div>
+        </div>
+
         <!-- Media upload quality -->
         <div class="flex items-center justify-between py-4 hover:bg-[#202c33] px-6 transition-colors group cursor-pointer" onclick="openUploadQualityModal()">
             <div class="flex-1 pr-4">
@@ -160,6 +173,43 @@
     </div>
 </div>
 
+<!-- Font Size Modal -->
+<div id="font_size_modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center">
+    <div class="absolute inset-0 bg-black bg-opacity-70" onclick="closeFontSizeModal()"></div>
+    <div class="relative bg-[#3b4a54] w-[340px] rounded-[3px] shadow-xl text-[#e9edef] z-10 scale-95 opacity-0 transition-all duration-200" id="font_size_modal_content">
+        <div class="p-6">
+            <h3 class="text-[19px] font-normal mb-5 text-white">Font size</h3>
+            <div class="space-y-4">
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <div class="relative flex items-center justify-center w-5 h-5 rounded-full border-2 border-[#8696a0]">
+                        <input type="radio" name="font_size_option" value="Small" class="peer sr-only" onchange="updateFontSizeSelection(this)">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    </div>
+                    <span class="text-[16px]">Small</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <div class="relative flex items-center justify-center w-5 h-5 rounded-full border-2 border-[#8696a0]">
+                        <input type="radio" name="font_size_option" value="Medium" class="peer sr-only" onchange="updateFontSizeSelection(this)" checked>
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    </div>
+                    <span class="text-[16px]">Medium</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer group">
+                    <div class="relative flex items-center justify-center w-5 h-5 rounded-full border-2 border-[#8696a0]">
+                        <input type="radio" name="font_size_option" value="Large" class="peer sr-only" onchange="updateFontSizeSelection(this)">
+                        <div class="w-2.5 h-2.5 rounded-full bg-[#00a884] opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                    </div>
+                    <span class="text-[16px]">Large</span>
+                </label>
+            </div>
+        </div>
+        <div class="flex justify-end gap-2 p-4 pt-2">
+            <button onclick="closeFontSizeModal()" class="px-6 py-2 rounded-full text-[#00a884] hover:bg-[#202c33] transition-colors text-[14px] font-medium border border-[#313d45]">Cancel</button>
+            <button onclick="applyFontSize()" class="px-6 py-2 rounded-full bg-[#00a884] hover:bg-[#02906f] text-[#111b21] transition-colors text-[14px] font-medium">OK</button>
+        </div>
+    </div>
+</div>
+
 <script>
     window.toggleChatSettings = function() {
         const chatPanel = document.getElementById('chats_settings_panel');
@@ -203,4 +253,80 @@
             window.showToast('Settings Updated', `${name} turned ${isEnabled ? 'on' : 'off'}.`);
         }
     }
+
+    // Font Size Logic
+    function openFontSizeModal() {
+        const modal = document.getElementById('font_size_modal');
+        const content = document.getElementById('font_size_modal_content');
+        
+        let currentSize = localStorage.getItem('whatsapp_font_size') || 'Medium';
+        document.querySelectorAll('input[name="font_size_option"]').forEach(radio => {
+            radio.checked = (radio.value === currentSize);
+            updateFontSizeRadioUI(radio);
+        });
+
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }, 10);
+    }
+
+    function closeFontSizeModal() {
+        const modal = document.getElementById('font_size_modal');
+        const content = document.getElementById('font_size_modal_content');
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 200);
+    }
+
+    function updateFontSizeSelection(radio) {
+        document.querySelectorAll('input[name="font_size_option"]').forEach(r => {
+            updateFontSizeRadioUI(r);
+        });
+    }
+
+    function updateFontSizeRadioUI(radio) {
+        const borderDiv = radio.closest('.relative');
+        if (radio.checked) {
+            borderDiv.classList.remove('border-[#8696a0]');
+            borderDiv.classList.add('border-[#00a884]');
+        } else {
+            borderDiv.classList.remove('border-[#00a884]');
+            borderDiv.classList.add('border-[#8696a0]');
+        }
+    }
+
+    function applyFontSize() {
+        const selected = document.querySelector('input[name="font_size_option"]:checked').value;
+        localStorage.setItem('whatsapp_font_size', selected);
+        
+        document.getElementById('chat_font_size_label').innerText = selected;
+        
+        applyGlobalFontSize();
+        
+        closeFontSizeModal();
+        if(window.showToast) window.showToast('Settings saved', 'Font size updated');
+    }
+
+    function applyGlobalFontSize() {
+        let size = localStorage.getItem('whatsapp_font_size') || 'Medium';
+        let scale = 1;
+        if (size === 'Small') scale = 0.85;
+        if (size === 'Large') scale = 1.25;
+        
+        document.documentElement.style.setProperty('--chat-zoom', scale);
+    }
+    
+    // Initialize Font Size display on load
+    document.addEventListener('DOMContentLoaded', () => {
+        let size = localStorage.getItem('whatsapp_font_size') || 'Medium';
+        const label = document.getElementById('chat_font_size_label');
+        if(label) label.innerText = size;
+        
+        applyGlobalFontSize();
+    });
+
 </script>

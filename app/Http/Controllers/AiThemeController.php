@@ -106,4 +106,53 @@ class AiThemeController extends Controller
             ], 500);
         }
     }
+
+    public function editPrompt(Request $request)
+    {
+        $request->validate([
+            'original_prompt' => 'required|string|max:2000',
+            'action' => 'required|string|max:50', // Add, Remove, Change
+            'edit_text' => 'required|string|max:1000'
+        ]);
+
+        $apiKey = env('GROQ_API_KEY');
+        if (!$apiKey) {
+            return response()->json(['prompt' => $request->original_prompt . ', ' . $request->action . ' ' . $request->edit_text]);
+        }
+
+        $sysPrompt = "You are an AI prompt rewriting engine for an image generator. The user has an original image prompt and wants to modify it. " .
+                     "Action requested: '{$request->action}'. Edit instruction: '{$request->edit_text}'. " .
+                     "Rewrite the original prompt intelligently to apply this edit. " .
+                     "If action is Remove, ensure the item is strictly excluded from the description without using the word 'remove'. " .
+                     "If action is Add, integrate the new item naturally. " .
+                     "If action is Change, replace the original element seamlessly. " .
+                     "Keep it highly descriptive but STRICTLY UNDER 30 words. Output ONLY the new raw prompt, no intro/outro, no quotes.";
+                     
+        try {
+            $groqResponse = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type' => 'application/json',
+            ])->post('https://api.groq.com/openai/v1/chat/completions', [
+                'model' => 'llama-3.1-8b-instant',
+                'messages' => [
+                    ['role' => 'system', 'content' => $sysPrompt],
+                    ['role' => 'user', 'content' => "Original prompt: " . $request->original_prompt]
+                ],
+                'temperature' => 0.3,
+                'max_tokens' => 50,
+            ]);
+
+            if ($groqResponse->successful()) {
+                $data = $groqResponse->json();
+                $newPrompt = trim($data['choices'][0]['message']['content']);
+                $newPrompt = preg_replace('/^(Here is|The prompt|Prompt:)/i', '', $newPrompt);
+                $newPrompt = trim(trim($newPrompt, '"\'*'));
+                return response()->json(['prompt' => $newPrompt]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Groq Edit API Error: ' . $e->getMessage());
+        }
+        
+        return response()->json(['prompt' => $request->original_prompt . ', ' . $request->action . ' ' . $request->edit_text]);
+    }
 }

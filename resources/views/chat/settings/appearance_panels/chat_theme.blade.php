@@ -734,6 +734,12 @@
                     localStorage.removeItem(`custom_wallpaper_${currentUserId}_group_${window.currentGroupId}`);
                 }
                 
+                // Update Appearance Panel UI
+                const headerIndicator = document.getElementById('appearance_theme_header');
+                if (headerIndicator) {
+                    headerIndicator.style.backgroundColor = theme.bubbleColor || theme.out.replace('bg-[', '').replace(']', '');
+                }
+                
                 // Re-apply styles
                 if (typeof window.applyGlobalWallpaper === 'function') {
                     window.applyGlobalWallpaper();
@@ -744,6 +750,15 @@
                 }
                 
                 closeThemePreview();
+                
+                // Also close any AI panels so user sees the Main Grid!
+                if (typeof window.closeAiInteractivePanel === 'function') window.closeAiInteractivePanel();
+                
+                const aiPanels = ['ai_state_loading', 'ai_state_results', 'ai_state_edit', 'ai_state_restyle'];
+                aiPanels.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
             }
         }
     }
@@ -801,34 +816,6 @@
         }, 300); // Wait for transition
     }
 
-    window.applyCurrentPreviewTheme = function() {
-        const theme = previewableThemes[previewIndex];
-        // Find original index
-        activeThemeIndex = chatThemes.findIndex(t => t.id === theme.id);
-        
-        // Save to localStorage
-        const currentUserId = window.myUserId || 'default';
-        localStorage.setItem(`whatsapp_chat_theme_${currentUserId}`, JSON.stringify(theme));
-        
-        // Update Grid UI
-        updateGridActiveState();
-
-        // Update Appearance Panel UI (mock)
-        const headerIndicator = document.getElementById('appearance_theme_header');
-        if (headerIndicator) {
-            headerIndicator.style.backgroundColor = theme.bubbleColor || theme.out.replace('bg-[', '').replace(']', '');
-        }
-
-        // Apply globally
-        if (typeof window.applyGlobalWallpaper === 'function') {
-            window.applyGlobalWallpaper();
-        }
-
-        window.showToast('Theme Applied', 'Your default chat theme has been updated.');
-        
-        // Close preview
-        closeThemePreview();
-    }
 
     window.togglePreviewThemeMode = function() {
         window.isPreviewDarkMode = !window.isPreviewDarkMode;
@@ -1426,6 +1413,9 @@
             chatThemes[existingIdx] = aiTheme;
             finalIdx = existingIdx;
             previewIndex = previewableThemes.findIndex(t => t.id === 'ai_generated');
+            if (previewIndex !== -1) {
+                previewableThemes[previewIndex] = aiTheme;
+            }
         } else {
             chatThemes.push(aiTheme);
             previewableThemes.push(aiTheme);
@@ -1480,14 +1470,38 @@
         document.getElementById('ai_edit_input').focus();
     };
 
-    window.generateEditPreview = function() {
+    window.generateEditPreview = async function() {
         const val = document.getElementById('ai_edit_input').value.trim();
         if (val) {
-            const action = window.currentEditAction ? window.currentEditAction + " " : "";
-            window.tempEditPrompt = window.currentAiPrompt + ", " + action + val;
-            
-            // Show loading overlay
+            // Show loading overlay immediately
             document.getElementById('ai_edit_loading').classList.remove('hidden');
+            
+            let finalPrompt = window.currentAiPrompt;
+            try {
+                const response = await fetch('/api/ai/edit-prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        original_prompt: window.currentAiPrompt,
+                        action: window.currentEditAction || 'Change',
+                        edit_text: val
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.prompt) {
+                        finalPrompt = data.prompt;
+                    }
+                }
+            } catch (err) {
+                console.error("Edit Prompt API error", err);
+            }
+            
+            window.tempEditPrompt = finalPrompt;
             
             // Dynamically load new image
             const img = document.getElementById('ai_edit_preview_img');

@@ -243,3 +243,4 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     Route::post('/media/forward', [MediaApiController::class, 'forwardMedia']);
 });
 Route::post('/ai/generate-theme', [\App\Http\Controllers\AiThemeController::class, 'generate']);
+Route::post('/ai/edit-prompt', [\App\Http\Controllers\AiThemeController::class, 'editPrompt']);
