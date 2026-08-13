@@ -12,10 +12,14 @@ class AiThemeController extends Controller
     public function generate(Request $request)
     {
         $request->validate([
-            'prompt' => 'required|string|max:1000'
+            'prompt' => 'required|string|max:1000',
+            'width' => 'nullable|integer|min:256|max:3840',
+            'height' => 'nullable|integer|min:256|max:3840'
         ]);
 
         $userPrompt = $request->input('prompt');
+        $width = $request->input('width', 1080);
+        $height = $request->input('height', 1920);
         $apiKey = env('GROQ_API_KEY');
 
         try {
@@ -67,7 +71,7 @@ class AiThemeController extends Controller
             // The user explicitly stated they don't mind waiting ("bhale ne genrate krta var lagee").
             for ($i = 0; $i < 4; $i++) {
                 $seed = rand(1, 999999);
-                $pollinationsUrl = "https://image.pollinations.ai/prompt/{$encodedPrompt}?width=1080&height=1920&nologo=true&seed={$seed}";
+                $pollinationsUrl = "https://image.pollinations.ai/prompt/{$encodedPrompt}?width={$width}&height={$height}&nologo=true&model=flux&enhance=true&seed={$seed}";
                 
                 try {
                     $imageResponse = Http::timeout(40)->get($pollinationsUrl);

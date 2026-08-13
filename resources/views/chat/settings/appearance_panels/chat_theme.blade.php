@@ -308,7 +308,7 @@
         <div id="ai_state_loading" class="flex-1 flex flex-col hidden">
             <div class="flex-1 flex flex-col items-center justify-center p-6 relative">
                 <!-- Mock dotted animation using background pattern -->
-                <div class="w-full max-w-[280px] aspect-[1/1.5] rounded-[24px] bg-[#1a2328] relative overflow-hidden flex items-center justify-center opacity-50 shadow-2xl">
+                <div class="w-full max-w-[280px] dynamic-aspect-ratio rounded-[24px] bg-[#1a2328] relative overflow-hidden flex items-center justify-center opacity-50 shadow-2xl">
                 <div class="absolute inset-0 opacity-30" style="background-image: radial-gradient(#a48cff 2px, transparent 2px); background-size: 20px 20px; background-position: center; animation: pulse 1.5s infinite alternate;"></div>
                 <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#a48cff" stroke-width="1.5" class="z-10 animate-pulse">
                     <path d="M19 1l-1.26 2.75L15 5l2.74 1.26L19 9l1.25-2.74L23 5l-2.75-1.25zM9 4L6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.26 2.74L15 19l2.74 1.25L19 23l1.25-2.75L23 19l-2.75-1.25z"></path>
@@ -374,8 +374,16 @@
             </div>
             
             <!-- Image Preview -->
-            <div class="flex-1 p-4 flex items-center justify-center pb-2">
-                <img id="ai_edit_preview_img" src="" class="w-full max-w-[280px] aspect-[9/16] object-cover rounded-[24px]">
+            <div class="flex-1 p-4 flex items-center justify-center pb-2 relative">
+                <div class="relative w-full max-w-[280px] dynamic-aspect-ratio">
+                    <img id="ai_edit_preview_img" src="" class="w-full h-full object-cover rounded-[24px]">
+                    <div id="ai_edit_loading" class="hidden absolute inset-0 flex items-center justify-center bg-black/50 rounded-[24px] z-10">
+                        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="white" stroke-width="2" class="animate-spin">
+                            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+                            <path d="M12 2a10 10 0 0 1 10 10"></path>
+                        </svg>
+                    </div>
+                </div>
             </div>
             
             <!-- Bottom Controls -->
@@ -406,57 +414,141 @@
             </div>
             
             <!-- Image Preview -->
-            <div class="flex-1 p-4 flex items-center justify-center pb-2">
-                <img id="ai_restyle_preview_img" src="" class="w-full max-w-[280px] aspect-[9/16] object-cover rounded-[24px]">
+            <div class="flex-1 p-4 flex items-center justify-center pb-2 relative">
+                <div class="relative w-full max-w-[280px] dynamic-aspect-ratio">
+                    <img id="ai_restyle_preview_img" src="" class="w-full h-full object-cover rounded-[24px]">
+                    <div id="ai_restyle_loading" class="hidden absolute inset-0 flex items-center justify-center bg-black/50 rounded-[24px] z-10">
+                        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="white" stroke-width="2" class="animate-spin">
+                            <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
+                            <path d="M12 2a10 10 0 0 1 10 10"></path>
+                        </svg>
+                    </div>
+                </div>
             </div>
             
             <!-- Bottom Controls -->
             <div class="p-4 flex flex-col gap-4 mb-4">
                 <!-- Categories (Scrollable) -->
-                <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-2">
-                    <button class="px-4 py-1.5 rounded-full bg-[#1e3a2f] text-white text-[14px] font-medium whitespace-nowrap shrink-0">Featured</button>
-                    <button class="px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Styles</button>
-                    <button class="px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Moods</button>
-                    <button class="px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Lighting</button>
-                    <button class="px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Colors</button>
+                <div class="flex gap-2 overflow-x-auto custom-scrollbar pb-2" id="restyle_categories_container">
+                    <button onclick="selectRestyleCategory('Featured', this)" class="restyle-category-btn px-4 py-1.5 rounded-full bg-[#1e3a2f] text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Featured</button>
+                    <button onclick="selectRestyleCategory('Styles', this)" class="restyle-category-btn px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Styles</button>
+                    <button onclick="selectRestyleCategory('Moods', this)" class="restyle-category-btn px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Moods</button>
+                    <button onclick="selectRestyleCategory('Lighting', this)" class="restyle-category-btn px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Lighting</button>
+                    <button onclick="selectRestyleCategory('Colors', this)" class="restyle-category-btn px-4 py-1.5 rounded-full bg-[#2a2f32] text-[#8696a0] hover:text-white text-[14px] font-medium whitespace-nowrap shrink-0 transition-colors">Colors</button>
                 </div>
                 
                 <!-- Style Chips (Scrollable) -->
-                <div class="flex gap-3 overflow-x-auto custom-scrollbar pb-2 px-1">
-                    <!-- 3D -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('3D', this)">
-                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-gray-200 to-gray-500 shadow-inner flex items-center justify-center text-[24px]">
-                            🧊
+                <div class="overflow-x-auto custom-scrollbar pb-2 px-1">
+                    <!-- Featured -->
+                    <div id="restyle_group_Featured" class="restyle-group flex gap-3">
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('3D', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-gray-200 to-gray-500 shadow-inner flex items-center justify-center text-[24px]">🧊</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">3D</span>
                         </div>
-                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">3D</span>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Anime', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-pink-300 to-purple-400 shadow-inner flex items-center justify-center text-[24px]">🌸</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Anime</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Papercraft', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-yellow-100 to-orange-300 shadow-inner flex items-center justify-center text-[24px]">📄</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Paper</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Illustrated', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-blue-300 to-green-300 shadow-inner flex items-center justify-center text-[24px]">🎨</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Illustrated</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Low Poly', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-purple-400 to-indigo-600 shadow-inner flex items-center justify-center text-[24px]">💠</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Low Poly</span>
+                        </div>
                     </div>
-                    <!-- Anime -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Anime', this)">
-                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-pink-300 to-purple-400 shadow-inner flex items-center justify-center text-[24px]">
-                            🌸
+                    
+                    <!-- Styles -->
+                    <div id="restyle_group_Styles" class="restyle-group hidden flex gap-3">
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Realistic', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-gray-700 to-gray-900 shadow-inner flex items-center justify-center text-[24px]">📸</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Realistic</span>
                         </div>
-                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Anime</span>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Cyberpunk', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-pink-600 to-blue-600 shadow-inner flex items-center justify-center text-[24px]">🌆</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Cyberpunk</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Watercolor', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-cyan-300 to-blue-200 shadow-inner flex items-center justify-center text-[24px]">🖌️</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Watercolor</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Pixel Art', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-green-400 to-green-600 shadow-inner flex items-center justify-center text-[24px]">👾</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Pixel Art</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Sketch', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-gray-100 to-gray-300 shadow-inner flex items-center justify-center text-[24px]">✏️</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Sketch</span>
+                        </div>
                     </div>
-                    <!-- Paper -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Papercraft', this)">
-                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-yellow-100 to-orange-300 shadow-inner flex items-center justify-center text-[24px]">
-                            📄
+                    
+                    <!-- Moods -->
+                    <div id="restyle_group_Moods" class="restyle-group hidden flex gap-3">
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Dark', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-gray-800 to-black shadow-inner flex items-center justify-center text-[24px]">🌑</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Dark</span>
                         </div>
-                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Paper</span>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Bright', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-yellow-200 to-orange-100 shadow-inner flex items-center justify-center text-[24px]">☀️</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Bright</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Serene', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-blue-100 to-teal-100 shadow-inner flex items-center justify-center text-[24px]">🍃</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Serene</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Dramatic', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-red-700 to-black shadow-inner flex items-center justify-center text-[24px]">🎭</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Dramatic</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Romantic', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-pink-200 to-red-200 shadow-inner flex items-center justify-center text-[24px]">❤️</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Romantic</span>
+                        </div>
                     </div>
-                    <!-- Illustrated -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Illustrated', this)">
-                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-blue-300 to-green-300 shadow-inner flex items-center justify-center text-[24px]">
-                            🎨
+                    
+                    <!-- Lighting -->
+                    <div id="restyle_group_Lighting" class="restyle-group hidden flex gap-3">
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Cinematic Lighting', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-indigo-900 to-purple-800 shadow-inner flex items-center justify-center text-[24px]">🎬</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Cinematic</span>
                         </div>
-                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Illustrated</span>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Neon Lighting', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-purple-500 to-pink-500 shadow-inner flex items-center justify-center text-[24px]">🚥</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Neon</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Golden Hour', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-orange-400 to-yellow-500 shadow-inner flex items-center justify-center text-[24px]">🌅</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Golden Hour</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Studio Lighting', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-gray-100 to-gray-400 shadow-inner flex items-center justify-center text-[24px]">💡</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Studio</span>
+                        </div>
                     </div>
-                     <!-- Low Poly -->
-                    <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Low Poly', this)">
-                        <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-purple-400 to-indigo-600 shadow-inner flex items-center justify-center text-[24px]">
-                            💠
+                    
+                    <!-- Colors -->
+                    <div id="restyle_group_Colors" class="restyle-group hidden flex gap-3">
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Pastel Colors', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-pink-100 to-blue-100 shadow-inner flex items-center justify-center text-[24px]">🍬</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Pastel</span>
                         </div>
-                        <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Low Poly</span>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Vibrant Colors', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-red-500 to-yellow-500 shadow-inner flex items-center justify-center text-[24px]">🌈</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Vibrant</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Monochromatic', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-gray-400 to-gray-600 shadow-inner flex items-center justify-center text-[24px]">⬜</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Monochrome</span>
+                        </div>
+                        <div class="flex flex-col items-center gap-2 cursor-pointer shrink-0 group" onclick="selectStyle('Sepia', this)">
+                            <div class="w-[72px] h-[72px] rounded-xl overflow-hidden border-2 border-transparent group-hover:opacity-80 transition-opacity style-thumb bg-gradient-to-br from-orange-200 to-orange-400 shadow-inner flex items-center justify-center text-[24px]">📜</div>
+                            <span class="text-[#8696a0] text-[13px] font-medium transition-colors">Sepia</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1271,7 +1363,11 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': window.csrf || document.querySelector('meta[name="csrf-token"]')?.content || ''
                 },
-                body: JSON.stringify({ prompt: promptText }),
+                body: JSON.stringify({ 
+                    prompt: promptText,
+                    width: window.innerWidth,
+                    height: window.innerHeight
+                }),
                 signal: window.aiGenerationController.signal
             });
             
@@ -1306,8 +1402,8 @@
             slide.className = 'min-w-full h-full flex items-center justify-center px-4 cursor-pointer';
             
             // Add a container with rounded corners and shadow to match the UI precisely
-            slide.innerHTML = `<div class="relative h-full w-full max-w-[280px] aspect-[9/16] rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 ${idx === window.currentAiVariationIndex ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}">
-                <img src="${url}" class="w-full h-full object-cover aspect-[9/16]" loading="lazy">
+            slide.innerHTML = `<div class="relative w-full max-w-[280px] dynamic-aspect-ratio rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 ${idx === window.currentAiVariationIndex ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}">
+                <img src="${url}" class="w-full h-full object-cover dynamic-aspect-ratio" loading="lazy">
             </div>`;
             track.appendChild(slide);
             
@@ -1328,9 +1424,9 @@
         for (let i = 0; i < slides.length; i++) {
             const innerDiv = slides[i].querySelector('div');
             if (i === index) {
-                innerDiv.className = 'relative h-full w-full max-w-[280px] aspect-[9/16] rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 scale-100 opacity-100';
+                innerDiv.className = 'relative w-full max-w-[280px] dynamic-aspect-ratio rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 scale-100 opacity-100';
             } else {
-                innerDiv.className = 'relative h-full w-full max-w-[280px] aspect-[9/16] rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 scale-95 opacity-50';
+                innerDiv.className = 'relative w-full max-w-[280px] dynamic-aspect-ratio rounded-[24px] overflow-hidden shadow-2xl transition-all duration-300 scale-95 opacity-50';
             }
         }
     };
@@ -1505,7 +1601,7 @@
             
             // Dynamically load new image
             const img = document.getElementById('ai_edit_preview_img');
-            const newSrc = `https://image.pollinations.ai/prompt/${encodeURIComponent(window.tempEditPrompt)}?width=400&height=711&nologo=true&seed=${Math.floor(Math.random()*100000)}`;
+            const newSrc = `https://image.pollinations.ai/prompt/${encodeURIComponent(window.tempEditPrompt)}?width=${window.innerWidth}&height=${window.innerHeight}&nologo=true&model=flux&enhance=true&seed=${Math.floor(Math.random()*100000)}`;
             
             img.onload = function() {
                 document.getElementById('ai_edit_loading').classList.add('hidden');
@@ -1574,7 +1670,7 @@
         
         // Dynamically load new image
         const img = document.getElementById('ai_restyle_preview_img');
-        const newSrc = `https://image.pollinations.ai/prompt/${encodeURIComponent(window.tempRestylePrompt)}?width=400&height=711&nologo=true&seed=${Math.floor(Math.random()*100000)}`;
+        const newSrc = `https://image.pollinations.ai/prompt/${encodeURIComponent(window.tempRestylePrompt)}?width=${window.innerWidth}&height=${window.innerHeight}&nologo=true&model=flux&enhance=true&seed=${Math.floor(Math.random()*100000)}`;
         
         img.onload = function() {
             document.getElementById('ai_restyle_loading').classList.add('hidden');
@@ -1602,5 +1698,36 @@
         goToAiVariation(window.currentAiVariationIndex);
         applyAiThemeSelection();
     };
+
+    window.selectRestyleCategory = function(category, element) {
+        // Reset all buttons
+        document.querySelectorAll('.restyle-category-btn').forEach(btn => {
+            btn.classList.remove('bg-[#1e3a2f]', 'text-white');
+            btn.classList.add('bg-[#2a2f32]', 'text-[#8696a0]');
+        });
+        
+        // Set active button
+        element.classList.remove('bg-[#2a2f32]', 'text-[#8696a0]');
+        element.classList.add('bg-[#1e3a2f]', 'text-white');
+        
+        // Hide all groups
+        document.querySelectorAll('.restyle-group').forEach(group => {
+            group.classList.add('hidden');
+        });
+        
+        // Show active group
+        document.getElementById('restyle_group_' + category).classList.remove('hidden');
+    };
+
+    window.updateDynamicAspectRatios = function() {
+        const ratio = window.innerWidth + ' / ' + window.innerHeight;
+        document.querySelectorAll('.dynamic-aspect-ratio').forEach(el => {
+            el.style.aspectRatio = ratio;
+        });
+    };
+    window.addEventListener('resize', window.updateDynamicAspectRatios);
+    document.addEventListener('DOMContentLoaded', window.updateDynamicAspectRatios);
+    // Make sure to call it initially in case the DOM is already loaded when this script runs
+    window.updateDynamicAspectRatios();
 
 </script>
