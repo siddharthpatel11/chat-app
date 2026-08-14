@@ -129,21 +129,21 @@
     // We only need 15. The screenshot shows 16 colors actually (4x4). I'll use 16 to match the grid.
 
     let selectedThemeColorIndex = 0;
-    if (window.backendAppearance && window.backendAppearance.app_theme_color_index !== undefined) {
+    let storedTheme = localStorage.getItem('whatsapp_app_theme_color_index');
+    if (storedTheme !== null) {
+        selectedThemeColorIndex = parseInt(storedTheme);
+    } else if (window.backendAppearance && window.backendAppearance.app_theme_color_index !== undefined) {
         selectedThemeColorIndex = parseInt(window.backendAppearance.app_theme_color_index);
         localStorage.setItem('whatsapp_app_theme_color_index', selectedThemeColorIndex);
-    } else {
-        let stored = localStorage.getItem('whatsapp_app_theme_color_index');
-        if (stored !== null) selectedThemeColorIndex = parseInt(stored);
     }
 
     let currentDarkMode = 'dark';
-    if (window.backendAppearance && window.backendAppearance.app_dark_mode !== undefined) {
+    let storedDark = localStorage.getItem('whatsapp_app_dark_mode');
+    if (storedDark !== null) {
+        currentDarkMode = storedDark;
+    } else if (window.backendAppearance && window.backendAppearance.app_dark_mode !== undefined) {
         currentDarkMode = window.backendAppearance.app_dark_mode;
         localStorage.setItem('whatsapp_app_dark_mode', currentDarkMode);
-    } else {
-        let stored = localStorage.getItem('whatsapp_app_dark_mode');
-        if (stored !== null) currentDarkMode = stored;
     }
 
     function renderAppThemeColors() {
@@ -171,15 +171,8 @@
         renderAppThemeColors();
         applyGlobalThemeColor();
         
-        // Save to backend
-        fetch('/api/settings/appearance', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('whatsapp_token')
-            },
-            body: JSON.stringify({ app_theme_color_index: index })
-        }).catch(err => console.error('Error saving theme color:', err));
+        // Save to backend (disabled for web)
+        // fetch('/api/v1/settings/appearance', { ... })
     }
 
     function resetAppTheme() {
@@ -275,16 +268,6 @@
         
         applyDarkMode();
         closeDarkModeModal();
-        
-        // Save to backend
-        fetch('/api/settings/appearance', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + localStorage.getItem('whatsapp_token')
-            },
-            body: JSON.stringify({ app_dark_mode: selected })
-        }).catch(err => console.error('Error saving dark mode:', err));
     }
     
     function applyDarkMode() {
@@ -292,10 +275,12 @@
         const isDark = currentDarkMode === 'dark' || (currentDarkMode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
         if (isDark) {
             document.documentElement.classList.add('dark');
+            document.documentElement.classList.remove('light-theme');
         } else {
             // Note: If the entire app was built strictly for dark mode, this might look weird if no light classes were added.
             // But we will respect the dark class toggle.
             document.documentElement.classList.remove('dark');
+            document.documentElement.classList.add('light-theme');
         }
     }
 

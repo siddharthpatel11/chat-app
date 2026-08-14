@@ -140,28 +140,24 @@
                 --app-primary: #00a884;
                 --app-primary-hover: #00bfa5;
             }
-            .bg-\[\#00a884\] { background-color: #00a884 !important; }
-            .bg-\[\#00bfa5\] { background-color: #00bfa5 !important; }
-            .bg-\[\#00bfa5\] { background-color: #00bfa5 !important; }
-            .bg-\[\#00bfa5\] { background-color: #00bfa5 !important; }
-            .bg-\[\#008f72\] { background-color: #00bfa5 !important; }
-            .text-\[\#00a884\] { color: #00a884 !important; }
-            .border-\[\#00a884\] { border-color: #00a884 !important; }
-            .border-\[\#00bfa5\] { border-color: #00bfa5 !important; }
-            .focus\:border-\[\#00a884\]:focus { border-color: #00a884 !important; }
-            .focus\:border-\[\#00bfa5\]:focus { border-color: #00bfa5 !important; }
-            .focus\:ring-\[\#00a884\]:focus { --tw-ring-color: #00a884 !important; }
-            .hover\:text-\[\#00a884\]:hover { color: #00a884 !important; }
-            .hover\:text-\[\#00bfa5\]:hover { color: #00bfa5 !important; }
-            .hover\:bg-\[\#00a884\]:hover { background-color: #00a884 !important; }
-            .hover\:bg-\[\#00bfa5\]:hover { background-color: #00bfa5 !important; }
-            .hover\:bg-\[\#00bfa5\]:hover { background-color: #00bfa5 !important; }
-            .hover\:bg-\[\#00bfa5\]:hover { background-color: #00bfa5 !important; }
-            .hover\:bg-\[\#008f72\]:hover { background-color: #00bfa5 !important; }
+            .bg-\[\#00a884\] { background-color: var(--app-primary) !important; }
+            .bg-\[\#00bfa5\] { background-color: var(--app-primary-hover) !important; }
+            .bg-\[\#008f72\] { background-color: var(--app-primary-hover) !important; }
+            .text-\[\#00a884\] { color: var(--app-primary) !important; }
+            .border-\[\#00a884\] { border-color: var(--app-primary) !important; }
+            .border-\[\#00bfa5\] { border-color: var(--app-primary-hover) !important; }
+            .focus\:border-\[\#00a884\]:focus { border-color: var(--app-primary) !important; }
+            .focus\:border-\[\#00bfa5\]:focus { border-color: var(--app-primary-hover) !important; }
+            .focus\:ring-\[\#00a884\]:focus { --tw-ring-color: var(--app-primary) !important; }
+            .hover\:text-\[\#00a884\]:hover { color: var(--app-primary) !important; }
+            .hover\:text-\[\#00bfa5\]:hover { color: var(--app-primary-hover) !important; }
+            .hover\:bg-\[\#00a884\]:hover { background-color: var(--app-primary) !important; }
+            .hover\:bg-\[\#00bfa5\]:hover { background-color: var(--app-primary-hover) !important; }
+            .hover\:bg-\[\#008f72\]:hover { background-color: var(--app-primary-hover) !important; }
             
             /* Fill color overrides for SVGs */
-            svg[fill="#00a884"], path[fill="#00a884"] { fill: #00a884 !important; }
-            .text-\[\#00a884\] svg, .text-\[\#00a884\] path { fill: #00a884 !important; }
+            svg[fill="#00a884"], path[fill="#00a884"] { fill: var(--app-primary) !important; }
+            .text-\[\#00a884\] svg, .text-\[\#00a884\] path { fill: var(--app-primary) !important; }
         </style>
     @endpush
 
@@ -1043,7 +1039,7 @@
                             <div class="flex flex-col items-center gap-4 group cursor-pointer"
                                 onclick="selectFile('.pdf,.doc,.docx')">
                                 <div
-                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#8696a0] group-hover:bg-[#2a3942] transition-all duration-300">
+                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#00a884] group-hover:bg-[#2a3942] transition-all duration-300">
                                     <svg viewBox="0 0 24 24" width="36" height="36" fill="none"
                                         stroke="currentColor" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -1058,7 +1054,7 @@
                             <div class="flex flex-col items-center gap-4 group cursor-pointer"
                                 onclick="toggleNewContact()">
                                 <div
-                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#8696a0] group-hover:bg-[#2a3942] transition-all duration-300">
+                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#00a884] group-hover:bg-[#2a3942] transition-all duration-300">
                                     <svg viewBox="0 0 24 24" width="40" height="40" fill="none"
                                         stroke="currentColor" stroke-width="1.5">
                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -1071,7 +1067,7 @@
                             <div class="flex flex-col items-center gap-4 group cursor-pointer"
                                 onclick="window.openMetaAiChat()">
                                 <div
-                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#d33682] group-hover:bg-[#2a3942] transition-all duration-300">
+                                    class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#00a884] group-hover:bg-[#2a3942] transition-all duration-300">
                                     <div class="relative w-10 h-10 flex items-center justify-center">
                                         <div class="absolute inset-0 border-2 border-current rounded-full opacity-40">
                                         </div>

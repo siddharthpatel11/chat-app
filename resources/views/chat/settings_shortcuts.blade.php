@@ -1,47 +1,58 @@
 <div id="settings_shortcuts_view" class="hidden flex-col items-center justify-center flex-1 bg-[#0b141a] transition-all duration-300">
-    <div class="flex gap-8">
+    <div class="flex gap-14 mb-8">
         <!-- Send Document -->
-        <div class="flex flex-col items-center gap-3 group cursor-pointer">
-            <div class="w-[120px] h-[120px] bg-[#2a3942] rounded-3xl flex items-center justify-center text-[#8696a0] group-hover:bg-[#384b57] transition-all transform group-hover:scale-105 shadow-lg">
-                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                    <line x1="16" y1="13" x2="8" y2="13"></line>
-                    <line x1="16" y1="17" x2="8" y2="17"></line>
-                    <polyline points="10 9 9 9 8 9"></polyline>
+        <div class="flex flex-col items-center gap-4 group cursor-pointer"
+            onclick="selectFile('.pdf,.doc,.docx')">
+            <div
+                class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#00a884] group-hover:bg-[#2a3942] transition-all duration-300">
+                <svg viewBox="0 0 24 24" width="36" height="36" fill="none"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9 12h6m-6 3h6m-6 3h6" />
                 </svg>
             </div>
-            <span class="text-[#8696a0] text-sm font-medium group-hover:text-[#e9edef] transition-colors">Send document</span>
+            <span class="text-[#8696a0] text-[13px] font-normal">Send document</span>
         </div>
-
         <!-- Add Contact -->
-        <div class="flex flex-col items-center gap-3 group cursor-pointer">
-            <div class="w-[120px] h-[120px] bg-[#2a3942] rounded-3xl flex items-center justify-center text-[#8696a0] group-hover:bg-[#384b57] transition-all transform group-hover:scale-105 shadow-lg">
-                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="8.5" cy="7" r="4"></circle>
-                    <line x1="20" y1="8" x2="20" y2="14"></line>
-                    <line x1="23" y1="11" x2="17" y2="11"></line>
+        <div class="flex flex-col items-center gap-4 group cursor-pointer"
+            onclick="toggleNewContact()">
+            <div
+                class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#00a884] group-hover:bg-[#2a3942] transition-all duration-300">
+                <svg viewBox="0 0 24 24" width="40" height="40" fill="none"
+                    stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
                 </svg>
             </div>
-            <span class="text-[#8696a0] text-sm font-medium group-hover:text-[#e9edef] transition-colors">Add contact</span>
+            <span class="text-[#8696a0] text-[13px] font-normal">Add contact</span>
         </div>
-
         <!-- Ask Meta AI -->
-        <div class="flex flex-col items-center gap-3 group cursor-pointer">
-            <div class="w-[120px] h-[120px] bg-[#2a3942] rounded-3xl flex items-center justify-center group-hover:bg-[#384b57] transition-all transform group-hover:scale-105 shadow-lg overflow-hidden">
-                <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="url(#ai_gradient)" stroke-width="2">
-                    <defs>
-                        <linearGradient id="ai_gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#ec4899;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M12 2v2m0 16v2m8-10h2m-20 0h2m15.364-6.364l-1.414 1.414m-11.314 11.314l-1.414 1.414m0-14.142l1.414 1.414m11.314 11.314l1.414-1.414"></path>
-                    <circle cx="12" cy="12" r="4"></circle>
-                </svg>
+        <div class="flex flex-col items-center gap-4 group cursor-pointer"
+            onclick="window.openMetaAiChat()">
+            <div
+                class="w-[110px] h-[110px] rounded-[28px] bg-[#202c33] flex items-center justify-center text-[#00a884] group-hover:bg-[#2a3942] transition-all duration-300">
+                <div class="relative w-10 h-10 flex items-center justify-center">
+                    <div class="absolute inset-0 border-2 border-current rounded-full opacity-40">
+                    </div>
+                    <div class="w-5 h-5 border-2 border-current rounded-full"></div>
+                    <!-- Dots -->
+                    <div
+                        class="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-current rounded-full">
+                    </div>
+                    <div
+                        class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-current rounded-full">
+                    </div>
+                    <div
+                        class="absolute top-1/2 -left-1 -translate-y-1/2 w-1.5 h-1.5 bg-current rounded-full">
+                    </div>
+                    <div
+                        class="absolute top-1/2 -right-1 -translate-y-1/2 w-1.5 h-1.5 bg-current rounded-full">
+                    </div>
+                </div>
             </div>
-            <span class="text-[#8696a0] text-sm font-medium group-hover:text-[#e9edef] transition-colors">Ask Meta AI</span>
+            <span class="text-[#8696a0] text-[13px] font-normal">Ask Meta AI</span>
         </div>
     </div>
 </div>
