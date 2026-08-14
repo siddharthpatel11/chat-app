@@ -83,6 +83,10 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
 
     Route::post('/settings/appearance', [SettingsApiController::class, 'saveAppearanceSettings']);
     
+    // Customization APIs
+    Route::post('/customization/app-appearance', [\App\Http\Controllers\Api\CustomizationApiController::class, 'saveAppAppearance']);
+    Route::post('/customization/default-chat-theme', [\App\Http\Controllers\Api\CustomizationApiController::class, 'saveDefaultChatTheme']);
+    Route::post('/customization/chat-theme/{chatId}', [\App\Http\Controllers\Api\CustomizationApiController::class, 'saveChatSpecificTheme']);
     // Disappearing Messages API
     Route::post('/settings/default-message-timer', [SettingsApiController::class, 'setDefaultMessageTimer']);
     Route::post('/settings/disappearing-message-timer', [SettingsApiController::class, 'setDisappearingMessageTimer']);
