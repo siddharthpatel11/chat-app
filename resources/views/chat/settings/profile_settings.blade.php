@@ -183,6 +183,8 @@
             'privacy_settings_panel',
             'chats_settings_panel',
             'appearance_settings_panel',
+            'app_icon_settings_panel',
+            'app_theme_settings_panel',
             'chat_theme_panel',
             'chats_hide_panel',
             'video_voice_settings_panel',
@@ -263,7 +265,7 @@
         // Check if settings_panel or ANY settings subpanel is currently visible
         const settingsPanels = [
             'settings_panel', 'edit_profile_panel', 'general_settings_panel', 'privacy_settings_panel',
-            'chats_settings_panel', 'appearance_settings_panel', 'chat_theme_panel', 'video_voice_settings_panel', 'notifications_settings_panel',
+            'chats_settings_panel', 'appearance_settings_panel', 'app_icon_settings_panel', 'app_theme_settings_panel', 'chat_theme_panel', 'video_voice_settings_panel', 'notifications_settings_panel',
             'help_feedback_settings_panel', 'storage_and_data_settings_panel', 'manage_storage_panel', 'manage_storage_larger_than_5mb_panel', 'manage_storage_chat_details_panel', 'account_settings_panel', 'security_settings_panel',
             'privacy_last_seen_panel', 'privacy_status_panel', 'privacy_profile_photo_panel',
             'privacy_about_panel', 'privacy_exclude_panel', 'privacy_blocked_contacts_panel',

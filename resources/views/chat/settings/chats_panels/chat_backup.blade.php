@@ -30,7 +30,7 @@
             </div>
 
             <div class="flex items-center">
-                <button id="chat_backup_btn" onclick="startChatBackup()" class="bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] font-medium text-[14px] py-2.5 px-6 rounded-full transition-colors mb-6">
+                <button id="chat_backup_btn" onclick="startChatBackup()" class="bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-medium text-[14px] py-2.5 px-6 rounded-full transition-colors mb-6">
                     Back up
                 </button>
                 <button id="chat_restore_btn" onclick="startChatRestore()" class="hidden bg-[#202c33] hover:bg-[#2a3942] border border-[#313d45] text-[#00a884] font-medium text-[14px] py-2.5 px-6 rounded-full transition-colors mb-6 ml-4">
@@ -201,7 +201,7 @@
         </p>
         
         <div id="e2e_actions_off" class="w-full flex flex-col gap-4">
-            <button onclick="openE2EPasswordModal('on')" class="w-full bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] font-medium text-[15px] py-3 rounded-full transition-colors">
+            <button onclick="openE2EPasswordModal('on')" class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-medium text-[15px] py-3 rounded-full transition-colors">
                 Turn On
             </button>
         </div>
@@ -253,7 +253,7 @@
             <button onclick="closeRestoreConfirmModal()" class="text-[#aebac1] font-medium hover:bg-white/5 px-4 py-2 rounded transition-colors">
                 Cancel
             </button>
-            <button onclick="confirmRestoreAction()" class="bg-[#00a884] text-[#111b21] font-medium hover:bg-[#06cf9c] px-4 py-2 rounded transition-colors">
+            <button onclick="confirmRestoreAction()" class="bg-[#00a884] text-[#111b21] font-medium hover:bg-[#00bfa5] px-4 py-2 rounded transition-colors">
                 Restore
             </button>
         </div>
@@ -274,7 +274,7 @@
         </p>
         
         <div class="w-full flex flex-col gap-3">
-            <button id="initial_restore_btn" onclick="startInitialRestore()" class="w-full bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] font-medium py-3 rounded-full transition-colors flex items-center justify-center gap-2">
+            <button id="initial_restore_btn" onclick="startInitialRestore()" class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-medium py-3 rounded-full transition-colors flex items-center justify-center gap-2">
                 Restore from Google Drive
             </button>
             <button onclick="skipInitialRestore()" class="w-full text-[#aebac1] hover:text-[#e9edef] font-medium py-3 transition-colors">

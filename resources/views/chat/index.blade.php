@@ -134,6 +134,34 @@
                     min-width: 300px !important;
                 }
             }
+
+            /* Global App Theme Overrides */
+            html {
+                --app-primary: #00a884;
+                --app-primary-hover: #00bfa5;
+            }
+            .bg-\[\#00a884\] { background-color: #00a884 !important; }
+            .bg-\[\#00bfa5\] { background-color: #00bfa5 !important; }
+            .bg-\[\#00bfa5\] { background-color: #00bfa5 !important; }
+            .bg-\[\#00bfa5\] { background-color: #00bfa5 !important; }
+            .bg-\[\#008f72\] { background-color: #00bfa5 !important; }
+            .text-\[\#00a884\] { color: #00a884 !important; }
+            .border-\[\#00a884\] { border-color: #00a884 !important; }
+            .border-\[\#00bfa5\] { border-color: #00bfa5 !important; }
+            .focus\:border-\[\#00a884\]:focus { border-color: #00a884 !important; }
+            .focus\:border-\[\#00bfa5\]:focus { border-color: #00bfa5 !important; }
+            .focus\:ring-\[\#00a884\]:focus { --tw-ring-color: #00a884 !important; }
+            .hover\:text-\[\#00a884\]:hover { color: #00a884 !important; }
+            .hover\:text-\[\#00bfa5\]:hover { color: #00bfa5 !important; }
+            .hover\:bg-\[\#00a884\]:hover { background-color: #00a884 !important; }
+            .hover\:bg-\[\#00bfa5\]:hover { background-color: #00bfa5 !important; }
+            .hover\:bg-\[\#00bfa5\]:hover { background-color: #00bfa5 !important; }
+            .hover\:bg-\[\#00bfa5\]:hover { background-color: #00bfa5 !important; }
+            .hover\:bg-\[\#008f72\]:hover { background-color: #00bfa5 !important; }
+            
+            /* Fill color overrides for SVGs */
+            svg[fill="#00a884"], path[fill="#00a884"] { fill: #00a884 !important; }
+            .text-\[\#00a884\] svg, .text-\[\#00a884\] path { fill: #00a884 !important; }
         </style>
     @endpush
 
@@ -288,7 +316,7 @@
                     <button id="delete_everyone_btn"
                         class="hidden bg-[#ea005e] text-white font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#ff1a75] transition-all active:scale-95 shadow-lg w-full text-center">Delete for everyone</button>
                     <button id="delete_confirm_btn"
-                        class="bg-[#00a884] text-[#111b21] font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg w-full text-center">Delete for me</button>
+                        class="bg-[#00a884] text-[#111b21] font-bold text-[14px] px-6 py-2.5 rounded-full hover:bg-[#00bfa5] transition-all active:scale-95 shadow-lg w-full text-center">Delete for me</button>
                     <button onclick="window.closeDeleteModal()"
                         class="text-[#8696a0] font-medium text-[14px] hover:bg-white/5 px-4 py-2 rounded-lg transition-colors w-full text-center">Cancel</button>
                 </div>
@@ -306,7 +334,7 @@
                     <button onclick="window.closeLogoutModal()"
                         class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-4 py-2 rounded-lg transition-colors border border-gray-600/30">Cancel</button>
                     <button onclick="document.getElementById('logout-form').submit();"
-                        class="bg-[#00a884] text-[#111b21] font-medium text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg">Log
+                        class="bg-[#00a884] text-[#111b21] font-medium text-[14px] px-6 py-2.5 rounded-full hover:bg-[#00bfa5] transition-all active:scale-95 shadow-lg">Log
                         out</button>
                 </div>
             </div>
@@ -749,6 +777,8 @@
             @include('chat.settings.chats_panels.transfer_chat_history')
             @include('chat.settings.appearance')
             @include('chat.settings.appearance_panels.chat_theme')
+            @include('chat.settings.appearance_panels.app_icon')
+            @include('chat.settings.appearance_panels.app_theme')
             @include('chat.settings.account')
             @include('chat.settings.security_notifications')
             @include('chat.settings.video_voice_panels.video_voice')
@@ -1151,7 +1181,7 @@
                                                 <!-- Call Action Buttons -->
                                                 <div class="flex gap-3 mt-6">
                                                     <button onclick="startVoiceCall()"
-                                                        class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
+                                                        class="flex-1 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
                                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                                             <path
                                                                 d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
@@ -1160,7 +1190,7 @@
                                                         Voice
                                                     </button>
                                                     <button onclick="startVideoCall()"
-                                                        class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
+                                                        class="flex-1 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
                                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                                             <path
                                                                 d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
@@ -1372,8 +1402,10 @@
                             </div>
                         </div>
 
-                        <div id="messages"
-                            class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]">
+                        <div class="flex-1 relative flex flex-col overflow-hidden bg-[#0b141a] chat-bg">
+                            <div id="messages"
+                                class="flex-1 overflow-y-auto p-4 space-y-1 scroll-smooth relative z-10 custom-scrollbar">
+                            </div>
                         </div>
 
                         <div
@@ -1704,7 +1736,7 @@
                                 </div>
 
                                 <button id="action_btn" onclick="handleActionBtn()"
-                                    class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
+                                    class="bg-[#00a884] hover:bg-[#00bfa5] text-white rounded-full w-10 h-10 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
                                     <!-- Mic SVG -->
                                     <svg id="mic_icon" viewBox="0 0 24 24" width="24" height="24"
                                         fill="currentColor">
@@ -2412,7 +2444,7 @@
                     </div>
                 </div>
                 <div class="h-px bg-white/10 my-1"></div>
-                <a href="${url}" target="_blank" onclick="event.stopPropagation();" class="w-full py-2 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] rounded-lg text-center font-bold text-sm block transition-all active:scale-[0.98] select-none">
+                <a href="${url}" target="_blank" onclick="event.stopPropagation();" class="w-full py-2 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] rounded-lg text-center font-bold text-sm block transition-all active:scale-[0.98] select-none">
                     Join call
                 </a>
             </div>
@@ -6456,7 +6488,7 @@
                                 </div>
                             </div>
                             <div class="mt-4 flex gap-2 pt-3 border-t border-white/5">
-                                <button onclick="window.open('${callLink}', '_blank')" class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-2 rounded-xl text-center text-sm font-bold transition-all active:scale-[0.98] focus:outline-none">
+                                <button onclick="window.open('${callLink}', '_blank')" class="flex-1 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] py-2 rounded-xl text-center text-sm font-bold transition-all active:scale-[0.98] focus:outline-none">
                                     Join call
                                 </button>
                             </div>
@@ -8666,14 +8698,14 @@
             <!-- Bottom Floating Action Bar -->
             <div class="p-4 bg-[#202c33] border-t border-white/5 shrink-0 flex gap-3 justify-end">
                 <button onclick="window.startGroupCallFromModal('voice')"
-                    class="bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-sm shrink-0">
+                    class="bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-sm shrink-0">
                     <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"></path>
                     </svg>
                     Voice
                 </button>
                 <button onclick="window.startGroupCallFromModal('video')"
-                    class="bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-sm shrink-0">
+                    class="bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-sm shrink-0">
                     <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path>
                     </svg>
@@ -8766,12 +8798,12 @@
 
                     <!-- Green Call Buttons (Voice & Video) -->
                     <div class="flex gap-4">
-                        <button onclick="window.submitDialerCall('voice')" class="w-14 h-14 rounded-full bg-[#00a884] hover:bg-[#06cf9c] active:scale-95 text-[#111b21] flex items-center justify-center shadow-lg transition-all focus:outline-none">
+                        <button onclick="window.submitDialerCall('voice')" class="w-14 h-14 rounded-full bg-[#00a884] hover:bg-[#00bfa5] active:scale-95 text-[#111b21] flex items-center justify-center shadow-lg transition-all focus:outline-none">
                             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                                 <path d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z"></path>
                             </svg>
                         </button>
-                        <button onclick="window.submitDialerCall('video')" class="w-14 h-14 rounded-full bg-[#00a884] hover:bg-[#06cf9c] active:scale-95 text-[#111b21] flex items-center justify-center shadow-lg transition-all focus:outline-none">
+                        <button onclick="window.submitDialerCall('video')" class="w-14 h-14 rounded-full bg-[#00a884] hover:bg-[#00bfa5] active:scale-95 text-[#111b21] flex items-center justify-center shadow-lg transition-all focus:outline-none">
                             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                                 <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"></path>
                             </svg>
@@ -8930,7 +8962,7 @@
                 </div>
 
                 <!-- Toggle End Time Button -->
-                <button type="button" id="schedule_toggle_endtime_btn" onclick="window.toggleScheduleEndTime()" class="text-[#00a884] hover:text-[#06cf9c] text-sm font-medium flex items-center gap-1.5 focus:outline-none self-start mt-1 transition-colors">
+                <button type="button" id="schedule_toggle_endtime_btn" onclick="window.toggleScheduleEndTime()" class="text-[#00a884] hover:text-[#00bfa5] text-sm font-medium flex items-center gap-1.5 focus:outline-none self-start mt-1 transition-colors">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                     <span id="schedule_toggle_endtime_text">Remove end time</span>
                 </button>
@@ -8989,7 +9021,7 @@
 
             <!-- Footer actions -->
             <div class="px-6 py-4 bg-[#202c33] border-t border-white/5 flex items-center justify-end shrink-0">
-                <button type="button" onclick="window.submitScheduledCall()" class="w-12 h-12 rounded-full bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] flex items-center justify-center shadow-lg transition-all active:scale-95 focus:outline-none">
+                <button type="button" onclick="window.submitScheduledCall()" class="w-12 h-12 rounded-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] flex items-center justify-center shadow-lg transition-all active:scale-95 focus:outline-none">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                         <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
                     </svg>
@@ -9101,11 +9133,11 @@
 
             <!-- Footer actions -->
             <div class="px-6 py-4 bg-[#202c33] border-t border-white/5 flex items-center justify-between shrink-0 font-['Inter']">
-                <button onclick="window.joinCallFromLink()" class="text-[#00a884] hover:text-[#06cf9c] font-bold text-base transition-colors focus:outline-none">
+                <button onclick="window.joinCallFromLink()" class="text-[#00a884] hover:text-[#00bfa5] font-bold text-base transition-colors focus:outline-none">
                     Join call
                 </button>
                 <button onclick="window.sendCallLinkToChat()"
-                    class="bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-[15px] focus:outline-none shrink-0">
+                    class="bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] px-5 py-2.5 rounded-full flex items-center gap-2 font-bold transition-all active:scale-95 text-[15px] focus:outline-none shrink-0">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
                     </svg>
@@ -9329,5 +9361,3 @@
         };
     </script>
 </x-app-layout>
-
-

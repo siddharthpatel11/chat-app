@@ -47,7 +47,7 @@
 
         <!-- Footer -->
         <div class="px-6 py-6 flex items-center justify-end shrink-0 mt-2">
-            <button onclick="closeKeyboardShortcutsModal()" class="px-6 py-2.5 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] rounded-full font-medium transition-colors text-[14px]">
+            <button onclick="closeKeyboardShortcutsModal()" class="px-6 py-2.5 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] rounded-full font-medium transition-colors text-[14px]">
                 OK
             </button>
         </div>

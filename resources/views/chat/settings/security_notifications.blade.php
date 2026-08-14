@@ -19,8 +19,8 @@
                     <path d="M12.5 15H80C86.9036 15 92.5 20.5964 92.5 27.5V67.5C92.5 74.4036 86.9036 80 80 80H42.5L20 100V80H12.5C5.59644 80 0 74.4036 0 67.5V27.5C0 20.5964 5.59644 15 12.5 15Z" fill="#E9FBC5"/>
                     <rect x="25" y="40" width="40" height="3" fill="#111B21"/>
                     <rect x="25" y="55" width="25" height="3" fill="#111B21"/>
-                    <rect x="65" y="45" width="45" height="40" rx="6" fill="#00A884"/>
-                    <path d="M72.5 45V32.5C72.5 24.2157 79.2157 17.5 87.5 17.5C95.7843 17.5 102.5 24.2157 102.5 32.5V45" stroke="#00A884" stroke-width="10" stroke-linecap="round"/>
+                    <rect x="65" y="45" width="45" height="40" rx="6" fill="#00a884"/>
+                    <path d="M72.5 45V32.5C72.5 24.2157 79.2157 17.5 87.5 17.5C95.7843 17.5 102.5 24.2157 102.5 32.5V45" stroke="#00a884" stroke-width="10" stroke-linecap="round"/>
                     <circle cx="87.5" cy="65" r="4" stroke="#111B21" stroke-width="2"/>
                 </svg>
             </div>

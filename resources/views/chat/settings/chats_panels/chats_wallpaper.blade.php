@@ -14,7 +14,7 @@
     <div class="flex-1 overflow-y-auto custom-scrollbar bg-[#111b21] py-4 px-6 flex flex-col h-full relative z-10">
 
         <div class="mb-4">
-            <button onclick="document.getElementById('global_wallpaper_upload').click()" class="bg-[#00a884] hover:bg-[#008f6f] text-[#111b21] px-4 py-2 rounded-md w-full font-medium transition-colors text-[14px]">
+            <button onclick="document.getElementById('global_wallpaper_upload').click()" class="bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] px-4 py-2 rounded-md w-full font-medium transition-colors text-[14px]">
                 Upload Custom Image
             </button>
             <input type="file" id="global_wallpaper_upload" accept="image/*" class="hidden" onchange="handleGlobalWallpaperUpload(event)">

@@ -185,7 +185,7 @@
 
         <!-- Fixed bottom button -->
         <div class="absolute bottom-6 left-6 right-6">
-            <button class="w-full bg-[#00a884] hover:bg-[#008f6f] text-[#111b21] font-medium text-[15px] py-[10px] rounded-full transition-colors" onclick="window.startScannerScreen()">
+            <button class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-medium text-[15px] py-[10px] rounded-full transition-colors" onclick="window.startScannerScreen()">
                 Continue
             </button>
         </div>
@@ -299,7 +299,7 @@
         </div>
         
         <div class="w-full pt-8 flex flex-col gap-3">
-            <button onclick="window.startTransferSync()" class="w-full bg-[#00a884] hover:bg-[#008f6f] text-[#111b21] font-medium text-[15px] py-[10px] rounded-full transition-colors shadow-lg">
+            <button onclick="window.startTransferSync()" class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-medium text-[15px] py-[10px] rounded-full transition-colors shadow-lg">
                 Accept and Continue
             </button>
             <button onclick="window.closeTransferChatHistoryPanel()" class="w-full bg-transparent hover:bg-white/5 text-[#8696a0] font-medium text-[15px] py-[10px] rounded-full transition-colors border border-gray-600/30">
@@ -345,7 +345,7 @@
         </div>
         
         <div class="w-full pt-8">
-            <button onclick="window.finishChatTransfer()" class="w-full bg-[#00a884] hover:bg-[#008f6f] text-[#111b21] font-medium text-[15px] py-[10px] rounded-full transition-colors">
+            <button onclick="window.finishChatTransfer()" class="w-full bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] font-medium text-[15px] py-[10px] rounded-full transition-colors">
                 Done
             </button>
         </div>

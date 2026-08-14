@@ -89,7 +89,7 @@
         </div>
 
         <!-- Send Button -->
-        <button onclick="window.postTextStatus()" class="w-14 h-14 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#06cf9c] active:scale-95 transition-all">
+        <button onclick="window.postTextStatus()" class="w-14 h-14 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#00bfa5] active:scale-95 transition-all">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" class="ml-1">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
             </svg>
@@ -281,3 +281,6 @@
         if (e.target.id === 'privacy_modal_overlay') window.closePrivacyModal();
     });
 </script>
+
+
+

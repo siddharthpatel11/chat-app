@@ -51,7 +51,7 @@
                     short.</p>
 
                 <button onclick="saveHideChatPassword()"
-                    class="w-full bg-[#00a884] text-[#111b21] font-semibold text-sm py-2.5 rounded-full hover:bg-[#06cf9c] transition-colors shadow-lg mt-4">
+                    class="w-full bg-[#00a884] text-[#111b21] font-semibold text-sm py-2.5 rounded-full hover:bg-[#00bfa5] transition-colors shadow-lg mt-4">
                     Create Password
                 </button>
             </div>
@@ -77,7 +77,7 @@
                 <p id="hide_chat_unlock_error" class="text-red-500 text-xs hidden text-center">Incorrect password.</p>
 
                 <button onclick="unlockHideChatPanel()"
-                    class="w-full bg-[#00a884] text-[#111b21] font-semibold text-sm py-2.5 rounded-full hover:bg-[#06cf9c] transition-colors shadow-lg mt-2">
+                    class="w-full bg-[#00a884] text-[#111b21] font-semibold text-sm py-2.5 rounded-full hover:bg-[#00bfa5] transition-colors shadow-lg mt-2">
                     Unlock
                 </button>
             </div>
@@ -149,7 +149,7 @@
             <button onclick="window.closeChangePasswordModal()"
                 class="flex-1 bg-[#2a3942] hover:bg-[#3b4a54] text-[#e9edef] font-medium text-[14px] py-2.5 rounded-full transition-colors">Cancel</button>
             <button onclick="changeHideChatPassword()"
-                class="flex-1 bg-[#00a884] text-[#111b21] font-semibold text-[14px] py-2.5 rounded-full hover:bg-[#06cf9c] transition-colors">Update</button>
+                class="flex-1 bg-[#00a884] text-[#111b21] font-semibold text-[14px] py-2.5 rounded-full hover:bg-[#00bfa5] transition-colors">Update</button>
         </div>
     </div>
 </div>
@@ -181,7 +181,7 @@
             <button onclick="window.closeHiddenChatClickUnlockModal()"
                 class="flex-1 bg-[#2a3942] hover:bg-[#3b4a54] text-[#e9edef] font-medium text-[14px] py-2 rounded-full transition-colors">Cancel</button>
             <button onclick="window.verifyHiddenChatClickUnlock()"
-                class="flex-1 bg-[#00a884] text-[#111b21] font-medium text-[14px] py-2 rounded-full hover:bg-[#06cf9c] transition-colors">Unlock</button>
+                class="flex-1 bg-[#00a884] text-[#111b21] font-medium text-[14px] py-2 rounded-full hover:bg-[#00bfa5] transition-colors">Unlock</button>
         </div>
     </div>
 </div>
@@ -478,7 +478,7 @@
                         <span class="text-[#e9edef] text-sm font-normal truncate">${name}</span>
                     </div>
                     <button onclick="unhideChat('${id}')"
-                        class="text-[#00a884] hover:text-[#06cf9c] text-xs font-semibold px-2 py-1 hover:bg-[#00a884]/10 rounded transition-colors shrink-0">
+                        class="text-[#00a884] hover:text-[#00bfa5] text-xs font-semibold px-2 py-1 hover:bg-[#00a884]/10 rounded transition-colors shrink-0">
                         Unhide
                     </button>
                 </div>

@@ -5,11 +5,28 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>WhatsApp</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+        <!-- Dynamic Manifest and Icon -->
+        <link rel="icon" type="image/svg+xml" href="/app-icon.svg">
+        <link rel="manifest" href="/manifest.json" crossorigin="use-credentials">
+
+        <!-- Fetch Appearance Settings from Firebase if authenticated -->
+        @php
+            $backendAppearance = [];
+            if (auth()->check()) {
+                $firebaseService = app(\App\Services\FirebaseService::class);
+                $userId = auth()->id();
+                $backendAppearance = $firebaseService->database()->getReference("users/{$userId}/settings/appearance")->getValue() ?: [];
+            }
+        @endphp
+        <script>
+            window.backendAppearance = @json($backendAppearance);
+        </script>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])

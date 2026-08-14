@@ -33,16 +33,8 @@
                 </div>
             </div>
 
-            <!-- WhatsApp Plus Header -->
-            <div class="flex items-center gap-2 mt-6 mb-4">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="#8696a0">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-                </svg>
-                <span class="text-[#8696a0] text-[14px] font-medium">WhatsApp Plus</span>
-            </div>
-
             <!-- App icon -->
-            <div class="flex items-center justify-between cursor-pointer hover:bg-[#202c33] -mx-6 px-6 py-4 transition-colors" onclick="window.showToast('App icon', 'Subscribe to WhatsApp Plus to change app icon')">
+            <div class="flex items-center justify-between cursor-pointer hover:bg-[#202c33] -mx-6 px-6 py-4 transition-colors" onclick="toggleAppIconPanel('appearance')">
                 <div class="flex items-center gap-4">
                     <div class="text-[#8696a0]">
                         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -64,7 +56,7 @@
             </div>
 
             <!-- App theme -->
-            <div class="flex items-center justify-between cursor-pointer hover:bg-[#202c33] -mx-6 px-6 py-4 transition-colors mb-2" onclick="window.showToast('App theme', 'Subscribe to WhatsApp Plus to change app theme')">
+            <div class="flex items-center justify-between cursor-pointer hover:bg-[#202c33] -mx-6 px-6 py-4 transition-colors mb-2" onclick="toggleAppThemePanel('appearance')">
                 <div class="flex items-center gap-4">
                     <div class="text-[#8696a0]">
                         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -77,10 +69,6 @@
                 <div class="w-6 h-6 bg-[#1a4a38] rounded-full border border-transparent"></div>
             </div>
 
-            <!-- Help text -->
-            <div class="text-[#8696a0] text-[14px] mt-4">
-                Subscribe to WhatsApp Plus to change your app icon, theme and more. <a href="#" class="text-[#00a884] hover:underline" onclick="window.showToast('WhatsApp Plus', 'Opening explore benefits...')">Explore benefits</a>
-            </div>
         </div>
     </div>
 </div>

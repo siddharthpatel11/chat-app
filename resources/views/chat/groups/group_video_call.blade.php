@@ -328,7 +328,7 @@
             </div>
             <div class="flex gap-2">
                 <button onclick="window.declineParticipant()" class="flex-1 py-1.5 bg-[#ef4444]/10 hover:bg-[#ef4444]/20 text-[#ef4444] rounded-lg text-sm font-semibold transition-colors focus:outline-none">Decline</button>
-                <button onclick="window.approveParticipant()" class="flex-1 py-1.5 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] rounded-lg text-sm font-semibold transition-colors focus:outline-none">Approve</button>
+                <button onclick="window.approveParticipant()" class="flex-1 py-1.5 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] rounded-lg text-sm font-semibold transition-colors focus:outline-none">Approve</button>
             </div>
         </div>
 
@@ -362,7 +362,7 @@
                     <h3 class="text-[#e9edef] text-xl font-semibold">Request Declined</h3>
                     <p class="text-[#8696a0] text-sm max-w-xs">Your request to join this call was declined by the organizer.</p>
                 </div>
-                <button onclick="window.location.href='/chat'" class="mt-4 px-6 py-2 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] rounded-full text-sm font-semibold transition-colors focus:outline-none">
+                <button onclick="window.location.href='/chat'" class="mt-4 px-6 py-2 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] rounded-full text-sm font-semibold transition-colors focus:outline-none">
                     Go Back
                 </button>
             </div>

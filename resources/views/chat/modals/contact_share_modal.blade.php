@@ -29,7 +29,7 @@
         </div>
 
         <!-- Send FAB -->
-        <button id="contact_share_send_btn" onclick="sendSelectedContacts()" class="absolute bottom-6 right-6 w-14 h-14 bg-[#00a884] rounded-full shadow-xl items-center justify-center text-white hover:bg-[#008f6f] transition-transform scale-0 flex z-30">
+        <button id="contact_share_send_btn" onclick="sendSelectedContacts()" class="absolute bottom-6 right-6 w-14 h-14 bg-[#00a884] rounded-full shadow-xl items-center justify-center text-white hover:bg-[#00bfa5] transition-transform scale-0 flex z-30">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
         </button>
 

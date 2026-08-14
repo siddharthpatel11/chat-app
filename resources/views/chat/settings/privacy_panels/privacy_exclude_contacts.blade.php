@@ -63,7 +63,7 @@
     <!-- Bottom Action Bar -->
     <div class="absolute bottom-0 left-0 w-full h-[88px] bg-[#111b21] flex items-center justify-between px-6 border-t border-[#313d45]">
         <div class="text-[#e9edef] text-[16px]" id="exclude_count_text">0 contacts excluded</div>
-        <button onclick="closePrivacyExcludePanel(true)" class="w-[50px] h-[50px] bg-[#00a884] rounded-full flex items-center justify-center hover:bg-[#008f6f] shadow-lg transition-colors">
+        <button onclick="closePrivacyExcludePanel(true)" class="w-[50px] h-[50px] bg-[#00a884] rounded-full flex items-center justify-center hover:bg-[#00bfa5] shadow-lg transition-colors">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
         </button>
     </div>

@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain, nativeImage } = require('electron')
 const path = require('path')
 
 function createWindow () {
@@ -9,7 +9,18 @@ function createWindow () {
     icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      preload: path.join(__dirname, 'preload.js')
+    }
+  })
+
+  // Handle icon updates from the web app
+  ipcMain.on('update-icon', (event, dataUrl) => {
+    try {
+      const image = nativeImage.createFromDataURL(dataUrl);
+      mainWindow.setIcon(image);
+    } catch (e) {
+      console.error('Failed to update icon:', e);
     }
   })
 

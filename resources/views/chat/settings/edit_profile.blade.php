@@ -234,7 +234,7 @@
             <canvas id="camera_canvas" class="hidden"></canvas>
 
             <button onclick="capturePhoto()"
-                class="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#00a884] hover:bg-[#06cf9c] rounded-full flex items-center justify-center shadow-2xl transform active:scale-90 transition-all">
+                class="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#00a884] hover:bg-[#00bfa5] rounded-full flex items-center justify-center shadow-2xl transform active:scale-90 transition-all">
                 <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor" class="text-[#111b21]">
                     <path
                         d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
@@ -591,3 +591,6 @@
         }
     });
 </script>
+
+
+

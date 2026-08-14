@@ -24,6 +24,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/manifest.json', [App\Http\Controllers\ManifestController::class, 'index'])->name('manifest');
+Route::get('/app-icon.svg', [App\Http\Controllers\ManifestController::class, 'icon'])->name('app-icon');
+
 Route::middleware('auth')->group(function () {
     Route::get('/chat', [ChatController::class, 'index']);
     Route::get('/chat/voice-call', [ChatController::class, 'voiceCall']);

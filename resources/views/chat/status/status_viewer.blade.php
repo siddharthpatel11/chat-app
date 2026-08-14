@@ -128,7 +128,7 @@
     <div id="status_reply_container" class="hidden absolute bottom-4 left-0 right-0 flex justify-center z-[610] px-4">
         <div class="bg-[#2a3942]/60 backdrop-blur-md rounded-full max-w-lg w-full flex items-center px-4 py-1.5 border border-white/10 shadow-lg">
             <input type="text" id="status_reply_input" onfocus="window.pauseStatusPlayback()" onblur="window.resumeStatusPlayback()" onkeydown="window.handleReplyKey(event)" placeholder="Reply" class="bg-transparent border-none focus:ring-0 text-white text-[15px] placeholder-white/60 flex-1 outline-none">
-            <button onclick="window.sendStatusReply()" class="text-[#00a884] hover:text-[#06cf9c] transition-colors p-2 shrink-0">
+            <button onclick="window.sendStatusReply()" class="text-[#00a884] hover:text-[#00bfa5] transition-colors p-2 shrink-0">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg>
             </button>
         </div>
@@ -523,3 +523,6 @@
         }
     });
 </script>
+
+
+

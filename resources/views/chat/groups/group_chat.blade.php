@@ -152,7 +152,7 @@
                             <div id="group_call_collapsed_footer" class="p-4 flex flex-col gap-3">
                                 <div class="flex gap-3">
                                     <button onclick="window.startGroupVoiceCall(false)"
-                                        class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
+                                        class="flex-1 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path
                                                 d="M20 15.5c-1.2 0-2.4-.2-3.6-.6-.3-.1-.7 0-1 .2l-2.2 2.2c-2.8-1.4-5.1-3.8-6.6-6.6l2.2-2.2c.3-.3.4-.7.2-1-.3-1.1-.5-2.3-.5-3.5 0-.6-.4-1-1-1H5c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1z">
@@ -161,7 +161,7 @@
                                         Voice Call
                                     </button>
                                     <button onclick="window.startGroupVideoCall(false)"
-                                        class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
+                                        class="flex-1 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                             <path
                                                 d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z">
@@ -306,7 +306,9 @@
         </div>
 
         <!-- Group Message List -->
-        <div id="group_messages" class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth bg-[#0b141a]">
+        <div class="flex-1 relative flex flex-col overflow-hidden bg-[#0b141a] chat-bg">
+            <div id="group_messages" class="flex-1 overflow-y-auto p-4 space-y-1 scroll-smooth relative z-10 custom-scrollbar">
+            </div>
         </div>
 
 
@@ -589,7 +591,7 @@
                 </div>
 
                 <button id="group_action_btn" onclick="handleGroupActionBtn()"
-                    class="bg-[#00a884] hover:bg-[#008f6f] text-white rounded-full w-11 h-11 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
+                    class="bg-[#00a884] hover:bg-[#00bfa5] text-white rounded-full w-11 h-11 flex items-center justify-center shadow-sm shrink-0 transition-colors focus:outline-none">
                     <svg id="group_mic_icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                         <path
                             d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.297 7.061 7.885v3.884h2.354v-3.884c3.884-.588 7.061-3.884 7.061-7.885h-2.002z">
@@ -6468,7 +6470,7 @@
                             </div>
                         </div>
                         <div class="mt-4 flex gap-2 pt-3 border-t border-white/5">
-                            <button onclick="window.open('${callLink}', '_blank')" class="flex-1 bg-[#00a884] hover:bg-[#06cf9c] text-[#111b21] py-2 rounded-xl text-center text-sm font-bold transition-all active:scale-[0.98] focus:outline-none">
+                            <button onclick="window.open('${callLink}', '_blank')" class="flex-1 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] py-2 rounded-xl text-center text-sm font-bold transition-all active:scale-[0.98] focus:outline-none">
                                 Join call
                             </button>
                         </div>

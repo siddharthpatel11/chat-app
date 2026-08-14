@@ -31,7 +31,7 @@
                 <input type="text" id="new_list_name_input" placeholder="List name" maxlength="25" class="w-full bg-[#2a3942] border border-[#313d45] rounded-lg px-4 py-2.5 text-[15px] text-[#d1d7db] placeholder-[#8696a0] focus:outline-none focus:border-[#00a884] transition-colors">
                 <div class="flex justify-end gap-3">
                     <button onclick="window.hideNewListInput()" class="px-5 py-2 rounded-full border border-[#313d45] text-[#00a884] hover:bg-[#182229] transition-colors text-[14px] font-medium focus:outline-none">Cancel</button>
-                    <button onclick="window.createNewList()" class="px-5 py-2 rounded-full bg-[#00a884] text-[#111b21] hover:bg-[#008f6f] transition-colors text-[14px] font-medium focus:outline-none">Create</button>
+                    <button onclick="window.createNewList()" class="px-5 py-2 rounded-full bg-[#00a884] text-[#111b21] hover:bg-[#00bfa5] transition-colors text-[14px] font-medium focus:outline-none">Create</button>
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
         <!-- Footer Actions -->
         <div class="px-6 py-4 bg-[#233138] border-t border-[#313d45] flex justify-end gap-4 shrink-0" id="add_to_list_actions">
             <button onclick="window.closeAddToListModal()" class="px-6 py-2.5 rounded-full border border-[#313d45] text-[#00a884] hover:bg-[#182229] transition-colors text-[14px] font-medium focus:outline-none">Cancel</button>
-            <button onclick="window.saveChatToLists()" class="px-6 py-2.5 rounded-full bg-[#00a884] text-[#111b21] hover:bg-[#008f6f] transition-colors text-[14px] font-medium focus:outline-none">Save</button>
+            <button onclick="window.saveChatToLists()" class="px-6 py-2.5 rounded-full bg-[#00a884] text-[#111b21] hover:bg-[#00bfa5] transition-colors text-[14px] font-medium focus:outline-none">Save</button>
         </div>
     </div>
 </div>

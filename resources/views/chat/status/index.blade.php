@@ -446,7 +446,7 @@
                         </div>
                     </div>
                     ${isHidden ? `
-                        <button onclick="event.stopPropagation(); window.unhideStatusUser('${userId}')" class="text-[#00a884] hover:text-[#06cf9c] text-sm font-semibold hover:underline shrink-0">
+                        <button onclick="event.stopPropagation(); window.unhideStatusUser('${userId}')" class="text-[#00a884] hover:text-[#00bfa5] text-sm font-semibold hover:underline shrink-0">
                             Unhide
                         </button>
                     ` : ''}
@@ -575,3 +575,6 @@
         window.closeAllStatusMenus();
     });
 </script>
+
+
+

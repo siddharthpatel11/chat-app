@@ -22,7 +22,7 @@
                 <label class="text-[#00a884] text-xs font-medium ml-3">What's happening?</label>
                 <div
                     class="relative flex items-center bg-transparent border-2 border-[#00a884] rounded-xl px-4 py-3 group">
-                    <button class="text-[#00a884] hover:text-[#06cf9c] mr-3" onclick="toggleAboutEmojiPicker(event)">
+                    <button class="text-[#00a884] hover:text-[#00bfa5] mr-3" onclick="toggleAboutEmojiPicker(event)">
                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                             <path
                                 d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8zm2.5-9.5c.828 0 1.5-.672 1.5-1.5s-.672-1.5-1.5-1.5-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm-5 0c.828 0 1.5-.672 1.5-1.5S8.828 8 8 8s-1.5.672-1.5 1.5.672 1.5 1.5 1.5zm2.5 6c2.511 0 4.67-1.516 5.568-3.693h-11.136c.898 2.177 3.057 3.693 5.568 3.693z">
@@ -179,7 +179,7 @@
                 </svg>
             </button>
             <button
-                class="w-14 h-14 bg-[#00a884] hover:bg-[#06cf9c] rounded-full flex items-center justify-center text-[#111b21] shadow-xl transform active:scale-95 transition-all"
+                class="w-14 h-14 bg-[#00a884] hover:bg-[#00bfa5] rounded-full flex items-center justify-center text-[#111b21] shadow-xl transform active:scale-95 transition-all"
                 onclick="saveAbout()">
                 <svg viewBox="0 0 24 24" width="30" height="30" fill="currentColor">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>

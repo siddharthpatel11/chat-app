@@ -36,7 +36,7 @@
         
         <div class="p-6 pt-4 flex justify-end gap-3 mt-4">
             <button onclick="closeChatThemeModal(false)" class="px-4 py-2 text-[#00a884] hover:bg-[#111b21] rounded-full text-[14px] font-medium transition-colors">Cancel</button>
-            <button onclick="closeChatThemeModal(true)" class="px-5 py-2 bg-[#00a884] text-[#111b21] hover:bg-[#06cf9c] rounded-full text-[14px] font-medium transition-colors">OK</button>
+            <button onclick="closeChatThemeModal(true)" class="px-5 py-2 bg-[#00a884] text-[#111b21] hover:bg-[#00bfa5] rounded-full text-[14px] font-medium transition-colors">OK</button>
         </div>
     </div>
 </div>

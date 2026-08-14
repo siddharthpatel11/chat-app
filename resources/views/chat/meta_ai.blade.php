@@ -81,12 +81,14 @@
     </div>
 
     <!-- Messages Area -->
-    <div id="meta_ai_messages" class="flex-1 overflow-y-auto p-4 chat-bg space-y-1 scroll-smooth" style="background: linear-gradient(135deg, #0b141a 0%, #10202b 100%);">
+    <div class="flex-1 relative flex flex-col overflow-hidden chat-bg" style="background: linear-gradient(135deg, #0b141a 0%, #10202b 100%);">
+        <div id="meta_ai_messages" class="flex-1 overflow-y-auto p-4 space-y-1 scroll-smooth relative z-10 custom-scrollbar">
         <!-- Messages will be injected here via JS -->
         <div class="text-center my-6">
             <span class="bg-[#182229] text-[#8696a0] text-xs px-3 py-1.5 rounded-lg shadow-sm">
                 Chat securely with Meta AI
             </span>
+        </div>
         </div>
     </div>
 

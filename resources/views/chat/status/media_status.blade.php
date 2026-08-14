@@ -80,7 +80,7 @@
             </div>
             <div class="h-20 flex items-center gap-6 mt-4">
                 <button onclick="window.cancelCrop()" class="px-6 py-2 rounded-full text-[#8696a0] hover:text-[#e9edef] font-medium transition-colors">Cancel</button>
-                <button onclick="window.applyCrop()" class="px-8 py-2 rounded-full bg-[#00a884] text-[#0b141a] font-bold hover:bg-[#06cf9c] transition-all active:scale-95">Done</button>
+                <button onclick="window.applyCrop()" class="px-8 py-2 rounded-full bg-[#00a884] text-[#0b141a] font-bold hover:bg-[#00bfa5] transition-all active:scale-95">Done</button>
             </div>
         </div>
         <!-- Canvas for drawing/text -->
@@ -155,7 +155,7 @@
         </div>
 
         <button id="send_media_status_btn" onclick="window.postMediaStatus()"
-            class="w-14 h-14 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#06cf9c] active:scale-95 transition-all transform scale-110">
+            class="w-14 h-14 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#00bfa5] active:scale-95 transition-all transform scale-110">
             <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" class="ml-1">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
             </svg>
@@ -260,7 +260,7 @@
         </div>
 
         <div class="p-4 bg-[#202c33] border-t border-white/5 flex justify-end shrink-0">
-            <button onclick="window.saveContactSelection()" class="w-14 h-14 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#06cf9c] active:scale-95 transition-all">
+            <button onclick="window.saveContactSelection()" class="w-14 h-14 bg-[#00a884] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#00bfa5] active:scale-95 transition-all">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"></path></svg>
             </button>
     </div>
@@ -1078,3 +1078,6 @@
         scrollbar-width: none;
     }
 </style>
+
+
+

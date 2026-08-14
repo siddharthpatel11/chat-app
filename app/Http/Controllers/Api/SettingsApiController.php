@@ -196,4 +196,30 @@ class SettingsApiController extends Controller
 
         return $this->successResponse([], 'Disappearing message timer updated for this chat');
     }
+
+    // Save global appearance settings (App Icon, App Theme, Dark Mode)
+    public function saveAppearanceSettings(Request $request)
+    {
+        $request->validate([
+            'app_icon_index' => 'nullable|integer',
+            'app_theme_color_index' => 'nullable|integer',
+            'app_dark_mode' => 'nullable|in:system,light,dark',
+        ]);
+
+        $userId = auth()->id();
+        if (!$userId) {
+            return $this->errorResponse('User ID is required', 400);
+        }
+
+        $settings = [];
+        if ($request->has('app_icon_index')) $settings['app_icon_index'] = (int) $request->app_icon_index;
+        if ($request->has('app_theme_color_index')) $settings['app_theme_color_index'] = (int) $request->app_theme_color_index;
+        if ($request->has('app_dark_mode')) $settings['app_dark_mode'] = $request->app_dark_mode;
+
+        if (!empty($settings)) {
+            $this->db->getReference("users/{$userId}/settings/appearance")->update($settings);
+        }
+
+        return $this->successResponse([], 'Appearance settings saved successfully');
+    }
 }

@@ -296,7 +296,7 @@
                            placeholder="Message Meta AI..."
                            onkeypress="if(event.key === 'Enter') submitAiInteractivePrompt()">
                 </div>
-                <button onclick="submitAiInteractivePrompt()" class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white hover:bg-[#008f6f] transition-colors flex-shrink-0 shadow-md">
+                <button onclick="submitAiInteractivePrompt()" class="w-[44px] h-[44px] rounded-full bg-[#00a884] flex items-center justify-center text-white hover:bg-[#00bfa5] transition-colors flex-shrink-0 shadow-md">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="translate-x-[-1px] translate-y-[1px]">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
                     </svg>

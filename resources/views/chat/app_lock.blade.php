@@ -6,7 +6,7 @@
         
         <div class="space-y-4 mb-8">
             <div>
-                <input type="password" id="app_lock_pwd_1" placeholder="Enter password" class="w-full bg-[#111b21] border-b-2 border-[#00a884] focus:border-[#06cf9c] text-[#e9edef] px-3 py-2 outline-none rounded-t-sm transition-colors text-[15px]">
+                <input type="password" id="app_lock_pwd_1" placeholder="Enter password" class="w-full bg-[#111b21] border-b-2 border-[#00a884] focus:border-[#00bfa5] text-[#e9edef] px-3 py-2 outline-none rounded-t-sm transition-colors text-[15px]">
             </div>
             <div>
                 <input type="password" id="app_lock_pwd_2" placeholder="Confirm password" class="w-full bg-[#111b21] border-b-2 border-gray-600 focus:border-[#00a884] text-[#e9edef] px-3 py-2 outline-none rounded-t-sm transition-colors text-[15px]">
@@ -16,7 +16,7 @@
 
         <div class="flex justify-end gap-4 items-center">
             <button onclick="window.closeAppLockSetup()" class="text-[#00a884] font-medium text-[14px] hover:bg-white/5 px-4 py-2 rounded-lg transition-colors border border-gray-600/30">Cancel</button>
-            <button onclick="window.saveAppLock()" class="bg-[#00a884] text-[#111b21] font-medium text-[14px] px-6 py-2.5 rounded-full hover:bg-[#06cf9c] transition-all active:scale-95 shadow-lg opacity-50 cursor-not-allowed" id="app_lock_save_btn" disabled>OK</button>
+            <button onclick="window.saveAppLock()" class="bg-[#00a884] text-[#111b21] font-medium text-[14px] px-6 py-2.5 rounded-full hover:bg-[#00bfa5] transition-all active:scale-95 shadow-lg opacity-50 cursor-not-allowed" id="app_lock_save_btn" disabled>OK</button>
         </div>
     </div>
 </div>
@@ -33,7 +33,7 @@
         
         <div class="w-full relative mb-6">
             <input type="password" id="app_lock_unlock_input" placeholder="Enter password" class="w-full bg-[#202c33] border-none text-[#e9edef] px-5 py-3.5 rounded-full outline-none focus:ring-2 focus:ring-[#00a884]/50 transition-all text-[15px] shadow-sm text-center">
-            <button onclick="window.unlockApp()" class="absolute right-2 top-2 bottom-2 bg-[#00a884] text-[#111b21] w-10 rounded-full flex items-center justify-center hover:bg-[#06cf9c] transition-colors shadow-sm">
+            <button onclick="window.unlockApp()" class="absolute right-2 top-2 bottom-2 bg-[#00a884] text-[#111b21] w-10 rounded-full flex items-center justify-center hover:bg-[#00bfa5] transition-colors shadow-sm">
                 <svg viewBox="0 0 24 24" height="20" width="20" fill="currentColor">
                     <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"></path>
                 </svg>
@@ -64,7 +64,7 @@
         
         <div class="flex justify-between gap-3 mt-6">
             <button onclick="window.closeChatUnlockModal()" class="flex-1 bg-[#2a3942] hover:bg-[#3b4a54] text-[#e9edef] font-medium text-[14px] py-2 rounded-full transition-colors">Cancel</button>
-            <button onclick="window.verifyChatUnlock()" class="flex-1 bg-[#00a884] text-[#111b21] font-medium text-[14px] py-2 rounded-full hover:bg-[#06cf9c] transition-colors">Unlock</button>
+            <button onclick="window.verifyChatUnlock()" class="flex-1 bg-[#00a884] text-[#111b21] font-medium text-[14px] py-2 rounded-full hover:bg-[#00bfa5] transition-colors">Unlock</button>
         </div>
     </div>
 </div>

@@ -80,6 +80,8 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     // Hide Chat Settings API
     Route::get('/settings/hide-chat', [SettingsApiController::class, 'getHideChatSettings']);
     Route::post('/settings/hide-chat', [SettingsApiController::class, 'saveHideChatSettings']);
+
+    Route::post('/settings/appearance', [SettingsApiController::class, 'saveAppearanceSettings']);
     
     // Disappearing Messages API
     Route::post('/settings/default-message-timer', [SettingsApiController::class, 'setDefaultMessageTimer']);
