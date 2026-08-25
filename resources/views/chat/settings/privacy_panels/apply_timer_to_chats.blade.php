@@ -196,7 +196,7 @@
                     
                     if (groupSettings === 'admins' && !isAdmin) {
                         disabled = true;
-                        subtitle = '<i class="text-[#8696a0]">You can\\'t edit group settings</i>';
+                        subtitle = '<i class="text-[#8696a0]">You can\'t edit group settings</i>';
                     } else {
                         // Show members
                         let members = [];

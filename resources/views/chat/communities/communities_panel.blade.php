@@ -1012,6 +1012,7 @@
         if (typeof window.closeAllSettings === 'function') {
             window.closeAllSettings();
         }
+        // Also closes mobile nav and removes chat-active
         window.closeAllSidebarPanels();
 
         // Update Navigation UI active states
@@ -1033,21 +1034,32 @@
         document.getElementById('chat_view_container').classList.add('hidden');
         document.getElementById('chat_view_container').classList.remove('flex');
 
-        // Show Communities Sidebar & Panel
+        // Show Communities Sidebar (use 'flex' only, 'sm:flex' doesn't work at runtime)
         const sidebar = document.getElementById('communities_sidebar_container');
         sidebar.classList.remove('hidden');
-        sidebar.classList.add('sm:flex', 'flex');
+        sidebar.classList.add('flex');
 
         const newCommBtn = document.getElementById('new_community_action_btn');
         if (newCommBtn) {
             newCommBtn.classList.remove('hidden');
         }
 
-        const mainColumn = document.getElementById('communities_main_column');
-        mainColumn.classList.remove('hidden');
-        mainColumn.classList.add('flex');
+        // Only show main column on desktop
+        if (window.innerWidth >= 768) {
+            const mainColumn = document.getElementById('communities_main_column');
+            mainColumn.classList.remove('hidden');
+            mainColumn.classList.add('flex');
+        }
 
-        document.getElementById('sidebar_resizer').classList.remove('hidden');
+        // Resizer only on desktop
+        const resizer = document.getElementById('sidebar_resizer');
+        if (resizer) {
+            if (window.innerWidth >= 768) {
+                resizer.classList.remove('hidden');
+            } else {
+                resizer.classList.add('hidden');
+            }
+        }
 
         if (window.activeCommunityId) {
             window.showCommunityDetails(window.activeCommunityId);

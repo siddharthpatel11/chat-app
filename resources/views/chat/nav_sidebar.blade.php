@@ -1,5 +1,5 @@
-<div
-    class="hidden sm:flex flex-col w-[60px] bg-[#202c33] border-r border-[#313d45] py-4 items-center justify-between shrink-0">
+<div id="nav_sidebar"
+    class="flex flex-col w-[60px] bg-[#202c33] border-r border-[#313d45] py-4 items-center justify-between shrink-0 z-50">
     <!-- Top Menu Items -->
     <div class="flex flex-col gap-4 w-full items-center">
         <!-- Chats -->
@@ -101,6 +101,22 @@
 
     <!-- Bottom Menu Items -->
     <div class="flex flex-col gap-2 w-full items-center mb-2">
+
+        <!-- Install PWA -->
+        <button id="nav_install_pwa" class="nav-item group hidden" title="Install App" onclick="window.installPWA()">
+            <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors relative">
+                <!-- App download/install icon -->
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"
+                    class="text-[#8696a0] group-hover:text-[#00a884]">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+                </svg>
+                <!-- Notification dot -->
+                <div class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#00a884] rounded-full border-2 border-[#202c33]"></div>
+            </div>
+        </button>
+
+
+
         <!-- Media -->
         <button class="nav-item group" title="Media" onclick="window.openGlobalMediaModal()">
             <div class="p-2 rounded-full hover:bg-[#384b57] transition-colors">

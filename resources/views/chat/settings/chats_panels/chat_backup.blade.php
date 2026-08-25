@@ -692,13 +692,40 @@
             return;
         }
 
-        if (!tokenClient) {
-            if (window.showToast) window.showToast('Error', 'Google Services not loaded yet.');
-            return;
-        }
-        
         window.pendingDriveAction = 'backup';
-        tokenClient.requestAccessToken();
+        
+        if (window.isAndroidApp && window.AndroidApp) {
+            try {
+                if (typeof window.AndroidApp.requestGoogleDriveAuth === 'function' || window.AndroidApp.requestGoogleDriveAuth) {
+                    window.AndroidApp.requestGoogleDriveAuth(clientId);
+                } else {
+                    if (window.showToast) window.showToast('Error', 'Please update your Android App to the latest version to use Google Drive Backup.');
+                }
+            } catch (e) {
+                if (window.showToast) window.showToast('Error', 'Failed to call native auth: ' + e.message);
+            }
+        } else {
+            if (!tokenClient) {
+                if (window.showToast) window.showToast('Error', 'Google Services not loaded yet.');
+                return;
+            }
+            tokenClient.requestAccessToken();
+        }
+    };
+
+    window.onAndroidDriveAuthSuccess = function(token) {
+        driveAccessToken = token;
+        if (window.pendingDriveAction === 'backup') {
+            executeDriveBackup();
+        } else if (window.pendingDriveAction === 'restore') {
+            executeDriveRestore(false);
+        } else if (window.pendingDriveAction === 'initial_restore') {
+            executeDriveRestore(true);
+        }
+    };
+    
+    window.onAndroidDriveAuthFailed = function() {
+        if (window.showToast) window.showToast('Authentication Failed', 'Failed to authenticate with Google Drive natively.');
     };
 
     function executeDriveBackup() {
@@ -1003,13 +1030,25 @@
     window.confirmRestoreAction = function() {
         closeRestoreConfirmModal();
         
-        if (!tokenClient) {
-            if (window.showToast) window.showToast('Error', 'Google Services not loaded yet. Please wait a moment and try again.');
-            return;
-        }
-        
         window.pendingDriveAction = 'restore';
-        tokenClient.requestAccessToken();
+        if (window.isAndroidApp && window.AndroidApp) {
+            try {
+                if (typeof window.AndroidApp.requestGoogleDriveAuth === 'function' || window.AndroidApp.requestGoogleDriveAuth) {
+                    const clientId = '{{ env("GOOGLE_DRIVE_CLIENT_ID") }}';
+                    window.AndroidApp.requestGoogleDriveAuth(clientId);
+                } else {
+                    if (window.showToast) window.showToast('Error', 'Please update your Android App to the latest version to use Google Drive Backup.');
+                }
+            } catch (e) {
+                if (window.showToast) window.showToast('Error', 'Failed to call native auth: ' + e.message);
+            }
+        } else {
+            if (!tokenClient) {
+                if (window.showToast) window.showToast('Error', 'Google Services not loaded yet. Please wait a moment and try again.');
+                return;
+            }
+            tokenClient.requestAccessToken();
+        }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1025,13 +1064,25 @@
             return;
         }
         
-        if (!tokenClient) {
-            if (window.showToast) window.showToast('Error', 'Google Services not loaded yet. Please wait a moment and try again.');
-            return;
-        }
-
         window.pendingDriveAction = 'initial_restore';
-        tokenClient.requestAccessToken();
+        
+        if (window.isAndroidApp && window.AndroidApp) {
+            try {
+                if (typeof window.AndroidApp.requestGoogleDriveAuth === 'function' || window.AndroidApp.requestGoogleDriveAuth) {
+                    window.AndroidApp.requestGoogleDriveAuth(clientId);
+                } else {
+                    if (window.showToast) window.showToast('Error', 'Please update your Android App to the latest version to use Google Drive Backup.');
+                }
+            } catch (e) {
+                if (window.showToast) window.showToast('Error', 'Failed to call native auth: ' + e.message);
+            }
+        } else {
+            if (!tokenClient) {
+                if (window.showToast) window.showToast('Error', 'Google Services not loaded yet. Please wait a moment and try again.');
+                return;
+            }
+            tokenClient.requestAccessToken();
+        }
     };
 
       window.skipInitialRestore = function() {

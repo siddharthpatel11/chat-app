@@ -50,13 +50,20 @@
     <!-- Normal Sidebar Header -->
     <div id="normal_sidebar_header"
         class="h-16 bg-[#202c33] flex items-center px-4 justify-between shrink-0 border-b border-[#313d45]">
-        <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSettings()">
-            <div
-                class="w-10 h-10 rounded-full overflow-hidden bg-[#202c33] flex items-center justify-center text-white border border-[#313d45]">
-                <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=2a3942&color=fff' }}"
-                    class="w-full h-full object-cover my-avatar">
+        <div class="flex items-center gap-3">
+            <button class="md:hidden text-[#8696a0] hover:text-[#e9edef] mr-1" onclick="window.toggleMobileNav()">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"></path>
+                </svg>
+            </button>
+            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleSettings()">
+                <div
+                    class="w-10 h-10 rounded-full overflow-hidden bg-[#202c33] flex items-center justify-center text-white border border-[#313d45]">
+                    <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode(auth()->user()->name) . '&background=2a3942&color=fff' }}"
+                        class="w-full h-full object-cover my-avatar">
+                </div>
+                <span class="font-semibold text-[#e9edef]"><span class="settings-profile-name">{{ auth()->user()->name }}</span> (You)</span>
             </div>
-            <span class="font-semibold text-[#e9edef]"><span class="settings-profile-name">{{ auth()->user()->name }}</span> (You)</span>
         </div>
         <div class="flex items-center gap-2">
             <!-- New Chat Icon -->

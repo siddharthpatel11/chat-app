@@ -4,7 +4,14 @@
         class="flex flex-col w-[30%] sm:min-w-[300px] border-r border-[#313d45] bg-[#111b21] shrink-0">
         <!-- Header -->
         <div class="h-16 bg-[#202c33] flex items-center px-4 justify-between shrink-0 border-b border-[#313d45]">
-            <h1 class="text-[#e9edef] text-[22px] font-bold">Status</h1>
+            <div class="flex items-center gap-3">
+                <button class="md:hidden text-[#8696a0] hover:text-[#e9edef]" onclick="window.toggleMobileNav()">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"></path>
+                    </svg>
+                </button>
+                <h1 class="text-[#e9edef] text-[22px] font-bold">Status</h1>
+            </div>
             <div class="flex items-center gap-2 relative">
                 <button onclick="window.toggleHeaderStatusMenu(event)" class="p-2 text-[#8696a0] hover:text-[#e9edef] rounded-full hover:bg-[#384b57] transition-all"
                     title="Add status">

@@ -1,7 +1,14 @@
 <div id="calls_sidebar_container" class="hidden w-[30%] sm:min-w-[300px] shrink-0 border-r border-[#313d45] flex-col bg-[#111b21] h-full">
     <!-- Header -->
     <div class="px-5 py-4 flex items-center justify-between mt-2">
-        <h1 class="text-[#e9edef] text-[22px] font-bold">Calls</h1>
+        <div class="flex items-center gap-3">
+            <button class="md:hidden text-[#8696a0] hover:text-[#e9edef]" onclick="window.toggleMobileNav()">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"></path>
+                </svg>
+            </button>
+            <h1 class="text-[#e9edef] text-[22px] font-bold">Calls</h1>
+        </div>
         <div class="flex gap-4 text-[#aebac1]">
             <button onclick="window.openNewCallModal()" class="hover:bg-[#202c33] p-2 rounded-full transition-colors" title="New call">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#aebac1]">

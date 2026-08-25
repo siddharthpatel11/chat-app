@@ -2,7 +2,14 @@
 <div id="channels_sidebar_container" class="hidden h-full flex flex-col bg-[#111b21] w-[30%] min-w-[300px] border-r border-[#313d45] z-50 shrink-0 relative flex-1 sm:flex-none">
     <!-- Header -->
     <div class="px-4 py-3 bg-[#111b21] shrink-0 h-[60px] flex items-center justify-between z-20">
-        <h1 class="text-[#e9edef] text-[22px] font-medium">Channels</h1>
+        <div class="flex items-center gap-3">
+            <button class="md:hidden text-[#8696a0] hover:text-[#e9edef]" onclick="window.toggleMobileNav()">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                    <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"></path>
+                </svg>
+            </button>
+            <h1 class="text-[#e9edef] text-[22px] font-medium">Channels</h1>
+        </div>
         <div class="flex items-center gap-4 relative">
             <button class="text-[#aebac1] hover:text-[#e9edef] focus:outline-none transition-colors" onclick="window.toggleChannelsHeaderMenu(event)" title="Options">
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -79,7 +86,7 @@
         if (typeof window.closeAllSettings === 'function') {
             window.closeAllSettings();
         }
-        // Hide all sidebars
+        // Hide all sidebars (also closes mobile nav and removes chat-active)
         if(typeof window.closeAllSidebarPanels === 'function') {
             window.closeAllSidebarPanels();
         }
@@ -106,11 +113,21 @@
         document.getElementById('channels_sidebar_container')?.classList.remove('hidden');
         document.getElementById('channels_sidebar_container')?.classList.add('flex');
 
-        // Show default empty state for channels if no channel is selected
-        document.getElementById('channels_main_column')?.classList.remove('hidden');
-        document.getElementById('channels_main_column')?.classList.add('flex');
+        // On desktop, also show the channels main column
+        if (window.innerWidth >= 768) {
+            document.getElementById('channels_main_column')?.classList.remove('hidden');
+            document.getElementById('channels_main_column')?.classList.add('flex');
+        }
 
-        document.getElementById('sidebar_resizer')?.classList.remove('hidden');
+        // Resizer only on desktop
+        const resizer = document.getElementById('sidebar_resizer');
+        if (resizer) {
+            if (window.innerWidth >= 768) {
+                resizer.classList.remove('hidden');
+            } else {
+                resizer.classList.add('hidden');
+            }
+        }
 
         // Update nav active states
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));

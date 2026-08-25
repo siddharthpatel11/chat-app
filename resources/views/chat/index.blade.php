@@ -14,6 +14,234 @@
                 height: calc(100vh / var(--chat-zoom, 1)) !important;
                 transform-origin: top left;
             }
+
+            /* On mobile: never zoom — zoom CSS breaks touch target alignment */
+            @media (max-width: 767px) {
+                #app-container {
+                    zoom: 1 !important;
+                    width: 100vw !important;
+                    /* Use dvh for dynamic viewport (accounts for browser chrome, keyboard) */
+                    height: 100dvh !important;
+                    min-height: 100dvh !important;
+                    max-height: 100dvh !important;
+                    overflow: hidden !important;
+                    /* Safe area insets for notched/rounded phones */
+                    padding-top: env(safe-area-inset-top);
+                    padding-bottom: env(safe-area-inset-bottom);
+                }
+
+                body, html {
+                    overflow: hidden;
+                    height: 100%;
+                    width: 100%;
+                    position: fixed;
+                    overscroll-behavior: none;
+                }
+
+                /* The outer flex container needs to fill fully */
+                body > div > main,
+                body > div > main > div {
+                    height: 100dvh !important;
+                }
+            }
+            
+            /* --- Mobile Responsive Chat Layout --- */
+            /* --- Mobile Responsive Chat Layout --- */
+            @media (max-width: 767px) {
+                /* Make nav sidebar compact, expand only active item */
+                #nav_sidebar {
+                    position: fixed !important;
+                    top: 0;
+                    bottom: 0;
+                    left: -250px;
+                    width: max-content !important;
+                    min-width: 60px !important;
+                    height: 100% !important;
+                    z-index: 1000 !important;
+                    transition: left 0.3s ease;
+                    align-items: flex-start !important;
+                }
+
+                #nav_sidebar.mobile-open {
+                    left: 0 !important;
+                    box-shadow: 2px 0 10px rgba(0,0,0,0.5);
+                }
+
+                #nav_sidebar > div {
+                    align-items: flex-start !important;
+                    width: 100% !important;
+                }
+                
+                #nav_sidebar .nav-item {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: flex-start;
+                    padding: 0.5rem 0.5rem;
+                }
+                
+                #nav_sidebar .nav-item > div:first-child {
+                    margin-right: 0;
+                }
+                
+                #nav_sidebar .nav-item.active > div:first-child {
+                    margin-right: 1rem;
+                }
+                
+                /* Hide labels by default, show only when active */
+                #nav_sidebar .nav-item::after {
+                    content: attr(title);
+                    color: #e9edef;
+                    font-size: 1.1rem;
+                    font-weight: 500;
+                    display: none;
+                    white-space: nowrap;
+                    padding-right: 1rem;
+                }
+                
+                #nav_sidebar .nav-item.active::after {
+                    display: block;
+                }
+
+                #nav_mobile_backdrop {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    background: rgba(11, 20, 26, 0.6);
+                    z-index: 999;
+                    backdrop-filter: blur(2px);
+                }
+
+                #nav_mobile_backdrop.mobile-open {
+                    display: block;
+                }
+
+                /* Ensure app-container is relative so absolute panels size correctly */
+                #app-container {
+                    position: relative !important;
+                }
+
+                /* Core sidebars and main columns take full width but remain flex items */
+                /* JS already hides inactive ones, so they won't side-by-side overflow */
+                #user_sidebar_container,
+                #calls_sidebar_container,
+                #communities_sidebar_container,
+                #channels_sidebar_container,
+                #status_sidebar,
+                #main_chat_column,
+                #calls_main_column,
+                #communities_main_column,
+                #channels_main_column,
+                #status_main_column,
+                #group_chat_main_column,
+                #channel_chat_main_column {
+                    width: 100% !important;
+                    min-width: 100% !important;
+                    max-width: 100% !important;
+                    flex-shrink: 0 !important;
+                }
+
+                /* Secondary panels (like New Chat, Settings, Info) MUST be absolute so they pop over everything */
+                #new_chat_panel,
+                #new_contact_panel,
+                #edit_contact_panel,
+                #add_group_members_panel,
+                #create_group_panel,
+                #broadcast_panel,
+                #new_broadcast_panel,
+                #contact_info_panel,
+                #group_info_panel,
+                #channel_info_panel,
+                #settings_panel,
+                #edit_profile_panel,
+                #general_settings_panel,
+                #privacy_settings_panel,
+                #chats_settings_panel,
+                #video_voice_settings_panel,
+                #notifications_settings_panel,
+                #help_feedback_settings_panel,
+                #storage_and_data_settings_panel,
+                #manage_storage_panel,
+                #manage_storage_larger_than_5mb_panel,
+                #manage_storage_chat_details_panel,
+                #network_usage_panel,
+                #account_settings_panel,
+                #security_settings_panel,
+                #privacy_last_seen_panel,
+                #privacy_status_panel,
+                #privacy_profile_photo_panel,
+                #privacy_about_panel,
+                #privacy_exclude_panel,
+                #privacy_blocked_contacts_panel,
+                #chats_wallpaper_panel,
+                #chats_upload_quality_panel,
+                #chats_auto_download_panel,
+                #chat_backup_panel,
+                #notifications_taskbar_panel,
+                #notifications_banner_panel,
+                #notifications_subpanel,
+                #communities_panel,
+                #find_channels_sidebar,
+                #create_channel_panel,
+                #broadcast_info_panel {
+                    position: absolute !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    min-width: 100% !important;
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
+                    background-color: #111b21;
+                    z-index: 30 !important;
+                }
+
+                /* Sidebar resizer is desktop-only */
+                #sidebar_resizer {
+                    display: none !important;
+                }
+
+                /* Chat column must fill remaining height below header */
+                #main_chat_column,
+                #group_chat_main_column,
+                #channel_chat_main_column {
+                    height: 100% !important;
+                    max-height: 100% !important;
+                }
+
+                /* Prevent horizontal overflow everywhere */
+                #app-container * {
+                    max-width: 100vw;
+                }
+                
+                /* When NOT active, hide ALL main columns so only the list is visible */
+                #app-container:not(.chat-active) #main_chat_column,
+                #app-container:not(.chat-active) #calls_main_column,
+                #app-container:not(.chat-active) #communities_main_column,
+                #app-container:not(.chat-active) #channels_main_column,
+                #app-container:not(.chat-active) #status_main_column,
+                #app-container:not(.chat-active) #group_chat_main_column,
+                #app-container:not(.chat-active) #channel_chat_main_column {
+                    display: none !important;
+                }
+                
+                /* When active, hide ALL sidebars AND the nav_sidebar so the main chat is truly full screen */
+                #app-container.chat-active #nav_sidebar,
+                #app-container.chat-active #user_sidebar_container,
+                #app-container.chat-active #calls_sidebar_container,
+                #app-container.chat-active #communities_sidebar_container,
+                #app-container.chat-active #channels_sidebar_container,
+                #app-container.chat-active #status_sidebar {
+                    display: none !important;
+                }
+                
+                /* Ensure emoji picker doesn't overflow */
+                .emoji-picker-container emoji-picker {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+            }
+
             .chat-bg {
                 background-color: #efeae2;
                 background-image: url('https://w0.peakpx.com/wallpaper/508/871/HD-wallpaper-whatsapp-background-theme-pattern.jpg');
@@ -161,7 +389,7 @@
         </style>
     @endpush
 
-    <div class="flex w-full h-[100vh] mx-auto overflow-hidden shadow-xl">
+    <div class="flex w-full overflow-hidden shadow-xl" style="height: 100dvh; height: 100vh;">
 
         <!-- Toast Container -->
         <div id="toast_container"
@@ -738,8 +966,31 @@
 
             document.addEventListener('DOMContentLoaded', () => {
                 window.applyGlobalWallpaper();
+                
+                // Ensure proper initialization of the Chats view, especially on mobile
+                // where the sidebar might be hidden by default Tailwind classes.
+                if (typeof window.showChats === 'function') {
+                    window.showChats();
+                }
             });
+
+            window.toggleMobileNav = function() {
+                const nav = document.getElementById('nav_sidebar');
+                const backdrop = document.getElementById('nav_mobile_backdrop');
+                if (nav) nav.classList.toggle('mobile-open');
+                if (backdrop) backdrop.classList.toggle('mobile-open');
+            };
+            
+            window.closeMobileNav = function() {
+                const nav = document.getElementById('nav_sidebar');
+                const backdrop = document.getElementById('nav_mobile_backdrop');
+                if (nav) nav.classList.remove('mobile-open');
+                if (backdrop) backdrop.classList.remove('mobile-open');
+            };
         </script>
+
+        <!-- Backdrop for mobile nav drawer -->
+        <div id="nav_mobile_backdrop" onclick="window.closeMobileNav()"></div>
 
         <div id="app-container" class="flex w-full h-full bg-[#111b21] overflow-hidden border-none">
 
@@ -1099,7 +1350,7 @@
                                 class="flex items-center justify-between h-full w-full transition-all duration-300">
                                 <div class="flex items-center gap-2">
                                     <button
-                                        class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
+                                        class="md:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
                                         onclick="window.backToSidebar()">
                                         <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z">
@@ -5206,6 +5457,8 @@
         };
 
         window.closeAllSidebarPanels = function() {
+            if (window.closeMobileNav) window.closeMobileNav();
+            document.getElementById('app-container').classList.remove('chat-active');
             const panels = [
                 'new_chat_panel',
                 'new_contact_panel',
@@ -5260,7 +5513,7 @@
         };
 
         window.showChats = function() {
-            // Close other sidebar panels
+            // Close other sidebar panels (also calls closeMobileNav and removes chat-active)
             window.closeAllSidebarPanels();
 
             // Update Navigation UI
@@ -5286,19 +5539,22 @@
             document.getElementById('channels_main_column')?.classList.add('hidden');
             document.getElementById('channels_main_column')?.classList.remove('flex');
 
-            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
-            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
-            document.getElementById('channels_main_column')?.classList.add('hidden');
-            document.getElementById('channels_main_column')?.classList.remove('flex');
-
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.remove('hidden');
-            sidebar.classList.add('sm:flex', 'flex'); // Ensure both base and responsive flex are added
+            sidebar.classList.add('flex'); // Use only 'flex', not 'sm:flex' (sm:flex is a CSS class, not a runtime toggle)
 
             document.getElementById('chat_view_container').classList.remove('hidden');
             document.getElementById('chat_view_container').classList.add('flex');
 
-            document.getElementById('sidebar_resizer').classList.remove('hidden');
+            // Only show resizer on non-mobile
+            const resizer = document.getElementById('sidebar_resizer');
+            if (resizer) {
+                if (window.innerWidth >= 768) {
+                    resizer.classList.remove('hidden');
+                } else {
+                    resizer.classList.add('hidden');
+                }
+            }
 
             if (window.closeAllSettings) {
                 window.closeAllSettings();
@@ -5306,7 +5562,7 @@
         };
 
         window.showArchivedChats = function() {
-            // Close other sidebar panels
+            // Close other sidebar panels (also calls closeMobileNav and removes chat-active)
             window.closeAllSidebarPanels();
 
             // Update Navigation UI
@@ -5318,7 +5574,7 @@
                 window.setSidebarFilter('archived');
             }
 
-            // Ensure Sidebar is shown (similar to showChats)
+            // Hide other views
             document.getElementById('status_view_container').classList.add('hidden');
             document.getElementById('status_view_container').classList.remove('flex');
 
@@ -5332,19 +5588,21 @@
             document.getElementById('channels_main_column')?.classList.add('hidden');
             document.getElementById('channels_main_column')?.classList.remove('flex');
 
-            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
-            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
-            document.getElementById('channels_main_column')?.classList.add('hidden');
-            document.getElementById('channels_main_column')?.classList.remove('flex');
-
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.remove('hidden');
-            sidebar.classList.add('sm:flex', 'flex');
+            sidebar.classList.add('flex');
 
             document.getElementById('chat_view_container').classList.remove('hidden');
             document.getElementById('chat_view_container').classList.add('flex');
 
-            document.getElementById('sidebar_resizer').classList.remove('hidden');
+            const resizer = document.getElementById('sidebar_resizer');
+            if (resizer) {
+                if (window.innerWidth >= 768) {
+                    resizer.classList.remove('hidden');
+                } else {
+                    resizer.classList.add('hidden');
+                }
+            }
 
             if (window.closeAllSettings) {
                 window.closeAllSettings();
@@ -5352,7 +5610,7 @@
         };
 
         window.showStatus = function() {
-            // Close all sidebar panels
+            // Close all sidebar panels (also removes chat-active and closes mobile nav)
             window.closeAllSidebarPanels();
 
             // Update Navigation UI
@@ -5362,7 +5620,7 @@
             // Toggle Views
             const sidebar = document.getElementById('user_sidebar_container');
             sidebar.classList.add('hidden');
-            sidebar.classList.remove('sm:flex', 'flex'); // Remove both base and responsive flex
+            sidebar.classList.remove('sm:flex', 'flex');
 
             document.getElementById('chat_view_container').classList.add('hidden');
             document.getElementById('chat_view_container').classList.remove('flex');
@@ -5379,16 +5637,6 @@
             document.getElementById('calls_main_column')?.classList.add('hidden');
             document.getElementById('calls_main_column')?.classList.remove('flex');
 
-            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
-            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
-            document.getElementById('channels_main_column')?.classList.add('hidden');
-            document.getElementById('channels_main_column')?.classList.remove('flex');
-
-            document.getElementById('channels_sidebar_container')?.classList.add('hidden');
-            document.getElementById('channels_sidebar_container')?.classList.remove('flex');
-            document.getElementById('channels_main_column')?.classList.add('hidden');
-            document.getElementById('channels_main_column')?.classList.remove('flex');
-
             document.getElementById('status_view_container').classList.remove('hidden');
             document.getElementById('status_view_container').classList.add('flex');
 
@@ -5398,7 +5646,7 @@
         };
 
         window.showCalls = function() {
-            // Close all sidebar panels
+            // Close all sidebar panels (also removes chat-active and closes mobile nav)
             window.closeAllSidebarPanels();
 
             // Update Navigation UI
@@ -5421,7 +5669,15 @@
             document.getElementById('status_view_container').classList.add('hidden');
             document.getElementById('status_view_container').classList.remove('flex');
 
-            document.getElementById('sidebar_resizer').classList.remove('hidden');
+            // Resizer only on desktop
+            const resizer = document.getElementById('sidebar_resizer');
+            if (resizer) {
+                if (window.innerWidth >= 768) {
+                    resizer.classList.remove('hidden');
+                } else {
+                    resizer.classList.add('hidden');
+                }
+            }
 
             // Show calls views
             document.getElementById('calls_sidebar_container')?.classList.remove('hidden');
@@ -5489,7 +5745,7 @@
 
             // Load saved width
             const savedWidth = localStorage.getItem('sidebarWidth');
-            if (savedWidth && window.innerWidth >= 640) {
+            if (savedWidth && window.innerWidth >= 1100) {
                 window.updateAllSidebarsWidth(savedWidth);
             }
 
@@ -5627,8 +5883,12 @@
         };
 
         window.backToSidebar = function() {
-            document.getElementById('user_sidebar_container').classList.remove('hidden');
-            document.getElementById('user_sidebar_container').classList.add('flex', 'w-full');
+            document.getElementById('app-container').classList.remove('chat-active');
+            const sidebar = document.getElementById('user_sidebar_container');
+            sidebar.classList.remove('hidden');
+            sidebar.classList.add('flex');
+            // Remove w-full which interferes with desktop multi-column layout
+            sidebar.classList.remove('w-full');
             document.getElementById('main_chat_column').classList.add('hidden');
             document.getElementById('main_chat_column').classList.remove('flex');
         };
@@ -5797,6 +6057,7 @@
             }
 
             // Mobile view handling
+            document.getElementById('app-container').classList.add('chat-active');
             if (window.innerWidth < 640) {
                 document.getElementById('user_sidebar_container').classList.add('hidden');
                 document.getElementById('main_chat_column').classList.remove('hidden');

@@ -212,7 +212,7 @@
         panel.classList.add('translate-x-0');
 
         // Adjust main chat width on desktop
-        if (window.innerWidth >= 640) {
+        if (window.innerWidth >= 1100) {
             mainChat.classList.add('sm:mr-[400px]');
         }
     };
@@ -225,7 +225,7 @@
         panel.classList.add('translate-x-full');
 
         // Remove width adjustment on desktop
-        if (window.innerWidth >= 640) {
+        if (window.innerWidth >= 1100) {
             mainChat.classList.remove('sm:mr-[400px]');
         }
 

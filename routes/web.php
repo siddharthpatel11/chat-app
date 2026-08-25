@@ -27,6 +27,18 @@ Route::middleware('auth')->group(function () {
 Route::get('/manifest.json', [App\Http\Controllers\ManifestController::class, 'index'])->name('manifest');
 Route::get('/app-icon.svg', [App\Http\Controllers\ManifestController::class, 'icon'])->name('app-icon');
 
+// Android APK download
+Route::get('/download/app', function () {
+    $apkPath = public_path('download/chat-app.apk');
+    if (file_exists($apkPath)) {
+        return response()->download($apkPath, 'ChatApp.apk', [
+            'Content-Type'        => 'application/vnd.android.package-archive',
+            'Content-Disposition' => 'attachment; filename="ChatApp.apk"',
+        ]);
+    }
+    return response('<html><body style="font-family:sans-serif;text-align:center;padding:40px;background:#111b21;color:#e9edef;"><h2 style="color:#00a884">APK Building</h2><p>The Android APK is currently being built in the background. Please wait a minute and refresh this page.</p></body></html>', 404);
+})->name('download.app');
+
 Route::middleware('auth')->group(function () {
     Route::get('/chat', [ChatController::class, 'index']);
     Route::get('/chat/voice-call', [ChatController::class, 'voiceCall']);

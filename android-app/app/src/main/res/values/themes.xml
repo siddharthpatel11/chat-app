@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.ChatApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#00a884</item>
+        <item name="colorPrimaryVariant">#008f72</item>
+        <item name="colorOnPrimary">#ffffff</item>
+        
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#202c33</item>
+        <item name="colorSecondaryVariant">#111b21</item>
+        <item name="colorOnSecondary">#ffffff</item>
+        
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">#202c33</item>
+        <!-- Navigation bar color. -->
+        <item name="android:navigationBarColor">#111b21</item>
+    </style>
+</resources>

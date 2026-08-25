@@ -20,15 +20,21 @@ class ManifestController extends Controller
             "theme_color" => "#00a884",
             "icons" => [
                 [
-                    "src" => $svgUrl,
-                    "type" => "image/svg+xml",
+                    "src" => "/icon-192.png",
+                    "type" => "image/png",
+                    "sizes" => "192x192",
+                    "purpose" => "any maskable"
+                ],
+                [
+                    "src" => "/icon-512.png",
+                    "type" => "image/png",
                     "sizes" => "512x512",
                     "purpose" => "any maskable"
                 ],
                 [
-                    "src" => $svgUrl,
+                    "src" => "/app-icon.svg",
                     "type" => "image/svg+xml",
-                    "sizes" => "192x192",
+                    "sizes" => "any",
                     "purpose" => "any maskable"
                 ]
             ]

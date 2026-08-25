@@ -304,7 +304,9 @@
             panel.classList.remove('hidden');
             panel.classList.add('flex');
             
-            // Hide all overlapping left sidebar panel containers
+            // Close mobile nav drawer if open
+            if (window.closeMobileNav) window.closeMobileNav();
+            
             const leftSidebarIds = [
                 'user_sidebar_container',
                 'calls_sidebar_container',
