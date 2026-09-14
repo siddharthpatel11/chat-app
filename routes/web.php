@@ -11,7 +11,7 @@ Route::get('/', function () {
     if (auth()->check()) {
         return redirect('/chat');
     }
-    return view('welcome');
+    return redirect('/login');
 });
 
 Route::get('/dashboard', function () {
@@ -22,22 +22,43 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/update-profile', [ProfileController::class, 'updateWebProfile'])->name('profile.update.web');
 });
 
 Route::get('/manifest.json', [App\Http\Controllers\ManifestController::class, 'index'])->name('manifest');
 Route::get('/app-icon.svg', [App\Http\Controllers\ManifestController::class, 'icon'])->name('app-icon');
 
 // Android APK download
-Route::get('/download/app', function () {
-    $apkPath = public_path('download/chat-app.apk');
+Route::get('/download/universal', function () {
+    $apkPath = public_path('download/universal-app.apk');
     if (file_exists($apkPath)) {
-        return response()->download($apkPath, 'ChatApp.apk', [
+        return response()->download($apkPath, 'UniversalApp.apk', [
             'Content-Type'        => 'application/vnd.android.package-archive',
-            'Content-Disposition' => 'attachment; filename="ChatApp.apk"',
+            'Content-Disposition' => 'attachment; filename="UniversalApp.apk"',
+            'Cache-Control'       => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma'              => 'no-cache',
+            'Expires'             => '0',
         ]);
     }
     return response('<html><body style="font-family:sans-serif;text-align:center;padding:40px;background:#111b21;color:#e9edef;"><h2 style="color:#00a884">APK Building</h2><p>The Android APK is currently being built in the background. Please wait a minute and refresh this page.</p></body></html>', 404);
-})->name('download.app');
+})->name('download.universal');
+
+// Keep old route just in case, but redirect it
+Route::get('/download/app', function () {
+    return redirect()->route('download.universal');
+});
+
+// Desktop App download
+Route::get('/download/desktop', function () {
+    $exePath = public_path('download/desktop-app.exe');
+    if (file_exists($exePath)) {
+        return response()->download($exePath, 'ChatApp-Desktop.exe', [
+            'Content-Type'        => 'application/x-msdownload',
+            'Content-Disposition' => 'attachment; filename="ChatApp-Desktop.exe"',
+        ]);
+    }
+    return response('<html><body style="font-family:sans-serif;text-align:center;padding:40px;background:#111b21;color:#e9edef;"><h2 style="color:#00a884">App Not Found</h2><p>The Desktop App installer is currently not available.</p></body></html>', 404);
+})->name('download.desktop');
 
 Route::middleware('auth')->group(function () {
     Route::get('/chat', [ChatController::class, 'index']);

@@ -168,6 +168,12 @@
                     }
                 }
                 
+                if (currentPrivacySetting === 'status' || currentPrivacySetting === 'status_include') {
+                    if (typeof window.updatePrivacyStatus === 'function') {
+                        window.updatePrivacyStatus();
+                    }
+                }
+                
                 if(window.showToast) window.showToast('Updated', `Settings saved. ${count} contacts ${currentPrivacySetting === 'status_include' ? 'included' : 'excluded'}.`);
             }
         }

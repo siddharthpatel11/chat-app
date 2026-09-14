@@ -1,5 +1,5 @@
 <div id="new_chat_panel"
-    class="hidden flex-col w-[30%] sm:min-w-[300px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden">
+    class="hidden flex flex-col w-[30%] sm:min-w-[300px] border-r border-[#313d45] bg-[#111b21] h-full shrink-0 overflow-hidden">
     <!-- Header -->
     <div class="h-[108px] bg-[#202c33] flex items-end pb-4 px-6 gap-6 shrink-0 border-b border-[#313d45]">
         <button onclick="toggleNewChat()" class="text-[#e9edef] hover:text-white transition-colors">
@@ -48,16 +48,15 @@
                     @php
                         $userAvatar = $user->avatar ?? 'https://ui-avatars.com/api/?name=' . urlencode($user->name ?: $user->phone) . '&background=2a3942&color=fff';
                     @endphp
-                    <div id="new_chat_contact_{{ $user->id }}" onclick="window.startNewChat({{ $user->id }}, '{{ addslashes($user->name) }}', '{{ addslashes($user->phone ?? '') }}', '{{ $userAvatar }}', '{{ addslashes($user->about ?? 'Available') }}')"
-                        class="flex items-center px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors new-chat-contact-item" data-name="{{ strtolower($user->name ?: $user->phone) }}">
-                        <div class="w-12 h-12 rounded-full overflow-hidden bg-[#2a3942] flex items-center justify-center shrink-0 ml-1">
-                            <img src="{{ $userAvatar }}" class="w-full h-full object-cover">
+                    <button class="new-chat-contact-item w-full flex items-center px-4 py-3 hover:bg-[#202c33] transition-colors gap-4 group"
+                        data-name="{{ strtolower($user->name ?: $user->phone) }}"
+                        onclick="startNewChat('{{ $user->id }}', '{{ addslashes($user->name ?: $user->phone) }}', '{{ $user->phone }}', '{{ $userAvatar }}', '{{ addslashes($user->about ?? 'Available') }}')">
+                        <img src="{{ $userAvatar }}" alt="Profile" class="w-12 h-12 rounded-full object-cover shrink-0">
+                        <div class="flex-1 flex flex-col items-start min-w-0 border-b border-[#202c33] pb-3 group-hover:border-transparent transition-colors">
+                            <div class="text-[#e9edef] text-[16px] truncate w-full text-left">{{ $user->name ?: $user->phone }}</div>
+                            <div class="text-[#8696a0] text-[13px] truncate w-full text-left">{{ $user->about ?? 'Available' }}</div>
                         </div>
-                        <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0">
-                            <h4 class="text-[17px] text-[#e9edef] truncate mr-2 font-normal">{{ $user->name ?: $user->phone }}</h4>
-                            <p class="text-[14px] text-[#8696a0] truncate mt-0.5 leading-snug new-chat-about-text">{{ $user->about ?? 'Available' }}</p>
-                        </div>
-                    </div>
+                    </button>
                 @endforeach
             </div>
         </div>
@@ -71,14 +70,14 @@
         
         if (newChatPanel.classList.contains('hidden')) {
             sidebar.classList.add('hidden');
-            sidebar.classList.remove('sm:flex');
+            sidebar.classList.remove('flex', 'sm:flex');
             newChatPanel.classList.remove('hidden');
-            newChatPanel.classList.add('sm:flex');
+            newChatPanel.classList.add('flex', 'sm:flex');
         } else {
             newChatPanel.classList.add('hidden');
-            newChatPanel.classList.remove('sm:flex');
+            newChatPanel.classList.remove('flex', 'sm:flex');
             sidebar.classList.remove('hidden');
-            sidebar.classList.add('sm:flex');
+            sidebar.classList.add('flex', 'sm:flex');
         }
     }
 

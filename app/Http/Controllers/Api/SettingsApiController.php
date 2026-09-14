@@ -56,7 +56,7 @@ class SettingsApiController extends Controller
         if ($request->hasFile('global_image')) {
             $file = $request->file('global_image');
             $path = $file->store('wallpapers', 'public');
-            $wallpaperSettings['global_image'] = url('storage/' . $path);
+            $wallpaperSettings['global_image'] = '/storage/' . $path;
         } elseif ($request->has('global_image') && is_string($request->global_image)) {
             $wallpaperSettings['global_image'] = $request->global_image;
         }

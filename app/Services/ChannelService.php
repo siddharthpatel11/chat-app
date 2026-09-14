@@ -29,7 +29,7 @@ class ChannelService
         $path = $request->file('avatar')->store('channels', 'public');
         return response()->json([
             'status' => true,
-            'url' => url('storage/'.$path)
+            'url' => '/storage/'.$path)
         ]);
     }
 
@@ -66,7 +66,7 @@ class ChannelService
         $avatarUrl = null;
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('channels', 'public');
-            $avatarUrl = url('storage/'.$path);
+            $avatarUrl = '/storage/'.$path;
         }
 
         $channelId = 'channel_'.time().'_'.uniqid();
@@ -207,7 +207,7 @@ class ChannelService
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('channels', 'public');
-            $updateData['avatar'] = url('storage/'.$path);
+            $updateData['avatar'] = '/storage/'.$path;
         }
 
         $channelRef->update($updateData);

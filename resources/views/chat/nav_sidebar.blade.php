@@ -100,7 +100,7 @@
     </div>
 
     <!-- Bottom Menu Items -->
-    <div class="flex flex-col gap-2 w-full items-center mb-2">
+    <div class="flex flex-col gap-1 w-full items-center mb-2">
 
         <!-- Install PWA -->
         <button id="nav_install_pwa" class="nav-item group hidden" title="Install App" onclick="window.installPWA()">

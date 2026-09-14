@@ -177,7 +177,7 @@
     </div>
 
     <!-- Hidden File Input -->
-    <input type="file" id="media_status_input" class="hidden" accept="image/*,video/*" multiple
+    <input type="file" id="media_status_input" class="hidden"
         onchange="window.handleMediaStatusSelection(event)">
 </div>
 
@@ -278,15 +278,27 @@
         document.getElementById('media_status_input').click();
     };
 
-    window.handleMediaStatusSelection = function (event) {
+    window.handleMediaStatusSelection = async function (event) {
         const files = event.target.files;
         if (!files.length) return;
 
-        const prevLength = selectedMediaItems.length;
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const type = file.type.startsWith('image/') ? 'image' : 'video';
-            const url = URL.createObjectURL(file);
+            
+            let url;
+            if (type === 'image') {
+                // Use FileReader for robust WebView compatibility for images
+                url = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = () => resolve(URL.createObjectURL(file)); // Fallback
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                // Video: use object URL to prevent memory crash on large files
+                url = URL.createObjectURL(file);
+            }
 
             selectedMediaItems.push({
                 file: file,
@@ -310,13 +322,24 @@
         event.target.value = '';
     };
 
-    window.openMediaStatusWithFiles = function(files) {
+    window.openMediaStatusWithFiles = async function(files) {
         if (!files || !files.length) return;
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const type = file.type.startsWith('image/') ? 'image' : 'video';
-            const url = URL.createObjectURL(file);
+            
+            let url;
+            if (type === 'image') {
+                url = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = () => resolve(URL.createObjectURL(file));
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                url = URL.createObjectURL(file);
+            }
 
             selectedMediaItems.push({
                 file: file,
@@ -747,7 +770,10 @@
                 const result = await response.json();
                 if (!result.status) throw new Error('Upload failed');
 
-                const downloadURL = result.url;
+                let downloadURL = result.url;
+                if (downloadURL && downloadURL.includes('/storage/')) {
+                    downloadURL = downloadURL.substring(downloadURL.indexOf('/storage/'));
+                }
 
                 const statusData = {
                     userId: window.myUserId,

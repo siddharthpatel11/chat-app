@@ -24,33 +24,51 @@
     }
 </style>
 <div id="active_group_chat_content" class="hidden flex-row flex-1 h-full overflow-hidden select-none">
+    <style>
+        @media (max-width: 639px) {
+            .mobile-dropdown-fixed {
+                position: fixed !important;
+                top: 80px !important;
+                left: 0 !important;
+                right: 0 !important;
+                width: 100% !important;
+                max-width: 280px !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+                transform-origin: top center !important;
+            }
+            .mobile-stack-buttons {
+                flex-direction: column !important;
+            }
+        }
+    </style>
     <!-- Main Chat Column -->
     <div id="group_chat_main_column" class="flex-1 flex flex-col relative h-full min-w-0">
-        <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-[45] relative">
+        <div class="h-16 bg-[#202c33] px-2 sm:px-4 border-b border-[#313d45] shrink-0 shadow-sm z-[45] relative">
             <!-- Normal Header -->
             <div id="group_normal_header"
                 class="flex items-center justify-between h-full w-full transition-all duration-300">
-                <div class="flex items-center gap-3">
-                    <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
+                <div class="flex items-center gap-1.5 sm:gap-3 flex-1 min-w-0">
+                    <button class="sm:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-0.5 shrink-0"
                         onclick="window.backToSidebar()">
-                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor">
                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path>
                         </svg>
                     </button>
                     <div id="active_group_chat_avatar" onclick="window.handleGroupHeaderClick()"
-                        class="relative w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm transition-transform hover:scale-105 cursor-pointer shrink-0">
-                        <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        class="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm transition-transform hover:scale-105 cursor-pointer shrink-0">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#8696a0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                         </svg>
                     </div>
                     <div onclick="window.handleGroupHeaderClick()"  
                         class="cursor-pointer min-w-0 flex flex-col justify-center">
-                        <div class="flex items-center">
+                        <div class="flex items-center min-w-0">
                             <h2 id="active_group_chat_title"
-                                class="text-[15.5px] font-semibold text-[#e9edef] leading-tight truncate">Select a group chat
+                                class="text-[14px] sm:text-[15.5px] font-semibold text-[#e9edef] leading-tight truncate flex-1 min-w-0">Select a group chat
                             </h2>
-                            <div id="group_header_mute_icon" class="hidden ml-1.5 text-[#8696a0]">
+                            <div id="group_header_mute_icon" class="hidden ml-1.5 text-[#8696a0] shrink-0">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                                     <path d="M18 8a6 6 0 0 0-9.33-5"></path>
                                     <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"></line>
@@ -64,22 +82,22 @@
                 </div>
 
                 <!-- Header Actions -->
-                <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div class="flex items-center gap-1 sm:gap-3 shrink-0">
                     <!-- Call Button Dropdown -->
                     <div class="relative">
                         <button id="group_call_btn_pill"
-                            class="hidden sm:flex items-center gap-2.5 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] px-4 py-2 rounded-full cursor-pointer transition-all duration-200 border border-transparent hover:border-[#313d45] focus:outline-none shrink-0 group">
+                            class="flex items-center gap-0.5 sm:gap-2.5 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] px-2 sm:px-4 py-1.5 sm:py-2 rounded-full cursor-pointer transition-all duration-200 border border-transparent hover:border-[#313d45] focus:outline-none shrink-0 group">
                             <div
-                                class="flex items-center gap-2 border-r border-[#313d45] pr-2 group-hover:border-[#8696a0]">
-                                <svg class="w-5 h-5 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
+                                class="flex items-center gap-1 sm:gap-2 border-r border-[#313d45] pr-1 sm:pr-2 group-hover:border-[#8696a0]">
+                                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
                                     stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
                                     </path>
                                 </svg>
-                                <span class="text-sm font-semibold">Call</span>
+                                <span class="text-[11px] sm:text-sm font-semibold leading-none">Call</span>
                             </div>
-                            <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#8696a0] group-hover:text-[#e9edef]" fill="none"
                                 stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M19 9l-7 7-7-7">
@@ -89,7 +107,7 @@
 
                         <!-- Call Dropdown -->
                         <div id="group_call_dropdown" style="display: none;"
-                            class="hidden absolute top-full mt-2 right-0 w-[340px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
+                            class="hidden absolute top-full mt-2 right-0 w-[340px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0 mobile-dropdown-fixed">
                             <!-- Header with Expand/Collapse -->
                             <div class="p-4 cursor-pointer hover:bg-white/5 transition-colors flex items-center justify-between"
                                 onclick="window.toggleGroupCallMembersList()">
@@ -126,7 +144,7 @@
                                 </div>
 
                                 <!-- Voice/Video buttons inside the list -->
-                                <div class="p-4 flex gap-3 border-t border-white/5 bg-[#111b21]">
+                                <div class="p-4 flex gap-3 border-t border-white/5 bg-[#111b21] mobile-stack-buttons">
                                     <button onclick="window.startGroupVoiceCall(true)"
                                         class="flex-1 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] py-2.5 rounded-full flex items-center justify-center gap-2 font-semibold transition-all active:scale-95">
                                         <svg class="w-5 h-5 text-[#8696a0]" fill="currentColor" viewBox="0 0 24 24">
@@ -150,7 +168,7 @@
 
                             <!-- Collapsed Footer Actions -->
                             <div id="group_call_collapsed_footer" class="p-4 flex flex-col gap-3">
-                                <div class="flex gap-3">
+                                <div class="flex gap-3 mobile-stack-buttons">
                                     <button onclick="window.startGroupVoiceCall(false)"
                                         class="flex-1 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2 font-bold transition-all active:scale-[0.98]">
                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -203,9 +221,9 @@
 
                     <!-- Search Icon -->
                     <button onclick="toggleGroupSearchDrawer()"
-                        class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                        class="p-1.5 sm:p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
                         title="Search">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
@@ -213,14 +231,14 @@
 
                     <!-- Community Icon -->
                     <button id="group_community_btn" onclick="window.currentGroupData && window.currentGroupData.community_id && window.openCommunityGroupsDrawer(window.currentGroupData.community_id)"
-                        class="hidden p-2 text-[#8696a0] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                        class="hidden p-1.5 sm:p-2 text-[#8696a0] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
                         title="Community Groups">
-                        <div class="relative w-7 h-7 bg-[#3a2c26] rounded-xl flex items-center justify-center">
-                            <svg class="w-4 h-4 text-[#eaa180]" fill="currentColor" viewBox="0 0 24 24">
+                        <div class="relative w-6 h-6 sm:w-7 sm:h-7 bg-[#3a2c26] rounded-xl flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#eaa180]" fill="currentColor" viewBox="0 0 24 24">
                                 <path d="M12 12.75c1.63 0 3.07.39 4.24.9 1.08.48 1.76 1.56 1.76 2.73V18H6v-1.62c0-1.17.68-2.25 1.76-2.73 1.17-.51 2.61-.9 4.24-.9zM12 11c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zM18.8 11.23c-1.28 0-2.42-.45-3.32-1.2a4.4 4.4 0 0 0 .52-2.03c0-.75-.19-1.46-.52-2.03.9-.75 2.04-1.2 3.32-1.2 2.08 0 3.8 1.71 3.8 3.8s-1.72 3.8-3.8 3.8zM5.2 11.23C3.12 11.23 1.4 9.52 1.4 7.44s1.72-3.8 3.8-3.8c1.28 0 2.42.45 3.32 1.2-.33.57-.52 1.28-.52 2.03 0 .75.19 1.46.52 2.03-.9.75-2.04 1.2-3.32 1.2z"/>
                             </svg>
-                            <div class="absolute -bottom-1 -right-1 w-[18px] h-[18px] bg-[#f0f2f5] rounded-full flex items-center justify-center border-2 border-[#202c33]">
-                                <svg class="w-2.5 h-2.5 text-[#111b21] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div class="absolute -bottom-1 -right-1 w-[14px] h-[14px] sm:w-[18px] sm:h-[18px] bg-[#f0f2f5] rounded-full flex items-center justify-center border-[1.5px] border-[#202c33]">
+                                <svg class="w-2 h-2 sm:w-2.5 sm:h-2.5 text-[#111b21] mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </div>
@@ -229,9 +247,9 @@
 
                     <!-- Menu Icon -->
                     <button id="group_header_more_btn" onclick="toggleGroupHeaderMoreMenu(event)"
-                        class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                        class="p-1.5 sm:p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
                         title="Menu">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
                             </path>
@@ -1868,8 +1886,7 @@
             if (member.id == window.myUserId) return; // Don't show self
 
             const isSelected = window.selectedCallParticipants.has(member.id);
-            const avatarUrl = member.avatar ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(member.name)}&background=2a3942&color=fff`;
+            const avatarUrl = window.formatAvatarUrl(member.avatar, member.name);
 
             const item = document.createElement('div');
             item.className =
@@ -2199,8 +2216,7 @@
         }
 
         document.getElementById('group_info_name').textContent = u.name;
-        document.getElementById('group_info_avatar').src = u.avatar ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=202c33&color=fff`;
+        document.getElementById('group_info_avatar').src = window.formatAvatarUrl(u.avatar, u.name);
 
         // Update Starred messages badge
         if (window.get && window.ref && window.db && window.myUserId && window.currentChatId) {
@@ -3244,7 +3260,7 @@
 
 <!-- Group Header More Options Dropdown -->
 <div id="group_header_more_dropdown"
-    class="hidden absolute top-14 right-4 w-[260px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
+    class="hidden absolute top-12 right-0 w-56 bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
     <div id="group_header_main_menu"></div>
     <div id="group_header_submenu"
         class="hidden absolute top-0 right-full mr-2 w-[220px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[101]"></div>
@@ -4619,8 +4635,7 @@
             item.setAttribute('data-name', group.name);
             item.setAttribute('data-groupid', group.id);
             item.setAttribute('data-timestamp', '0');
-            item.setAttribute('data-avatar', group.avatar ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`
+            item.setAttribute('data-avatar', window.formatAvatarUrl(group.avatar, group.name)
             );
 
             // Set community data attributes for all community groups
@@ -4668,12 +4683,12 @@
                     <div class="absolute w-[36px] h-[36px] rounded-lg bg-[#2d383e] left-1.5 top-1.5 border border-[#111b21] transform -rotate-[5deg] z-[2]"></div>
                     <!-- Main top card -->
                     <div class="relative w-9 h-9 rounded-xl bg-[#3d302b] flex items-center justify-center border border-[#111b21] shadow-md z-[3] overflow-hidden">
-                        <img src="${group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=3d302b&color=ff8e6e`}" class="w-full h-full object-cover">
+                        <img src="${window.formatAvatarUrl(group.avatar, group.name)}" class="w-full h-full object-cover">
                     </div>
                 </div>
             ` : `
                 <div id="avatar_wrapper_group_${group.id}" class="relative w-12 h-12 rounded-full bg-[#2a3942] flex items-center justify-center shrink-0">
-                    <img src="${group.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(group.name)}&background=2a3942&color=fff`}" class="w-full h-full object-cover rounded-full">
+                    <img src="${window.formatAvatarUrl(group.avatar, group.name)}" class="w-full h-full object-cover rounded-full">
                 </div>
             `;
 
@@ -4746,8 +4761,7 @@
             const img = item.querySelector('img');
             const displayName = (isAnnounceGroup && group.community_id) ? (group.community_name || group.name.replace(' - Announcements','').replace(' Announcements','')) : group.name;
             if (h4) h4.textContent = displayName;
-            if (img) img.src = group.avatar ||
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+            if (img) img.src = window.formatAvatarUrl(group.avatar, displayName);
         }
 
         // Attach message listener for real-time sidebar updates
@@ -5335,6 +5349,7 @@
     };
 
     window.selectGroupChatOriginal = function(groupId, name, avatar, searchMsgTime = null) {
+        if (typeof window.activateMainColumn === 'function') window.activateMainColumn('group_chat_main_column');
         const commSidebar = document.getElementById('communities_sidebar_container');
         const isCommSidebarActive = commSidebar && !commSidebar.classList.contains('hidden');
 
@@ -5497,10 +5512,10 @@
                 if (callBtn) {
                     if (gData.is_announcement === true) {
                         callBtn.classList.add('hidden');
-                        callBtn.classList.remove('sm:flex');
+                        callBtn.classList.remove('flex');
                     } else {
                         callBtn.classList.remove('hidden');
-                        callBtn.classList.add('sm:flex');
+                        callBtn.classList.add('flex');
                     }
                 }
 
@@ -5812,16 +5827,25 @@
             window.closeAllSettings();
         }
 
-        if (window.innerWidth < 640) {
+        // Mobile view handling
+        document.getElementById('app-container').classList.add('chat-active');
+        if (window.innerWidth < 768) {
             const sidebarToHide = isCommSidebarActive ? 'communities_sidebar_container' : 'user_sidebar_container';
             const sEl = document.getElementById(sidebarToHide);
             if (sEl) {
                 sEl.classList.add('hidden');
                 sEl.classList.remove('flex', 'w-full');
             }
-            document.getElementById('main_chat_column').classList.remove('hidden');
-            document.getElementById('main_chat_column').classList.add('flex');
         }
+
+        let x = window.innerWidth / 2;
+        let y = window.innerHeight / 2;
+        try {
+            if (window.event && window.event.clientX) {
+                x = window.event.clientX;
+                y = window.event.clientY;
+            }
+        } catch(e){}
 
         if (window.unsubscribeAdded) window.unsubscribeAdded();
         if (window.unsubscribeRemoved) window.unsubscribeRemoved();
@@ -6209,13 +6233,14 @@
             });
 
             let mediaContent = '';
+            const vSender = data.sender_id == window.myUserId ? 'You' : (window.allContacts?.find(c => c.id == data.sender_id)?.name || 'Member');
+            const vSenderEscaped = vSender.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+            const vTextEscaped = data.text ? data.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ") : '';
+
             if (data.type === 'image' && data.file_url) {
                 mediaContent =
-                    `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
+                    `<img src="${data.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="event.stopPropagation(); window.openGlobalSearchImageViewer('${key}', window.currentChatId, '${data.file_url}', '${vSenderEscaped}', '${time}', true, '${vTextEscaped}')">`;
             } else if (data.type === 'video' && data.file_url) {
-                const vSender = data.sender_id == window.myUserId ? 'You' : (window.allContacts?.find(c => c.id == data.sender_id)?.name || 'Member');
-                const vSenderEscaped = vSender.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                const vTextEscaped = data.text ? data.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ") : '';
                 mediaContent =
                     `<div class="relative cursor-pointer max-w-[200px] sm:max-w-xs rounded-lg mb-2 overflow-hidden bg-[#233138] border border-[#313d45] flex items-center justify-center min-h-[120px]" onclick="event.stopPropagation(); window.openGlobalSearchVideoViewer('${key}', window.currentChatId, '${data.file_url}', '${vSenderEscaped}', '${time}', true, '${vTextEscaped}')">
                         <video src="${data.file_url}#t=0.1" preload="metadata" class="w-full h-full max-h-[300px] object-cover pointer-events-none"></video>
@@ -6562,8 +6587,7 @@
                 const matchUser = window.allContacts.find(c => c.id == data.sender_id);
                 if (matchUser) {
                     senderDisplayName = matchUser.name || matchUser.phone || "Member";
-                    senderAvatar = matchUser.avatar ||
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName.charAt(0))}&background=2a3942&color=fff`;
+                    senderAvatar = window.formatAvatarUrl(matchUser.avatar, senderDisplayName.charAt(0));
                 } else {
                     senderAvatar =
                         `https://ui-avatars.com/api/?name=${encodeURIComponent(senderDisplayName.charAt(0))}&background=2a3942&color=fff`;
@@ -6874,8 +6898,7 @@
             html = `<div class="p-8 text-center text-[#8696a0] text-sm">No new contacts to add</div>`;
         } else {
             contactsToAdd.forEach(user => {
-                const avatar = user.avatar ||
-                    `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.phone)}&background=2a3942&color=fff`;
+                const avatar = window.formatAvatarUrl(user.avatar, user.name || user.phone);
                 html += `
                     <div onclick="window.toggleAddMemberSelection('${user.id}')" class="flex items-center gap-4 p-3 hover:bg-[#2a3942]/60 rounded-xl cursor-pointer transition-all group/item add-member-item" data-name="${(user.name || user.phone).toLowerCase()}">
                         <div class="relative shrink-0">
@@ -7494,3 +7517,4 @@
 
 </script>
 @include('chat.communities.community_drawer')
+

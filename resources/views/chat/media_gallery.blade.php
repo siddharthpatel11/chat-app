@@ -5,8 +5,8 @@
         id="global_media_modal_content">
         
         <!-- Header -->
-        <div class="flex items-center justify-between px-6 py-4 bg-[#202c33] shrink-0 border-b border-[#313d45]">
-            <div class="flex items-center gap-4 w-1/3">
+        <div class="relative flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-[#202c33] shrink-0 border-b border-[#313d45] gap-4 sm:gap-0">
+            <div class="flex items-center gap-4 w-full sm:w-1/3 pr-32 sm:pr-0">
                 <div class="flex flex-col">
                     <h3 class="text-[#e9edef] text-[16px] font-medium leading-tight">Media</h3>
                     <span class="text-[#8696a0] text-[13px]">Media from all chats</span>
@@ -14,15 +14,15 @@
             </div>
 
             <!-- Tabs -->
-            <div class="flex items-center justify-center gap-8 w-1/3 text-[14.5px] font-medium">
-                <button onclick="switchGlobalMediaTab('media')" id="gm_tab_media" class="text-[#00a884] border-b-2 border-[#00a884] pb-1 transition-colors px-1">Media</button>
-                <button onclick="switchGlobalMediaTab('docs')" id="gm_tab_docs" class="text-[#8696a0] hover:text-[#e9edef] pb-1 transition-colors px-1 border-b-2 border-transparent">Docs</button>
-                <button onclick="switchGlobalMediaTab('links')" id="gm_tab_links" class="text-[#8696a0] hover:text-[#e9edef] pb-1 transition-colors px-1 border-b-2 border-transparent">Links</button>
+            <div class="flex items-center justify-start sm:justify-center gap-6 sm:gap-8 w-full sm:w-1/3 text-[14.5px] font-medium overflow-x-auto custom-scrollbar pb-1 sm:pb-0">
+                <button onclick="switchGlobalMediaTab('media')" id="gm_tab_media" class="text-[#00a884] border-b-2 border-[#00a884] pb-1 transition-colors px-1 shrink-0">Media</button>
+                <button onclick="switchGlobalMediaTab('docs')" id="gm_tab_docs" class="text-[#8696a0] hover:text-[#e9edef] pb-1 transition-colors px-1 border-b-2 border-transparent shrink-0">Docs</button>
+                <button onclick="switchGlobalMediaTab('links')" id="gm_tab_links" class="text-[#8696a0] hover:text-[#e9edef] pb-1 transition-colors px-1 border-b-2 border-transparent shrink-0">Links</button>
             </div>
 
             <!-- Actions -->
-            <div id="gm_normal_actions" class="flex items-center justify-end gap-5 w-1/3 relative">
-                <input type="text" id="gm_search_input" onkeyup="renderGlobalMedia()" placeholder="Search..." class="hidden absolute right-[150px] bg-[#202c33] text-[#e9edef] text-[14px] px-3 py-1.5 rounded-lg outline-none border border-[#313d45] focus:border-[#00a884] transition-all w-[200px]">
+            <div id="gm_normal_actions" class="absolute top-4 sm:top-auto right-4 sm:right-auto sm:static flex items-center justify-end gap-3 sm:gap-5 w-auto sm:w-1/3">
+                <input type="text" id="gm_search_input" onkeyup="renderGlobalMedia()" placeholder="Search..." class="hidden absolute right-12 sm:right-[150px] top-10 sm:top-auto bg-[#202c33] text-[#e9edef] text-[14px] px-3 py-1.5 rounded-lg outline-none border border-[#313d45] focus:border-[#00a884] transition-all w-[180px] sm:w-[200px] z-[50]">
                 
                 <button onclick="toggleGmSearch()" title="Search" class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
@@ -41,14 +41,14 @@
                     </svg>
                 </button>
                 <button onclick="closeGlobalMediaModal()"
-                    class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none ml-2">
+                    class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none ml-1 sm:ml-2">
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
                         <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path>
                     </svg>
                 </button>
             </div>
             
-            <div id="gm_select_actions" class="hidden items-center justify-end w-1/3 pr-2">
+            <div id="gm_select_actions" class="hidden absolute top-4 sm:top-auto right-4 sm:right-auto sm:static items-center justify-end w-auto sm:w-1/3">
                 <button onclick="toggleGmSelectMode()" class="text-[#e9edef] text-[15px] font-medium hover:text-[#00a884] transition-colors">Cancel</button>
             </div>
         </div>

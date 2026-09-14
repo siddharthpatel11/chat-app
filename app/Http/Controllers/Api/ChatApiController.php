@@ -58,7 +58,7 @@ class ChatApiController extends Controller
 
             $fileName = $file->getClientOriginalName();
             $path = $file->store('uploads', 'public');
-            $fileUrl = url('storage/'.$path);
+            $fileUrl = '/storage/'.$path;
         } elseif ($request->has('file_url')) {
             $fileUrl = $request->file_url;
             $fileName = $request->file_name;
@@ -597,7 +597,7 @@ class ChatApiController extends Controller
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
             $path = $file->store('avatars', 'public');
-            $data['avatar'] = url('storage/'.$path);
+            $data['avatar'] = '/storage/'.$path;
         }
 
         if (empty($data)) {

@@ -81,7 +81,7 @@ class ChatController extends Controller
             $fileName = $file->getClientOriginalName();
             $extension = $file->getClientOriginalExtension() ?: $file->guessExtension() ?: 'bin';
             $path = $file->storeAs('uploads', \Illuminate\Support\Str::random(40) . '.' . $extension, 'public');
-            $fileUrl = url('storage/' . $path);
+            $fileUrl = '/storage/' . $path;
         } elseif ($request->has('file_url')) {
             $fileUrl = $request->file_url;
             $fileName = $request->file_name;
@@ -360,7 +360,7 @@ class ChatController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $path = $file->store('uploads/statuses', 'public');
-            $fileUrl = url('storage/' . $path);
+            $fileUrl = '/storage/' . $path;
             return response()->json(['status' => true, 'url' => $fileUrl]);
         }
         return response()->json(['status' => false], 400);

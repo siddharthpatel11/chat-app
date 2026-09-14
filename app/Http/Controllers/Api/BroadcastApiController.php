@@ -292,7 +292,7 @@ class BroadcastApiController extends Controller
 
             $fileName = $file->getClientOriginalName();
             $path = $file->store('uploads', 'public');
-            $fileUrl = url('storage/'.$path);
+            $fileUrl = '/storage/'.$path;
         }
 
         if ($request->type === 'location' || $request->type === 'live_location') {

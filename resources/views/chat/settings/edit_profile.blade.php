@@ -112,11 +112,11 @@
                     <div class="relative border-b-2 border-[#00a884] pb-2 flex items-center gap-3">
                         <input type="text" id="about_edit_input" value="{{ auth()->user()->about ?? '' }}" maxlength="139"
                             class="bg-transparent border-none focus:ring-0 text-[#e9edef] text-[17px] w-full p-0"
-                            oninput="updateAboutCounter(this)">
+                            oninput="updateAboutCounter(this)" onkeydown="if(event.key === 'Enter') saveProfileAbout()">
 
                         <div class="flex items-center gap-4">
                             <span id="about_char_counter" class="text-[#8696a0] text-sm">139</span>
-                            <button class="text-[#8696a0] hover:text-[#00a884] transition-colors" onclick="saveAbout()">
+                            <button class="text-[#8696a0] hover:text-[#00a884] transition-colors" onclick="saveProfileAbout()">
                                 <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
                                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"></path>
                                 </svg>
@@ -148,7 +148,7 @@
                     <div class="relative border-b-2 border-[#00a884] pb-2 flex items-center gap-3">
                         <input type="text" id="name_edit_input" value="{{ auth()->user()->name }}" maxlength="25"
                             class="bg-transparent border-none focus:ring-0 text-[#e9edef] text-[17px] w-full p-0"
-                            oninput="updateNameCounter(this)">
+                            oninput="updateNameCounter(this)" onkeydown="if(event.key === 'Enter') saveName()">
 
                         <div class="flex items-center gap-4">
                             <span id="name_char_counter" class="text-[#8696a0] text-sm">25</span>
@@ -365,7 +365,7 @@
             formData.append('avatar_remove', 'true');
         }
 
-        fetch('/api/update-profile', {
+        fetch('/update-profile', {
             method: 'POST',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -445,7 +445,7 @@
         if (newName.trim() === '') return;
 
         // Update API
-        fetch('/api/update-profile', {
+        fetch('/update-profile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -496,12 +496,12 @@
         document.getElementById('about_char_counter').innerText = 139 - input.value.length;
     }
 
-    function saveAbout() {
+    function saveProfileAbout() {
         const newAbout = document.getElementById('about_edit_input').value;
         if (newAbout.trim() === '') return;
 
         // Update API
-        fetch('/api/update-profile', {
+        fetch('/update-profile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

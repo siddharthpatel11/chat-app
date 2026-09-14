@@ -1,8 +1,9 @@
 <!-- Disappearing Messages Sidebar -->
 <div id="disappearing_messages_sidebar"
-    class="fixed top-0 right-0 h-screen w-[400px] bg-[#111b21] border-l border-[#313d45] z-[550] flex flex-col shadow-2xl transition-transform duration-300 translate-x-full">
+    class="fixed top-0 right-0 h-screen w-full sm:w-[400px] bg-[#111b21] sm:border-l border-[#313d45] z-[550] flex flex-col shadow-2xl transition-transform duration-300 translate-x-full">
     <!-- Header -->
-    <div class="h-[60px] bg-[#202c33] flex items-center px-4 gap-6 shrink-0 cursor-pointer hover:bg-[#2a3942] transition-colors"
+    <div class="bg-[#202c33] flex items-center px-4 gap-6 shrink-0 cursor-pointer hover:bg-[#2a3942] transition-colors pb-4"
+        style="padding-top: max(1rem, env(safe-area-inset-top, 20px)); min-h-[60px];"
         onclick="closeDisappearingMessagesSidebar()">
         <button class="text-[#aebac1] hover:text-[#e9edef] transition-colors">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -133,7 +134,7 @@
 
         // Adjust main chat width on desktop
         const mainChat = document.getElementById('main_chat_column');
-        if (window.innerWidth >= 640 && mainChat) {
+        if (window.innerWidth >= 768 && mainChat) {
             mainChat.classList.add('sm:mr-[400px]');
         }
     }
@@ -155,7 +156,7 @@
 
         if (!isContactInfoOpen && !isBroadcastInfoOpen) {
             const mainChat = document.getElementById('main_chat_column');
-            if (window.innerWidth >= 640 && mainChat) {
+            if (window.innerWidth >= 768 && mainChat) {
                 mainChat.classList.remove('sm:mr-[400px]');
             }
         }

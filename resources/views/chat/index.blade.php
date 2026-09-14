@@ -15,15 +15,14 @@
                 transform-origin: top left;
             }
 
-            /* On mobile: never zoom — zoom CSS breaks touch target alignment */
+            /* On mobile: allow zoom so font size settings work */
             @media (max-width: 767px) {
                 #app-container {
-                    zoom: 1 !important;
-                    width: 100vw !important;
+                    width: calc(100vw / var(--chat-zoom, 1)) !important;
                     /* Use dvh for dynamic viewport (accounts for browser chrome, keyboard) */
-                    height: 100dvh !important;
-                    min-height: 100dvh !important;
-                    max-height: 100dvh !important;
+                    height: calc(100dvh / var(--chat-zoom, 1)) !important;
+                    min-height: calc(100dvh / var(--chat-zoom, 1)) !important;
+                    max-height: calc(100dvh / var(--chat-zoom, 1)) !important;
                     overflow: hidden !important;
                     /* Safe area insets for notched/rounded phones */
                     padding-top: env(safe-area-inset-top);
@@ -54,12 +53,24 @@
                     top: 0;
                     bottom: 0;
                     left: -250px;
-                    width: max-content !important;
+                    width: 60px !important;
                     min-width: 60px !important;
                     height: 100% !important;
                     z-index: 1000 !important;
                     transition: left 0.3s ease;
-                    align-items: flex-start !important;
+                    align-items: center !important;
+                    padding-top: calc(1rem + env(safe-area-inset-top)) !important;
+                    padding-bottom: env(safe-area-inset-bottom) !important;
+                    overflow-y: auto !important;
+                }
+
+                /* Hide scrollbar for nav_sidebar but keep functionality */
+                #nav_sidebar::-webkit-scrollbar {
+                    display: none;
+                }
+                #nav_sidebar {
+                    -ms-overflow-style: none;  /* IE and Edge */
+                    scrollbar-width: none;  /* Firefox */
                 }
 
                 #nav_sidebar.mobile-open {
@@ -68,7 +79,7 @@
                 }
 
                 #nav_sidebar > div {
-                    align-items: flex-start !important;
+                    align-items: center !important;
                     width: 100% !important;
                 }
                 
@@ -76,8 +87,8 @@
                     width: 100%;
                     display: flex;
                     align-items: center;
-                    justify-content: flex-start;
-                    padding: 0.5rem 0.5rem;
+                    justify-content: center;
+                    /* rely on default padding from nav_sidebar.blade.php */
                 }
                 
                 #nav_sidebar .nav-item > div:first-child {
@@ -85,22 +96,12 @@
                 }
                 
                 #nav_sidebar .nav-item.active > div:first-child {
-                    margin-right: 1rem;
+                    margin-right: 0;
                 }
                 
-                /* Hide labels by default, show only when active */
+                /* Keep labels hidden in mobile to show only icons */
                 #nav_sidebar .nav-item::after {
-                    content: attr(title);
-                    color: #e9edef;
-                    font-size: 1.1rem;
-                    font-weight: 500;
-                    display: none;
-                    white-space: nowrap;
-                    padding-right: 1rem;
-                }
-                
-                #nav_sidebar .nav-item.active::after {
-                    display: block;
+                    display: none !important;
                 }
 
                 #nav_mobile_backdrop {
@@ -128,6 +129,7 @@
                 #communities_sidebar_container,
                 #channels_sidebar_container,
                 #status_sidebar,
+                #broadcast_lists_panel,
                 #main_chat_column,
                 #calls_main_column,
                 #communities_main_column,
@@ -194,6 +196,8 @@
                     box-sizing: border-box !important;
                     background-color: #111b21;
                     z-index: 30 !important;
+                    padding-top: env(safe-area-inset-top) !important;
+                    padding-bottom: env(safe-area-inset-bottom) !important;
                 }
 
                 /* Sidebar resizer is desktop-only */
@@ -207,11 +211,6 @@
                 #channel_chat_main_column {
                     height: 100% !important;
                     max-height: 100% !important;
-                }
-
-                /* Prevent horizontal overflow everywhere */
-                #app-container * {
-                    max-width: 100vw;
                 }
                 
                 /* When NOT active, hide ALL main columns so only the list is visible */
@@ -565,6 +564,42 @@
         </div>
 
         <script>
+            // Global fetch wrapper to bypass ngrok browser warning on AJAX requests
+            const originalFetch = window.fetch;
+            const appBaseUrl = '{{ url("/") }}';
+            window.fetch = async function(resource, config) {
+                config = config || {};
+                
+                let urlStr = '';
+                if (typeof resource === 'string') urlStr = resource;
+                else if (resource instanceof Request) urlStr = resource.url;
+                else if (resource && resource.toString) urlStr = resource.toString();
+                
+                // Prepend base URL for relative paths starting with /
+                if (urlStr.startsWith('/') && !urlStr.startsWith('//')) {
+                    if (typeof resource === 'string') {
+                        resource = appBaseUrl + urlStr;
+                        urlStr = resource;
+                    }
+                }
+                
+                if (urlStr.startsWith('/') || urlStr.startsWith(window.location.origin) || urlStr.startsWith(appBaseUrl)) {
+                    config.headers = config.headers || {};
+                    if (config.headers instanceof Headers) {
+                        config.headers.append('ngrok-skip-browser-warning', '1');
+                    } else {
+                        config.headers['ngrok-skip-browser-warning'] = '1';
+                    }
+                    
+                    if (!config.credentials) {
+                        config.credentials = 'same-origin';
+                    }
+                }
+                return originalFetch(resource, config);
+            };
+
+
+
             window.openLogoutModal = function() {
                 const modal = document.getElementById('logout_modal');
                 const content = document.getElementById('logout_modal_content');
@@ -1338,63 +1373,83 @@
                                         </div>
                                     </div>
                                 </div>
-                                <span class="text-[#8696a0] text-[13px] font-normal">Ask Meta AI</span>
+<span class="text-[#8696a0] text-[13px] font-normal">Ask Meta AI</span>
                             </div>
                         </div>
                     </div>
 
                     <div id="active_chat_content" class="hidden flex-col flex-1 h-full overflow-hidden">
-                        <div class="h-16 bg-[#202c33] px-4 border-b border-[#313d45] shrink-0 shadow-sm z-[45] relative">
+                        <style>
+                            @media (max-width: 639px) {
+                                .mobile-dropdown-fixed {
+                                    position: fixed !important;
+                                    top: 80px !important;
+                                    left: 0 !important;
+                                    right: 0 !important;
+                                    width: 100% !important;
+                                    max-width: 280px !important;
+                                    margin-left: auto !important;
+                                    margin-right: auto !important;
+                                    transform-origin: top center !important;
+                                }
+                                .mobile-stack-buttons {
+                                    flex-direction: column !important;
+                                }
+                            }
+                        </style>
+                        <div class="h-16 bg-[#202c33] px-2 sm:px-4 border-b border-[#313d45] shrink-0 shadow-sm z-[45] relative">
                             <!-- Normal Header -->
                             <div id="normal_header"
                                 class="flex items-center justify-between h-full w-full transition-all duration-300">
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-1.5 sm:gap-3 flex-1 min-w-0">
                                     <button
-                                        class="md:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-1"
+                                        class="md:hidden text-[#8696a0] hover:text-[#e9edef] transition-colors mr-0.5 shrink-0"
                                         onclick="window.backToSidebar()">
-                                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                                        <svg viewBox="0 0 24 24" class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor">
                                             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z">
                                             </path>
                                         </svg>
                                     </button>
                                     <div id="active_chat_avatar" onclick="openContactInfo()"
-                                        class="relative w-10 h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm transition-transform hover:scale-105 cursor-pointer">
-                                        <svg class="w-6 h-6 text-[#8696a0]" fill="none" stroke="currentColor"
+                                        class="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#2a3942] flex items-center justify-center text-gray-600 font-bold shadow-sm transition-transform hover:scale-105 cursor-pointer shrink-0">
+                                        <svg class="w-5 h-5 sm:w-6 sm:h-6 text-[#8696a0]" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
                                             </path>
                                         </svg>
                                     </div>
-                                    <div class="cursor-pointer" onclick="openContactInfo()">
-                                        <h2 id="active_chat_title"
-                                            class="text-[15px] font-semibold text-[#e9edef] leading-tight">Select a
-                                            chat
-                                        </h2>
+                                    <div class="cursor-pointer min-w-0 flex flex-col justify-center" onclick="openContactInfo()">
+                                        <div class="flex items-center min-w-0">
+                                            <h2 id="active_chat_title"
+                                                class="text-[14px] sm:text-[15.5px] font-semibold text-[#e9edef] leading-tight truncate flex-1 min-w-0">Select a
+                                                chat
+                                            </h2>
+                                        </div>
                                         <p id="active_chat_subtitle"
-                                            class="text-xs text-[#00a884] font-medium hidden">
+                                            class="text-xs text-[#00a884] font-medium hidden truncate">
                                             online</p>
                                     </div>
                                 </div>
 
                                 <!-- Header Actions -->
-                                <div class="flex items-center gap-2 sm:gap-4">
+                                <div class="flex items-center gap-1 sm:gap-4 shrink-0">
                                     <!-- Call Button Pill -->
                                     <div class="relative">
                                         <button id="call_btn_pill"
-                                            class="hidden sm:flex items-center gap-2.5 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] px-4 py-2 rounded-full cursor-pointer transition-all duration-200 border border-transparent hover:border-[#313d45] group focus:outline-none">
+                                            class="flex items-center gap-0.5 sm:gap-2.5 bg-[#2a3942] hover:bg-[#384b57] text-[#e9edef] px-2 sm:px-4 py-1.5 sm:py-2 rounded-full cursor-pointer transition-all duration-200 border border-transparent hover:border-[#313d45] group focus:outline-none shrink-0">
                                             <div
-                                                class="flex items-center gap-2 border-r border-[#313d45] pr-2 group-hover:border-[#8696a0]">
-                                                <svg class="w-5 h-5 text-[#8696a0] group-hover:text-[#e9edef]"
+                                                class="flex items-center gap-0.5 sm:gap-2 border-r border-[#313d45] pr-1 sm:pr-2 group-hover:border-[#8696a0]">
+                                                <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5 text-[#8696a0] group-hover:text-[#e9edef]"
                                                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2"
                                                         d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z">
                                                     </path>
                                                 </svg>
-                                                <span class="text-sm font-semibold">Call</span>
+                                                <span class="text-[11px] sm:text-sm font-semibold leading-none">Call</span>
                                             </div>
-                                            <svg class="w-4 h-4 text-[#8696a0] group-hover:text-[#e9edef]"
+                                            <svg class="w-3 h-3 sm:w-4 sm:h-4 text-[#8696a0] group-hover:text-[#e9edef]"
                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M19 9l-7 7-7-7"></path>
@@ -1403,7 +1458,7 @@
 
                                         <!-- Call Dropdown -->
                                         <div id="call_dropdown" style="display: none;"
-                                            class="hidden absolute top-full mt-2 right-0 w-[350px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0">
+                                            class="hidden absolute top-full mt-2 right-0 w-[350px] bg-[#111b21] rounded-2xl shadow-2xl z-[100] flex flex-col border border-white/5 overflow-hidden transition-all duration-200 transform origin-top-right scale-95 opacity-0 mobile-dropdown-fixed">
                                             <style>
                                                 #call_dropdown.show {
                                                     transform: scale(1);
@@ -1426,7 +1481,7 @@
                                                 </div>
 
                                                 <!-- Call Action Buttons -->
-                                                <div class="flex gap-3 mt-6">
+                                                <div class="flex gap-3 mt-6 mobile-stack-buttons">
                                                     <button onclick="startVoiceCall()"
                                                         class="flex-1 bg-[#00a884] hover:bg-[#00bfa5] text-[#111b21] py-3 rounded-full flex items-center justify-center gap-2.5 font-bold transition-all active:scale-[0.98]">
                                                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -1497,9 +1552,9 @@
 
                                     <!-- Search Icon -->
                                     <button onclick="toggleSearchPanel()"
-                                        class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                                        class="p-1.5 sm:p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
                                         title="Search">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
                                             viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -1510,9 +1565,9 @@
                                     <div class="relative">
                                         <button id="private_header_more_btn"
                                             onclick="togglePrivateHeaderMoreMenu(event)"
-                                            class="p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
+                                            class="p-1.5 sm:p-2.5 text-[#8696a0] hover:text-[#e9edef] hover:bg-[#2a3942] rounded-full transition-all duration-200 focus:outline-none"
                                             title="Menu">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor"
                                                 viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
@@ -1522,7 +1577,7 @@
 
                                         <!-- Private Header More Options Dropdown -->
                                         <div id="private_header_more_dropdown"
-                                            class="hidden absolute top-12 right-0 w-[240px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
+                                            class="hidden absolute top-12 right-0 w-56 bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
                                             <button onclick="window.openContactInfo(); togglePrivateHeaderMoreMenu()"
                                                 class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span
                                                     class="text-[15px]">Contact info</span></button>
@@ -3374,8 +3429,17 @@
                         'X-CSRF-TOKEN': csrf
                     },
                     body: formData
-                }).catch(e => console.error('Send error:', e));
+                }).then(async response => {
+                    if (!response.ok) {
+                        let text = await response.text();
+                        alert('Message send failed! Status: ' + response.status + '\nResponse: ' + text.substring(0, 100));
+                    }
+                }).catch(e => {
+                    alert('Message send fetch error: ' + e.message);
+                    console.error('Send error:', e);
+                });
             } catch (e) {
+                alert('Message send sync error: ' + e.message);
                 console.error('Send error:', e);
             }
         }
@@ -4300,9 +4364,10 @@
         window.sRef = sRef;
         window.uploadBytesResumable = uploadBytesResumable;
         window.getDownloadURL = getDownloadURL;
-        window.myUserId = {{ auth()->id() ?? '0' }};
-        window.myUserName = "{{ auth()->user()->name ?? 'Me' }}";
+        window.myUserId = {{ auth()->id() ?? 1 }};
+        window.myUserName = "{{ auth()->user()->name ?? 'Test User' }}";
         window.myUserAvatar = "{{ auth()->user()->avatar ?? '' }}";
+        window.APP_ASSET_URL = "{{ rtrim(asset(''), '/') }}";
         window.currentChatId = null;
         window.allContacts = @json($users ?? []);
         window.unsubscribeAdded = null;
@@ -5792,14 +5857,14 @@
 
             if (newChatPanel.classList.contains('hidden')) {
                 sidebar.classList.add('hidden');
-                sidebar.classList.remove('sm:flex');
+                sidebar.classList.remove('flex', 'sm:flex');
                 newChatPanel.classList.remove('hidden');
-                newChatPanel.classList.add('sm:flex');
+                newChatPanel.classList.add('flex', 'sm:flex');
             } else {
                 newChatPanel.classList.add('hidden');
-                newChatPanel.classList.remove('sm:flex');
+                newChatPanel.classList.remove('flex', 'sm:flex');
                 sidebar.classList.remove('hidden');
-                sidebar.classList.add('sm:flex');
+                sidebar.classList.add('flex', 'sm:flex');
             }
         };
 
@@ -5960,7 +6025,7 @@
             document.querySelectorAll('.user-chat-item').forEach(el => el.classList.remove('active'));
 
             // On mobile, also navigate back to sidebar
-            if (window.innerWidth < 640) {
+            if (window.innerWidth < 768) {
                 window.backToSidebar();
             }
         };
@@ -5976,7 +6041,37 @@
             }
         };
 
+        window.formatAvatarUrl = function(url, fallbackName) {
+            if (url) return url.replace(/^https?:\/\/[^\/]+/, '');
+            return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(fallbackName || '') + '&background=2a3942&color=fff';
+        };
+
+        window.activateMainColumn = function(columnId) {
+            document.getElementById('app-container')?.classList.add('chat-active');
+            const allMainColumns = [
+                'main_chat_column',
+                'group_chat_main_column',
+                'channel_chat_main_column',
+                'calls_main_column',
+                'communities_main_column',
+                'status_main_column'
+            ];
+            allMainColumns.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (id === columnId) {
+                        el.classList.remove('hidden');
+                        el.classList.add('flex');
+                    } else {
+                        el.classList.add('hidden');
+                        el.classList.remove('flex');
+                    }
+                }
+            });
+        };
+
         window.selectChatOriginal = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
+            if (typeof window.activateMainColumn === 'function') window.activateMainColumn('main_chat_column');
             if (typeof window.closeAllSearchPanels === 'function') {
                 window.closeAllSearchPanels();
             }
@@ -6058,10 +6153,8 @@
 
             // Mobile view handling
             document.getElementById('app-container').classList.add('chat-active');
-            if (window.innerWidth < 640) {
+            if (window.innerWidth < 768) {
                 document.getElementById('user_sidebar_container').classList.add('hidden');
-                document.getElementById('main_chat_column').classList.remove('hidden');
-                document.getElementById('main_chat_column').classList.add('flex');
             }
 
             if (window.statusUnsubscribe) window.statusUnsubscribe();
@@ -6363,6 +6456,10 @@
 
                 window.getAutoDownloadedMediaUrl = function(url) {
                     if (!url) return url;
+                    
+                    // Strip absolute domains to fix old DB entries
+                    url = url.replace(/^https?:\/\/[^\/]+/, '');
+                    
                     const quality = localStorage.getItem('whatsapp_auto_download_quality') || 'HD quality';
                     let qualityParam = '';
                     if (quality === 'Standard quality') qualityParam = 'standard';
@@ -6398,20 +6495,21 @@
 
 
                 let mediaContent = '';
+                const vSender = isMe ? 'You' : (window.activeChatUser ? window.activeChatUser.name : 'Member');
+                const vSenderEscaped = vSender.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+                const vTextEscaped = data.text ? data.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ") : '';
+                
                 if (data.type === 'image' && data.file_url) {
                     const renderUrl = window.getAutoDownloadedMediaUrl(data.file_url);
                     if (window.isMediaAutoDownloadAllowed('photos') || isMe) {
-                        mediaContent = `<img src="${renderUrl}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${data.file_url}', '_blank')">`;
+                        mediaContent = `<img src="${renderUrl}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="event.stopPropagation(); window.openGlobalSearchImageViewer('${key}', window.currentChatId, '${data.file_url}', '${vSenderEscaped}', '${time}', false, '${vTextEscaped}')">`;
                     } else {
-                        mediaContent = `<div class="relative w-[200px] h-[200px] bg-[#233138] rounded-lg mb-2 flex flex-col items-center justify-center cursor-pointer border border-[#313d45] hover:bg-[#2a3942] transition-colors" onclick="this.outerHTML = \\\`<img src='${renderUrl}' class='max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90' onclick='window.open(\\\\\\\`${data.file_url}\\\\\\\`, \\\\\\\`_blank\\\\\\\')'>\\\`">
+                        mediaContent = `<div class="relative w-[200px] h-[200px] bg-[#233138] rounded-lg mb-2 flex flex-col items-center justify-center cursor-pointer border border-[#313d45] hover:bg-[#2a3942] transition-colors" onclick="this.outerHTML = \\\`<img src='${renderUrl}' class='max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90' onclick='event.stopPropagation(); window.openGlobalSearchImageViewer(\\\\\\\`${key}\\\\\\\`, window.currentChatId, \\\\\\\`${data.file_url}\\\\\\\`, \\\\\\\`${vSenderEscaped}\\\\\\\`, \\\\\\\`${time}\\\\\\\`, false, \\\\\\\`${vTextEscaped}\\\\\\\`)'>\\\`">
                             <div class="w-12 h-12 rounded-full border-2 border-white/60 flex items-center justify-center text-white/80 mb-2">${downloadIconSvg}</div>
                         </div>`;
                     }
                 } else if (data.type === 'video' && data.file_url) {
                     const renderUrl = window.getAutoDownloadedMediaUrl(data.file_url);
-                    const vSender = isMe ? 'You' : (window.activeChatUser ? window.activeChatUser.name : 'Member');
-                    const vSenderEscaped = vSender.replace(/'/g, "\\'").replace(/"/g, "&quot;");
-                    const vTextEscaped = data.text ? data.text.replace(/'/g, "\\'").replace(/"/g, "&quot;").replace(/\n/g, " ") : '';
                     
                     if (window.isMediaAutoDownloadAllowed('videos') || isMe) {
                         mediaContent =
@@ -8004,7 +8102,7 @@
 
             filtered.forEach(c => {
                 const displayName = c.saved_name || c.name || c.phone;
-                const displayAvatar = c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+                const displayAvatar = window.formatAvatarUrl(c.avatar, displayName);
 
                 const itemHtml = `
                     <div class="flex items-center justify-between p-3 rounded-lg hover:bg-[#202c33] transition-colors border-b border-gray-800/20">
@@ -8067,7 +8165,7 @@
             filtered.forEach(c => {
                 const isSelected = window.selectedGroupCallUsers.has(String(c.id));
                 const displayName = c.saved_name || c.name || c.phone;
-                const displayAvatar = c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+                const displayAvatar = window.formatAvatarUrl(c.avatar, displayName);
 
                 const itemHtml = `
                     <div onclick="window.toggleGroupCallUser('${c.id}')"
@@ -8121,7 +8219,7 @@
                 if (!contact) return;
 
                 const displayName = contact.saved_name || contact.name || contact.phone;
-                const displayAvatar = contact.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+                const displayAvatar = window.formatAvatarUrl(contact.avatar, displayName);
 
                 const chipHtml = `
                     <div class="flex items-center gap-1.5 bg-[#202c33] pl-1.5 pr-2.5 py-1 rounded-full text-white text-sm shrink-0 border border-white/5">
@@ -8813,7 +8911,7 @@
 
             filtered.forEach(item => {
                 const displayName = item.name;
-                const displayAvatar = item.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+                const displayAvatar = window.formatAvatarUrl(item.avatar, displayName);
 
                 const itemHtml = `
                     <div onclick="window.selectShareTarget('${item.id}', '${displayName.replace(/'/g, "\\'")}')"
@@ -9425,7 +9523,7 @@
             <div class="px-6 pt-4 pb-8 flex flex-col items-center font-sans">
                 <!-- Channel Avatar -->
                 <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden mb-5 border border-gray-100 shadow-sm">
-                    <img id="admin_invite_modal_avatar" src="" class="w-full h-full object-cover">
+                    <img id="admin_invite_modal_avatar" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="w-full h-full object-cover">
                 </div>
 
                 <!-- Channel Name -->
@@ -9617,4 +9715,245 @@
             }
         };
     </script>
+
+    <script>
+        /**
+         * Android / Browser Back Button Navigation Handler
+         * Uses the History API to build a virtual navigation stack so the
+         * Android Back button navigates within the app instead of exiting.
+         */
+        (function() {
+            function navPush(state) {
+                history.pushState(state || { nav: 'app' }, '');
+            }
+
+            // Seed the stack on page load
+            navPush({ nav: 'sidebar' });
+            window.navPush = navPush;
+
+            function getTopLayer() {
+                // 1. Fullscreen modals
+                var modalIds = [
+                    'logout_modal','delete_message_modal','forward_modal_overlay',
+                    'new_device_transfer_prompt',
+                    'link_preview_modal','sticker_picker_panel','gif_picker_panel',
+                    'audio_recorder_overlay','image_viewer_overlay','video_viewer_overlay',
+                    'location_picker_modal','poll_modal','poll_vote_modal',
+                    'disappearing_messages_modal','block_contact_modal','report_contact_modal',
+                    'add_member_modal','group_settings_modal','group_media_modal',
+                    'wallpaper_modal','wallpaper_preview_modal','call_info_modal',
+                    'incoming_call_overlay','group_incoming_call_overlay',
+                    'call_overlay','group_call_overlay','schedule_call_modal'
+                ];
+                for (var i = 0; i < modalIds.length; i++) {
+                    var el = document.getElementById(modalIds[i]);
+                    if (el && !el.classList.contains('hidden') && el.style.display !== 'none') {
+                        return { type: 'modal', id: modalIds[i] };
+                    }
+                }
+
+                // 2. Open dropdown menus (detected via .show class)
+                var dropdownIds = [
+                    'call_dropdown','group_call_dropdown','private_header_more_menu',
+                    'group_header_more_menu','channel_header_more_menu','meta_ai_header_menu'
+                ];
+                for (var j = 0; j < dropdownIds.length; j++) {
+                    var dd = document.getElementById(dropdownIds[j]);
+                    if (dd && dd.classList.contains('show')) {
+                        return { type: 'dropdown', id: dropdownIds[j] };
+                    }
+                }
+
+                // 3. Slide-in side panels
+                var panels = [
+                    { id: 'contact_info_panel',            closeFunc: 'closeContactInfo' },
+                    { id: 'group_info_panel',              closeFunc: 'closeGroupInfoPanel' },
+                    { id: 'broadcast_info_panel',          closeFunc: 'closeBroadcastInfo' },
+                    { id: 'starred_messages_panel',        closeFunc: 'closeStarredMessages' },
+                    { id: 'disappearing_messages_sidebar', closeFunc: 'closeDisappearingMessagesSidebar' },
+                    { id: 'channel_info_panel',            closeFunc: 'closeChannelInfo' },
+                    { id: 'search_sidebar',                closeFunc: null },
+                    { id: 'group_search_drawer',           closeFunc: null }
+                ];
+                for (var k = 0; k < panels.length; k++) {
+                    var p = panels[k];
+                    var pe = document.getElementById(p.id);
+                    if (pe && !pe.classList.contains('translate-x-full') && !pe.classList.contains('hidden')) {
+                        return { type: 'panel', id: p.id, closeFunc: p.closeFunc };
+                    }
+                }
+
+                // 4. Settings panel
+                var settings = document.getElementById('settings_sidebar');
+                if (settings && !settings.classList.contains('hidden')) {
+                    return { type: 'settings' };
+                }
+
+                // 5. Active chat visible on mobile
+                if (window.innerWidth < 768) {
+                    var chatContent = document.getElementById('active_chat_content');
+                    if (chatContent && chatContent.classList.contains('flex')) return { type: 'chat' };
+
+                    var groupContent = document.getElementById('active_group_chat_content');
+                    if (groupContent && groupContent.classList.contains('flex')) return { type: 'chat' };
+
+                    var metaContent = document.getElementById('meta_ai_content');
+                    if (metaContent && metaContent.classList.contains('flex')) return { type: 'chat' };
+
+                    var channelContent = document.getElementById('channels_main_column');
+                    if (channelContent && channelContent.classList.contains('flex')) return { type: 'channel' };
+
+                    var callsContent = document.getElementById('calls_main_column');
+                    if (callsContent && callsContent.classList.contains('flex')) return { type: 'call' };
+
+                    var communitiesContent = document.getElementById('communities_main_column');
+                    if (communitiesContent && communitiesContent.classList.contains('flex')) return { type: 'community' };
+                }
+
+                return { type: 'sidebar' };
+            }
+
+            function handleBackAction() {
+                var layer = getTopLayer();
+
+                if (layer.type === 'modal') {
+                    var el = document.getElementById(layer.id);
+                    if (el) {
+                        var closeBtn = el.querySelector('[data-dismiss], .modal-close, .close-btn');
+                        if (closeBtn) { closeBtn.click(); } else { el.classList.add('hidden'); }
+                    }
+
+                } else if (layer.type === 'dropdown') {
+                    var dd = document.getElementById(layer.id);
+                    if (dd) {
+                        dd.classList.remove('show');
+                        dd.style.opacity = '0';
+                        dd.style.transform = 'scale(0.95)';
+                        setTimeout(function() { dd.style.display = 'none'; }, 200);
+                    }
+
+                } else if (layer.type === 'panel') {
+                    if (layer.closeFunc && typeof window[layer.closeFunc] === 'function') {
+                        window[layer.closeFunc]();
+                    } else {
+                        var pe = document.getElementById(layer.id);
+                        if (pe) { pe.classList.add('hidden'); pe.classList.remove('flex'); }
+                    }
+
+                } else if (layer.type === 'settings') {
+                    if (typeof window.closeAllSettings === 'function') window.closeAllSettings();
+
+                } else if (layer.type === 'chat') {
+                    if (typeof window.backToSidebar === 'function') window.backToSidebar();
+
+                } else if (layer.type === 'channel') {
+                    if (typeof window.backToChannelSidebar === 'function') window.backToChannelSidebar();
+
+                } else if (layer.type === 'call') {
+                    if (typeof window.backToSidebar === 'function') window.backToSidebar(); // Adjust if there's a specific calls back function
+
+                } else if (layer.type === 'community') {
+                    if (typeof window.backToCommunitiesList === 'function') window.backToCommunitiesList();
+
+                } else {
+                    // Already at sidebar — do NOT exit. Re-push base state.
+                    navPush({ nav: 'sidebar' });
+                    return;
+                }
+
+                // Re-push so there is always a back-able entry in the stack
+                navPush({ nav: 'app' });
+            }
+
+            window.addEventListener('popstate', function() {
+                handleBackAction();
+            });
+
+            // Patch navigation functions after all scripts finish loading
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    var origSelectChat = window.selectChatOriginal;
+                    if (origSelectChat && !origSelectChat._navPatched) {
+                        window.selectChatOriginal = function() {
+                            origSelectChat.apply(this, arguments);
+                            navPush({ nav: 'chat' });
+                        };
+                        window.selectChatOriginal._navPatched = true;
+                    }
+
+                    var origSelectGroup = window.selectGroup;
+                    if (origSelectGroup && !origSelectGroup._navPatched) {
+                        window.selectGroup = function() {
+                            origSelectGroup.apply(this, arguments);
+                            navPush({ nav: 'chat' });
+                        };
+                        window.selectGroup._navPatched = true;
+                    }
+
+                    var origOpenContactInfo = window.openContactInfo;
+                    if (origOpenContactInfo && !origOpenContactInfo._navPatched) {
+                        window.openContactInfo = function() {
+                            origOpenContactInfo.apply(this, arguments);
+                            navPush({ nav: 'panel' });
+                        };
+                        window.openContactInfo._navPatched = true;
+                    }
+
+                    var origOpenGroupInfo = window.openGroupInfoPanel;
+                    if (origOpenGroupInfo && !origOpenGroupInfo._navPatched) {
+                        window.openGroupInfoPanel = function() {
+                            origOpenGroupInfo.apply(this, arguments);
+                            navPush({ nav: 'panel' });
+                        };
+                        window.openGroupInfoPanel._navPatched = true;
+                    }
+                }, 800);
+            });
+
+            window.openChatMedia = function(url) {
+                if (window.innerWidth < 640) {
+                    const modal = document.getElementById('mobile_image_viewer_modal');
+                    const img = document.getElementById('mobile_image_viewer_img');
+                    if (modal && img) {
+                        img.src = url;
+                        modal.classList.remove('hidden');
+                        // Force reflow
+                        void modal.offsetWidth;
+                        modal.classList.remove('opacity-0');
+                        modal.classList.add('opacity-100');
+                    } else {
+                        window.open(url, '_blank');
+                    }
+                } else {
+                    window.open(url, '_blank');
+                }
+            };
+
+            window.closeMobileImageViewer = function() {
+                const modal = document.getElementById('mobile_image_viewer_modal');
+                if (modal) {
+                    modal.classList.remove('opacity-100');
+                    modal.classList.add('opacity-0');
+                    setTimeout(() => {
+                        modal.classList.add('hidden');
+                        document.getElementById('mobile_image_viewer_img').src = '';
+                    }, 300);
+                }
+            };
+
+        })();
+    </script>
+
+    <div id="mobile_image_viewer_modal" class="fixed inset-0 z-[100] bg-black hidden flex-col transition-opacity opacity-0 duration-300">
+        <div class="h-16 flex items-center justify-between px-4 text-white bg-black/50 absolute top-0 w-full z-10">
+            <button onclick="closeMobileImageViewer()" class="p-2">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.8l5.6-5.6L12 4l-8 8 8 8 1.4-1.4L7.8 13H20v-2z"></path></svg>
+            </button>
+        </div>
+        <div class="flex-1 flex items-center justify-center overflow-auto h-full w-full">
+            <img id="mobile_image_viewer_img" src="" class="max-w-full max-h-full object-contain">
+        </div>
+    </div>
+
 </x-app-layout>
+

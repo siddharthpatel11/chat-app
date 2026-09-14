@@ -43,7 +43,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private WebView webView;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar progressBar;
     private LinearLayout errorLayout;
     private TextView errorText;
@@ -123,17 +121,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         webView          = findViewById(R.id.webview);
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh);
         progressBar      = findViewById(R.id.progress_bar);
         errorLayout      = findViewById(R.id.error_layout);
         errorText        = findViewById(R.id.error_text);
 
         setupWebView();
         requestAllPermissions();
-
-        swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#00a884"));
-        swipeRefreshLayout.setProgressBackgroundColorSchemeColor(Color.parseColor("#202c33"));
-        swipeRefreshLayout.setOnRefreshListener(() -> webView.reload());
 
         // Long-press anywhere on the progress bar area launches the URL-settings dialog
         // (Useful when the page fails to load and you need to change the ngrok URL)
@@ -243,13 +236,21 @@ public class MainActivity extends AppCompatActivity {
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
         settings.setTextZoom(100);
-        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+
+        // Clear cache to ensure updated Laravel backend code is always loaded
+        webView.clearCache(true);
 
         // Identify as Android wrapper app
         String ua = settings.getUserAgentString();
         settings.setUserAgentString(ua + " ChatAppAndroid/1.0");
 
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+
+        // Enable Cookies (required for Laravel Session & CSRF)
+        android.webkit.CookieManager cookieManager = android.webkit.CookieManager.getInstance();
+        cookieManager.setAcceptCookie(true);
+        cookieManager.setAcceptThirdPartyCookies(webView, true);
 
         // JS bridge
         webView.addJavascriptInterface(new AndroidBridge(), "AndroidApp");
@@ -268,7 +269,6 @@ public class MainActivity extends AppCompatActivity {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
 
                 // Tell the web app it's running inside the Android app
                 view.evaluateJavascript(
@@ -283,7 +283,6 @@ public class MainActivity extends AppCompatActivity {
                                         WebResourceError error) {
                 if (request.isForMainFrame()) {
                     progressBar.setVisibility(View.GONE);
-                    swipeRefreshLayout.setRefreshing(false);
                     showError("Cannot connect to server.\n\nMake sure ngrok is running.\n\n" +
                               "Long-press here to change the server URL.");
                 }

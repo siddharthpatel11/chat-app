@@ -118,5 +118,30 @@
         if (labelEl) labelEl.innerText = val;
         
         if(window.showToast && !val.includes('excluded') && !val.includes('included')) window.showToast('Privacy Updated', 'Setting saved.');
+        
+        // Sync to Firebase
+        if (window.myUserId && window.db && window.update && window.ref) {
+            let statusExcludedIds = [];
+            let statusIncludedIds = [];
+            let statusVal = val;
+            
+            if (val.includes('excluded') || val === 'My contacts except...') {
+                statusVal = 'My contacts except...';
+                const savedData = localStorage.getItem('whatsapp_privacy_exclude_status');
+                if (savedData) { try { statusExcludedIds = JSON.parse(savedData); } catch(e){} }
+            } else if (val.includes('included') || val === 'Only share with...') {
+                statusVal = 'Only share with...';
+                const savedData = localStorage.getItem('whatsapp_privacy_exclude_status_include');
+                if (savedData) { try { statusIncludedIds = JSON.parse(savedData); } catch(e){} }
+            } else {
+                statusVal = 'My contacts';
+            }
+            
+            window.update(window.ref(window.db, `users/${window.myUserId}/privacy`), {
+                status: statusVal,
+                status_exclude: statusExcludedIds,
+                status_include: statusIncludedIds
+            }).catch(err => console.error("Error syncing status privacy to firebase:", err));
+        }
     }
 </script>

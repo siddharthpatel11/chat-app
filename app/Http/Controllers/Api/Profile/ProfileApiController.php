@@ -10,7 +10,7 @@ class ProfileApiController extends Controller
 {
     use \App\Traits\ApiResponse;
 
-    public function updateProfile(Request $request)
+    public function updateProfile(Request $request, \App\Services\FirebaseService $firebaseService)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
@@ -45,7 +45,7 @@ class ProfileApiController extends Controller
         if ($request->hasFile('avatar')) {
             $file = $request->file('avatar');
             $path = $file->store('avatars', 'public');
-            $data['avatar'] = url('storage/'.$path);
+            $data['avatar'] = '/storage/'.$path;
         }
 
         if (empty($data)) {
@@ -53,6 +53,21 @@ class ProfileApiController extends Controller
         }
 
         $user->update($data);
+
+        // Sync to Firebase
+        try {
+            $firebaseData = [];
+            if (isset($data['name'])) $firebaseData['name'] = $data['name'];
+            if (isset($data['about'])) $firebaseData['about'] = $data['about'];
+            if (isset($data['about_subtitle'])) $firebaseData['about_subtitle'] = $data['about_subtitle'];
+            if (array_key_exists('avatar', $data)) $firebaseData['avatar'] = $data['avatar'];
+            
+            if (!empty($firebaseData)) {
+                $firebaseService->database()->getReference("users/{$user->id}/profile")->update($firebaseData);
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Firebase profile sync error API: ' . $e->getMessage());
+        }
 
         return response()->json([
             'status' => true,

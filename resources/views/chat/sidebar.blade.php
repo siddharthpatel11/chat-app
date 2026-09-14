@@ -1104,9 +1104,11 @@
 
             window.sortSidebar();
 
-            window.toggleUserContextMenu = function(event, targetId, displayName, type = 'user') {
-                event.stopPropagation();
-                event.preventDefault();
+            window.toggleUserContextMenu = function(event, targetId, displayName, type = 'user', targetElement = null, touchX = null, touchY = null) {
+                if (event) {
+                    event.stopPropagation();
+                    if (event.cancelable) event.preventDefault();
+                }
 
                 activeChatIdForMenu = targetId;
                 activeChatTypeForMenu = type;
@@ -1234,28 +1236,55 @@
                     }
                 }
 
-                // Position the dropdown at the button position
-                const rect = event.currentTarget.getBoundingClientRect();
+                // Position the dropdown
+                let rect;
+                if (targetElement) {
+                    rect = targetElement.getBoundingClientRect();
+                } else if (event && event.currentTarget) {
+                    rect = event.currentTarget.getBoundingClientRect();
+                } else {
+                    rect = { top: 0, bottom: 0, left: 0, right: 0 };
+                }
 
                 // Show dropdown temporarily to calculate height
                 dropdown.style.visibility = 'hidden';
                 dropdown.classList.remove('hidden', 'scale-95', 'opacity-0');
 
                 const dropdownHeight = dropdown.offsetHeight;
+                const dropdownWidth = dropdown.offsetWidth;
 
-                dropdown.classList.remove('origin-top-right', 'origin-bottom-right');
+                dropdown.classList.remove('origin-top-right', 'origin-bottom-right', 'origin-top-left', 'origin-bottom-left');
 
-                let topPos = rect.bottom + 4;
-                if (topPos + dropdownHeight + 10 > window.innerHeight) {
-                    topPos = rect.top - dropdownHeight - 4;
-                    if (topPos < 10) topPos = 10;
-                    dropdown.classList.add('origin-bottom-right');
+                let topPos, leftPos;
+
+                if (touchX !== null && touchY !== null) {
+                    topPos = touchY;
+                    leftPos = touchX;
+                    // adjust so it doesn't go offscreen
+                    if (leftPos + dropdownWidth > window.innerWidth) {
+                        leftPos = window.innerWidth - dropdownWidth - 10;
+                    }
+                    if (topPos + dropdownHeight > window.innerHeight) {
+                        topPos = window.innerHeight - dropdownHeight - 10;
+                        if (topPos < 10) topPos = 10;
+                        dropdown.classList.add('origin-bottom-left');
+                    } else {
+                        dropdown.classList.add('origin-top-left');
+                    }
                 } else {
-                    dropdown.classList.add('origin-top-right');
+                    topPos = rect.bottom + 4;
+                    if (topPos + dropdownHeight + 10 > window.innerHeight) {
+                        topPos = rect.top - dropdownHeight - 4;
+                        if (topPos < 10) topPos = 10;
+                        dropdown.classList.add('origin-bottom-right');
+                    } else {
+                        dropdown.classList.add('origin-top-right');
+                    }
+                    leftPos = rect.right - dropdownWidth;
                 }
 
                 dropdown.style.top = `${topPos}px`;
-                dropdown.style.left = `${rect.right - dropdown.offsetWidth}px`;
+                dropdown.style.left = `${leftPos}px`;
 
                 // Restore classes for animation
                 dropdown.classList.add('scale-95', 'opacity-0');
@@ -1456,12 +1485,14 @@
                 }, 150);
             };
 
-            // Close when clicking anywhere else
-            document.addEventListener('click', (e) => {
-                if (dropdown && !dropdown.contains(e.target)) {
+            // Close when clicking or touching anywhere else
+            const closeMenuHandler = (e) => {
+                if (dropdown && !dropdown.contains(e.target) && !dropdown.classList.contains('hidden')) {
                     window.closeUserContextMenu();
                 }
-            });
+            };
+            document.addEventListener('click', closeMenuHandler);
+            document.addEventListener('touchstart', closeMenuHandler, { passive: true });
 
             // Close on escape key
             document.addEventListener('keydown', (e) => {
@@ -1469,6 +1500,56 @@
                     window.closeUserContextMenu();
                 }
             });
+
+            // Long press logic for mobile
+            let pressTimer;
+            let isPressing = false;
+            let touchX = 0;
+            let touchY = 0;
+            const userListContainer = document.getElementById('user_list_container');
+            
+            if (userListContainer) {
+                userListContainer.addEventListener('touchstart', (e) => {
+                    const chatItem = e.target.closest('.user-chat-item');
+                    if (!chatItem) return;
+                    
+                    isPressing = true;
+                    touchX = e.touches[0].clientX;
+                    touchY = e.touches[0].clientY;
+
+                    pressTimer = setTimeout(() => {
+                        if (isPressing) {
+                            isPressing = false; // Prevent multiple triggers
+                            if(window.navigator && window.navigator.vibrate) window.navigator.vibrate(50); // haptic feedback
+                            
+                            const targetId = chatItem.id.replace('user_sidebar_', '').replace('group_sidebar_', '');
+                            const type = chatItem.id.startsWith('group') ? 'group' : 'user';
+                            const nameSpan = chatItem.querySelector('.font-medium');
+                            const displayName = nameSpan ? nameSpan.innerText : '';
+                            
+                            const fakeEvent = {
+                                stopPropagation: () => {},
+                                preventDefault: () => {},
+                                clientX: touchX,
+                                clientY: touchY,
+                                currentTarget: chatItem
+                            };
+                            
+                            window.toggleUserContextMenu(fakeEvent, targetId, displayName, type, chatItem, touchX, touchY);
+                        }
+                    }, 500);
+                }, { passive: true });
+
+                userListContainer.addEventListener('touchend', () => {
+                    isPressing = false;
+                    clearTimeout(pressTimer);
+                });
+
+                userListContainer.addEventListener('touchmove', () => {
+                    isPressing = false;
+                    clearTimeout(pressTimer);
+                }, { passive: true });
+            }
             window.toggleArchiveChat = function(targetId, type) {
                 const elementId = type === 'group' ? `group_sidebar_${targetId}` : `user_sidebar_${targetId}`;
                 const index = window.archivedChats.indexOf(elementId);
@@ -2565,7 +2646,7 @@
                         <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
                                 <div class="w-5 h-5 rounded-full overflow-hidden bg-[#2a3942] shrink-0">
-                                    <img src="${senderAvatar}" class="w-full h-full object-cover">
+                                    <img src="${senderAvatar}" onerror="this.src='data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='" class="w-full h-full object-cover">
                                 </div>
                                 <span class="text-[13px] text-[#8696a0] font-medium truncate max-w-[170px]">${senderInfo}</span>
                             </div>

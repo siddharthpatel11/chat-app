@@ -35,7 +35,7 @@ class FileUploadService
 
         $fileName = $file->getClientOriginalName();
         $path = $file->store('uploads', $disk);
-        $fileUrl = url('storage/'.$path);
+        $fileUrl = '/storage/'.$path;
 
         return [
             'type' => $type,

@@ -136,14 +136,14 @@
 
     <!-- Custom Delete Confirmation Modal -->
     <div id="delete_status_modal" class="hidden fixed inset-0 z-[700] flex items-center justify-center p-6">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px]" onclick="window.closeDeleteModal()"></div>
+        <div class="absolute inset-0 bg-black/60 backdrop-blur-[2px]" onclick="window.closeStatusDeleteModal()"></div>
         <div class="relative w-full max-w-[400px] bg-[#1f2c33] rounded-[28px] shadow-2xl p-8 animate-in fade-in zoom-in duration-200">
             <h2 class="text-[#e9edef] text-[22px] font-normal mb-4">Delete 1 status update</h2>
             <p class="text-[#8696a0] text-[15px] leading-relaxed mb-10">
                 Delete this status update? It will also be deleted for everyone who received it.
             </p>
             <div class="flex items-center justify-end gap-6">
-                <button onclick="window.closeDeleteModal()" class="text-[#00a884] font-semibold text-[15px] hover:bg-[#00a884]/10 px-4 py-2 rounded-full transition-colors">
+                <button onclick="window.closeStatusDeleteModal()" class="text-[#00a884] font-semibold text-[15px] hover:bg-[#00a884]/10 px-4 py-2 rounded-full transition-colors">
                     Cancel
                 </button>
                 <button onclick="window.confirmDeleteStatus()" class="bg-[#f15c6d] hover:bg-[#d94f5e] active:scale-95 text-[#111b21] font-semibold text-[15px] px-6 py-2.5 rounded-full transition-all shadow-lg">
@@ -155,6 +155,7 @@
 </div>
 
 <script>
+    window.APP_ASSET_URL = "{{ rtrim(asset(''), '/') }}";
     let currentStatusArray = [];
     let currentStatusIndex = 0;
     let statusPlaybackTimer = null;
@@ -212,14 +213,19 @@
             overlay.style.backgroundColor = '#000';
             mediaContainer.classList.remove('hidden');
             
+            let normalizedMediaUrl = status.mediaUrl;
+            if (normalizedMediaUrl && normalizedMediaUrl.includes('/storage/')) {
+                normalizedMediaUrl = window.APP_ASSET_URL + normalizedMediaUrl.substring(normalizedMediaUrl.indexOf('/storage/'));
+            }
+
             if (status.type === 'image') {
                 const img = document.createElement('img');
-                img.src = status.mediaUrl;
+                img.src = normalizedMediaUrl;
                 img.className = 'max-w-full max-h-full object-contain';
                 mediaInner.appendChild(img);
             } else if (status.type === 'video') {
                 const video = document.createElement('video');
-                video.src = status.mediaUrl;
+                video.src = normalizedMediaUrl;
                 video.className = 'max-w-full max-h-full object-contain';
                 video.autoplay = true;
                 video.muted = true;
@@ -233,8 +239,14 @@
             }
         }
         
+        let normalizedAvatar = status.userAvatar;
+        if (normalizedAvatar && normalizedAvatar.includes('/storage/')) {
+            normalizedAvatar = window.APP_ASSET_URL + normalizedAvatar.substring(normalizedAvatar.indexOf('/storage/'));
+        } else if (normalizedAvatar && normalizedAvatar.startsWith('storage/')) {
+            normalizedAvatar = window.APP_ASSET_URL + '/' + normalizedAvatar;
+        }
         nameEl.textContent = status.userId == window.myUserId ? 'You' : status.userName;
-        avatarEl.src = status.userAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(status.userName)}&background=2a3942&color=fff`;
+        avatarEl.src = normalizedAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(status.userName)}&background=2a3942&color=fff`;
         
         // Format time
         const date = new Date(status.timestamp);
@@ -341,7 +353,7 @@
         isPaused = true; // Pause status while modal is open
     };
 
-    window.closeDeleteModal = function() {
+    window.closeStatusDeleteModal = function() {
         document.getElementById('delete_status_modal').classList.add('hidden');
         isPaused = false; // Resume if desired
     };
@@ -350,7 +362,7 @@
         const status = currentStatusArray[currentStatusIndex];
         try {
             await window.remove(window.ref(window.db, `statuses/${window.myUserId}/${status.id}`));
-            window.closeDeleteModal();
+            window.closeStatusDeleteModal();
             window.closeStatusViewer();
             if (window.showToast) window.showToast('Deleted', 'Your status has been deleted.');
         } catch (e) {

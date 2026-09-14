@@ -1,7 +1,7 @@
 <!-- Global Search Image Viewer (Lightbox) -->
 <div id="gs_image_viewer" class="hidden fixed inset-0 z-[2000] bg-black flex flex-col transition-opacity duration-300 opacity-0 pointer-events-auto">
     <!-- Header -->
-    <div class="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/60 to-transparent absolute top-0 w-full z-[2100]">
+    <div class="flex items-center justify-between px-4 pb-3 bg-gradient-to-b from-black/60 to-transparent absolute top-0 w-full z-[2100]" style="padding-top: max(0.75rem, env(safe-area-inset-top, 20px));">
         <div class="flex items-center gap-4">
             <!-- Back Button -->
             <button onclick="window.closeGlobalSearchImageViewer()" class="text-white hover:text-[#d1d7db] transition-colors focus:outline-none p-1 rounded-full">
@@ -57,12 +57,46 @@
             
             <!-- Context Menu Dropdown -->
             <div id="gs_viewer_dropdown_menu" class="hidden absolute top-12 right-0 bg-[#233138] border border-[#313d45] rounded-lg shadow-xl z-[2200] py-2 w-56 transition-opacity duration-150">
+                <button id="gs_viewer_btn_edit" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg> Edit
+                </button>
+                <button id="gs_viewer_btn_share_menu" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg> Share
+                </button>
+                <button id="gs_viewer_btn_star" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg> Star
+                </button>
                 <button id="gs_viewer_btn_show_chat" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg> Show in chat
+                </button>
+                <button id="gs_viewer_btn_create_sticker" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Create sticker
+                </button>
+                <button id="gs_viewer_btn_ask_meta_ai" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center gap-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Ask Meta AI
                 </button>
                 <button id="gs_viewer_btn_delete" class="w-full text-left px-4 py-3 text-[#f15c6d] hover:bg-[#182229] transition-colors text-[14.5px] flex items-center gap-3">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg> Delete
                 </button>
+                <div class="border-t border-[#313d45] my-1"></div>
+                <div class="relative group/more">
+                    <button class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex items-center justify-between">
+                        More
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                    <!-- Submenu -->
+                    <div class="hidden group-hover/more:block absolute right-[102%] top-0 bg-[#233138] border border-[#313d45] rounded-lg shadow-xl z-[2300] py-2 w-48">
+                        <button onclick="if(window.showToast) window.showToast('Notice', 'Feature coming soon')" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px]">All media</button>
+                        <button onclick="if(window.showToast) window.showToast('Notice', 'Feature coming soon')" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px]">View in gallery</button>
+                        <button onclick="if(window.showToast) window.showToast('Notice', 'Feature coming soon')" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px]">Search on web</button>
+                        <button id="gs_viewer_btn_rotate" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px]">Rotate</button>
+                        <div class="border-t border-[#313d45] my-1"></div>
+                        <button onclick="if(window.showToast) window.showToast('Notice', 'Feature coming soon')" class="w-full text-left px-4 py-3 text-[#d1d7db] hover:bg-[#182229] hover:text-white transition-colors text-[14.5px] flex justify-between items-center">
+                            Set as...
+                            <svg class="w-4 h-4 -mr-1 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -263,7 +297,8 @@
         const text = window.gsViewerCurrentContext.text || '';
         
         if (!navigator.share) {
-            if (window.showToast) window.showToast('Notice', 'System sharing is not supported on this device.');
+            // Fallback to internal forward modal if system share is not available (e.g. over HTTP)
+            handleImageForwardOrShare();
             return;
         }
         
@@ -459,14 +494,62 @@
         }
     });
 
+    // Rotate Image logic
+    window.gsViewerRotation = 0;
+    document.getElementById('gs_viewer_btn_rotate').addEventListener('click', () => {
+        window.gsViewerRotation = (window.gsViewerRotation + 90) % 360;
+        document.getElementById('gs_viewer_img').style.transform = `rotate(${window.gsViewerRotation}deg)`;
+        window.closeGsViewerMenu();
+    });
+
+    // Reset rotation on close
+    const originalClose = window.closeGlobalSearchImageViewer;
+    window.closeGlobalSearchImageViewer = function() {
+        originalClose();
+        window.gsViewerRotation = 0;
+        document.getElementById('gs_viewer_img').style.transform = '';
+    };
+
+    // Other fake menu items
+    document.getElementById('gs_viewer_btn_edit').addEventListener('click', () => {
+        if(window.showToast) window.showToast('Notice', 'Feature coming soon');
+        window.closeGsViewerMenu();
+    });
+    document.getElementById('gs_viewer_btn_share_menu').addEventListener('click', () => {
+        document.getElementById('gs_viewer_btn_share').click();
+        window.closeGsViewerMenu();
+    });
+    document.getElementById('gs_viewer_btn_star').addEventListener('click', () => {
+        if (!gsViewerCurrentContext) return;
+        if(window.starMsg) {
+            window.starMsg(gsViewerCurrentContext.key);
+        } else if(window.showToast) {
+            window.showToast('Success', 'Message starred');
+        }
+        window.closeGsViewerMenu();
+    });
+    document.getElementById('gs_viewer_btn_create_sticker').addEventListener('click', () => {
+        if(window.showToast) window.showToast('Notice', 'Feature coming soon');
+        window.closeGsViewerMenu();
+    });
+    document.getElementById('gs_viewer_btn_ask_meta_ai').addEventListener('click', () => {
+        if(window.openMetaAI) {
+            window.closeGlobalSearchImageViewer();
+            window.openMetaAI();
+        } else if(window.showToast) {
+            window.showToast('Notice', 'Feature coming soon');
+        }
+        window.closeGsViewerMenu();
+    });
+
     // Handle double click to zoom
     document.getElementById('gs_viewer_image_container').addEventListener('dblclick', (e) => {
         if (e.target.tagName !== 'IMG') return;
         const img = e.target;
-        const isZoomed = img.style.transform === 'scale(2)';
+        const isZoomed = img.style.transform && img.style.transform.includes('scale(2)');
         
         if (isZoomed) {
-            img.style.transform = 'scale(1)';
+            img.style.transform = `rotate(${window.gsViewerRotation}deg) scale(1)`;
             img.style.cursor = 'zoom-in';
         } else {
             // Zoom at click position
@@ -475,7 +558,7 @@
             const y = ((e.clientY - rect.top) / rect.height) * 100;
             
             img.style.transformOrigin = `${x}% ${y}%`;
-            img.style.transform = 'scale(2)';
+            img.style.transform = `rotate(${window.gsViewerRotation}deg) scale(2)`;
             img.style.cursor = 'zoom-out';
         }
     });

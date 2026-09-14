@@ -140,12 +140,7 @@
 
             pwaInstallBtn.addEventListener('click', async () => {
                 hidePwaPrompt();
-                if (window.deferredPrompt) {
-                    window.deferredPrompt.prompt();
-                    const { outcome } = await window.deferredPrompt.userChoice;
-                    window.deferredPrompt = null;
-                    if (outcome === 'accepted') localStorage.setItem('pwa-prompt-dismissed', 'true');
-                }
+                window.installPWA();
             });
 
             pwaCloseBtn.addEventListener('click', () => {
@@ -187,59 +182,14 @@
                 initInstallBtn();
             }
 
-            // ── Main entry point: Install App button in sidebar ───────────
+            // 🚀 Main entry point: Install App button in sidebar 🚀
             window.installPWA = async function() {
-                // ① Running inside our Android WebView app → do nothing
+                // 🛑 Running inside our Android WebView app ➔ do nothing
                 if (window.isAndroidApp) return;
 
-                // ② Android mobile browser → download the APK
-                if (isAndroidMobile()) {
-                    const apkUrl = '{!! url("/download/app") !!}';
-                    if (window.showToast) {
-                        window.showToast('Downloading APK…', 'Please wait while the app downloads. This may take a few seconds.');
-                    }
-                    
-                    try {
-                        // Fetch using JS to ensure ngrok cookies are sent, as Android's native Download Manager often lacks them
-                        const response = await fetch(apkUrl, {
-                            credentials: 'same-origin',
-                            headers: {
-                                'ngrok-skip-browser-warning': '1'
-                            }
-                        });
-                        
-                        if (!response.ok) throw new Error('Download failed');
-                        
-                        const blob = await response.blob();
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        
-                        const a = document.createElement('a');
-                        a.style.display = 'none';
-                        a.href = blobUrl;
-                        a.download = 'ChatApp.apk';
-                        document.body.appendChild(a);
-                        a.click();
-                        
-                        setTimeout(() => {
-                            document.body.removeChild(a);
-                            window.URL.revokeObjectURL(blobUrl);
-                            if (window.showToast) {
-                                window.showToast('Download Complete', 'Open the downloaded file to install the app!');
-                            }
-                        }, 1000);
-                        
-                    } catch (err) {
-                        console.error('APK fetch failed:', err);
-                        if (window.showToast) {
-                            window.showToast('Download Error', 'Retrying with alternative method...');
-                        }
-                        // Fallback: Open in new tab. Chrome might handle the ngrok warning or download manager better.
-                        setTimeout(() => window.open(apkUrl, '_blank'), 1500);
-                    }
-                    return;
-                }
-
-                // ③ iOS → show "Add to Home Screen" instructions
+                const apkUrl = '{!! url("/download/universal") !!}';
+                
+                // If it's iOS, show iOS instructions
                 if (isIos() && !isStandalone()) {
                     document.getElementById('pwa-prompt-title').textContent = 'Install App (iOS)';
                     document.getElementById('pwa-prompt-desc').innerHTML =
@@ -249,7 +199,26 @@
                     return;
                 }
 
-                // ② Desktop / Android Chrome with native install prompt
+                // If it's Android Mobile, download the Universal APK
+                if (isAndroidMobile()) {
+                    if (window.showToast) {
+                        window.showToast('Downloading Universal App...', 'Please wait while the new app downloads.');
+                    }
+                    // Adding timestamp to force browser to ignore any cached downloads
+                    window.location.href = apkUrl + "?t=" + new Date().getTime();
+                    return;
+                }
+
+                // If it's Desktop, trigger the Desktop App (.exe) download
+                if (confirm("Do you want to download the Desktop App (.exe)?\n(Cancel to install the Web App instead)")) {
+                    if (window.showToast) {
+                        window.showToast('Downloading App...', 'Please wait while the setup file downloads.');
+                    }
+                    window.location.href = '{!! url("/download/desktop") !!}';
+                    return;
+                }
+
+                // If they cancelled the .exe download, trigger the Native PWA Installation (Web App)
                 if (window.deferredPrompt) {
                     window.deferredPrompt.prompt();
                     const { outcome } = await window.deferredPrompt.userChoice;
@@ -261,7 +230,7 @@
                 } else {
                     if (window.showToast) {
                         window.showToast('Install App',
-                            'Look for the install ⊕ icon in the address bar, or use the browser menu → "Add to Home Screen" or "Install App".');
+                            'Look for the install ⬇ icon in the address bar, or use the browser menu ➔ "Install App".');
                     }
                 }
             };

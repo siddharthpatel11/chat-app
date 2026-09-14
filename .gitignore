@@ -25,3 +25,21 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /storage/app/firebase.json
+/build-tools/
+
+# Temporary Scripts & Test Files
+build_universal_apk.ps1
+dump.json
+fix_*.php
+fix_*.cjs
+fix_*.py
+replace.py
+test.txt
+test_*.php
+update_url*.cjs
+update_url.js
+
+# Downloads & Temp Folders
+/public/download/temp.zip
+/public/download/temp_unzip/
+/public/download/universal-app.apk

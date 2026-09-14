@@ -1,5 +1,5 @@
 <!-- Channel Info Sidebar -->
-<div id="channel_info_sidebar" class="hidden w-[30%] min-w-[400px] max-w-full h-full bg-[#111b21] border-l border-[#313d45] flex-col shrink-0 z-40 select-none flex-1 sm:flex-none">
+<div id="channel_info_panel" class="hidden w-[30%] min-w-[400px] max-w-full h-full bg-[#111b21] border-l border-[#313d45] flex-col shrink-0 z-40 select-none flex-1 sm:flex-none">
     <!-- Header -->
     <div class="h-[60px] bg-[#111b21] px-4 flex items-center gap-6 shrink-0">
         <!-- Close button 'X' -->
@@ -505,7 +505,7 @@
 
 <script>
     window.toggleChannelInfo = async function() {
-        const sidebar = document.getElementById('channel_info_sidebar');
+        const sidebar = document.getElementById('channel_info_panel');
         if (sidebar.classList.contains('hidden')) {
             sidebar.classList.remove('hidden');
             sidebar.classList.add('flex');
@@ -547,7 +547,7 @@
             descSection.classList.remove('hidden');
         }
 
-        document.getElementById('info_channel_avatar').src = ch.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=2a3942&color=fff';
+        document.getElementById('info_channel_avatar').src = window.formatAvatarUrl(ch.avatar, ch.name);
 
         const followersCount = ch.followers ? Object.keys(ch.followers).length : 0;
         document.getElementById('info_channel_followers').innerText = "Channel · " + followersCount + " follower" + (followersCount !== 1 ? 's' : '');
@@ -826,7 +826,7 @@
     };
 
     window.closeChannelInfo = function() {
-        const sidebar = document.getElementById('channel_info_sidebar');
+        const sidebar = document.getElementById('channel_info_panel');
         sidebar.classList.add('hidden');
         sidebar.classList.remove('flex');
         window.closeChannelNotifications(); // also close any child panel
@@ -1449,7 +1449,7 @@
 
         if (ch) {
             document.getElementById('revoke_modal_channel_name').innerText = ch.name;
-            document.getElementById('revoke_modal_avatar').src = ch.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=2a3942&color=fff';
+            document.getElementById('revoke_modal_avatar').src = window.formatAvatarUrl(ch.avatar, ch.name);
         }
 
         modal.classList.remove('hidden');

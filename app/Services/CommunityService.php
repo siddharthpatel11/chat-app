@@ -32,7 +32,7 @@ class CommunityService
         $avatarUrl = null;
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('communities', 'public');
-            $avatarUrl = url('storage/'.$path);
+            $avatarUrl = '/storage/'.$path;
         }
 
         $communityId = 'community_'.time().'_'.uniqid();
@@ -263,7 +263,7 @@ class CommunityService
         $avatarUrl = null;
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('groups', 'public');
-            $avatarUrl = url('storage/'.$path);
+            $avatarUrl = '/storage/'.$path;
         }
 
         $newGroupData = [
@@ -677,7 +677,7 @@ class CommunityService
 
         if ($request->hasFile('avatar')) {
             $path = $request->file('avatar')->store('communities', 'public');
-            $updateData['avatar'] = url('storage/'.$path);
+            $updateData['avatar'] = '/storage/'.$path;
         }
 
         $communityRef->update($updateData);

@@ -97,9 +97,7 @@
                                 "granted" && document.visibilityState !== 'visible') {
                                 new Notification(title, {
                                     body: body,
-                                    icon: ch.avatar || 'https://ui-avatars.com/api/?name=' +
-                                        encodeURIComponent(ch.name) +
-                                        '&background=2a3942&color=fff'
+                                    icon: window.formatAvatarUrl(ch.avatar, ch.name)
                                 });
                             }
                         }
@@ -129,7 +127,7 @@
                     html += `
                             <div onclick="window.openChannel('${ch.id}')" class="flex items-center gap-3 px-3 py-3 ${activeClass} cursor-pointer transition-colors hover:bg-[#202c33]">
                                 <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
-                                    <img src="${ch.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=2a3942&color=fff'}" class="w-full h-full object-cover">
+                                    <img src="${window.formatAvatarUrl(ch.avatar, ch.name)}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="flex-1 min-w-0 flex flex-col justify-center border-b border-[#202c33] pb-3 -mb-3">
                                     <div class="flex justify-between items-center mb-0.5">
@@ -182,7 +180,7 @@
                     html += `
                             <div onclick="window.openChannel('${ch.id}')" class="flex items-center gap-3 px-3 py-3 hover:bg-[#202c33] cursor-pointer transition-colors group">
                                 <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
-                                    <img src="${ch.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=2a3942&color=fff'}" class="w-full h-full object-cover">
+                                    <img src="${window.formatAvatarUrl(ch.avatar, ch.name)}" class="w-full h-full object-cover">
                                 </div>
                                 <div class="flex-1 min-w-0 flex flex-col justify-center border-b border-[#202c33] pb-3 -mb-3 group-last:border-none group-last:pb-0 group-last:-mb-0">
                                     <div class="flex justify-between items-center">
@@ -242,7 +240,7 @@
                 const chHtml = `
                         <div onclick="window.openChannel('${ch.id}')" class="flex items-center gap-4 px-4 py-3 hover:bg-[#202c33] cursor-pointer transition-colors group">
                             <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
-                                <img src="${ch.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=2a3942&color=fff'}" class="w-full h-full object-cover">
+                                <img src="${window.formatAvatarUrl(ch.avatar, ch.name)}" class="w-full h-full object-cover">
                             </div>
                             <div class="flex-1 min-w-0 flex flex-col justify-center border-b border-[#202c33] pb-3 -mb-3 group-last:border-none group-last:pb-0 group-last:-mb-0">
                                 <div class="flex justify-between items-center">
@@ -326,6 +324,7 @@
     };
 
     window.backToChannelSidebar = function() {
+        document.getElementById('app-container')?.classList.remove('chat-active');
         document.getElementById('channels_sidebar_container')?.classList.remove('hidden');
         document.getElementById('channels_sidebar_container')?.classList.add('flex', 'w-full');
         document.getElementById('channels_main_column')?.classList.add('hidden');
@@ -333,6 +332,7 @@
     };
 
     window.openChannel = function(channelId) {
+        if (typeof window.activateMainColumn === 'function') window.activateMainColumn('channel_chat_main_column');
         // Clear unread count
         if (window.channelUnreadCounts && window.channelUnreadCounts[channelId]) {
             window.channelUnreadCounts[channelId] = 0;
@@ -351,7 +351,7 @@
         document.getElementById('active_channel_view').classList.add('flex');
 
         // On mobile, hide sidebar and show main column
-        if (window.innerWidth < 640) {
+        if (window.innerWidth < 768) {
             document.getElementById('channels_sidebar_container')?.classList.add('hidden');
             document.getElementById('channels_sidebar_container')?.classList.remove('flex');
             document.getElementById('channels_main_column')?.classList.remove('hidden');
@@ -368,9 +368,7 @@
             const fCount = ch.followers ? Object.keys(ch.followers).length : 0;
             document.getElementById('current_channel_followers').innerText = fCount + " follower" + (
                 fCount !== 1 ? 's' : '');
-            document.getElementById('current_channel_avatar').src = ch.avatar ||
-                'https://ui-avatars.com/api/?name=' + encodeURIComponent(ch.name) +
-                '&background=2a3942&color=fff';
+            document.getElementById('current_channel_avatar').src = window.formatAvatarUrl(ch.avatar, ch.name);
             
             if (typeof window.updateChannelMuteIcon === 'function') {
                 window.updateChannelMuteIcon(channelId);

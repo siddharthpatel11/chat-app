@@ -42,7 +42,7 @@
                 </button>
                 
                 <!-- Dropdown -->
-                <div id="meta_ai_header_dropdown" class="hidden absolute top-12 right-0 w-[240px] bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
+                <div id="meta_ai_header_dropdown" class="hidden absolute top-12 right-0 w-56 bg-[#233138] rounded-xl shadow-2xl border border-[#313d45] py-2 z-[100] transition-all duration-200 origin-top-right transform scale-95 opacity-0">
                     <button onclick="window.openMetaAiInfo(); toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Contact info</span></button>
                     <button onclick="toggleSearchPanel(); toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Search</span></button>
                     <button onclick="window.selectMetaAiMessage(); toggleMetaAiHeaderMenu()" class="w-full flex items-center gap-4 px-5 py-2.5 text-[#e9edef] hover:bg-[#182229] transition-colors"><span class="text-[15px]">Select messages</span></button>

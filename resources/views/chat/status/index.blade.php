@@ -193,7 +193,7 @@
 
         // Load saved width
         const savedWidth = localStorage.getItem('sidebarWidth'); // Sync with chat sidebar width
-        if (savedWidth && window.innerWidth >= 640) {
+        if (savedWidth && window.innerWidth >= 768) {
             sidebar.style.width = savedWidth;
         }
 
@@ -359,12 +359,14 @@
                     if (userId != window.myUserId) {
                         const mode = status.privacyMode || 'all';
                         const contacts = status.privacyContacts || [];
+                        const myUserIdStr = String(window.myUserId);
+                        const myUserIdNum = Number(window.myUserId);
                         
                         // If it's 'except' and I'm in the excluded list, skip
-                        if (mode === 'except' && contacts.includes(window.myUserId)) continue;
+                        if (mode === 'except' && (contacts.includes(myUserIdStr) || contacts.includes(myUserIdNum))) continue;
                         
                         // If it's 'only' and I'm NOT in the included list, skip
-                        if (mode === 'only' && !contacts.includes(window.myUserId)) continue;
+                        if (mode === 'only' && !(contacts.includes(myUserIdStr) || contacts.includes(myUserIdNum))) continue;
                     }
 
                     // Auto-delete from DB if >= 24h old
@@ -437,12 +439,12 @@
                                     `<div class="w-full h-full flex items-center justify-center text-[6px] font-bold p-1 text-center" style="background-color: ${lastStatus.bgColor}">${lastStatus.text}</div>` :
                                     (lastStatus.type === 'video' ?
                                         `<div class="w-full h-full relative">
-                                            <video src="${lastStatus.mediaUrl}" class="w-full h-full object-cover" muted preload="metadata"></video>
+                                            <video src="${displayMediaUrl && displayMediaUrl.includes('/storage/') ? (window.APP_ASSET_URL || '') + displayMediaUrl.substring(displayMediaUrl.indexOf('/storage/')) : displayMediaUrl}" class="w-full h-full object-cover" muted preload="metadata"></video>
                                             <div class="absolute inset-0 flex items-center justify-center bg-black/20">
                                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="white"><path d="M8 5v14l11-7z"></path></svg>
                                             </div>
                                         </div>` :
-                                        `<img src="${displayMediaUrl}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${fallbackAvatar}';">`
+                                        `<img src="${displayMediaUrl && displayMediaUrl.includes('/storage/') ? (window.APP_ASSET_URL || '') + displayMediaUrl.substring(displayMediaUrl.indexOf('/storage/')) : displayMediaUrl}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='${fallbackAvatar}';">`
                                     )
                                 }
                             </div>

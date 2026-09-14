@@ -181,7 +181,7 @@
         panel.classList.add('translate-x-0');
 
         // Adjust main chat width on desktop
-        if (window.innerWidth >= 640) {
+        if (window.innerWidth >= 768) {
             mainChat.classList.add('sm:mr-[400px]');
         }
     };
@@ -193,7 +193,7 @@
             panel.classList.remove('translate-x-0');
             panel.classList.add('translate-x-full');
         }
-        if (mainChat && window.innerWidth >= 640) {
+        if (mainChat && window.innerWidth >= 768) {
             mainChat.classList.remove('sm:mr-[400px]');
         }
         // Hide Dropdown

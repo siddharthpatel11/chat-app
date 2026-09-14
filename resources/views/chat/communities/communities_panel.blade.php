@@ -1117,6 +1117,7 @@
     };
 
     window.backToCommunitiesList = function() {
+        document.getElementById('app-container')?.classList.remove('chat-active');
         document.getElementById('communities_sidebar_container').classList.remove('hidden');
         document.getElementById('communities_sidebar_container').classList.add('flex', 'w-full');
         document.getElementById('communities_main_column').classList.add('hidden');
@@ -1124,8 +1125,12 @@
     };
 
     window.startCreateCommunityFlow = function() {
-        // Ensure main column is visible (for mobile)
-        if (window.innerWidth < 640) {
+        if (typeof window.activateMainColumn === 'function') {
+            window.activateMainColumn('communities_main_column');
+        }
+        
+        // Ensure main column is visible (for mobile fallback)
+        if (window.innerWidth < 768) {
             document.getElementById('communities_sidebar_container').classList.add('hidden');
             document.getElementById('communities_sidebar_container').classList.remove('flex');
             document.getElementById('communities_main_column').classList.remove('hidden');
@@ -1249,6 +1254,10 @@
     };
 
     window.showCommunityDetails = async function(communityId) {
+        if (typeof window.activateMainColumn === 'function') {
+            window.activateMainColumn('communities_main_column');
+        }
+        
         window.activeCommunityId = communityId;
         document.getElementById('community_intro_screen').classList.add('hidden');
         document.getElementById('community_form_screen').classList.add('hidden');
@@ -1267,7 +1276,7 @@
                 document.getElementById('community_view_members_btn_label').textContent = `View groups (${data.groups ? data.groups.length : 0})`;
                 document.getElementById('community_member_count_label').textContent = `${data.users ? data.users.length : 0} community members`;
 
-                const avatar = data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(data.name)}&background=2a3942&color=fff`;
+                const avatar = window.formatAvatarUrl(data.avatar, data.name);
                 document.getElementById('detail_community_avatar').src = avatar;
                 document.getElementById('edit_community_avatar_preview').src = avatar;
                 document.getElementById('edit_community_name_input').value = data.name;
@@ -1350,7 +1359,7 @@
                         const isOwner = String(data.created_by) === String(m.id);
                         const isUserAdmin = data.admins && data.admins.map(String).includes(String(m.id));
 
-                        const mAvatar = m.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=2a3942&color=fff`;
+                        const mAvatar = window.formatAvatarUrl(m.avatar, m.name);
                         let badge = '';
                         if (isOwner) badge = `<span class="px-2 py-0.5 text-[10px] bg-[#00a884]/20 text-[#00a884] rounded-full">Community Owner</span>`;
                         else if (isUserAdmin) badge = `<span class="px-2 py-0.5 text-[10px] bg-white/10 text-[#aebac1] rounded-full">Admin</span>`;
@@ -1443,7 +1452,7 @@
                                             <div class="w-full h-full bg-[#005c4b]/30 flex items-center justify-center text-[#00a884]">
                                                 <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
                                             </div>` : `
-                                            <img src="${g.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.name)}&background=2a3942&color=fff`}" class="w-full h-full object-cover">`}
+                                            <img src="${window.formatAvatarUrl(g.avatar, g.name)}" class="w-full h-full object-cover">`}
                                     </div>
                                     <div class="flex flex-col min-w-0 flex-1">
                                         <div class="flex items-center">
@@ -1651,7 +1660,7 @@
                     }
                 });
                 const membersText = memberNames.join(', ');
-                const avatar = g.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.name)}&background=2a3942&color=fff`;
+                const avatar = window.formatAvatarUrl(g.avatar, g.name);
 
                 listContainer.insertAdjacentHTML('beforeend', `
                     <div onclick="window.toggleAddExistingGroupSelect('${g.id}')" id="add_existing_row_${g.id}"
@@ -1732,7 +1741,7 @@
             const g = window.addExistingGroupsData[gid];
             if (!g) return;
 
-            const avatar = g.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.name)}&background=2a3942&color=fff`;
+            const avatar = window.formatAvatarUrl(g.avatar, g.name);
             chips.insertAdjacentHTML('beforeend', `
                 <div class="relative w-12 flex flex-col items-center gap-1">
                     <div class="w-10 h-10 rounded-full overflow-hidden bg-[#2a3942] relative border border-[#313d45]">
@@ -1813,7 +1822,7 @@
             const g = window.addExistingGroupsData[gid];
             if (!g) return;
 
-            const avatar = g.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.name)}&background=2a3942&color=fff`;
+            const avatar = window.formatAvatarUrl(g.avatar, g.name);
 
             const users = g.users ? (Array.isArray(g.users) ? g.users : Object.values(g.users)).map(String) : [];
             const myIdStr = String(window.myUserId);
@@ -2111,7 +2120,7 @@
 
             const displayName = isAnnounce ? 'Announcements' : g.name;
             const subtitle = isAnnounce ? 'Welcome to announcements' : (isMember ? 'Group chat' : 'Join group');
-            const avatarUrl = g.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+            const avatarUrl = window.formatAvatarUrl(g.avatar, displayName);
 
             let clickAction = '';
             if (isMember) {
@@ -2207,7 +2216,7 @@
                     const hasUser = uList.map(String).includes(String(window.myUserId));
                     if (!hasUser) return;
 
-                    const avatar = comm.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(comm.name)}&background=2a3942&color=fff`;
+                    const avatar = window.formatAvatarUrl(comm.avatar, comm.name);
 
                     const cId = comm.id;
                     const groupIds = comm.groups ? (Array.isArray(comm.groups) ? comm.groups : Object.values(comm.groups)) : [];
@@ -2311,7 +2320,7 @@
                                 </button>`;
                         }
 
-                        const avatar = g.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(g.name)}&background=2a3942&color=fff`;
+                        const avatar = window.formatAvatarUrl(g.avatar, g.name);
 
                         listContainer.insertAdjacentHTML('beforeend', `
                             <div class="flex items-center gap-3 p-3 border-b border-[#313d45]/40 hover:bg-[#202c33]/30 rounded-xl transition-colors">
@@ -2634,7 +2643,7 @@
 
             // Set Avatar
             const displayName = g.name;
-            const avatarUrl = g.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=2a3942&color=fff`;
+            const avatarUrl = window.formatAvatarUrl(g.avatar, displayName);
             document.getElementById('join_preview_avatar').src = avatarUrl;
 
             // Set Title & Desc
@@ -2789,3 +2798,4 @@
         </div>
     </div>
 </div>
+

@@ -113,7 +113,7 @@
         modal.classList.remove('hidden');
 
         document.getElementById('share_modal_channel_name').innerText = ch.name;
-        document.getElementById('share_modal_channel_avatar').src = ch.avatar || 'https://ui-avatars.com/api/?name='+encodeURIComponent(ch.name)+'&background=2a3942&color=fff';
+        document.getElementById('share_modal_channel_avatar').src = window.formatAvatarUrl(ch.avatar, ch.name);
         
         const link = window.location.origin + '/channel/' + ch.id;
         document.getElementById('share_modal_channel_link_text').innerText = link;

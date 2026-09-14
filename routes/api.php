@@ -153,7 +153,7 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1')->group(functi
     Route::patch('/profile/general', [GeneralApiController::class, 'updateSettings']);
 
     // Get profile details & Update profile
-    Route::patch('/profile', [ProfileApiController::class, 'updateProfile']);
+    Route::match(['post', 'patch'], '/profile', [ProfileApiController::class, 'updateProfile']);
     Route::get('/profile', [ProfileApiController::class, 'getProfile']);
     
     // Profile Account Settings

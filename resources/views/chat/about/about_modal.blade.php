@@ -347,7 +347,7 @@
         }
 
         // Save to Database API
-        fetch('/api/update-profile', {
+        fetch('/update-profile', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

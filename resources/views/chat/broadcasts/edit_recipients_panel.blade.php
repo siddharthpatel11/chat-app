@@ -104,7 +104,7 @@
         editPanel.classList.add('translate-x-0');
 
         // Adjust main chat width on desktop
-        if (window.innerWidth >= 640 && mainChat) {
+        if (window.innerWidth >= 768 && mainChat) {
             mainChat.classList.add('sm:mr-[400px]');
         }
 
@@ -123,7 +123,7 @@
 
         // Adjust main chat width on desktop
         // If broadcast info panel is still open (does not have translate-x-full), keep sm:mr-[400px]
-        if (mainChat && window.innerWidth >= 640) {
+        if (mainChat && window.innerWidth >= 768) {
             if (bcastInfo && !bcastInfo.classList.contains('translate-x-full')) {
                 // Keep sm:mr-[400px] since info panel is still open
             } else {

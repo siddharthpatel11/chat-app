@@ -854,7 +854,7 @@
                             // Build media preview/content if available
                             let mediaContent = '';
                             if (msg.type === 'image' && msg.file_url) {
-                                mediaContent = `<img src="${msg.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.open('${msg.file_url}', '_blank')">`;
+                                mediaContent = `<img src="${msg.file_url}" class="max-w-[200px] sm:max-w-xs rounded-lg mb-2 object-cover cursor-pointer hover:opacity-90" onclick="window.openChatMedia('${msg.file_url}')">`;
                             } else if (msg.type === 'video' && msg.file_url) {
                                 mediaContent = `<video src="${msg.file_url}" controls class="max-w-[200px] sm:max-w-xs rounded-lg mb-2"></video>`;
                             } else if (msg.type === 'audio' && msg.file_url) {
@@ -962,13 +962,21 @@
             window.selectChat = function(otherUserId, name, phone, avatar = null, about = null, searchMsgTime = null) {
                 if (window.closeBroadcastInfo) window.closeBroadcastInfo();
                 if (typeof otherUserId === 'string' && otherUserId.startsWith('broadcast_')) {
+                    const doSelect = function() {
+                        window.selectBroadcastChatActual(otherUserId, name, phone, avatar, about, searchMsgTime);
+                        if (typeof window.activateMainColumn === 'function') window.activateMainColumn('main_chat_column');
+                        if (typeof window.closeAllSearchPanels === 'function') window.closeAllSearchPanels();
+                        if (typeof window.closeContactInfo === 'function') window.closeContactInfo();
+                        if (typeof window.closeGroupInfoPanel === 'function') window.closeGroupInfoPanel();
+                    };
+
                     const elementId = `user_sidebar_${otherUserId}`;
                     if (window.hiddenChats && window.hiddenChats.includes(elementId)) {
                         window.promptHiddenChatClickUnlock(function() {
-                            window.selectBroadcastChatActual(otherUserId, name, phone, avatar, about, searchMsgTime);
+                            doSelect();
                         });
                     } else {
-                        window.selectBroadcastChatActual(otherUserId, name, phone, avatar, about, searchMsgTime);
+                        doSelect();
                     }
                 } else {
                     const callBtn = document.getElementById('call_btn_pill');
