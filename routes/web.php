@@ -73,6 +73,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/chat/event/update', [ChatController::class, 'updateEvent']);
     Route::post('/chat/event/cancel', [ChatController::class, 'cancelEvent']);
+    Route::post('/check-phone', [ChatController::class, 'checkPhone']);
     Route::post('/save-contact', [ChatController::class, 'saveContact']);
     Route::post('/delete-contact', [ChatController::class, 'deleteContact']);
     Route::post('/send-group-notification', [ChatController::class, 'sendGroupNotification']);

@@ -9743,7 +9743,10 @@
                     'add_member_modal','group_settings_modal','group_media_modal',
                     'wallpaper_modal','wallpaper_preview_modal','call_info_modal',
                     'incoming_call_overlay','group_incoming_call_overlay',
-                    'call_overlay','group_call_overlay','schedule_call_modal'
+                    'call_overlay','group_call_overlay','schedule_call_modal',
+                    'media_preview_modal', 'status_viewer_overlay', 'media_status_editor', 
+                    'text_status_editor', 'status_viewers_modal', 'status_viewers_drawer',
+                    'new_group_call_modal', 'app_lock_setup_modal', 'app_lock_screen'
                 ];
                 for (var i = 0; i < modalIds.length; i++) {
                     var el = document.getElementById(modalIds[i]);
@@ -9773,7 +9776,14 @@
                     { id: 'disappearing_messages_sidebar', closeFunc: 'closeDisappearingMessagesSidebar' },
                     { id: 'channel_info_panel',            closeFunc: 'closeChannelInfo' },
                     { id: 'search_sidebar',                closeFunc: null },
-                    { id: 'group_search_drawer',           closeFunc: null }
+                    { id: 'group_search_drawer',           closeFunc: null },
+                    { id: 'meta_ai_info_panel',            closeFunc: 'closeMetaAiInfo' },
+                    { id: 'broadcast_lists_panel',         closeFunc: 'toggleBroadcastPanel' },
+                    { id: 'add_group_members_panel',       closeFunc: 'toggleAddMembers' },
+                    { id: 'new_chat_panel',                closeFunc: 'toggleNewChat' },
+                    { id: 'new_contact_panel',             closeFunc: 'toggleNewContact' },
+                    { id: 'create_group_panel',            closeFunc: 'backToAddMembers' },
+                    { id: 'create_channel_panel',          closeFunc: 'closeCreateChannelModal' }
                 ];
                 for (var k = 0; k < panels.length; k++) {
                     var p = panels[k];
@@ -9784,36 +9794,63 @@
                 }
 
                 // 4. Settings panel
-                var settings = document.getElementById('settings_sidebar');
-                if (settings && !settings.classList.contains('hidden')) {
-                    return { type: 'settings' };
+                var settingsPanels = [
+                    'settings_panel', 'edit_profile_panel', 'general_settings_panel', 'privacy_settings_panel',
+                    'chats_settings_panel', 'appearance_settings_panel', 'app_icon_settings_panel', 'app_theme_settings_panel',
+                    'chat_theme_panel', 'chats_hide_panel', 'video_voice_settings_panel', 'notifications_settings_panel',
+                    'help_feedback_settings_panel', 'storage_and_data_settings_panel', 'manage_storage_panel',
+                    'manage_storage_larger_than_5mb_panel', 'manage_storage_chat_details_panel', 'network_usage_panel',
+                    'account_settings_panel', 'security_settings_panel', 'privacy_last_seen_panel', 'privacy_status_panel',
+                    'privacy_profile_photo_panel', 'privacy_about_panel', 'privacy_exclude_panel', 'privacy_blocked_contacts_panel',
+                    'chats_wallpaper_panel', 'chats_upload_quality_panel', 'chats_auto_download_panel', 'chat_backup_panel',
+                    'chat_history_panel', 'notifications_taskbar_panel', 'notifications_banner_panel', 'notifications_subpanel',
+                    'default_timer_sidebar'
+                ];
+                for (var s = 0; s < settingsPanels.length; s++) {
+                    var el = document.getElementById(settingsPanels[s]);
+                    if (el && !el.classList.contains('hidden') && !el.classList.contains('translate-x-full')) {
+                        return { type: 'settings', id: settingsPanels[s] };
+                    }
                 }
 
-                // 5. Active chat visible on mobile
+                // 5. Active main columns visible on mobile
                 if (window.innerWidth < 768) {
-                    var chatContent = document.getElementById('active_chat_content');
-                    if (chatContent && chatContent.classList.contains('flex')) return { type: 'chat' };
+                    var mainColumns = [
+                        'main_chat_column',
+                        'group_chat_main_column',
+                        'channel_chat_main_column',
+                        'channels_main_column',
+                        'calls_main_column',
+                        'communities_main_column',
+                        'status_main_column',
+                        'meta_ai_content'
+                    ];
+                    for (var m = 0; m < mainColumns.length; m++) {
+                        var mc = document.getElementById(mainColumns[m]);
+                        if (mc && mc.classList.contains('flex')) {
+                            return { type: 'main_column', id: mainColumns[m] };
+                        }
+                    }
+                }
 
-                    var groupContent = document.getElementById('active_group_chat_content');
-                    if (groupContent && groupContent.classList.contains('flex')) return { type: 'chat' };
-
-                    var metaContent = document.getElementById('meta_ai_content');
-                    if (metaContent && metaContent.classList.contains('flex')) return { type: 'chat' };
-
-                    var channelContent = document.getElementById('channels_main_column');
-                    if (channelContent && channelContent.classList.contains('flex')) return { type: 'channel' };
-
-                    var callsContent = document.getElementById('calls_main_column');
-                    if (callsContent && callsContent.classList.contains('flex')) return { type: 'call' };
-
-                    var communitiesContent = document.getElementById('communities_main_column');
-                    if (communitiesContent && communitiesContent.classList.contains('flex')) return { type: 'community' };
+                // 6. Sidebar Custom Headers (Archived, Starred, Select Chats)
+                var archHeader = document.getElementById('archived_sidebar_header');
+                if (archHeader && (!archHeader.classList.contains('hidden') || archHeader.classList.contains('flex'))) {
+                    return { type: 'sidebar_custom', closeFunc: 'showChats' };
+                }
+                var starredHeader = document.getElementById('global_starred_sidebar_header');
+                if (starredHeader && (!starredHeader.classList.contains('hidden') || starredHeader.classList.contains('flex'))) {
+                    return { type: 'sidebar_custom', closeFunc: 'closeGlobalStarredMessages' };
+                }
+                var selectChatsHeader = document.getElementById('select_chats_sidebar_header');
+                if (selectChatsHeader && (!selectChatsHeader.classList.contains('hidden') || selectChatsHeader.classList.contains('flex'))) {
+                    return { type: 'sidebar_custom', closeFunc: 'closeSelectChatsMode' };
                 }
 
                 return { type: 'sidebar' };
             }
 
-            function handleBackAction() {
+            window.handleAndroidBackButton = function() {
                 var layer = getTopLayer();
 
                 if (layer.type === 'modal') {
@@ -9841,28 +9878,72 @@
                     }
 
                 } else if (layer.type === 'settings') {
-                    if (typeof window.closeAllSettings === 'function') window.closeAllSettings();
+                    var el = document.getElementById(layer.id);
+                    if (el) {
+                        var backBtn = el.querySelector('.h-16 button, header button, button[onclick^="toggle"]');
+                        if (backBtn) {
+                            backBtn.click();
+                        } else {
+                            if (typeof window.toggleSettings === 'function') window.toggleSettings();
+                            else if (typeof window.closeAllSettings === 'function') window.closeAllSettings();
+                        }
+                    } else {
+                        if (typeof window.toggleSettings === 'function') window.toggleSettings();
+                        else if (typeof window.closeAllSettings === 'function') window.closeAllSettings();
+                    }
 
-                } else if (layer.type === 'chat') {
-                    if (typeof window.backToSidebar === 'function') window.backToSidebar();
+                } else if (layer.type === 'sidebar_custom') {
+                    if (layer.closeFunc && typeof window[layer.closeFunc] === 'function') {
+                        window[layer.closeFunc]();
+                    }
 
-                } else if (layer.type === 'channel') {
-                    if (typeof window.backToChannelSidebar === 'function') window.backToChannelSidebar();
-
-                } else if (layer.type === 'call') {
-                    if (typeof window.backToSidebar === 'function') window.backToSidebar(); // Adjust if there's a specific calls back function
-
-                } else if (layer.type === 'community') {
-                    if (typeof window.backToCommunitiesList === 'function') window.backToCommunitiesList();
+                } else if (layer.type === 'main_column') {
+                    document.getElementById('app-container')?.classList.remove('chat-active');
+                    
+                    var mc = document.getElementById(layer.id);
+                    if (mc) {
+                        mc.classList.add('hidden');
+                        mc.classList.remove('flex');
+                    }
+                    
+                    // Force the relevant sidebar to display
+                    if (layer.id === 'channel_chat_main_column' || layer.id === 'channels_main_column') {
+                        var sb = document.getElementById('channels_sidebar_container');
+                        if (sb) { sb.classList.remove('hidden'); sb.classList.add('flex'); sb.classList.remove('w-full'); }
+                    } else if (layer.id === 'calls_main_column') {
+                        var sb = document.getElementById('calls_sidebar_container');
+                        if (sb) { sb.classList.remove('hidden'); sb.classList.add('flex'); sb.classList.remove('w-full'); }
+                    } else if (layer.id === 'communities_main_column') {
+                        var sb = document.getElementById('communities_sidebar_container');
+                        if (sb) { sb.classList.remove('hidden'); sb.classList.add('flex'); sb.classList.remove('w-full'); }
+                    } else if (layer.id === 'status_main_column') {
+                        var sb = document.getElementById('status_sidebar');
+                        if (sb) { sb.classList.remove('hidden'); sb.classList.add('flex'); sb.classList.remove('w-full'); }
+                    } else {
+                        // main_chat_column, group_chat_main_column, meta_ai_content
+                        var sb = document.getElementById('user_sidebar_container');
+                        if (sb) { sb.classList.remove('hidden'); sb.classList.add('flex'); sb.classList.remove('w-full'); }
+                    }
 
                 } else {
-                    // Already at sidebar — do NOT exit. Re-push base state.
-                    navPush({ nav: 'sidebar' });
-                    return;
+                    // Already at sidebar — returning false means we tell Android to exit
+                    var isNative = window.isAndroidApp || (window.Capacitor && window.Capacitor.isNative);
+                    if (!isNative) {
+                        navPush({ nav: 'sidebar' });
+                    }
+                    return false;
                 }
 
-                // Re-push so there is always a back-able entry in the stack
-                navPush({ nav: 'app' });
+                var isNative = window.isAndroidApp || (window.Capacitor && window.Capacitor.isNative);
+                if (!isNative) {
+                    // Re-push so there is always a back-able entry in the stack for browsers
+                    navPush({ nav: 'app' });
+                }
+                return true;
+            };
+
+            function handleBackAction() {
+                window.handleAndroidBackButton();
             }
 
             window.addEventListener('popstate', function() {

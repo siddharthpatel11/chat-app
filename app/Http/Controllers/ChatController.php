@@ -366,6 +366,32 @@ class ChatController extends Controller
         return response()->json(['status' => false], 400);
     }
 
+    public function checkPhone(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+        ]);
+
+        $phone = preg_replace('/\s+/', '', $request->phone);
+
+        $user = \App\Models\User::where('phone', $phone)
+            ->orWhere('phone', 'like', '%'.$phone)
+            ->first();
+
+        if ($user) {
+            return response()->json([
+                'status' => true, 
+                'message' => 'This phone number is on WhatsApp.', 
+                'user' => $user
+            ]);
+        }
+
+        return response()->json([
+            'status' => false, 
+            'message' => 'This phone number is not on WhatsApp. Invite them on your primary device.'
+        ], 404);
+    }
+
     public function saveContact(Request $request)
     {
         $request->validate([
