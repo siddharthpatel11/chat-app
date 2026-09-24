@@ -3686,8 +3686,15 @@
             // Write to pinned_msgs/${key} (multi-pin)
             set(ref(db, `chats/${window.currentChatId}/pinned_msgs/${messageKey}`), {
                 text: msgText,
-                time: msg.time || Math.floor(Date.now() / 1000)
+                time: msg.time || Math.floor(Date.now() / 1000),
+                pinned_at: Math.floor(Date.now() / 1000)
             }).then(() => {
+                push(ref(db, `pinned_messages_index`), {
+                    node: 'chats',
+                    chat_id: window.currentChatId,
+                    message_id: messageKey,
+                    expires_at: Math.floor(Date.now() / 1000) + 2592000
+                });
                 window.showToast?.('Message Pinned', 'This message has been pinned.');
             }).catch(e => console.error("Pin private error:", e));
 
@@ -6304,8 +6311,36 @@
                 const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
 
                 if (pinnedData && typeof pinnedData === 'object') {
+                    const currentTime = Math.floor(Date.now() / 1000);
+                    const PIN_DURATION = 2592000; // 30 days
+
+                    // Clear existing timers
+                    if (window.privatePinTimers) {
+                        for (const key in window.privatePinTimers) {
+                            clearTimeout(window.privatePinTimers[key]);
+                        }
+                    }
+                    window.privatePinTimers = {};
+
                     // Build sorted list (newest first)
                     for (const [key, val] of Object.entries(pinnedData)) {
+                        // Auto-unpin if expired
+                        const pinnedAt = val.pinned_at || val.time || 0;
+                        const timeLeft = PIN_DURATION - (currentTime - pinnedAt);
+
+                        if (timeLeft <= 0) {
+                            remove(ref(db, `chats/${window.currentChatId}/pinned_msgs/${key}`));
+                            continue;
+                        }
+
+                        // Schedule removal if app stays open (max delay is ~24 days due to 32-bit int limit)
+                        const delayMs = timeLeft * 1000;
+                        if (delayMs <= 2147483647) {
+                            window.privatePinTimers[key] = setTimeout(() => {
+                                remove(ref(db, `chats/${window.currentChatId}/pinned_msgs/${key}`));
+                            }, delayMs);
+                        }
+
                         // Hide if chat was cleared after the message was pinned
                         if (val.time && val.time <= clearedTime) {
                             continue;

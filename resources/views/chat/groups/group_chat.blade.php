@@ -3961,7 +3961,15 @@
         // Write to pinned_msgs/${key} (multi-pin)
         window.set(window.ref(window.db, `groups/${window.currentChatId}/pinned_msgs/${messageKey}`), {
             text: msgText,
-            time: msg.time || Math.floor(Date.now() / 1000)
+            time: msg.time || Math.floor(Date.now() / 1000),
+            pinned_at: Math.floor(Date.now() / 1000)
+        }).then(() => {
+            window.push(window.ref(window.db, `pinned_messages_index`), {
+                node: 'groups',
+                chat_id: window.currentChatId,
+                message_id: messageKey,
+                expires_at: Math.floor(Date.now() / 1000) + 2592000
+            });
         });
         document.getElementById('group_msg_dropdown').classList.add('hidden');
     };
@@ -5633,7 +5641,35 @@
                 const clearedTime = Math.max(window.clearedChats?.[elementId] || 0, skippedRestoreTime);
 
                 if (gData.pinned_msgs && typeof gData.pinned_msgs === 'object') {
+                    const currentTime = Math.floor(Date.now() / 1000);
+                    const PIN_DURATION = 2592000; // 30 days
+
+                    // Clear existing timers
+                    if (window.groupPinTimers) {
+                        for (const key in window.groupPinTimers) {
+                            clearTimeout(window.groupPinTimers[key]);
+                        }
+                    }
+                    window.groupPinTimers = {};
+
                     for (const [key, val] of Object.entries(gData.pinned_msgs)) {
+                        // Auto-unpin if expired
+                        const pinnedAt = val.pinned_at || val.time || 0;
+                        const timeLeft = PIN_DURATION - (currentTime - pinnedAt);
+
+                        if (timeLeft <= 0) {
+                            window.remove(window.ref(window.db, `groups/${window.currentChatId}/pinned_msgs/${key}`));
+                            continue;
+                        }
+
+                        // Schedule removal if app stays open (max delay is ~24 days due to 32-bit int limit)
+                        const delayMs = timeLeft * 1000;
+                        if (delayMs <= 2147483647) {
+                            window.groupPinTimers[key] = setTimeout(() => {
+                                window.remove(window.ref(window.db, `groups/${window.currentChatId}/pinned_msgs/${key}`));
+                            }, delayMs);
+                        }
+
                         // Hide if chat was cleared after the message was pinned
                         if (val.time && val.time <= clearedTime) {
                             continue;

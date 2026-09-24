@@ -236,10 +236,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setDisplayZoomControls(false);
         settings.setSupportZoom(false);
         settings.setTextZoom(100);
-        settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-
-        // Clear cache to ensure updated Laravel backend code is always loaded
-        webView.clearCache(true);
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
 
         // Identify as Android wrapper app
         String ua = settings.getUserAgentString();

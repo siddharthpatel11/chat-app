@@ -20,7 +20,10 @@ class ChatController extends Controller
 
     public function index()
     {
-        $users = \App\Models\User::where('id', '!=', auth()->id())->get();
+        // Only select required fields for the sidebar UI to reduce initial memory and data overhead
+        $users = \App\Models\User::where('id', '!=', auth()->id())
+            ->select('id', 'name', 'phone', 'avatar', 'about')
+            ->get();
 
         $contacts = [];
         if (Schema::hasTable('contacts')) {

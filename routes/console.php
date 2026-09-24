@@ -10,4 +10,5 @@ Artisan::command('inspire', function () {
 
 
 Schedule::command('chat:process-disappearing-messages')->everyMinute();
+Schedule::command('chat:process-pinned-messages')->everyMinute();
 Schedule::command('app:run-auto-backups')->everyMinute();
