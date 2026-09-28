@@ -4386,6 +4386,59 @@
         window.usersPrivacyData = {};
         window.chatDisappearingTimers = {};
 
+        // Listen for pinned chats and auto-unpin them locally
+        const globalPinnedChatsRef = ref(db, `users/${window.myUserId}/pinned_chats`);
+        onValue(globalPinnedChatsRef, (snapshot) => {
+            const data = snapshot.val();
+            const currentTime = Math.floor(Date.now() / 1000);
+            const PIN_DURATION = 2592000; // 30 days
+
+            // Clear existing timers
+            if (window.navbarPinTimers) {
+                for (const key in window.navbarPinTimers) {
+                    clearTimeout(window.navbarPinTimers[key]);
+                }
+            }
+            window.navbarPinTimers = {};
+            window.pinnedChats = [];
+
+            if (data && typeof data === 'object') {
+                for (const [elementId, val] of Object.entries(data)) {
+                    const pinnedAt = val.pinned_at || 0;
+                    const timeLeft = PIN_DURATION - (currentTime - pinnedAt);
+
+                    if (timeLeft <= 0) {
+                        remove(ref(db, `users/${window.myUserId}/pinned_chats/${elementId}`));
+                        continue;
+                    }
+
+                    // Keep it
+                    window.pinnedChats.push(elementId);
+
+                    // Schedule removal if app stays open
+                    const delayMs = timeLeft * 1000;
+                    if (delayMs <= 2147483647) {
+                        window.navbarPinTimers[elementId] = setTimeout(() => {
+                            remove(ref(db, `users/${window.myUserId}/pinned_chats/${elementId}`));
+                        }, delayMs);
+                    }
+                }
+            }
+
+            // Sync visual states for all chat items
+            const items = document.querySelectorAll(`.user-chat-item`);
+            items.forEach(item => {
+                const isPinned = window.pinnedChats.includes(item.id);
+                if (window.applyPinVisualState) {
+                    window.applyPinVisualState(item, isPinned);
+                }
+            });
+
+            if (window.sortSidebar) {
+                window.sortSidebar();
+            }
+        });
+
         window.updateDisappearingBadge = function(chatId, isDisappearing) {
             try {
                 if (!chatId) return;

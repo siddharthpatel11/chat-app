@@ -46,4 +46,39 @@ class PinnedMessageService
             }
         }
     }
+
+    public function processExpiredPinnedChats()
+    {
+        $currentTime = time();
+        $indexRef = $this->db->getReference("pinned_chats_index");
+
+        $allPins = $indexRef->getValue();
+
+        if ($allPins) {
+            $expiredPins = array_filter($allPins, function($pin) use ($currentTime) {
+                return isset($pin['expires_at']) && $pin['expires_at'] <= $currentTime;
+            });
+
+            if (empty($expiredPins)) {
+                return;
+            }
+
+            foreach ($expiredPins as $key => $data) {
+                $userId = $data['user_id'] ?? null;
+                $elementId = $data['element_id'] ?? null;
+
+                if ($userId && $elementId) {
+                    $pinRef = $this->db->getReference("users/{$userId}/pinned_chats/{$elementId}");
+                    $pin = $pinRef->getValue();
+
+                    if ($pin) {
+                        $pinRef->remove();
+                    }
+                }
+
+                // Always remove the expired index entry
+                $indexRef->getChild($key)->remove();
+            }
+        }
+    }
 }

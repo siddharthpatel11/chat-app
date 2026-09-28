@@ -515,17 +515,24 @@
                 textPreview.classList.remove('hidden');
                 textPreview.textContent = lastStatus.text;
                 inner.style.backgroundColor = lastStatus.bgColor;
+                const vid = inner.querySelector('.status-video-preview');
+                if (vid) vid.remove();
             } else if (lastStatus.type === 'video') {
                 avatar.classList.add('hidden');
                 textPreview.classList.add('hidden');
                 inner.style.backgroundColor = '#2a3942';
-                inner.innerHTML = `
-                    <div class="w-full h-full relative">
+                let vid = inner.querySelector('.status-video-preview');
+                if (!vid) {
+                    inner.insertAdjacentHTML('beforeend', `
+                    <div class="w-full h-full relative status-video-preview">
                         <video src="${lastStatus.mediaUrl}" class="w-full h-full object-cover" muted preload="metadata"></video>
                         <div class="absolute inset-0 flex items-center justify-center bg-black/20">
                             <svg viewBox="0 0 24 24" width="14" height="14" fill="white"><path d="M8 5v14l11-7z"></path></svg>
                         </div>
-                    </div>`;
+                    </div>`);
+                } else {
+                    vid.querySelector('video').src = lastStatus.mediaUrl;
+                }
             } else {
                 avatar.classList.remove('hidden');
                 textPreview.classList.add('hidden');
@@ -536,8 +543,8 @@
                     avatar.src = myFallbackAvatar; 
                 };
                 inner.style.backgroundColor = '#2a3942';
-                inner.innerHTML = ''; // Clear any video content
-                inner.appendChild(avatar);
+                const vid = inner.querySelector('.status-video-preview');
+                if (vid) vid.remove();
             }
             timeEl.textContent = formatStatusTime(lastStatus.timestamp);
         } else {

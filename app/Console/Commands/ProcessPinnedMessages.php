@@ -28,6 +28,8 @@ class ProcessPinnedMessages extends Command
     {
         $this->info('Processing pinned messages...');
         $service->processExpiredPins();
-        $this->info('Done processing pinned messages.');
+        $this->info('Processing pinned chats...');
+        $service->processExpiredPinnedChats();
+        $this->info('Done processing pinned messages and chats.');
     }
 }

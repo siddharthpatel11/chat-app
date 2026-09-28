@@ -471,11 +471,9 @@
                 class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
                 <button
                     onclick="event.stopPropagation(); window.toggleUserContextMenu(event, 'meta_ai', 'Meta AI', 'user')"
-                    class="text-[#8696a0] hover:text-[#e9edef] p-1 rounded transition-colors focus:outline-none">
-                    <svg viewBox="0 0 24 24" height="24" width="24" fill="currentColor">
-                        <path
-                            d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z">
-                        </path>
+                    class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                    <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                        <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
                     </svg>
                 </button>
             </div>
@@ -776,7 +774,7 @@
             window.activeSidebarFilter = 'all';
 
             // Pinned chats management
-            window.pinnedChats = JSON.parse(localStorage.getItem('pinned_chats') || '[]');
+            window.pinnedChats = [];
 
             // Favourites management
             window.favouriteChats = JSON.parse(localStorage.getItem('favourite_chats') || '[]');
@@ -947,15 +945,29 @@
                 let isPinned = false;
 
                 if (index > -1) {
+                    // Unpin
+                    window.remove(window.ref(window.db, `users/${window.myUserId}/pinned_chats/${elementId}`));
+                } else {
+                    // Pin
+                    isPinned = true;
+                    window.set(window.ref(window.db, `users/${window.myUserId}/pinned_chats/${elementId}`), {
+                        pinned_at: Math.floor(Date.now() / 1000)
+                    }).then(() => {
+                        window.push(window.ref(window.db, `pinned_chats_index`), {
+                            user_id: window.myUserId,
+                            element_id: elementId,
+                            expires_at: Math.floor(Date.now() / 1000) + 2592000 // 30 days
+                        });
+                    });
+                }
+
+                // Optimistic UI update
+                if (index > -1) {
                     window.pinnedChats.splice(index, 1);
                 } else {
                     window.pinnedChats.push(elementId);
-                    isPinned = true;
                 }
 
-                localStorage.setItem('pinned_chats', JSON.stringify(window.pinnedChats));
-
-                // Update visual states
                 const items = document.querySelectorAll(`.user-chat-item`);
                 items.forEach(item => {
                     if (item.id === elementId || item.getAttribute('data-userid') == targetId || item

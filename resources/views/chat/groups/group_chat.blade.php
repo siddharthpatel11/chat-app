@@ -4700,6 +4700,8 @@
                 </div>
             `;
 
+            const safeName = (isAnnounceGroup && group.community_id) ? (group.community_name || group.name.replace(' - Announcements','').replace(' Announcements','')) : group.name;
+
             item.innerHTML = `
                 ${avatarHtml}
                 ${isAnnounceGroup && group.community_id ? `
@@ -4714,11 +4716,26 @@
                             <p class="text-[14px] text-[#8696a0] truncate leading-snug" id="group_last_msg_${group.id}">Add members to start chatting</p>
                         </div>
                         <div class="flex items-center gap-2 shrink-0 ml-2">
+                            <!-- Pin Icon -->
+                            <span id="group_pin_icon_${group.id}" class="hidden text-[#8696a0]">
+                                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z"/>
+                                </svg>
+                            </span>
                             <!-- Unread Badge -->
                             <span id="group_unread_badge_${group.id}" class="hidden bg-[#00a884] text-[#111b21] text-[12px] font-bold min-w-[20px] h-5 rounded-full flex items-center justify-center px-1.5 shadow-sm">0</span>
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" class="text-[#8696a0] shrink-0"><path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/></svg>
                         </div>
                     </div>
+                </div>
+                <!-- Dropdown Trigger Button with Gradient Overlay -->
+                <div class="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#202c33] via-[#202c33] to-transparent hidden group-hover:flex items-center justify-end pr-3 z-20 options-btn-gradient">
+                    <button onclick="event.stopPropagation(); window.toggleUserContextMenu(event, '${group.id}', '${safeName.replace(/'/g, "\\'")}', 'group')"
+                        class="text-[#8696a0] hover:text-[#e9edef] transition-colors focus:outline-none">
+                        <svg viewBox="0 0 19 20" width="19" height="20" fill="currentColor">
+                            <path d="M3.8 6.7l5.7 5.7 5.7-5.7 1.6 1.6-7.3 7.2-7.3-7.2 1.6-1.6z"></path>
+                        </svg>
+                    </button>
                 </div>
                 ` : `
                 <div class="ml-3 flex-1 border-b border-[#202c33] pb-3 pt-1 min-w-0 pr-6 relative">
